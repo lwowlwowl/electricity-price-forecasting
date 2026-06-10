@@ -32,7 +32,8 @@ school/
 │       └── tables.py           # 生成对比表格
 │
 ├── experiments/                # 实验脚本
-│   └── run_all.py              # 一键运行所有模型
+│   ├── run_all.py              # 一键运行所有模型
+│   └── run_batch_experiments.py # 批量对比实验（多时间点×节点选择）
 │
 ├── external/                   # 第三方预训练模型（需从以下仓库克隆）
 │   ├── chronos-forecasting/    # Chronos-2 模型
@@ -43,9 +44,10 @@ school/
 │       └── `git clone https://github.com/DataDog/toto.git`
 │
 ├── hf_cache/                   # HuggingFace 缓存（模型权重）
-└── docs/                       # 文档资料
-    ├── meetingminutes/         #     会议纪要
-    └── reference/              #     参考资料
+├── docs/                       # 文档资料
+│   ├── meetingminutes/         #     会议纪要
+│   └── reference/              #     参考资料
+└── .gitignore                  # Git 忽略配置
 ```
 
 ## 🚀 快速开始
@@ -94,6 +96,20 @@ cd src/evaluation
 cd experiments
 python run_all.py
 ```
+
+### 6. 批量对比实验（高级）
+
+运行多个时间点、多种节点选择策略的组合实验：
+
+```bash
+cd experiments
+python run_batch_experiments.py
+```
+
+支持配置：
+- **时间节点**: 年终、夏季高峰、节假日等
+- **节点选择**: 波动最大、尖峰最多、随机
+- **自动汇总**: 生成对比表格
 
 ## 📊 实验配置
 
