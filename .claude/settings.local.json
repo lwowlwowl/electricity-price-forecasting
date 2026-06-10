@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/Users/wanghaochen/school/toto/.venv/bin/pip install *)",
+      "Bash(/Users/wanghaochen/school/toto/.venv/bin/pip3 install *)",
+      "Bash(mv dataset/EIA data/raw/)",
+      "Bash(mv dataset/ENLITEN-Grid-Econ-Data data/raw/)",
+      "Bash(mv dataset/lmp_processed.csv data/processed/)"
+    ]
+  }
+}
