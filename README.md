@@ -34,10 +34,13 @@ school/
 ├── experiments/                # 实验脚本
 │   └── run_all.py              # 一键运行所有模型
 │
-├── external/                   # 第三方预训练模型
+├── external/                   # 第三方预训练模型（需从以下仓库克隆）
 │   ├── chronos-forecasting/    # Chronos-2 模型
+│   │   └── `git clone https://github.com/amazon-science/chronos-forecasting.git`
 │   ├── timesfm/                # TimesFM 2.5 模型
+│   │   └── `git clone https://github.com/google-research/timesfm.git`
 │   └── toto/                   # Toto 1.0 模型
+│       └── `git clone https://github.com/DataDog/toto.git`
 │
 ├── hf_cache/                   # HuggingFace 缓存（模型权重）
 └── docs/                       # 文档资料
