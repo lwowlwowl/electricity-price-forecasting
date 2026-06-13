@@ -1,0 +1,36 @@
+# 消融 B：上下文长度（手册 §6）
+# 只转动 context_len 一个旋钮：168 → 336 → 720（7天/14天/30天回看）
+# 其余全部锁死在基准配置，回答"喂更长历史是否更准、边际收益拐点在哪"。
+#
+# 用法：python src/forecasting/run_ablation.py configs/experiments/ablation_B_context.yaml
+
+name: ablation_B_context
+market: ERCOT
+nodes_group: volatility
+freq: 1h
+context_len: 168             # 会被 ablate 覆盖，这里只是占位
+train_context_len: 1440      # 树模型训练窗口固定（不随消融变化）
+horizon: 24
+data_start: 2025-04-01       # 给 720h 上下文 + 1440h 训练窗口留足历史
+data_end: 2025-09-01
+
+backtest:
+  test_start: 2025-08-01
+  test_end: 2025-08-31
+  stride_hours: 24
+  max_origins: 10            # 每档 10 起报点（先跑通流水线；放大本数=更稳的统计）
+
+models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto]
+
+covariates: []
+
+spike:
+  quantile: 0.95
+  mode: global
+
+# ── 被消融的旋钮 ──────────────────────────────────────────────────────────────
+ablate:
+  key: context_len
+  values: [168, 336, 720]
+  labels: ["168h(7天)", "336h(14天)", "720h(30天)"]
+  axis_label: "上下文长度"

@@ -1,0 +1,7 @@
+# 各市场代表性电价节点清单（由 build_nodes_config.py 自动生成）
+# volatility=波动最大  spikes=尖峰最多  stable=最平稳(对照)
+
+ERCOT:
+  volatility: [LZ_LCRA, LZ_WEST, LZ_RAYBN]
+  spikes: [LZ_HOUSTON, HB_HOUSTON, HB_SOUTH]
+  stable: [HB_HUBAVG, HB_BUSAVG, LZ_SOUTH]

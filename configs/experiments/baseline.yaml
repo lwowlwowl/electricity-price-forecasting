@@ -1,0 +1,32 @@
+# 基准实验配置（阶段2 验证 + 阶段3 消融的出发点）
+# 用法：python src/forecasting/run_experiment.py configs/experiments/baseline.yaml
+#
+# 这份配置就是手册 §6 的"基准配置(Baseline Config)"，所有消融都从它出发，
+# 每次只改一个旋钮（如 covariates / context_len / horizon / freq）。
+
+name: baseline
+market: ERCOT
+nodes_group: volatility      # 引用 configs/nodes.yaml 里的节点组
+freq: 1h
+context_len: 168             # 零样本/统计/基础模型回看 7 天
+train_context_len: 1440      # 需训练模型(树模型)回看 60 天用于 fit（仍只用起报点之前的历史，无泄漏）
+horizon: 24                  # 预测未来 24 小时（日前预测）
+data_start: 2025-04-01       # 提前到 4 月，给 60 天训练窗口留出起报点前的历史
+data_end: 2025-09-01
+
+backtest:
+  test_start: 2025-08-01
+  test_end: 2025-08-31
+  stride_hours: 24           # 每天一个起报点
+  max_origins: 30            # 限制起报点数量（去掉本行=用满整个测试期）
+
+# 免训练-朴素/统计：Naive/SeasonalNaive + ETS/Theta(统计强基线)
+# 需训练-树模型：RandomForest/LightGBM/XGBoost(每起报点重训、无泄漏)
+# 基础模型：TimesFM/Chronos2/Toto(预训练权重，子进程 worker 推理)
+models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto]
+
+covariates: []               # 基准不用协变量；消融A 在此处增减
+
+spike:
+  quantile: 0.95             # 尖峰阈值 = 历史 P95
+  mode: global               # global=固定阈值 / rolling=滚动阈值

@@ -1,191 +1,197 @@
 """
-零样本电价预测结果可视化
-========================
-读取三个模型的预测结果 CSV，生成对比图表。
+实验结果可视化 plotting.py
+==========================
+为阶段2/阶段3 提供两个【可复用】绘图函数，统一吃 run_experiment.py 落盘的
+summary.csv（列：model, mae_mean, rmse_mean, mase_mean, coverage_mean,
+spike_f1_mean_signal, spike_recall, ...），杜绝早期各脚本各画各的。
 
-运行前准备：
-  1. 确保三个预测脚本已运行完毕，生成了以下文件：
-       ../../data/results/forecast_toto.csv
-       ../../data/results/forecast_timesfm.csv
-       ../../data/results/forecast_chronos2.csv
-  2. 激活 toto 虚拟环境：source ../../external/toto/.venv/bin/activate
+两个核心函数：
+  plot_summary(summary_csv, out_png)
+      单次实验的【模型对比】柱状图：横轴=模型，分面板画 MAE / RMSE /
+      Spike-F1 / Coverage。用于阶段2 基准对照、以及每个消融某一档的快照。
 
-运行方式：
-  python plotting.py
+  plot_ablation(summaries, knob_label, out_png)
+      消融的【旋钮扫描】折线图：横轴=旋钮取值，每个模型一条线，
+      分面板画 MAE / RMSE / Spike-F1。这是手册 §6 每个消融要求的
+      "指标 vs 旋钮取值"图。summaries = [(旋钮值, summary_df), ...]。
 
-输出文件：
-  ../../data/results/forecast_comparison.png   — 各节点三模型对比图
-  ../../data/results/forecast_metrics.csv      — MAE / RMSE 误差汇总表
+也可直接命令行用：
+  python plotting.py data/results/baseline/summary.csv
 """
 
+from __future__ import annotations
+
 import os
-import numpy as np
+from typing import List, Tuple, Union, Optional
+
 import pandas as pd
 import matplotlib
-matplotlib.use("Agg")   # 无显示器环境下保存图片
+matplotlib.use("Agg")  # 无显示器环境保存图片
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 from matplotlib import rcParams
+
 rcParams["font.family"] = ["PingFang HK", "Arial Unicode MS", "DejaVu Sans"]
-rcParams["axes.unicode_minus"] = False  # 负号正常显示
+rcParams["axes.unicode_minus"] = False
 
-# ── 路径配置 ──────────────────────────────────────────────────────────────────
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-RESULTS_DIR = os.path.join(SCRIPT_DIR, "../../data/results")
-os.makedirs(RESULTS_DIR, exist_ok=True)
-
-FILES = {
-    "Toto-1.0":    os.path.join(RESULTS_DIR, "forecast_toto.csv"),
-    "TimesFM-2.5": os.path.join(RESULTS_DIR, "forecast_timesfm.csv"),
-    "Chronos-2":   os.path.join(RESULTS_DIR, "forecast_chronos2.csv"),
-}
-OUTPUT_PNG     = os.path.join(RESULTS_DIR, "forecast_comparison.png")
-OUTPUT_METRICS = os.path.join(RESULTS_DIR, "forecast_metrics.csv")
-
+# 稳定的模型→颜色映射（同一模型在所有图里颜色一致，方便横向比对）
 MODEL_COLORS = {
-    "Toto-1.0":    "#E05C5C",
-    "TimesFM-2.5": "#4A90D9",
-    "Chronos-2":   "#5CB85C",
+    "Naive": "#9E9E9E", "SeasonalNaive": "#607D8B",
+    "ETS": "#8D6E63", "Theta": "#A1887F",
+    "RandomForest": "#66BB6A", "LightGBM": "#26A69A", "XGBoost": "#9CCC65",
+    "TimesFM": "#4A90D9", "Chronos2": "#5C6BC0", "Toto": "#E05C5C",
 }
+_FALLBACK = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
+             "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
 
-print("=" * 60)
-print("零样本电价预测结果可视化")
-print("=" * 60)
 
-# ── 辅助函数：将可能是字符串数组的列解析为标量 ────────────────────────────────
-def _parse_array_col(series, agg):
+def _color_for(model: str, idx: int) -> str:
+    return MODEL_COLORS.get(model, _FALLBACK[idx % len(_FALLBACK)])
+
+
+# ── 指标面板配置：(列名, 标题, 越小越好?) ────────────────────────────────────
+_PANELS = [
+    ("mae_mean", "MAE（越低越好）", True),
+    ("rmse_mean", "RMSE（越低越好）", True),
+    ("spike_f1_mean_signal", "Spike-F1（越高越好）", False),
+    ("coverage_mean", "覆盖率（理想≈0.80）", False),
+]
+
+
+def _load_summary(src: Union[str, pd.DataFrame]) -> pd.DataFrame:
+    return pd.read_csv(src) if isinstance(src, str) else src.copy()
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# 1) 单次实验：模型对比柱状图
+# ══════════════════════════════════════════════════════════════════════════════
+def plot_summary(summary: Union[str, pd.DataFrame],
+                 out_png: str,
+                 title: str = "模型对比",
+                 sort_by: str = "mae_mean") -> str:
     """
-    若列值为字符串（如 Toto 输出的 numpy 数组字符串），
-    则解析为 numpy 数组后按 agg 聚合（'mean'/'q10'/'q90'）；
-    否则直接转 float。
+    画一份 summary 的模型对比柱状图（MAE/RMSE/Spike-F1/Coverage 四面板）。
+    summary : summary.csv 路径或 DataFrame。
+    返回输出图片路径。
     """
-    def _convert(val):
-        if isinstance(val, str):
-            nums = np.fromstring(val.replace('\n', ' ').strip('[] '), sep=' ')
-            if agg == 'mean':
-                return float(nums.mean())
-            elif agg == 'q10':
-                return float(np.percentile(nums, 10))
-            elif agg == 'q90':
-                return float(np.percentile(nums, 90))
-        return float(val)
-    return series.apply(_convert)
+    df = _load_summary(summary)
+    if sort_by in df.columns:
+        df = df.sort_values(sort_by).reset_index(drop=True)
+    models = df["model"].tolist()
+    colors = [_color_for(m, i) for i, m in enumerate(models)]
+
+    panels = [(c, t, lo) for c, t, lo in _PANELS if c in df.columns]
+    n = len(panels)
+    ncols = 2
+    nrows = (n + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols, figsize=(7 * ncols, 4 * nrows))
+    axes = axes.ravel() if hasattr(axes, "ravel") else [axes]
+
+    for ax, (col, ptitle, lower_better) in zip(axes, panels):
+        vals = df[col].astype(float).values
+        bars = ax.bar(range(len(models)), vals, color=colors)
+        # coverage 面板画一条 0.8 理想线
+        if col == "coverage_mean":
+            ax.axhline(0.8, color="red", ls="--", lw=1, alpha=0.7, label="理想0.80")
+            ax.legend(fontsize=8)
+        ax.set_title(ptitle, fontsize=11, fontweight="bold")
+        ax.set_xticks(range(len(models)))
+        ax.set_xticklabels(models, rotation=35, ha="right", fontsize=8)
+        ax.grid(True, axis="y", alpha=0.3)
+        for b, v in zip(bars, vals):
+            ax.text(b.get_x() + b.get_width() / 2, v, f"{v:.3g}",
+                    ha="center", va="bottom", fontsize=7)
+
+    # 关掉多余空面板
+    for ax in axes[len(panels):]:
+        ax.axis("off")
+
+    fig.suptitle(title, fontsize=14, fontweight="bold", y=1.02)
+    plt.tight_layout()
+    os.makedirs(os.path.dirname(os.path.abspath(out_png)), exist_ok=True)
+    plt.savefig(out_png, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    return out_png
 
 
-def _normalize_df(df):
-    """确保 mean/q10/q90 列均为 float（处理 Toto 的数组字符串格式）。"""
-    for col, agg in [('mean', 'mean'), ('q10', 'q10'), ('q90', 'q90')]:
-        if df[col].dtype == object:
-            df = df.copy()
-            df[col] = _parse_array_col(df[col], agg)
-    return df
+# ══════════════════════════════════════════════════════════════════════════════
+# 2) 消融：旋钮扫描折线图
+# ══════════════════════════════════════════════════════════════════════════════
+def plot_ablation(summaries: List[Tuple[object, Union[str, pd.DataFrame]]],
+                  knob_label: str,
+                  out_png: str,
+                  title: Optional[str] = None,
+                  metrics: Optional[List[str]] = None) -> str:
+    """
+    画消融折线图：横轴=旋钮取值，每模型一条线，分面板画各指标。
+
+    summaries : [(旋钮取值, summary 路径或 DataFrame), ...]，按旋钮顺序排列。
+                旋钮取值可为数字(如 168/336/720)或字符串标签(如 "无"/"+负荷")。
+    knob_label: 横轴名称，如 "上下文长度(h)"、"协变量集合"。
+    返回输出图片路径。
+    """
+    metrics = metrics or ["mae_mean", "rmse_mean", "spike_f1_mean_signal"]
+    knob_vals = [k for k, _ in summaries]
+    dfs = [_load_summary(s) for _, s in summaries]
+
+    # 收集所有出现过的模型，保证每个模型在所有档都画上
+    all_models: List[str] = []
+    for d in dfs:
+        for m in d["model"].tolist():
+            if m not in all_models:
+                all_models.append(m)
+
+    metric_titles = {
+        "mae_mean": "MAE（越低越好）",
+        "rmse_mean": "RMSE（越低越好）",
+        "spike_f1_mean_signal": "Spike-F1（越高越好）",
+        "mase_mean": "MASE（<1 优于季节朴素）",
+        "coverage_mean": "覆盖率（理想≈0.80）",
+    }
+    panels = [m for m in metrics if any(m in d.columns for d in dfs)]
+    n = len(panels)
+    fig, axes = plt.subplots(1, n, figsize=(6 * n, 4.5))
+    if n == 1:
+        axes = [axes]
+
+    x = list(range(len(knob_vals)))
+    for ax, col in zip(axes, panels):
+        for i, model in enumerate(all_models):
+            ys = []
+            for d in dfs:
+                row = d[d["model"] == model]
+                ys.append(float(row[col].iloc[0]) if (len(row) and col in d.columns
+                                                      and pd.notna(row[col].iloc[0]))
+                          else float("nan"))
+            ax.plot(x, ys, marker="o", lw=1.8, color=_color_for(model, i), label=model)
+        if col == "coverage_mean":
+            ax.axhline(0.8, color="red", ls="--", lw=1, alpha=0.6)
+        if col == "mase_mean":
+            ax.axhline(1.0, color="gray", ls="--", lw=1, alpha=0.6)
+        ax.set_title(metric_titles.get(col, col), fontsize=11, fontweight="bold")
+        ax.set_xlabel(knob_label, fontsize=10)
+        ax.set_xticks(x)
+        ax.set_xticklabels([str(k) for k in knob_vals])
+        ax.grid(True, alpha=0.3)
+
+    # 只在最后一个面板放图例，避免重复
+    axes[-1].legend(fontsize=8, loc="best", ncol=1)
+    fig.suptitle(title or f"消融：{knob_label}",
+                 fontsize=14, fontweight="bold", y=1.03)
+    plt.tight_layout()
+    os.makedirs(os.path.dirname(os.path.abspath(out_png)), exist_ok=True)
+    plt.savefig(out_png, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    return out_png
 
 
-# ── 1. 读取预测结果 ───────────────────────────────────────────────────────────
-dfs = {}
-missing = []
-for model, path in FILES.items():
-    if os.path.exists(path):
-        raw = pd.read_csv(path, parse_dates=["timestamp"])
-        dfs[model] = _normalize_df(raw)
-        print(f"✅ 读取 {model}：{path}")
-    else:
-        missing.append(model)
-        print(f"⚠️  缺少 {model} 的预测文件：{path}")
-
-if not dfs:
-    print("\n❌ 没有找到任何预测结果，请先运行预测脚本")
-    exit(1)
-
-if missing:
-    print(f"\n⚠️  以下模型结果缺失，将跳过：{missing}")
-
-# ── 2. 获取节点列表 ───────────────────────────────────────────────────────────
-first_df   = next(iter(dfs.values()))
-node_list  = first_df["node"].unique().tolist()
-n_nodes    = len(node_list)
-n_models   = len(dfs)
-
-print(f"\n节点列表：{node_list}")
-print(f"模型数量：{n_models}")
-
-# ── 3. 计算误差指标 ───────────────────────────────────────────────────────────
-metrics_rows = []
-for model, df in dfs.items():
-    for node in node_list:
-        sub = df[df["node"] == node].sort_values("timestamp")
-        actual = sub["actual"].values
-        pred   = sub["mean"].values
-        mae    = np.mean(np.abs(actual - pred))
-        rmse   = np.sqrt(np.mean((actual - pred) ** 2))
-        mape   = np.mean(np.abs((actual - pred) / (np.abs(actual) + 1e-6))) * 100
-        metrics_rows.append({
-            "model": model,
-            "node":  node,
-            "MAE":   round(mae, 3),
-            "RMSE":  round(rmse, 3),
-            "MAPE%": round(mape, 2),
-        })
-
-metrics_df = pd.DataFrame(metrics_rows)
-metrics_df.to_csv(OUTPUT_METRICS, index=False)
-print(f"\n误差指标已保存：{OUTPUT_METRICS}")
-print(metrics_df.to_string(index=False))
-
-# ── 4. 绘图 ───────────────────────────────────────────────────────────────────
-fig, axes = plt.subplots(
-    n_nodes, 1,
-    figsize=(14, 4 * n_nodes),
-    sharex=False,
-)
-if n_nodes == 1:
-    axes = [axes]
-
-fig.suptitle("零样本电价预测对比（ENLITEN LMP，预测未来 24 小时）",
-             fontsize=14, fontweight="bold", y=1.01)
-
-for ax, node in zip(axes, node_list):
-    # 画实际值（取第一个模型的 actual 列，所有模型 actual 相同）
-    first_model = next(iter(dfs))
-    sub_actual  = dfs[first_model][dfs[first_model]["node"] == node].sort_values("timestamp")
-    timestamps  = sub_actual["timestamp"].values
-    actual_vals = sub_actual["actual"].values
-
-    ax.plot(timestamps, actual_vals,
-            color="black", linewidth=2, label="实际值", zorder=5)
-
-    # 画各模型预测
-    for model, df in dfs.items():
-        sub  = df[df["node"] == node].sort_values("timestamp")
-        ts   = sub["timestamp"].values
-        mean = sub["mean"].values
-        q10  = sub["q10"].values
-        q90  = sub["q90"].values
-        color = MODEL_COLORS.get(model, "gray")
-
-        ax.plot(ts, mean, color=color, linewidth=1.5,
-                linestyle="--", label=f"{model} 预测", zorder=4)
-        ax.fill_between(ts, q10, q90, color=color, alpha=0.15,
-                        label=f"{model} 80%区间")
-
-    # 误差标注
-    node_metrics = metrics_df[metrics_df["node"] == node]
-    metric_text  = "  ".join([
-        f"{row['model']}: MAE={row['MAE']:.2f}"
-        for _, row in node_metrics.iterrows()
-    ])
-    ax.set_title(f"节点：{node}    {metric_text}", fontsize=10)
-    ax.set_ylabel("LMP ($/MWh)", fontsize=9)
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d %H:%M"))
-    ax.xaxis.set_major_locator(mdates.HourLocator(interval=4))
-    plt.setp(ax.xaxis.get_majorticklabels(), rotation=30, ha="right", fontsize=8)
-    ax.legend(loc="upper right", fontsize=8, ncol=2)
-    ax.grid(True, alpha=0.3)
-
-plt.tight_layout()
-plt.savefig(OUTPUT_PNG, dpi=150, bbox_inches="tight")
-print(f"\n✅ 对比图已保存：{OUTPUT_PNG}")
-
-print("\n" + "=" * 60)
-print("✅ 可视化完成！")
-print("=" * 60)
+# ══════════════════════════════════════════════════════════════════════════════
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) < 2:
+        print("用法：python plotting.py <summary.csv> [输出png]")
+        sys.exit(1)
+    src = sys.argv[1]
+    out = sys.argv[2] if len(sys.argv) > 2 else os.path.join(
+        os.path.dirname(os.path.abspath(src)), "summary_compare.png")
+    p = plot_summary(src, out, title="模型对比")
+    print(f"✅ 对比图已保存：{p}")
