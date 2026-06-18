@@ -145,6 +145,8 @@ def run(cfg: dict) -> dict:
         max_origins=bt.get("max_origins"),
         # 需训练模型（树模型/神经网）专用训练窗口；零样本/基础模型仍用 context_len
         train_context_len=cfg.get("train_context_len") or bt.get("train_context_len"),
+        # 多变量旋钮（手册 §6 消融 C）：true=多节点联合建模，false=逐列单变量。
+        multivariate=bool(cfg.get("multivariate", False)),
     )
 
     # 4) 滚动回测
@@ -166,9 +168,28 @@ def run(cfg: dict) -> dict:
     os.makedirs(out_dir, exist_ok=True)
     summary_sorted.to_csv(os.path.join(out_dir, "summary.csv"), index=False)
     result["per_origin"].to_csv(os.path.join(out_dir, "per_origin.csv"), index=False)
+    # 落盘逐时刻预测记录（用于时序图）
+    records_csv = os.path.join(out_dir, "records.csv")
+    result["records"].to_csv(records_csv, index=False)
     with open(os.path.join(out_dir, "thresholds.json"), "w") as f:
         json.dump(result["thresholds"], f, indent=2)
     print(f"\n✅ 结果已写入：{out_dir}/")
+
+    # 6) 自动出图
+    try:
+        from plotting import plot_summary, plot_timeseries
+        png1 = plot_summary(summary_sorted,
+                            os.path.join(out_dir, "summary_compare.png"),
+                            title=f"{name} 模型对比")
+        print(f"📊 对比柱状图：{png1}")
+        png2 = plot_timeseries(result["records"],
+                               os.path.join(out_dir, "timeseries_compare.png"),
+                               thresholds=result["thresholds"],
+                               title=f"{name} 预测时序对比")
+        print(f"📈 时序预测图：{png2}")
+    except Exception as e:
+        print(f"⚠️  出图失败（不影响结果）：{e}")
+
     return result
 
 

@@ -1,0 +1,33 @@
+# 协变量路径端到端验证（手册 §6 消融 A）
+# 用法：<venv>/bin/python src/forecasting/run_experiment.py configs/experiments/smoke/verify_covariate.yaml
+#
+# 目的：确认协变量旋钮端到端贯穿。喂 load + temperature 两个协变量：
+#   - Chronos2 原生支持协变量 → covariates_used=True
+#   - TimesFM 本期未接入协变量 → 自动降级 → covariates_used=False
+#   - SeasonalNaive 基线 → 不吃协变量
+# 起报点压到 2 个，仅验证链路与能力诚实标记。
+
+name: verify_covariate
+market: ERCOT
+nodes_group: volatility
+freq: 1h
+context_len: 168
+horizon: 24
+data_start: 2025-07-15
+data_end: 2025-09-01
+
+backtest:
+  test_start: 2025-08-01
+  test_end: 2025-08-05
+  stride_hours: 24
+  max_origins: 2
+
+models: [SeasonalNaive, Chronos2, TimesFM]
+
+covariates: [load, temperature]
+
+multivariate: false
+
+spike:
+  quantile: 0.95
+  mode: global

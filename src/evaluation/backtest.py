@@ -60,6 +60,13 @@ class BacktestConfig:
     # 168 步（7 天）不足以训练树模型/神经网，给它们额外回看更长历史（仍严格
     # 截断在起报点之前 → 无泄漏）。None=不启用，所有模型都用 context_len。
     train_context_len: Optional[int] = None
+    # 多变量旋钮（手册 §6 消融 C）：
+    #   True  = 多节点【联合建模】，把一个节点组的多列序列一起喂给模型，
+    #           让模型利用节点间空间相关性（Toto/Chronos2 的强项）。
+    #   False = 单变量，每个节点【独立】预测（逐列分别建模）。
+    # 不支持多变量的模型（如 TimesFM 本期）即便置 True 也自动降级为逐列，
+    # 并在结果里写 multivariate_used=False（能力诚实原则，手册 §3.3）。
+    multivariate: bool = False
 
 
 # ── 单条预测记录 ──────────────────────────────────────────────────────────────
@@ -146,10 +153,17 @@ def _predict_all_origins(
 
     out: Dict[int, Forecast] = {}
     if isinstance(fc, FoundationForecaster):
-        forecasts = fc.predict_batch(context_dfs, future_covs, cfg.horizon)
+        # 多变量旋钮：仅当本次实验要求多变量、且模型原生支持时才联合建模；
+        # 否则降级为逐列单变量（worker 内部据此切换）。这一降级会反映在
+        # fc.multivariate_used 上，由回测主循环写进结果（能力诚实）。
+        forecasts = fc.predict_batch(
+            context_dfs, future_covs, cfg.horizon,
+            multivariate=cfg.multivariate)
         for oi, f in zip(valid_oi, forecasts):
             out[oi] = f
     else:
+        # 基线（朴素/统计/树模型）均为单变量模型：逐起报点、逐列独立预测，
+        # 与多变量旋钮无关。
         for oi, ctx_in, future_cov in zip(valid_oi, context_dfs, future_covs):
             out[oi] = fc.predict(ctx_in, future_covariates=future_cov,
                                  horizon=cfg.horizon)
@@ -255,9 +269,14 @@ def run_backtest(
             m = M.all_point_prob_metrics(
                 actual.ravel(), mean.ravel(),
                 q10.ravel(), mean.ravel(), q90.ravel())
+            # multivariate_used：实验要求多变量 且 模型原生支持，才算真正用上。
+            mv_used = bool(cfg.multivariate
+                           and getattr(fc, "supports_multivariate", False)
+                           and len(nodes) > 1)
             per_origin_rows.append({
                 "model": fc.name, "origin": origin_ts,
-                "covariates_used": use_cov, **m})
+                "covariates_used": use_cov,
+                "multivariate_used": mv_used, **m})
 
     records = rec.to_df()           # 逐时刻记录，已带 model 列
     per_origin = pd.DataFrame(per_origin_rows)
@@ -295,6 +314,8 @@ def _summarize(per_origin, records, forecasters, nodes, target_cols,
             continue
         row = {"model": fc.name,
                "covariates_used": bool(sub["covariates_used"].iloc[0]),
+               "multivariate_used": bool(sub["multivariate_used"].iloc[0])
+               if "multivariate_used" in sub else False,
                "n_origins": int(sub["origin"].nunique())}
         for metric in ("mae", "rmse", "smape", "pinball", "coverage"):
             if metric in sub:

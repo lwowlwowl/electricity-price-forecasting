@@ -1,0 +1,34 @@
+# 多变量路径端到端验证（手册 §6 消融 C）
+# 用法：<venv>/bin/python src/forecasting/run_experiment.py configs/experiments/smoke/verify_multivariate.yaml
+#
+# 目的：确认多变量旋钮端到端贯穿。多节点（volatility 组 3 节点）联合建模：
+#   - Chronos2 原生多变量 → multivariate_used=True（联合预测）
+#   - Toto 原生多变量     → multivariate_used=True（同组 id_mask 联合）
+#   - TimesFM 单序列架构  → 自动降级逐列 → multivariate_used=False
+#   - SeasonalNaive 基线  → 始终逐列
+# 起报点压到 2 个，仅验证链路与能力诚实标记。
+
+name: verify_multivariate
+market: ERCOT
+nodes_group: volatility       # 3 节点，触发多变量
+freq: 1h
+context_len: 168
+horizon: 24
+data_start: 2025-07-15
+data_end: 2025-09-01
+
+backtest:
+  test_start: 2025-08-01
+  test_end: 2025-08-05
+  stride_hours: 24
+  max_origins: 2
+
+models: [SeasonalNaive, Chronos2, Toto, TimesFM]
+
+covariates: []                # 多变量验证不叠加协变量
+
+multivariate: true            # 开启多节点联合建模
+
+spike:
+  quantile: 0.95
+  mode: global

@@ -80,10 +80,14 @@ def _infer_interval_seconds(index: pd.DatetimeIndex) -> int:
 
 
 def _run_worker(kind: str, tasks: List[Task], horizon: int,
-                num_samples: int = 200) -> List[Dict[str, np.ndarray]]:
+                num_samples: int = 200,
+                multivariate: bool = False) -> List[Dict[str, np.ndarray]]:
     """
     把 tasks 打包成 request.npz，调用 kind 对应 venv 的 worker，读回结果。
     返回 list（与 tasks 等长），每项 {"mean","q10","q90"} 形状 (horizon, n_series)。
+
+    multivariate : 是否要求多节点联合建模。作为 request 的全局标志传给 worker，
+                   worker 据此在“逐列独立”与“联合”之间切换。
     """
     py = VENV_PYTHON[kind]
     script = WORKER_SCRIPT[kind]
@@ -99,6 +103,7 @@ def _run_worker(kind: str, tasks: List[Task], horizon: int,
         "horizon": np.int64(horizon),
         "interval_seconds": np.int64(interval),
         "num_samples": np.int64(num_samples),
+        "multivariate": np.int64(1 if multivariate else 0),
     }
     for i, t in enumerate(tasks):
         payload[f"context__{i}"] = t.context.astype(np.float32)
@@ -161,6 +166,9 @@ class FoundationForecaster(Forecaster):
 
     def __init__(self):
         self._cache: Dict[str, List[Forecast]] = {}
+        # 最近一次预测是否真正走了多变量联合建模（仅供调试/参考；
+        # 结果表里的 multivariate_used 以 backtest 的记录为准）。
+        self.multivariate_used: bool = False
 
     # ── 把 (context_df, future_cov) 转成内部 Task ─────────────────────────────
     def _make_task(self, context_df: pd.DataFrame,
@@ -207,45 +215,71 @@ class FoundationForecaster(Forecaster):
         return h.hexdigest()
 
     # ── 真·批量预测：一次子进程跑完所有任务 ──────────────────────────────────
-    def predict_tasks(self, tasks: List[Task], horizon: int) -> List[Forecast]:
+    def predict_tasks(self, tasks: List[Task], horizon: int,
+                      multivariate: bool = False) -> List[Forecast]:
         if not tasks:
             return []
-        key = self._cache_key(tasks, horizon)
+        # 能力诚实：只有本模型原生支持多变量、且调用方要求多变量时，才真正
+        # 传 multivariate=True 给 worker（联合建模）；否则降级为逐列单变量。
+        mv = bool(multivariate and self.supports_multivariate)
+        self.multivariate_used = bool(mv and tasks[0].context.shape[1] > 1)
+        # 缓存键带上单/多变量后缀，避免两种模式互相串味。
+        key = self._cache_key(tasks, horizon) + ("_mv" if mv else "_uv")
         if key in self._cache:
             return self._cache[key]
-        raw_list = _run_worker(self.kind, tasks, horizon, num_samples=self.num_samples)
+        raw_list = _run_worker(self.kind, tasks, horizon,
+                               num_samples=self.num_samples, multivariate=mv)
         forecasts = [self._pack(raw, t) for raw, t in zip(raw_list, tasks)]
         self._cache[key] = forecasts
         return forecasts
 
     def predict_batch(self, context_dfs: List[pd.DataFrame],
                       future_covs: Optional[List[Optional[pd.DataFrame]]],
-                      horizon: int) -> List[Forecast]:
-        """回测引擎用的批量入口：传一串起报点的 context（与可选未来协变量）。"""
+                      horizon: int,
+                      multivariate: bool = False) -> List[Forecast]:
+        """回测引擎用的批量入口：传一串起报点的 context（与可选未来协变量）。
+
+        multivariate : 是否多节点联合建模（手册 §6 消融 C）。
+        """
         if future_covs is None:
             future_covs = [None] * len(context_dfs)
         tasks = [self._make_task(c, fc, horizon)
                  for c, fc in zip(context_dfs, future_covs)]
-        return self.predict_tasks(tasks, horizon)
+        return self.predict_tasks(tasks, horizon, multivariate=multivariate)
 
     # ── 单任务（兼容旧接口）：退化为 1 任务批 ────────────────────────────────
-    def predict(self, context_df, future_covariates=None, horizon=24) -> Forecast:
+    def predict(self, context_df, future_covariates=None, horizon=24,
+                multivariate: bool = False) -> Forecast:
         task = self._make_task(context_df, future_covariates, horizon)
-        return self.predict_tasks([task], horizon)[0]
+        return self.predict_tasks([task], horizon, multivariate=multivariate)[0]
 
 
 # ── 三个具体适配器 ───────────────────────────────────────────────────────────
 class TimesFMForecaster(FoundationForecaster):
-    """TimesFM-2.5：零样本、单变量逐序列预测。多节点逐列处理。"""
+    """TimesFM-2.5：decoder-only 单序列模型。
+
+    架构上是单变量预测器，**不原生支持多变量联合建模**——多节点只能逐列独立
+    预测（节点间互不影响）。因此 supports_multivariate=False：当上层要求多变量
+    时会如实降级为逐列，并在结果里标记 multivariate_used=False（手册 §3.3 能力诚实）。
+
+    协变量：TimesFM-2.5 通过 XReg 原生支持外生协变量，但本期 worker 尚未接入
+    该路径，故 supports_covariates=False（暂不喂协变量，也不冒充支持）。
+    """
     name = "TimesFM"
     kind = "timesfm"
     needs_training = False
-    supports_covariates = False        # 本期按单变量消融
-    supports_multivariate = True       # worker 逐列支持
+    supports_covariates = False        # XReg 原生支持，但本期 worker 未接入
+    supports_multivariate = False      # decoder-only 单序列，不支持联合建模
 
 
 class Chronos2Forecaster(FoundationForecaster):
-    """Chronos-2：零样本，协变量能力最原生（past/future covariates）。"""
+    """Chronos-2：唯一同时原生支持多变量 + 协变量的基础模型。
+
+    官方在单一架构内零样本支持 univariate / multivariate / covariate-informed
+    三类任务：多变量时把多个协同序列联合预测，捕捉节点间依赖。
+    所以两个能力标志都是 True（但本轮协变量+多变量同时开启时，worker
+    仍按逐列+协变量处理以保证稳定）。
+    """
     name = "Chronos2"
     kind = "chronos2"
     needs_training = False
@@ -254,12 +288,19 @@ class Chronos2Forecaster(FoundationForecaster):
 
 
 class TotoForecaster(FoundationForecaster):
-    """Toto-1.0：零样本，强项是多节点联合建模（id_mask 同组）。"""
+    """Toto：生来面向多变量的时间序列基础模型（为可观测性多指标设计）。
+
+    强项是多节点联合建模：多变量时 worker 用同组 id_mask 把多节点作为
+    一个多变量序列联合预测。故 supports_multivariate=True。
+
+    协变量：Toto 未提供变量级外生协变量接口，故 supports_covariates=False（不
+    喂协变量，也不冒充支持）。
+    """
     name = "Toto"
     kind = "toto"
     needs_training = False
-    supports_covariates = False        # 本期不喂协变量
-    supports_multivariate = True       # 联合建模
+    supports_covariates = False        # 无变量级协变量接口
+    supports_multivariate = True       # 原生多变量联合建模
 
 
 # ── 注册表：名字 → 构造器 ─────────────────────────────────────────────────────

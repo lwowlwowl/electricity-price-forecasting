@@ -1,5 +1,5 @@
 # 基础模型接入验证配置（阶段：接入基础模型）
-# 用法：python src/forecasting/run_experiment.py configs/experiments/foundation_smoke.yaml
+# 用法：python src/forecasting/run_experiment.py configs/experiments/smoke/foundation_smoke.yaml
 #
 # 目的：用 ERCOT 真实数据把 TimesFM / Chronos2 / Toto 三个基础模型与基线
 # 放进同一套滚动回测里跑通，确认子进程 worker 批量调度链路正确、指标可算。

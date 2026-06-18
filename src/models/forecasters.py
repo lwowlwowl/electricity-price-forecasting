@@ -48,7 +48,9 @@ class NaiveForecaster(Forecaster):
     name = "Naive"
     needs_training = False
     supports_covariates = False
-    supports_multivariate = True   # 逐列独立处理即可支持多节点
+    # supports_multivariate=False：基线逐列独立预测，节点间零交互，不是多变量
+    # 联合建模。多变量实验里基线始终按逐列处理，multivariate_used 应为 False。
+    supports_multivariate = False
 
     def predict(self, context_df, future_covariates=None, horizon=24) -> Forecast:
         cols = self._target_columns(context_df)
@@ -119,7 +121,8 @@ class _StatForecaster(NaiveForecaster):
 
     name = "_Stat"
     needs_training = False
-    supports_multivariate = True   # 逐列独立拟合即支持多节点
+    # 逐列独立拟合，非多变量联合建模 → supports_multivariate=False
+    supports_multivariate = False
 
     # 拟合用的最大历史长度（电价高频数据，截断以控速）
     MAX_CONTEXT = 2000
@@ -230,7 +233,8 @@ class _TreeForecaster(NaiveForecaster):
     name = "_Tree"
     needs_training = True
     supports_covariates = False
-    supports_multivariate = True   # 逐列独立训练即支持多节点
+    # 逐列独立训练，非多变量联合建模 → supports_multivariate=False
+    supports_multivariate = False
 
     MAX_CONTEXT = 2000   # 每列最多取最近这么多小时训练，控速
     MIN_ROWS = 100       # 去掉缺失后至少这么多行才训练，否则退化

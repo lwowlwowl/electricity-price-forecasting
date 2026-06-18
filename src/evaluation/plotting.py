@@ -24,6 +24,7 @@ from __future__ import annotations
 import os
 from typing import List, Tuple, Union, Optional
 
+import numpy as np
 import pandas as pd
 import matplotlib
 matplotlib.use("Agg")  # 无显示器环境保存图片
@@ -185,13 +186,101 @@ def plot_ablation(summaries: List[Tuple[object, Union[str, pd.DataFrame]]],
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+# 3) 单模型时序图：整个测试期的 actual vs predicted（每模型一张子图）
+# ══════════════════════════════════════════════════════════════════════════════
+def plot_timeseries(records: Union[str, pd.DataFrame],
+                    out_png: str,
+                    thresholds: Optional[dict] = None,
+                    title: str = "预测时序对比") -> str:
+    """
+    为每个模型画一张子图：整个测试期的真实电价 vs 预测均值。
+    records : backtest 落盘的 records.csv 或 DataFrame。
+              列：model, origin, node, ts, actual, mean, q10, q90。
+    thresholds : {node: spike_threshold}，有则画阈值线。
+    返回输出图片路径。
+    """
+    df = pd.read_csv(records, parse_dates=["ts", "origin"]) if isinstance(records, str) else records.copy()
+    if "ts" in df.columns:
+        df["ts"] = pd.to_datetime(df["ts"], utc=True)
+
+    models = df["model"].unique().tolist()
+    nodes = df["node"].unique().tolist()
+    n_models = len(models)
+
+    # 布局：每行 2 个模型
+    ncols = 2
+    nrows = (n_models + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols, figsize=(8 * ncols, 3.5 * nrows),
+                             sharex=True)
+    if n_models == 1:
+        axes = [axes] if not hasattr(axes, '__iter__') else axes
+    axes = axes.ravel() if hasattr(axes, "ravel") else [axes]
+
+    for ax, model in zip(axes, models):
+        sub = df[df["model"] == model].sort_values("ts")
+        color = _color_for(model, models.index(model))
+
+        # 对每个节点,取每个时刻最晚一个起报点的预测(避免重叠)
+        for node in nodes:
+            ns = sub[sub["node"] == node].drop_duplicates(subset=["ts"], keep="last")
+            ts = ns["ts"]
+            # 真实值（只在第一个节点画一次即可，如多节点则叠加）
+            if node == nodes[0]:
+                ax.plot(ts, ns["actual"], color="black", lw=0.8, alpha=0.85,
+                        label="真实电价")
+            ax.plot(ts, ns["mean"], color=color, lw=0.7, alpha=0.85,
+                    label=f"预测" if node == nodes[0] else None)
+            # 阈值线
+            if thresholds and node in thresholds and node == nodes[0]:
+                ax.axhline(thresholds[node], color="red", ls="--", lw=0.8,
+                           alpha=0.5, label=f"尖峰阈值")
+
+        # 如果多节点,只画第一个节点的 actual/pred,避免太乱
+        # (已在上面逻辑通过只第一次画 actual 实现)
+
+        # 计算整体 MAE 标注到标题
+        sub_first = sub[sub["node"] == nodes[0]].drop_duplicates(subset=["ts"], keep="last")
+        mae_val = float(np.abs(sub_first["actual"] - sub_first["mean"]).mean())
+        ax.set_title(f"{model}（MAE={mae_val:.1f}）", fontsize=11, fontweight="bold")
+        ax.set_ylabel("$/MWh", fontsize=9)
+        ax.grid(True, alpha=0.25)
+        ax.legend(fontsize=7, loc="upper right", ncol=2)
+
+    # 关掉多余空面板
+    for ax in axes[n_models:]:
+        ax.axis("off")
+
+    # x 轴日期格式
+    import matplotlib.dates as mdates
+    for ax in axes[:n_models]:
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
+        ax.tick_params(axis="x", rotation=30, labelsize=8)
+
+    fig.suptitle(title, fontsize=14, fontweight="bold", y=1.01)
+    plt.tight_layout()
+    os.makedirs(os.path.dirname(os.path.abspath(out_png)), exist_ok=True)
+    plt.savefig(out_png, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    return out_png
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2:
-        print("用法：python plotting.py <summary.csv> [输出png]")
+        print("用法：")
+        print("  python plotting.py <summary.csv> [输出png]          -- 模型对比柱状图")
+        print("  python plotting.py --ts <records.csv> [输出png]     -- 时序预测图")
         sys.exit(1)
-    src = sys.argv[1]
-    out = sys.argv[2] if len(sys.argv) > 2 else os.path.join(
-        os.path.dirname(os.path.abspath(src)), "summary_compare.png")
-    p = plot_summary(src, out, title="模型对比")
-    print(f"✅ 对比图已保存：{p}")
+    if sys.argv[1] == "--ts":
+        src = sys.argv[2]
+        out = sys.argv[3] if len(sys.argv) > 3 else os.path.join(
+            os.path.dirname(os.path.abspath(src)), "timeseries_compare.png")
+        p = plot_timeseries(src, out, title="预测时序对比")
+        print(f"✅ 时序图已保存：{p}")
+    else:
+        src = sys.argv[1]
+        out = sys.argv[2] if len(sys.argv) > 2 else os.path.join(
+            os.path.dirname(os.path.abspath(src)), "summary_compare.png")
+        p = plot_summary(src, out, title="模型对比")
+        print(f"✅ 对比图已保存：{p}")

@@ -28,8 +28,14 @@
 | `hist_cov__{i}` | (T, n_cov) float 或缺省 | 第 i 个任务的历史协变量（可选） |
 | `interval_seconds` | 标量 int | 采样间隔秒数（Toto 需要） |
 | `start_ts__{i}` | 标量 int | 第 i 个任务 context 首点 unix 时间戳（Toto 需要） |
+| `multivariate` | 标量 int | 1=多节点联合建模，0=逐列单变量（手册 §6 消融 C） |
 
-> 多节点（n_series>1）由各 worker 自行处理：TimesFM/Chronos 逐列；Toto 联合建模。
+> 多节点（n_series>1）行为由 `multivariate` 旋钮控制：
+> - `multivariate=0`（默认）：所有 worker 逐列单变量预测，节点之间相互独立。
+> - `multivariate=1`：支持联合建模的模型（Toto / Chronos-2）把多节点作为一个
+>   多变量序列联合预测；TimesFM 不支持联合，自动降级为逐列，并在结果里如实
+>   标记 `multivariate_used=False`。
+> - 协变量与多变量同时开启时，Chronos-2 本轮仍按逐列+协变量处理以保证稳定。
 
 ## response.npz 格式
 

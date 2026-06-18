@@ -38,6 +38,10 @@ def main(req_path: str, resp_path: str):
     horizon = int(req["horizon"])
     interval = int(req["interval_seconds"]) if "interval_seconds" in req.files else 3600
     num_samples = int(req["num_samples"]) if "num_samples" in req.files else 200
+    # 多变量旋钮（手册 §6 消融 C）：
+    #   1 = 多节点联合建模，id_mask 全 0（同组），让模型利用空间相关性（Toto 强项）；
+    #   0 = 单变量，每个节点 id_mask 各不相同（独立组），模型不跨节点共享信息。
+    multivariate = bool(int(req["multivariate"])) if "multivariate" in req.files else False
 
     from toto.data.util.dataset import MaskedTimeseries
     from toto.inference.forecaster import TotoForecaster
@@ -60,10 +64,19 @@ def main(req_path: str, resp_path: str):
         ts = torch.from_numpy(timestamps).unsqueeze(0).expand(n_series, -1).to(device)
         ivl = torch.full((n_series,), interval, dtype=torch.int64).to(device)
 
+        # id_mask 决定节点是否“同组”：同组才会跨节点共享注意力（联合建模）。
+        #   多变量：全 0 → 所有节点同组，利用空间相关性（Toto 强项）。
+        #   单变量：每行不同 id → 节点彼此独立，等价于逐序列预测。
+        if multivariate and n_series > 1:
+            id_mask = torch.zeros_like(series, dtype=torch.int64)
+        else:
+            ids = torch.arange(n_series, dtype=torch.int64).unsqueeze(1)
+            id_mask = ids.expand(n_series, T).to(device)
+
         inputs = MaskedTimeseries(
             series=series,
             padding_mask=torch.ones_like(series, dtype=torch.bool),
-            id_mask=torch.zeros_like(series, dtype=torch.int64),  # 同组联合建模
+            id_mask=id_mask,
             timestamp_seconds=ts,
             time_interval_seconds=ivl,
         )

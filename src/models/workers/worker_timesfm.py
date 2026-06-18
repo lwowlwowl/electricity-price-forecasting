@@ -41,6 +41,9 @@ def main(req_path: str, resp_path: str):
         infer_is_positive=False,     # 电价可能为负
     ))
 
+    # TimesFM 是单变量模型：无论 request 是否要求多变量，都逐列独立预测。
+    # （多节点联合建模由 Toto/Chronos2 承担；TimesFM 在多变量实验里会被
+    #  foundation.py 标记为 multivariate_used=False，体现“能力诚实”。）
     out = {}
     for i in range(n_tasks):
         ctx = req[f"context__{i}"].astype(np.float32)   # (T, n_series)
