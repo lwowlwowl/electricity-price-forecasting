@@ -171,16 +171,18 @@ def _predict_all_origins(
 
 
 def _as_2d(forecast: Forecast):
-    """把 Forecast 的 mean/q10/q90 统一成 (horizon, n_series)。"""
+    """把 Forecast 的 mean/q10/q50/q90 统一成 (horizon, n_series)。"""
     if forecast.mean.ndim == 1:
         mean = forecast.mean[:, None]
-        q90 = forecast.q90[:, None] if forecast.q90 is not None else mean
         q10 = forecast.q10[:, None] if forecast.q10 is not None else mean
+        q50 = forecast.q50[:, None] if forecast.q50 is not None else mean
+        q90 = forecast.q90[:, None] if forecast.q90 is not None else mean
     else:
         mean = forecast.mean
-        q90 = forecast.q90 if forecast.q90 is not None else mean
         q10 = forecast.q10 if forecast.q10 is not None else mean
-    return mean, q10, q90
+        q50 = forecast.q50 if forecast.q50 is not None else mean
+        q90 = forecast.q90 if forecast.q90 is not None else mean
+    return mean, q10, q50, q90
 
 
 # ── 主回测函数 ────────────────────────────────────────────────────────────────
@@ -257,7 +259,7 @@ def run_backtest(
                 continue
             origin_ts = data.index[oi]
             fut = data.iloc[oi: oi + cfg.horizon]
-            mean, q10, q90 = _as_2d(preds[oi])   # (horizon, n_series)
+            mean, q10, q50, q90 = _as_2d(preds[oi])   # (horizon, n_series)
             actual = fut[target_cols].to_numpy(dtype=float)   # (horizon, n_series)
 
             for j, node in enumerate(nodes):
@@ -268,7 +270,7 @@ def run_backtest(
             # 记录这个 (模型, 起报点) 的指标（按所有节点汇总）
             m = M.all_point_prob_metrics(
                 actual.ravel(), mean.ravel(),
-                q10.ravel(), mean.ravel(), q90.ravel())
+                q10.ravel(), q50.ravel(), q90.ravel())
             # multivariate_used：实验要求多变量 且 模型原生支持，才算真正用上。
             mv_used = bool(cfg.multivariate
                            and getattr(fc, "supports_multivariate", False)
@@ -351,7 +353,7 @@ def _spike_f1_for_model(fc, data, origins, nodes, target_cols, thresholds,
         if oi not in preds:
             continue
         fut = data.iloc[oi: oi + cfg.horizon]
-        mean, _q10, q90 = _as_2d(preds[oi])
+        mean, _q10, _q50, q90 = _as_2d(preds[oi])
         actual = fut[target_cols].to_numpy(dtype=float)
         for j, node in enumerate(nodes):
             y_true.append(actual[:, j])

@@ -1,0 +1,36 @@
+# 消融 D：预测步长（手册 §6）
+# 只转动 horizon 一个旋钮：24 → 48 → 168（日前/两日前/周前预测）
+# 其余全部锁死在基准配置，回答"长预测谁衰减最慢？"
+#
+# 用法：python src/forecasting/run_ablation.py configs/experiments/ablation_D_horizon.yaml
+
+name: ablation_D_horizon
+market: ERCOT
+nodes_group: volatility
+freq: 1h
+context_len: 168
+train_context_len: 1440
+horizon: 24                  # 会被 ablate 覆盖
+data_start: 2025-04-01
+data_end: 2025-09-01
+
+backtest:
+  test_start: 2025-08-01
+  test_end: 2025-08-31
+  stride_hours: 24
+  max_origins: 10
+
+models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto]
+
+covariates: []
+
+spike:
+  quantile: 0.95
+  mode: global
+
+# ── 被消融的旋钮 ──────────────────────────────────────────────────────────────
+ablate:
+  key: horizon
+  values: [24, 48, 168]
+  labels: ["24h（日前）", "48h（两日前）", "168h（周前）"]
+  axis_label: "预测步长"

@@ -1,0 +1,45 @@
+# 消融 E：零样本 vs 微调（手册 §6）
+# 转动"是否微调"旋钮：零样本（当前默认）→ 微调（用更长历史做 fine-tuning）
+# 回答"微调值不值得？提升多少？"
+#
+# ⚠️ 当前状态：暂不可执行
+#   - 基础模型适配器(foundation.py)仅支持零样本推理，不包含微调逻辑
+#   - 微调需要额外的训练脚本、GPU 资源、超参数搜索
+#   - 需要先完成消融 A-D，确认零样本性能基线后，再决定是否值得投入微调
+#   - 建议使用 NYISO 长历史数据（2020-2026）做微调训练集
+#
+# 预留配置如下，待微调功能实现后可直接使用。
+# 用法（待实现）：python src/forecasting/run_ablation.py configs/experiments/ablation_E_finetune.yaml
+
+name: ablation_E_finetune
+market: ERCOT
+nodes_group: volatility
+freq: 1h
+context_len: 168
+train_context_len: 1440
+horizon: 24
+data_start: 2025-04-01
+data_end: 2025-09-01
+
+backtest:
+  test_start: 2025-08-01
+  test_end: 2025-08-31
+  stride_hours: 24
+  max_origins: 10
+
+# 微调仅对基础模型有意义；基线模型每起报点已在重训
+models: [TimesFM, Chronos2, Toto]
+
+covariates: []
+
+spike:
+  quantile: 0.95
+  mode: global
+
+# ── 被消融的旋钮（待微调功能实现后启用）──────────────────────────────────────
+# finetune: false=零样本（预训练权重直接推理），true=微调（用历史数据 fine-tune）
+# ablate:
+#   key: finetune
+#   values: [false, true]
+#   labels: ["零样本", "微调"]
+#   axis_label: "是否微调"

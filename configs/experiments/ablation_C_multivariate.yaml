@@ -1,0 +1,41 @@
+# 消融 C：单变量 vs 多变量联合建模（手册 §6）
+# 只转动 multivariate 旋钮：false → true
+# 其余全部锁死在基准配置，回答"多节点空间相关性谁利用得最好？Toto 是否占优？"
+#
+# multivariate=false 时所有模型逐节点独立预测（当前默认）；
+# multivariate=true 时支持多变量的模型（Toto/Chronos2）做联合建模，
+# 不支持的模型（TimesFM/基线）自动降级为逐列，并标记 multivariate_used=False。
+#
+# 用法：python src/forecasting/run_ablation.py configs/experiments/ablation_C_multivariate.yaml
+
+name: ablation_C_multivariate
+market: ERCOT
+nodes_group: volatility
+freq: 1h
+context_len: 168
+train_context_len: 1440
+horizon: 24
+multivariate: false          # 会被 ablate 覆盖
+data_start: 2025-04-01
+data_end: 2025-09-01
+
+backtest:
+  test_start: 2025-08-01
+  test_end: 2025-08-31
+  stride_hours: 24
+  max_origins: 10
+
+models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto]
+
+covariates: []
+
+spike:
+  quantile: 0.95
+  mode: global
+
+# ── 被消融的旋钮 ──────────────────────────────────────────────────────────────
+ablate:
+  key: multivariate
+  values: [false, true]
+  labels: ["单变量（逐节点独立）", "多变量（联合建模）"]
+  axis_label: "建模方式"

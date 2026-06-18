@@ -1,0 +1,28 @@
+# 基准实验 — 窗口 W3：极端尖峰期（2026-01）
+# 1月有 25 次 >$1000 的极端尖峰事件，是全数据集最极端的月份。
+# 这个窗口考验模型的尾部风险捕捉能力和 Spike-F1 表现。
+# 用法：python src/forecasting/run_experiment.py configs/experiments/baseline_w3_extreme.yaml
+
+name: baseline_w3_extreme
+market: ERCOT
+nodes_group: volatility
+freq: 1h
+context_len: 168
+train_context_len: 1440
+horizon: 24
+data_start: 2025-09-01
+data_end: 2026-02-01
+
+backtest:
+  test_start: 2026-01-01
+  test_end: 2026-01-31
+  stride_hours: 24
+  max_origins: 30
+
+models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto]
+
+covariates: []
+
+spike:
+  quantile: 0.95
+  mode: global

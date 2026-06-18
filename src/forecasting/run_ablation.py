@@ -82,7 +82,9 @@ def run_ablation(cfg: dict) -> dict:
 
         tagged = summ.copy()
         tagged.insert(0, "knob", key)
-        tagged.insert(1, "knob_value", val)
+        # val 可能是列表（如协变量消融 []→[load]→…），pandas.insert 会把列表
+        # 当数组匹配行数；统一转字符串存储。
+        tagged.insert(1, "knob_value", str(val))
         tagged.insert(2, "knob_label", label)
         merged_rows.append(tagged)
 

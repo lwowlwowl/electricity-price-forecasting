@@ -1,0 +1,36 @@
+# 消融 A：协变量 — 窗口 W1：稳定期（2025-08）
+# 用法：python src/forecasting/run_ablation.py configs/experiments/ablation_A_covariates_w1_stable.yaml
+
+name: ablation_A_covariates_w1_stable
+market: ERCOT
+nodes_group: volatility
+freq: 1h
+context_len: 168
+train_context_len: 1440
+horizon: 24
+data_start: 2025-04-01
+data_end: 2025-09-01
+
+backtest:
+  test_start: 2025-08-01
+  test_end: 2025-08-31
+  stride_hours: 24
+  max_origins: 10
+
+models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto]
+
+covariates: []
+
+spike:
+  quantile: 0.95
+  mode: global
+
+ablate:
+  key: covariates
+  values:
+    - []
+    - [load]
+    - [load, temperature]
+    - [load, temperature, wind, solar]
+  labels: ["无协变量", "+负荷", "+负荷+温度", "+负荷+温度+风光"]
+  axis_label: "协变量组合"

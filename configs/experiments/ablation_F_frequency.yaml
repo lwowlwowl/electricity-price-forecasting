@@ -1,0 +1,48 @@
+# 消融 F：数据频率（手册 §6）
+# 只转动 freq 一个旋钮：1h → 15min → 5min
+# 其余全部锁死在基准配置，回答"高频数据是否带来更难/更易？"
+#
+# 注意：horizon 的语义是"步数"而非"时间"，不同频率下 24 步代表不同时间跨度。
+# 为保持预测的时间跨度一致（始终预测未来 24 小时），按频率调整 horizon：
+#   1h → 24 步 = 24 小时
+#   15min → 96 步 = 24 小时
+#   5min → 288 步 = 24 小时
+# context_len 也按比例调整，始终回看 7 天。
+#
+# 用法：python src/forecasting/run_ablation.py configs/experiments/ablation_F_frequency.yaml
+
+name: ablation_F_frequency
+market: ERCOT
+nodes_group: volatility
+freq: 1h                    # 会被 ablate 覆盖
+context_len: 168             # 会联动调整
+train_context_len: 1440
+horizon: 24                  # 会联动调整
+data_start: 2025-04-01
+data_end: 2025-09-01
+
+backtest:
+  test_start: 2025-08-01
+  test_end: 2025-08-31
+  stride_hours: 24
+  max_origins: 10
+
+models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto]
+
+covariates: []
+
+spike:
+  quantile: 0.95
+  mode: global
+
+# ── 被消融的旋钮 ──────────────────────────────────────────────────────────────
+# 注意：频率消融比较特殊，改 freq 的同时需要联动改 horizon 和 context_len，
+# 否则不同频率下预测的时间跨度不一致。run_ablation 的 _set_knob 逐个写入。
+# 这里先只转 freq，horizon/context_len 需要在回测前手工或脚本联动修改。
+# 当前简化处理：不联动调整，仅改频率，让 24 步在不同频率下代表不同时间跨度，
+# 直接观察"同步数下高频数据是否更难/更易预测"。
+ablate:
+  key: freq
+  values: [1h, 15min]
+  labels: ["1h", "15min"]
+  axis_label: "数据频率"
