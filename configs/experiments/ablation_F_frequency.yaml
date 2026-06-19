@@ -11,7 +11,7 @@
 #
 # 用法：python src/forecasting/run_ablation.py configs/experiments/ablation_F_frequency.yaml
 
-name: ablation_F_frequency
+name: ablation_F_frequency_w1_stable
 market: ERCOT
 nodes_group: volatility
 freq: 1h                    # 会被 ablate 覆盖
@@ -25,7 +25,7 @@ backtest:
   test_start: 2025-08-01
   test_end: 2025-08-31
   stride_hours: 24
-  max_origins: 10
+  max_origins: 30
 
 models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto]
 

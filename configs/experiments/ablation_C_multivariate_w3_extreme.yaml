@@ -16,7 +16,7 @@ backtest:
   test_start: 2026-01-01
   test_end: 2026-01-31
   stride_hours: 24
-  max_origins: 10
+  max_origins: 30
 
 models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto]
 

@@ -4,7 +4,7 @@
 # 这份配置就是手册 §6 的"基准配置(Baseline Config)"，所有消融都从它出发，
 # 每次只改一个旋钮（如 covariates / context_len / horizon / freq）。
 
-name: baseline
+name: baseline_w1_stable
 market: ERCOT
 nodes_group: volatility      # 引用 configs/nodes.yaml 里的节点组
 freq: 1h

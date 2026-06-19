@@ -8,7 +8,7 @@
 #
 # 用法：python src/forecasting/run_ablation.py configs/experiments/ablation_C_multivariate.yaml
 
-name: ablation_C_multivariate
+name: ablation_C_multivariate_w1_stable
 market: ERCOT
 nodes_group: volatility
 freq: 1h
@@ -23,7 +23,7 @@ backtest:
   test_start: 2025-08-01
   test_end: 2025-08-31
   stride_hours: 24
-  max_origins: 10
+  max_origins: 30
 
 models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto]
 

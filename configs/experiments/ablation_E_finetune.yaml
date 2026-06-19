@@ -25,7 +25,7 @@ backtest:
   test_start: 2025-08-01
   test_end: 2025-08-31
   stride_hours: 24
-  max_origins: 10
+  max_origins: 30
 
 # 微调仅对基础模型有意义；基线模型每起报点已在重训
 models: [TimesFM, Chronos2, Toto]
