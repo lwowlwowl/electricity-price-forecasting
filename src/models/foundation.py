@@ -1,7 +1,7 @@
 """
 基础模型适配器 foundation.py
 =============================
-把三个时序基础模型（TimesFM-2.5 / Chronos-2 / Toto-1.0）统一封装成 Forecaster，
+把四个时序基础模型（TimesFM-2.5 / Chronos-2 / Toto-1.0 / Toto-2.0）统一封装成 Forecaster，
 使其能与基线在同一回测里公平对比。
 
 ★ 核心难点：三个模型装在各自独立 venv 里，依赖互相冲突，**不能在同一个
@@ -44,11 +44,13 @@ VENV_PYTHON = {
     "timesfm":  os.path.join(ROOT, "external", "timesfm", ".venv", "bin", "python"),
     "chronos2": os.path.join(ROOT, "external", "chronos-forecasting", ".venv", "bin", "python"),
     "toto":     os.path.join(ROOT, "external", "toto", ".venv", "bin", "python"),
+    "toto2":    os.path.join(ROOT, "external", "toto", ".venv", "bin", "python"),  # 共用 toto venv
 }
 WORKER_SCRIPT = {
     "timesfm":  os.path.join(WORKERS_DIR, "worker_timesfm.py"),
     "chronos2": os.path.join(WORKERS_DIR, "worker_chronos2.py"),
     "toto":     os.path.join(WORKERS_DIR, "worker_toto.py"),
+    "toto2":    os.path.join(WORKERS_DIR, "worker_toto2.py"),
 }
 
 
@@ -303,11 +305,31 @@ class TotoForecaster(FoundationForecaster):
     supports_multivariate = True       # 原生多变量联合建模
 
 
+class Toto2Forecaster(FoundationForecaster):
+    """Toto 2.0：u-μP scaling + 分位数输出头 + CPM 解码。
+
+    相比 1.0 的核心改进：
+    - 输出头从 Student-T 混合采样 → 9 分位数（Pinball Loss），消除数值爆炸；
+    - 解码从逐 patch 自回归 → CPM 单次前向，更快且误差不累积；
+    - 输入归一化增加 asinh 变换，对重尾分布（如电价尖峰）更鲁棒；
+    - patch_size 64→32，粒度更细；patch 嵌入改为 ResidualMLP。
+
+    多变量：通过 series_ids 控制，与 1.0 相同。
+    协变量：2.0 目前版本尚未开放 fine-tuning / exogenous 接口。
+    """
+    name = "Toto2"
+    kind = "toto2"
+    needs_training = False
+    supports_covariates = False        # 2.0 当前版本未开放 exogenous 接口
+    supports_multivariate = True       # 原生多变量联合建模
+
+
 # ── 注册表：名字 → 构造器 ─────────────────────────────────────────────────────
 FOUNDATION_REGISTRY = {
     "TimesFM":  lambda **kw: TimesFMForecaster(),
     "Chronos2": lambda **kw: Chronos2Forecaster(),
     "Toto":     lambda **kw: TotoForecaster(),
+    "Toto2":    lambda **kw: Toto2Forecaster(),
 }
 
 
@@ -316,7 +338,7 @@ if __name__ == "__main__":
     print("=" * 60)
     print("基础模型适配器环境自检")
     print("=" * 60)
-    for kind in ("timesfm", "chronos2", "toto"):
+    for kind in ("timesfm", "chronos2", "toto", "toto2"):
         py_ok = os.path.exists(VENV_PYTHON[kind])
         sc_ok = os.path.exists(WORKER_SCRIPT[kind])
         print(f"{kind:10s}  venv={'✅' if py_ok else '❌'}  "

@@ -23,7 +23,7 @@ backtest:
 # 免训练-朴素/统计：Naive/SeasonalNaive + ETS/Theta(统计强基线)
 # 需训练-树模型：RandomForest/LightGBM/XGBoost(每起报点重训、无泄漏)
 # 基础模型：TimesFM/Chronos2/Toto(预训练权重，子进程 worker 推理)
-models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto]
+models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto, Toto2]
 
 covariates: []               # 基准不用协变量；消融A 在此处增减
 

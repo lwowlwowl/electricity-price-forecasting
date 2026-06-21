@@ -28,7 +28,7 @@ backtest:
   max_origins: 30
 
 # 微调仅对基础模型有意义；基线模型每起报点已在重训
-models: [TimesFM, Chronos2, Toto]
+models: [TimesFM, Chronos2, Toto, Toto2]
 
 covariates: []
 

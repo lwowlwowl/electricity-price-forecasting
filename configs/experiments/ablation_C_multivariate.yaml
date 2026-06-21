@@ -25,7 +25,7 @@ backtest:
   stride_hours: 24
   max_origins: 30
 
-models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto]
+models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto, Toto2]
 
 covariates: []
 

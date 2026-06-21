@@ -40,6 +40,7 @@ MODEL_COLORS = {
     "ETS": "#8D6E63", "Theta": "#A1887F",
     "RandomForest": "#66BB6A", "LightGBM": "#26A69A", "XGBoost": "#9CCC65",
     "TimesFM": "#4A90D9", "Chronos2": "#5C6BC0", "Toto": "#E05C5C",
+    "Toto2": "#C62828",
 }
 _FALLBACK = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
              "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"]
