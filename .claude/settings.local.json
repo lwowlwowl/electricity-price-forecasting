@@ -5,7 +5,23 @@
       "Bash(/Users/wanghaochen/school/toto/.venv/bin/pip3 install *)",
       "Bash(mv dataset/EIA data/raw/)",
       "Bash(mv dataset/ENLITEN-Grid-Econ-Data data/raw/)",
-      "Bash(mv dataset/lmp_processed.csv data/processed/)"
+      "Bash(mv dataset/lmp_processed.csv data/processed/)",
+      "Bash(cat)",
+      "Bash(/Users/wanghaochen/school/external/timesfm/.venv/bin/python3 /tmp/test_ablations_timesfm.py)",
+      "Bash(/Users/wanghaochen/school/external/timesfm/.venv/bin/python3 *)",
+      "Bash(/Users/wanghaochen/school/external/chronos-forecasting/.venv/bin/python3 /tmp/test_ablations_chronos2.py)",
+      "Bash(/Users/wanghaochen/school/external/toto/.venv/bin/python3 /tmp/test_ablations_toto2.py)",
+      "Bash(/Users/wanghaochen/school/external/toto/.venv/bin/python3 *)",
+      "Bash(python3 src/structural_ablation/run_structural_ablation.py configs/structural_ablation/smoke_toto2.yaml)",
+      "Bash(python3 src/structural_ablation/run_structural_ablation.py configs/structural_ablation/rerun_fixed_timesfm.yaml)",
+      "Bash(python3 src/structural_ablation/run_structural_ablation.py configs/structural_ablation/rerun_fixed_chronos2.yaml)",
+      "Bash(python3 src/structural_ablation/run_structural_ablation.py configs/structural_ablation/rerun_fixed_toto2.yaml)",
+      "Bash(python3 -c \"import pandas as pd; df=pd.read_csv\\('data/results/structural_ablation/structural_full_toto2/structural_ablation_summary.csv'\\); print\\(df['ablation_type'].tolist\\(\\)\\)\")",
+      "Bash(python3 -c \"import pandas as pd; df=pd.read_csv\\('data/results/structural_fixed_toto2/structural_ablation_summary.csv'\\); print\\(df['ablation_type'].tolist\\(\\)\\)\")",
+      "Bash(python3 -c \"import pandas as pd; df=pd.read_csv\\('data/results/structural_ablation/structural_full_chronos2/structural_ablation_summary.csv'\\); print\\(df['ablation_type'].tolist\\(\\)\\)\")",
+      "Bash(python3 -c \"import pandas as pd; df=pd.read_csv\\('data/results/structural_fixed_chronos2/structural_ablation_summary.csv'\\); print\\(df['ablation_type'].tolist\\(\\)\\)\")",
+      "Bash(python3 -c \"import pandas as pd; df=pd.read_csv\\('data/results/structural_ablation/structural_full_timesfm/structural_ablation_summary.csv'\\); print\\(df['ablation_type'].tolist\\(\\)\\)\")",
+      "Bash(python3 *)"
     ]
   }
 }

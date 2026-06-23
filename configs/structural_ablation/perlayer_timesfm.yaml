@@ -1,0 +1,44 @@
+# 逐层消融实验 - TimesFM-2.5 (20层)
+# 逐一跳过每层，精确定位各层贡献
+name: structural_perlayer_timesfm
+market: ERCOT
+nodes_group: volatility
+freq: 1h
+context_len: 168
+horizon: 24
+data_start: "2025-06-01"
+data_end: "2025-09-01"
+backtest:
+  test_start: "2025-08-01"
+  test_end: "2025-08-31"
+  stride_hours: 24
+  max_origins: 30
+spike:
+  quantile: 0.95
+  mode: global
+multivariate: false
+structural_ablation:
+  models: [timesfm]
+  ablations:
+    - skip_layer_0
+    - skip_layer_1
+    - skip_layer_2
+    - skip_layer_3
+    - skip_layer_4
+    - skip_layer_5
+    - skip_layer_6
+    - skip_layer_7
+    - skip_layer_8
+    - skip_layer_9
+    - skip_layer_10
+    - skip_layer_11
+    - skip_layer_12
+    - skip_layer_13
+    - skip_layer_14
+    - skip_layer_15
+    - skip_layer_16
+    - skip_layer_17
+    - skip_layer_18
+    - skip_layer_19
+  include_baseline: true
+  baseline_models: [Naive, SeasonalNaive]

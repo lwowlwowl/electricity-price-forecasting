@@ -1,0 +1,33 @@
+# 消融 C：单变量 vs 多变量 — 窗口 W2：负价期（2025-03）
+# 用法：python src/parameter_ablation/run_ablation.py configs/parameter_ablation/ablation_C_multivariate_w2_negative.yaml
+
+name: ablation_C_multivariate_w2_negative
+market: ERCOT
+nodes_group: volatility
+freq: 1h
+context_len: 168
+train_context_len: 1440
+horizon: 24
+multivariate: false
+data_start: 2025-01-01
+data_end: 2025-04-01
+
+backtest:
+  test_start: 2025-03-01
+  test_end: 2025-03-31
+  stride_hours: 24
+  max_origins: 30
+
+models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto, Toto2]
+
+covariates: []
+
+spike:
+  quantile: 0.95
+  mode: global
+
+ablate:
+  key: multivariate
+  values: [false, true]
+  labels: ["单变量（逐节点独立）", "多变量（联合建模）"]
+  axis_label: "建模方式"

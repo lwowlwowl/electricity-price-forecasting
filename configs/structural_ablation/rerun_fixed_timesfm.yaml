@@ -1,0 +1,28 @@
+# 重跑修复后的 TimesFM-2.5 结构消融
+# - skip_attention: 原先 CRASH（Identity 返回 Tensor 而非 (Tensor, cache) 元组），现已修复
+# - halve_heads: 原先 CRASH（compile 后 decode_cache 大小与减半 heads 不匹配），
+#                现改为先消融再 compile，同时更新 in_features 和 model.h
+name: structural_fixed_timesfm
+market: ERCOT
+nodes_group: volatility
+freq: 1h
+context_len: 168
+horizon: 24
+data_start: "2025-06-01"
+data_end: "2025-09-01"
+backtest:
+  test_start: "2025-08-01"
+  test_end: "2025-08-31"
+  stride_hours: 24
+  max_origins: 30
+spike:
+  quantile: 0.95
+  mode: global
+multivariate: false
+structural_ablation:
+  models: [timesfm]
+  ablations:
+    - skip_attention
+    - halve_heads
+  include_baseline: true
+  baseline_models: [Naive, SeasonalNaive, ETS]

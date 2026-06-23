@@ -1,0 +1,24 @@
+# 结构消融冒烟测试配置 - Toto-2.0 attention 消融
+# 仅用 3 个起报点做快速验证，确认流程通畅
+name: structural_smoke_toto2
+market: ERCOT
+nodes_group: volatility
+freq: 1h
+context_len: 168
+horizon: 24
+data_start: "2025-06-01"
+data_end: "2025-09-01"
+backtest:
+  test_start: "2025-08-01"
+  test_end: "2025-08-31"
+  stride_hours: 24
+  max_origins: 3
+spike:
+  quantile: 0.95
+  mode: global
+multivariate: false
+structural_ablation:
+  models: [toto2]
+  ablations: [skip_attention, halve_heads, skip_ffn]
+  include_baseline: true
+  baseline_models: [Naive, SeasonalNaive]

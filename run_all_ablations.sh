@@ -12,21 +12,21 @@ echo "开始时间: $(date)"
 echo "========================================"
 
 CONFIGS=(
-  "configs/experiments/ablation_A_covariates.yaml"
-  "configs/experiments/ablation_A_covariates_w2_negative.yaml"
-  "configs/experiments/ablation_A_covariates_w3_extreme.yaml"
-  "configs/experiments/ablation_B_context.yaml"
-  "configs/experiments/ablation_B_context_w2_negative.yaml"
-  "configs/experiments/ablation_B_context_w3_extreme.yaml"
-  "configs/experiments/ablation_C_multivariate.yaml"
-  "configs/experiments/ablation_C_multivariate_w2_negative.yaml"
-  "configs/experiments/ablation_C_multivariate_w3_extreme.yaml"
-  "configs/experiments/ablation_D_horizon.yaml"
-  "configs/experiments/ablation_D_horizon_w2_negative.yaml"
-  "configs/experiments/ablation_D_horizon_w3_extreme.yaml"
-  "configs/experiments/ablation_F_frequency.yaml"
-  "configs/experiments/ablation_F_frequency_w2_negative.yaml"
-  "configs/experiments/ablation_F_frequency_w3_extreme.yaml"
+  "configs/parameter_ablation/ablation_A_covariates.yaml"
+  "configs/parameter_ablation/ablation_A_covariates_w2_negative.yaml"
+  "configs/parameter_ablation/ablation_A_covariates_w3_extreme.yaml"
+  "configs/parameter_ablation/ablation_B_context.yaml"
+  "configs/parameter_ablation/ablation_B_context_w2_negative.yaml"
+  "configs/parameter_ablation/ablation_B_context_w3_extreme.yaml"
+  "configs/parameter_ablation/ablation_C_multivariate.yaml"
+  "configs/parameter_ablation/ablation_C_multivariate_w2_negative.yaml"
+  "configs/parameter_ablation/ablation_C_multivariate_w3_extreme.yaml"
+  "configs/parameter_ablation/ablation_D_horizon.yaml"
+  "configs/parameter_ablation/ablation_D_horizon_w2_negative.yaml"
+  "configs/parameter_ablation/ablation_D_horizon_w3_extreme.yaml"
+  "configs/parameter_ablation/ablation_F_frequency.yaml"
+  "configs/parameter_ablation/ablation_F_frequency_w2_negative.yaml"
+  "configs/parameter_ablation/ablation_F_frequency_w3_extreme.yaml"
 )
 
 TOTAL=${#CONFIGS[@]}
@@ -41,7 +41,7 @@ for cfg in "${CONFIGS[@]}"; do
   echo "  开始: $(date)"
   echo "========================================"
 
-  python3 src/forecasting/run_ablation.py "$cfg"
+  python3 src/parameter_ablation/run_ablation.py "$cfg"
   EXIT_CODE=$?
 
   if [ $EXIT_CODE -eq 0 ]; then

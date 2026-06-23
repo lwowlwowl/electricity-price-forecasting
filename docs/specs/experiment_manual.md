@@ -384,7 +384,7 @@ school/
 ## 附录 B：实验配置文件示例
 
 ```yaml
-# configs/experiments/ablation_A_covariates.yaml
+# configs/parameter_ablation/ablation_A_covariates.yaml
 name: "ablation_A_covariates"
 market: ERCOT
 nodes_group: volatility        # 引用 nodes.yaml 中的清单

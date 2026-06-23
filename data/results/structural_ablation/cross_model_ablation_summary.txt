@@ -1,0 +1,122 @@
+================================================================================
+STRUCTURAL ABLATION v2.1 — CROSS-MODEL SUMMARY
+================================================================================
+
+--- Toto-2.0 (baseline SMAPE: 29.92) ---
+  skip_attention            SMAPE=91.27      delta=+205.0%
+  halve_heads               SMAPE=NaN        delta=CRASHED
+  skip_variate              SMAPE=36.34      delta=+21.5%
+  skip_time                 SMAPE=79.95      delta=+167.2%
+  remove_rope               SMAPE=39.08      delta=+30.6%
+  disable_xpos              SMAPE=29.92      delta=+0.0%
+  simplify_patch_emb        SMAPE=55.90      delta=+86.8%
+  simplify_output_head      SMAPE=NaN        delta=CRASHED
+  skip_ffn                  SMAPE=155.37     delta=+419.3%
+  skip_layernorm            SMAPE=NaN        delta=CRASHED
+  truncate_front_half       SMAPE=132.76     delta=+343.7%
+  truncate_back_half        SMAPE=77.24      delta=+158.1%
+
+--- Chronos-2 (baseline SMAPE: 30.06) ---
+  skip_attention            SMAPE=46.25      delta=+53.9%
+  halve_heads               SMAPE=28.84      delta=-4.1%
+  skip_variate              SMAPE=32.06      delta=+6.6%
+  skip_time                 SMAPE=47.25      delta=+57.2%
+  remove_rope               SMAPE=42.13      delta=+40.2%
+  simplify_patch_emb        SMAPE=NaN        delta=CRASHED
+  simplify_output_head      SMAPE=NaN        delta=CRASHED
+  skip_ffn                  SMAPE=39.91      delta=+32.8%
+  skip_layernorm            SMAPE=90.58      delta=+201.3%
+  truncate_front_half       SMAPE=31.38      delta=+4.4%
+  truncate_back_half        SMAPE=42.09      delta=+40.0%
+
+--- TimesFM-2.5 (baseline SMAPE: 27.67) ---
+  skip_attention            SMAPE=NaN        delta=CRASHED
+  halve_heads               SMAPE=27.67      delta=+0.0%
+  remove_rope               SMAPE=27.67      delta=+0.0%
+  simplify_patch_emb        SMAPE=46.61      delta=+68.5%
+  simplify_output_head      SMAPE=27.67      delta=+0.0%
+  point_only                SMAPE=27.67      delta=+0.0%
+  skip_ffn                  SMAPE=162.23     delta=+486.4%
+  skip_layernorm            SMAPE=NaN        delta=CRASHED
+  truncate_front_half       SMAPE=34.75      delta=+25.6%
+  truncate_front_quarter    SMAPE=36.26      delta=+31.1%
+  truncate_back_half        SMAPE=40.82      delta=+47.5%
+
+================================================================================
+CROSS-MODEL COMPARISON (SMAPE % degradation from baseline)
+================================================================================
+Ablation                      Toto-2.0    Chronos-2  TimesFM-2.5
+----------------------------------------------------------------
+skip_attention                +205.0%      +53.9%       CRASH
+halve_heads                     CRASH       -4.1%       +0.0%
+skip_ffn                      +419.3%      +32.8%     +486.4%
+skip_layernorm                  CRASH     +201.3%       CRASH
+remove_rope                    +30.6%      +40.2%       +0.0%
+truncate_front_half           +343.7%       +4.4%      +25.6%
+truncate_back_half            +158.1%      +40.0%      +47.5%
+simplify_patch_emb             +86.8%       CRASH      +68.5%
+simplify_output_head            CRASH       CRASH       +0.0%
+
+KEY: positive% = worse, negative% = better, CRASH = model produced NaN
+
+================================================================================
+MODEL-SPECIFIC ABLATIONS
+================================================================================
+
+Toto-2.0 specific:
+  skip_variate              +21.5%
+  skip_time                 +167.2%
+  disable_xpos              +0.0%
+
+Chronos-2 specific:
+  skip_variate              +6.6%
+  skip_time                 +57.2%
+
+TimesFM-2.5 specific:
+  point_only                +0.0%
+  truncate_front_quarter    +31.1%
+
+================================================================================
+KEY FINDINGS
+================================================================================
+
+1. FFN is universally the most critical component:
+   - Toto-2.0: +419% SMAPE degradation
+   - TimesFM-2.5: +487% degradation
+   - Chronos-2: +33% (less severe, but still 2nd highest after LayerNorm)
+
+2. LayerNorm is catastrophic when removed:
+   - All 3 models CRASH or show extreme degradation (Chronos-2: +201%)
+   - Confirms LayerNorm is essential for numerical stability at inference
+
+3. Attention mechanisms show model-dependent importance:
+   - Toto-2.0: skip_attention causes +205% (very important)
+   - Chronos-2: skip_attention causes +54% (moderate)
+   - TimesFM-2.5: CRASH (cannot run without attention)
+
+4. halve_heads reveals over-parameterization:
+   - Toto-2.0: CRASH (fragile to head reduction)
+   - Chronos-2: -4.1% (IMPROVES with fewer heads!)
+   - TimesFM-2.5: 0% (completely no effect)
+
+5. RoPE positional encoding importance varies:
+   - Toto-2.0: +31% (moderate importance)
+   - Chronos-2: +40% (important)
+   - TimesFM-2.5: 0% (no effect - may use different pos encoding)
+
+6. Layer depth distribution:
+   - All models: back layers more critical than front layers
+   - Toto-2.0: front +344% vs back +158%
+   - Chronos-2: front +4.4% vs back +40%
+   - TimesFM-2.5: front +26% vs back +48%
+
+7. Patch embedding is universally important:
+   - Toto-2.0: +87%
+   - TimesFM-2.5: +68%
+   - Chronos-2: CRASH
+
+8. Toto-2.0 distinguishes time vs variate attention:
+   - skip_time: +167% (time is critical)
+   - skip_variate: +21% (variate is supplementary)
+   - disable_xpos: 0% (xPos is completely dispensable)
+

@@ -1,0 +1,24 @@
+# 跨模型对比：注意力消融
+# 同时对三个模型做 attention 相关的消融，对比哪个模型最依赖注意力机制
+name: structural_cross_attention
+market: ERCOT
+nodes_group: volatility
+freq: 1h
+context_len: 168
+horizon: 24
+data_start: "2025-06-01"
+data_end: "2025-09-01"
+backtest:
+  test_start: "2025-08-01"
+  test_end: "2025-08-31"
+  stride_hours: 24
+  max_origins: 30
+spike:
+  quantile: 0.95
+  mode: global
+multivariate: false
+structural_ablation:
+  models: [toto2, chronos2, timesfm]
+  ablations: [skip_attention, halve_heads]
+  include_baseline: true
+  baseline_models: [Naive, SeasonalNaive]

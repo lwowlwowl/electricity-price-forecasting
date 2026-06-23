@@ -1,0 +1,36 @@
+# 结构消融完整实验 - Toto-2.0 全消融扫描
+# 对 Toto-2.0 跑所有适用的结构消融类型
+name: structural_full_toto2
+market: ERCOT
+nodes_group: volatility
+freq: 1h
+context_len: 168
+horizon: 24
+data_start: "2025-06-01"
+data_end: "2025-09-01"
+backtest:
+  test_start: "2025-08-01"
+  test_end: "2025-08-31"
+  stride_hours: 24
+  max_origins: 30
+spike:
+  quantile: 0.95
+  mode: global
+multivariate: false
+structural_ablation:
+  models: [toto2]
+  ablations:
+    - skip_attention
+    - halve_heads
+    - skip_variate
+    - skip_time
+    - remove_rope
+    - disable_xpos
+    - simplify_patch_emb
+    - simplify_output_head
+    - skip_ffn
+    - skip_layernorm
+    - truncate_front_half
+    - truncate_back_half
+  include_baseline: true
+  baseline_models: [Naive, SeasonalNaive, ETS]
