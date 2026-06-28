@@ -1,0 +1,26 @@
+# 重跑修复后的 TimesFM remove_rope 和 simplify_output_head 消融
+# 修复：worker 加入 torch_compile=False，消除 Dynamo 编译图对属性修改的屏蔽
+name: structural_rerun_rope_head_timesfm
+market: ERCOT
+nodes_group: volatility
+freq: 1h
+context_len: 168
+horizon: 24
+data_start: "2025-06-01"
+data_end: "2025-09-01"
+backtest:
+  test_start: "2025-08-01"
+  test_end: "2025-08-31"
+  stride_hours: 24
+  max_origins: 30
+spike:
+  quantile: 0.95
+  mode: global
+multivariate: false
+structural_ablation:
+  models: [timesfm]
+  ablations:
+    - remove_rope
+    - simplify_output_head
+  include_baseline: true
+  baseline_models: [Naive, SeasonalNaive]

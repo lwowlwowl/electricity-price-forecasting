@@ -33,8 +33,16 @@ def main(req_path: str, resp_path: str):
     ablation_type = str(req["ablation_type"]) if "ablation_type" in req.files else None
 
     import timesfm
+    # ★ 消融实验必须禁用 torch.compile（torch_compile=False）。
+    # load_checkpoint() 内部调用 torch.compile() 会将 forward 路径"冻结"成
+    # Dynamo 编译图，编译图捕获的是具体张量引用而非 Python 属性名。
+    # 若在 compile 后再修改属性（如 use_rotary_position_embeddings=False 或
+    # output_projection_quantiles=nn.Linear(...)），编译执行路径仍走原始逻辑，
+    # 导致消融静默失效（MAE 与 baseline bit-identical）。
+    # 关闭 torch_compile 后模型以普通 Python 动态调度运行，属性修改立即生效。
     model = timesfm.TimesFM_2p5_200M_torch.from_pretrained(
-        "google/timesfm-2.5-200m-pytorch")
+        "google/timesfm-2.5-200m-pytorch",
+        torch_compile=False)
 
     # ★ 应用结构消融必须在 compile() 之前执行。
     # compile() 会根据当前模型结构（特别是 num_heads）预分配 decode_cache；
