@@ -126,7 +126,10 @@ class _StatForecaster(NaiveForecaster):
 
     # 拟合用的最大历史长度（电价高频数据，截断以控速）
     MAX_CONTEXT = 2000
-    SEASON = 24
+
+    def __init__(self, season: int = 24):
+        # SEASON 作为实例变量，允许按频率传入（1h→24，15min→96，5min→288）
+        self.SEASON = season
 
     def _fit_forecast_1d(self, series: np.ndarray, horizon: int) -> np.ndarray:
         """对单条一维序列拟合并预测，返回长度 horizon 的点预测。"""
@@ -406,8 +409,9 @@ BASELINE_REGISTRY = {
     # 免训练（零样本）
     "Naive":         lambda **kw: NaiveForecaster(),
     "SeasonalNaive": lambda **kw: SeasonalNaiveForecaster(period=kw.get("period", 24)),
-    "ETS":           lambda **kw: ETSForecaster(),
-    "Theta":         lambda **kw: ThetaForecaster(),
+    # ETS/Theta 的季节周期同样按频率传入（1h→24，15min→96，5min→288）
+    "ETS":           lambda **kw: ETSForecaster(season=kw.get("period", 24)),
+    "Theta":         lambda **kw: ThetaForecaster(season=kw.get("period", 24)),
     # 需训练
     "RandomForest":  lambda **kw: RandomForestForecaster(),
     "LightGBM":      lambda **kw: LightGBMForecaster(),

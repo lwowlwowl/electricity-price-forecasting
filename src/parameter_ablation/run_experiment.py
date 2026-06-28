@@ -36,6 +36,18 @@ CONFIG_DIR = os.path.join(ROOT, "configs")
 NODES_YAML = os.path.join(CONFIG_DIR, "nodes.yaml")
 RESULTS_DIR = os.path.join(ROOT, "data", "results")
 
+# 频率 → 每天步数（SeasonalNaive/ETS/Theta 的季节周期）
+_STEPS_PER_DAY: dict = {
+    "1h": 24, "hourly": 24, "h": 24, "60min": 24,
+    "15min": 96, "15m": 96,
+    "5min": 288, "5m": 288,
+}
+
+
+def _period_for_freq(freq: str) -> int:
+    """根据数据频率返回一天的步数，用作季节性基线的周期。"""
+    return _STEPS_PER_DAY.get(str(freq).lower(), 24)
+
 
 # ── 极简 YAML 读取（避免强依赖 pyyaml）────────────────────────────────────────
 def _load_yaml(path: str) -> dict:
@@ -129,7 +141,11 @@ def run(cfg: dict) -> dict:
     print(f"\n取数完成：{data.shape}  {data.index[0]} → {data.index[-1]}")
 
     # 2) 构造模型
-    forecasters = [build_forecaster(m) for m in cfg["models"]]
+    # period = 每天步数（SeasonalNaive/ETS/Theta 的季节周期随频率联动）
+    period = _period_for_freq(freq)
+    forecasters = [build_forecaster(m, period=period) for m in cfg["models"]]
+    if period != 24:
+        print(f"⚠️  频率 {freq}：季节周期 period={period}（SeasonalNaive/ETS/Theta 均已调整）")
     print(f"模型：{[f.name for f in forecasters]}")
 
     # 3) 回测配置

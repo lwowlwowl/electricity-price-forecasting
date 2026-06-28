@@ -1,4 +1,8 @@
 # 消融 F：数据频率 — 窗口 W2：负价期（2025-03）
+# 联动策略同 W1：等时间跨度比较
+#   1h  → context_len=168 / horizon=24 / stride=24  / train=1440
+#   15min→ context_len=672 / horizon=96 / stride=96  / train=5760
+#
 # 用法：python src/parameter_ablation/run_ablation.py configs/parameter_ablation/ablation_F_frequency_w2_negative.yaml
 
 name: ablation_F_frequency_w2_negative
@@ -28,5 +32,8 @@ spike:
 ablate:
   key: freq
   values: [1h, 15min]
-  labels: ["1h", "15min"]
+  labels: ["1h（基准）", "15min（联动等时长）"]
   axis_label: "数据频率"
+  linked:
+    - {context_len: 168, horizon: 24, backtest.stride_hours: 24, train_context_len: 1440}
+    - {context_len: 672, horizon: 96, backtest.stride_hours: 96, train_context_len: 5760}

@@ -21,7 +21,12 @@
       "Bash(python3 -c \"import pandas as pd; df=pd.read_csv\\('data/results/structural_ablation/structural_full_chronos2/structural_ablation_summary.csv'\\); print\\(df['ablation_type'].tolist\\(\\)\\)\")",
       "Bash(python3 -c \"import pandas as pd; df=pd.read_csv\\('data/results/structural_fixed_chronos2/structural_ablation_summary.csv'\\); print\\(df['ablation_type'].tolist\\(\\)\\)\")",
       "Bash(python3 -c \"import pandas as pd; df=pd.read_csv\\('data/results/structural_ablation/structural_full_timesfm/structural_ablation_summary.csv'\\); print\\(df['ablation_type'].tolist\\(\\)\\)\")",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "Bash(python3 src/parameter_ablation/run_ablation.py configs/parameter_ablation/ablation_F_frequency.yaml)",
+      "Bash(echo \"W1_EXIT:$?\")",
+      "Read(//private/tmp/**)",
+      "Bash(python3 src/parameter_ablation/run_ablation.py configs/parameter_ablation/ablation_F_frequency_w2_negative.yaml)",
+      "Bash(echo \"W2_EXIT:$?\")"
     ]
   }
 }

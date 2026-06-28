@@ -61,17 +61,30 @@ def run_ablation(cfg: dict) -> dict:
     labels = ab.get("labels") or [str(v) for v in values]
     base_name = cfg["name"]
 
+    # linked：与主旋钮联动的额外旋钮（每档对应一个 {knob: value} 字典）
+    # 例如频率消融里，改 freq 的同时联动 context_len / horizon / backtest.stride_hours
+    linked_list = ab.get("linked") or [{} for _ in values]
+    if len(linked_list) != len(values):
+        raise ValueError(
+            f"ablate.linked 长度（{len(linked_list)}）必须与 ablate.values（{len(values)}）一致"
+        )
+
     print("=" * 70)
     print(f"消融实验：{base_name}　转动旋钮：{key}　档位：{values}")
+    if any(linked_list):
+        print(f"  联动旋钮：{[list(d.keys()) for d in linked_list if d]}")
     print("=" * 70)
 
     per_level = []          # [(label, summary_df), ...] 给画图
     merged_rows = []        # 跨档总表
 
-    for val, label in zip(values, labels):
+    for val, label, linked in zip(values, labels, linked_list):
         sub = copy.deepcopy(cfg)
         sub.pop("ablate", None)
         _set_knob(sub, key, val)
+        # 联动旋钮：与主旋钮同步写入
+        for lk, lv in linked.items():
+            _set_knob(sub, lk, lv)
         # 每档单独落盘目录，避免互相覆盖
         sub["name"] = f"{base_name}/{key}={val}"
 
