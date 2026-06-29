@@ -26,7 +26,8 @@
       "Bash(echo \"W1_EXIT:$?\")",
       "Read(//private/tmp/**)",
       "Bash(python3 src/parameter_ablation/run_ablation.py configs/parameter_ablation/ablation_F_frequency_w2_negative.yaml)",
-      "Bash(echo \"W2_EXIT:$?\")"
+      "Bash(echo \"W2_EXIT:$?\")",
+      "Skill(keybindings-help)"
     ]
   }
 }

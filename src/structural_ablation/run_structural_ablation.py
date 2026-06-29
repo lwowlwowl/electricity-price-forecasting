@@ -82,7 +82,7 @@ try:
 except ImportError:
     HAS_BASELINE = False
 
-RESULTS_DIR = os.path.join(ROOT, "data", "results")
+RESULTS_DIR = os.path.join(ROOT, "data", "results", "structural_ablation")
 CONFIG_DIR = os.path.join(ROOT, "configs")
 NODES_YAML = os.path.join(CONFIG_DIR, "nodes.yaml")
 

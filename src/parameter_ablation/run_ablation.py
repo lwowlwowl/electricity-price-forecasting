@@ -38,7 +38,7 @@ sys.path.insert(0, os.path.join(ROOT, "src", "evaluation"))
 import run_experiment as RE          # noqa: E402  复用取数/建模/回测/落盘
 from plotting import plot_ablation   # noqa: E402
 
-RESULTS_DIR = os.path.join(ROOT, "data", "results")
+RESULTS_DIR = os.path.join(ROOT, "data", "results", "parameter_ablation")
 
 
 def _set_knob(cfg: dict, key: str, value):

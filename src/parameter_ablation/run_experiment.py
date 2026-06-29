@@ -34,7 +34,7 @@ from backtest import run_backtest, BacktestConfig  # noqa: E402
 
 CONFIG_DIR = os.path.join(ROOT, "configs")
 NODES_YAML = os.path.join(CONFIG_DIR, "nodes.yaml")
-RESULTS_DIR = os.path.join(ROOT, "data", "results")
+RESULTS_DIR = os.path.join(ROOT, "data", "results", "parameter_ablation")
 
 # 频率 → 每天步数（SeasonalNaive/ETS/Theta 的季节周期）
 _STEPS_PER_DAY: dict = {
