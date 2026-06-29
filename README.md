@@ -73,12 +73,23 @@ school/
 ├── hf_cache/                           # HuggingFace 模型权重缓存（离线可用）
 ├── data/
 │   ├── raw/<市场>/processed/           # 原始长表（loader 直接读取，如 actual_price_hourly.csv）
-│   └── results/<实验名>/               # 每个实验的输出（summary.csv / per_origin.csv / 图）
-├── docs/                               # 实验手册、概念说明、参考文献
+│   ├── results/<实验名>/               # 每个实验的输出（summary.csv / per_origin.csv / 图）
+│   └── results/structural_ablation/report/  # 结构消融汇总报告
+│       ├── fig1_component_heatmap.png   # 组件贡献热力图
+│       ├── fig2_perlayer_curves.png     # 逐层贡献曲线
+│       ├── fig3_discordance_scatter.png # SMAPE vs Spike-F1 散点图
+│       ├── fig4_pruning_map.png         # 剪枝安全边界图
+│       ├── architecture_insight_report.md # 架构洞察报告
+│       ├── significance_summary.md      # 统计显著性检验摘要
+│       └── significance_tests.csv       # 完整检验记录
+├── docs/                               # 实验手册、结果汇报、概念说明、参考文献
 │   ├── specs/
 │   │   ├── experiment_manual.md        # v1.0 参数级消融手册
 │   │   └── experiment_manual_v2.md     # v2.0 结构级消融与模型融合手册
+│   ├── 参数消融汇报材料.md              # 参数消融汇报文档（含关键发现与结论）
 │   ├── 参数消融实验结果与问答.md         # 参数消融全量结果分析（11 模型 × 3 窗口 × 5 消融）
+│   ├── 结构消融汇报材料.md              # 结构消融汇报文档（含图表与核心发现）
+│   ├── 结构消融实验结果与问答.md         # 结构消融完整分析（组件级 + 逐层 + 显著性检验）
 │   └── concepts/                       # 核心概念说明
 └── run_all_ablations.sh                # 一键跑全部消融实验的脚本
 ```
@@ -105,9 +116,24 @@ school/
 
 每组消融均在 W1/W2/W3 三个窗口上完成，共 5 × 3 = 15 组实验，全部 11 个模型参与对比。
 
-### 结构消融（v2.0，下一阶段）
+### 结构消融（v2.0，已完成）
 
-在 v1.0 结论基础上，深入模型内部做结构级消融——逐一移除或替换 Transformer 内部组件（注意力层、位置编码、输出头、Patch 机制等），定位每个基础模型在电价预测上的关键组件，最终设计融合模型。详见 `docs/specs/experiment_manual_v2.md`。
+在 v1.0 结论基础上，深入模型内部做结构级消融——逐一移除或替换 Transformer 内部组件（注意力层、位置编码、输出头、Patch 机制等），定位每个基础模型在电价预测上的关键组件。
+
+**已完成实验**：
+- 组件级消融：36 次（3 模型 × 12 类组件，含 FFN、注意力、位置编码、Patch 嵌入等）
+- 逐层消融：32 次（Toto2 6 层 + Chronos2 6 层 + TimesFM 20 层）
+- 统计显著性检验：Wilcoxon signed-rank + Bonferroni 校正
+
+**核心发现**：
+| 发现 | 说明 |
+|------|------|
+| FFN 是核心引擎 | 三模型移除 FFN 后 SMAPE 退化 +419%~+486% |
+| 精度 vs 尖峰通路分离 | 部分层专精度、部分层专尖峰检测，甚至互相抑制 |
+| 层冗余程度差异大 | TimesFM 40% 层可安全移除，Toto2 几乎无冗余 |
+| RoPE 不可或缺 | Chronos2 移除后 Spike-F1 归零，TimesFM 依赖最弱 |
+
+详见 `docs/specs/experiment_manual_v2.md`、汇报材料 `docs/结构消融汇报材料.md`、完整分析 `docs/结构消融实验结果与问答.md`。
 
 ## 快速开始
 
@@ -136,7 +162,7 @@ python src/parameter_ablation/run_experiment.py configs/parameter_ablation/basel
 python src/parameter_ablation/run_experiment.py configs/parameter_ablation/baseline_w3_extreme.yaml
 ```
 
-结果写入 `data/results/<实验名>/`，含 `summary.csv`（各模型指标汇总，按 MAE 升序）、`per_origin.csv`（逐起报点明细）、`thresholds.json`（尖峰阈值）。
+结果写入 `data/results/<实验名>/`，含 `summary.csv`（各模型指标汇总，按 MAE 升序）、`per_origin.csv`（逐起报点明细）、`thresholds.json`（尖峰阈值）、`records.csv`（逐时刻原始预测）及对比图（`summary_compare.png`、`timeseries_compare.png`、`ablation_*.png`）。
 
 > 后台运行：基础模型推理较慢，可放后台。建议加 `-u` 让日志实时可见：
 > ```bash
@@ -198,8 +224,8 @@ bash run_all_ablations.sh
 
 ## 实验进度
 
-- ✅ **v1.0 参数消融**：全部完成。5 类消融 × 3 窗口 = 15 组实验，11 个模型全部跑完，结果文档见 `docs/参数消融实验结果与问答.md`。
-- 🔧 **v2.0 结构消融**：代码框架已就位（`src/structural_ablation/`），待模型 venv 就绪后执行。方案见 `docs/specs/experiment_manual_v2.md`。
+- ✅ **v1.0 参数消融**：全部完成。5 类消融 × 3 窗口 = 15 组实验，11 个模型全部跑完，结果文档见 `docs/参数消融汇报材料.md` 和 `docs/参数消融实验结果与问答.md`。
+- ✅ **v2.0 结构消融**：全部完成。36 次组件级消融 + 32 次逐层消融 + Wilcoxon 显著性检验，结果文档见 `docs/结构消融汇报材料.md` 和 `docs/结构消融实验结果与问答.md`，图表见 `data/results/structural_ablation/report/`。
 
 ### 5. 跑结构消融实验
 
