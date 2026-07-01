@@ -1,0 +1,52 @@
+# ElecFM 融合模型配置
+# 参考：fusion_model_design_v3.md
+# 运行：external/timesfm/.venv/bin/python src/fusion_model/run_fusion.py --config configs/fusion/electfm.yaml
+
+# ── 数据 ──────────────────────────────────────────────────────────────────────
+market:       ERCOT
+nodes:                         # volatility 组高波动节点（与 v1.0/v2.0 一致）
+  - LZ_LCRA
+  - LZ_WEST
+  - LZ_RAYBN
+freq:         1h
+context_len:  168              # 168h = 1 周上下文
+horizon:      24               # 24h 预测步长
+
+# ── 模型 ──────────────────────────────────────────────────────────────────────
+pretrained_id: google/timesfm-2.5-200m-pytorch   # TimesFM 骨干（从 hf_cache 离线加载）
+
+# ── 训练 ──────────────────────────────────────────────────────────────────────
+batch_size:           32
+train_stride:         1        # 滑窗步长（1 = 全覆盖，约 25,000 训练样本）
+
+# Stage 1（冻结底层，热身顶层 + heads）
+stage1_epochs:        10
+stage1_lr:            1.0e-4
+
+# Stage 2（全层解冻，Cosine decay）
+stage2_epochs:        40
+stage2_lr:            5.0e-6
+stage2_lr_min:        5.0e-7
+
+# 公共训练参数
+gradient_clip:        1.0
+weight_decay:         0.01
+early_stop_patience:  10       # 监控验证集 Pinball
+use_amp:              true     # fp16 混合精度（CUDA/MPS 自动启用；CPU 自动禁用）
+
+# 损失函数
+lambda_pinball:       0.8
+lambda_spike:         0.2
+# spike_pos_weight 由脚本从训练集自动统计（理论值 ≈ 19）
+
+# ── 评估 ──────────────────────────────────────────────────────────────────────
+stride_hours:         24       # 起报点间隔（每天一个）
+max_origins:          30       # 每窗口起报点数（≥30 满足手册要求）
+spike_quantile:       0.95     # P95 尖峰阈值
+
+# τ* 搜索（验证集 Spike-F1 最大化）
+tau_search_range:     [0.05, 0.95]
+tau_search_step:      0.05
+
+# ── 输出 ──────────────────────────────────────────────────────────────────────
+checkpoint_dir:       data/checkpoints/electfm   # 相对项目根
