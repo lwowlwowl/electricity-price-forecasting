@@ -1,0 +1,76 @@
+# ElecFM v5 — 纯 Spike Head 训练
+# 策略：完全冻结骨干（TimesFM 零样本权重不变），只训练 spike_head
+#
+# context_len 选择依据（ablation B 完整数值）：
+#   W1 SMAPE: 168h=27.67 / 336h=27.42 / 720h=26.84（720h 明确最优）
+#   W2 SMAPE: 三档无明显差异
+#   W3 SMAPE: 三档基本持平（720h 略差 0.6pp）
+#   → 720h 在 W1 优势明显，整体最优
+#
+# 预期结果：
+#   SMAPE ≈ 26.84（720h zero-shot 基准，骨干不动）
+#   Spike-F1 > 0.388（优于 v4 的 mean 信号）
+#
+# ⚠️  内存注意：720h / patch_size(32) = 23 patches，比 168h 多 ~4x
+#   但 spike_head_only 模式骨干无梯度，实际显存压力可控
+#   如果 MPS OOM：把 context_len 改为 336（W1 SMAPE=27.42，折中方案）
+#
+# 可训练参数：~340K（spike_head only）
+# 参数/样本比：340K / 124K ≈ 2.7 ✅
+# 预计训练时间：~3-4 小时（720h 比 168h 慢约 2x）
+
+market:       ERCOT
+nodes:
+  - HB_BUSAVG
+  - HB_HOUSTON
+  - HB_HUBAVG
+  - HB_NORTH
+  - HB_PAN
+  - HB_SOUTH
+  - HB_WEST
+  - LZ_AEN
+  - LZ_CPS
+  - LZ_HOUSTON
+  - LZ_LCRA
+  - LZ_NORTH
+  - LZ_RAYBN
+  - LZ_SOUTH
+  - LZ_WEST
+freq:         1h
+context_len:  720   # ablation B 明确：W1 SMAPE 26.84（优于 168h 的 27.67）
+horizon:      24
+
+pretrained_id: google/timesfm-2.5-200m-pytorch
+
+# v5 核心配置
+spike_head_only:      true   # 完全冻结骨干，只训 spike_head
+use_lora:             false  # 不使用 LoRA
+
+batch_size:           32
+train_stride:         1
+
+# 训练参数
+# 监控指标：val spike loss（pinball 被骨干冻结后不变，无监控意义）
+stage1_epochs:        30     # spike head 参数少，可多训
+stage1_lr:            1.0e-3 # 参数少 + 样本多，可用更高 LR
+
+# Stage 2 被跳过（spike_head_only 模式下自动跳过）
+stage2_epochs:        0
+stage2_lr:            0.0
+stage2_lr_min:        0.0
+
+gradient_clip:        1.0
+weight_decay:         0.01
+early_stop_patience:  5      # 监控 val spike loss，收敛快
+use_amp:              true
+
+lambda_pinball:       0.8
+lambda_spike:         0.2
+
+stride_hours:         24
+max_origins:          30
+spike_quantile:       0.95
+tau_search_range:     [0.05, 0.95]
+tau_search_step:      0.05
+
+checkpoint_dir:       data/checkpoints/electfm_ercot_full_v5

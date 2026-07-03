@@ -1,0 +1,57 @@
+# ElecFM V6 — CrossNodeAttention 跨节点尖峰检测
+# 在 spike head 分叉点插入跨节点注意力，移植 Chronos skip_variate 消融思路。
+#
+# 架构：
+#   骨干（TimesFM 15层，冻结）→ spike 分叉点 →
+#   CrossNodeAttention（3节点 hidden state 互相 attend）→
+#   spike_head（各节点独立输出）
+#
+# 训练节点：LZ_LCRA、LZ_WEST、LZ_RAYBN（ERCOT 高波动节点，由代码固定）
+# 可训练参数：CrossNodeAttention ~330K + spike_head ~334K = ~664K
+# 参数/样本比：664K / ~8307 ≈ 79.9
+# 预计时间：~3-5 小时（早停后）
+
+market:       ERCOT
+nodes:        # 仅用于评估时的显示，V6 训练节点由 V6_NODES 常量固定
+  - LZ_LCRA
+  - LZ_WEST
+  - LZ_RAYBN
+freq:         1h
+context_len:  168    # ablation B：TimesFM 对 168h vs 720h 无明显差异，且 168h 训练更快
+horizon:      24
+
+pretrained_id: google/timesfm-2.5-200m-pytorch
+
+# V6 核心配置
+cross_node_only:      true   # 3节点联合训练 + CrossNodeAttention
+spike_head_only:      false
+use_lora:             false
+cross_attn_dim:       64     # Q/K/V 投影维度，控制 CrossNodeAttention 参数量
+
+batch_size:           32
+train_stride:         1
+
+# 训练参数（同 v5a，只监控 val spike loss）
+stage1_epochs:        30
+stage1_lr:            1.0e-3
+
+# Stage 2 自动跳过（cross_node_only 模式）
+stage2_epochs:        0
+stage2_lr:            0.0
+stage2_lr_min:        0.0
+
+gradient_clip:        1.0
+weight_decay:         0.01
+early_stop_patience:  5
+use_amp:              true
+
+lambda_pinball:       0.8
+lambda_spike:         0.2
+
+stride_hours:         24
+max_origins:          30
+spike_quantile:       0.95
+tau_search_range:     [0.05, 0.95]
+tau_search_step:      0.05
+
+checkpoint_dir:       data/checkpoints/electfm_ercot_full_v6

@@ -1,8 +1,31 @@
 # 融合模型设计文档 v3.0
 
 > 版本：v3.0 ｜ 日期：2026-06-30
+> 更新：2026-07-02（添加第一轮训练结果与 LoRA 方案）
 > 前置文档：`experiment_manual.md`（v1.0 参数消融）、`experiment_manual_v2.md`（v2.0 结构消融）
-> 状态：**设计完成，待实现**
+> 相关文档：`elecfm_lora_optimization.md`（LoRA 优化方案）
+> 状态：**第一轮训练完成，转向 LoRA 方案**
+
+---
+
+## 更新日志
+
+### 2026-07-02：第一轮全 ERCOT 训练结果
+
+**执行结果**：❌ 严重过拟合
+
+| 指标 | 结果 |
+|------|------|
+| 零样本 SMAPE | 27.55（vs 27.67 baseline）✅ 通过 |
+| Stage 1 最优 Val Pinball | 8.29（Epoch 1）|
+| Stage 1 最终 Val Pinball | 8.95（Epoch 10，恶化）|
+| Stage 2 第 1 epoch | 8.44（继续恶化）|
+
+**问题诊断**：79M 可训练参数 vs 125K 样本 = 634 参数/样本，严重失衡。
+
+**下一步**：采用 **LoRA 微调** 方案，见 `elecfm_lora_optimization.md`。
+
+---
 
 ---
 
@@ -310,68 +333,49 @@ def is_excluded(context_start, target_end):
 
 ### 6.2 分阶段微调策略
 
-#### Stage 1：冻结低层，热身顶层（约 10 epoch）
+> **⚠️ 重要更新（2026-07-02）**：第一轮全 ERCOT 训练（125K 样本）出现严重过拟合。
+> 当前训练方案（非 LoRA）参数/样本比为 634，远超合理范围。
+> **建议切换到 LoRA 方案**：详见 `elecfm_lora_optimization.md`，可训练参数降至 ~4M（-95%）。
+>
+> 以下保留原始非 LoRA 方案作为参考。
 
-**目标**：让顶层和两个输出头适应电价分布，同时保护底层预训练表征（含 spike 关键层）不被污染。
+#### Stage 1：冻结底层 + quant_head，热身顶层 + spike_head（约 10 epoch）
 
-> **实际架构（Step 1 验证后）**：模型共 15 层（L0–L14），spike layer = 新 L6（原 L7）。
-> Stage 1 冻结 tokenizer + L0–L6（7 层），训练 L7–L14（8 层）+ 两个 head。
+**目标**：让 L7–L14 和 spike_head 适应电价域，同时完整保护 quant_head 的预训练分位数校准。
+
+> **关键设计决策（基于第一轮训练结果）**：
+> quant_head 在全部两个 Stage 中**永久冻结**。理由：
+> - 上轮训练（quant_head 可训）：Coverage 从 0.775 降至 0.582，val pinball 从第 1 epoch 就单调上升，说明 25K 样本不足以维持分位数校准质量
+> - 预训练 quant_head 的分位数覆盖率（≈80%）是 TimesFM 多年预训练的结果，不应用小数据覆盖
+> - 本研究的创新贡献是 spike_head，不是改进分位数头
 
 ```python
-# 冻结：tokenizer + L0–L6（含 spike 关键层新 L6 = 原 L7，避免扰动尖峰表征）
-for module in [model.tokenizer, *model.layers[:7]]:
-    for p in module.parameters():
-        p.requires_grad = False
+# 冻结：tokenizer + L0–L6（含 spike 层）+ quant_head（永久冻结）
+_freeze([model.tokenizer] + list(model.layers[:7]) + [model.quant_head])
 
-# 训练：L7–L14 + quantile_head + spike_head
-trainable_params = (
-    list(model.layers[7:].parameters()) +
-    list(model.quantile_head.parameters()) +
-    list(model.spike_head.parameters())
-)
-# 可训练参数：约 8×10M + 10M + 0.34M ≈ 90M
+# 训练：L7–L14 + spike_head（约 80M + 0.34M ≈ 80M）
+_unfreeze([model.spike_head] + list(model.layers[7:]))
+# 可训练参数：约 8×10M + 0.34M ≈ 80M
 ```
 
-- 学习率：`1e-4`  
+- 学习率：`1e-5`（上轮 1e-4 导致 val 第 1 epoch 即发散，降一个数量级）
 - 优化器：AdamW（`weight_decay=0.01`）  
 - LR scheduler：constant（Stage 1 不 decay，让顶层快速适应）
 
-#### Stage 2：全层微调（约 40 epoch）
+#### Stage 2：解冻骨干（quant_head 保持冻结），Cosine decay（约 40 epoch）
 
-**目标**：端到端精调整个网络，让底层表征也向电价特征适配。
+**目标**：让底层表征轻度向电价特征适配，同时严格保护 quant_head 的预训练校准。
 
 ```python
-# 解冻全部参数
-for p in model.parameters():
-    p.requires_grad = True
+# 解冻：tokenizer + 所有 15 层（quant_head 保持 requires_grad=False）
+_unfreeze([model.tokenizer] + list(model.layers))
+_freeze([model.quant_head])   # 显式确认 quant_head 不参与更新
 ```
 
-- 学习率：`5e-6`（比 Stage 1 低 20×，避免灾难性遗忘）  
+- 学习率：`5e-7`（比 Stage 1 低 20×；上轮 5e-6 仍过激）
 - 优化器：AdamW（`weight_decay=0.01`）  
-- LR scheduler：Cosine decay → `5e-7`  
+- LR scheduler：Cosine decay → `5e-8`  
 - 梯度裁剪：`max_norm = 1.0`
-
-**⚠️ Stage 2 过拟合退路（若验证集 Pinball 在 5 epoch 内开始回升）**：
-
-全参数解冻 133M 参数在 46K 样本上存在过拟合风险。如果 Stage 2 中验证集 Pinball 无法继续收敛或开始反弹，改用 **LoRA 微调底层**：
-
-```python
-# 退路方案：保持底层 L0–L6 冻结，仅对底层 attn 的 q_proj/v_proj 加 LoRA adapter
-# （需要 peft 库：pip install peft）
-from peft import get_peft_model, LoraConfig, TaskType
-
-lora_config = LoraConfig(
-    r=8,                     # LoRA rank，8 或 16
-    lora_alpha=16,
-    target_modules=["q_proj", "v_proj"],   # 仅注意力 QV 投影
-    lora_dropout=0.05,
-    bias="none",
-)
-# 应用到底层 L0–L6（仍冻结其余参数）
-# 实际可训练参数：LoRA ~2M + 顶层 90M ≈ 92M，与 Stage 1 相当
-```
-
-> **执行顺序**：先跑默认的全参数 Stage 2，观察 5 epoch 内的验证集曲线。若过拟合，切换到 LoRA 退路，将两个结果作为消融比较（全参 vs LoRA）写入实验报告。
 
 #### 通用设置
 
@@ -551,34 +555,56 @@ assert original_l7_id == pruned_l5_id, "层对应关系验证失败"
 
 ## 附录 B：待做实验的执行顺序
 
+> **2026-07-02 更新**：第一轮全 ERCOT 训练（非 LoRA）失败（严重过拟合）。
+> 当前执行顺序已转向 **LoRA 方案**，详见 `elecfm_lora_optimization.md`。
+> 以下保留原始执行顺序作为历史参考。
+
+### 原始执行顺序（非 LoRA）
+
 ```
 Step 1：【验证】12 层剪枝基准（零样本，不训练）
   → 对比原 20 层 TimesFM 的 SMAPE 和 Spike-F1
   → 通过标准：SMAPE 退化 < 5%（验证 8 层同时移除的累积效应可接受）
   → 若 5% ≤ SMAPE 退化 < 10%：警告，进入 Step 2 但在 Step 5 额外报告基准差距
-  → 若 SMAPE 退化 ≥ 10%：层间依赖强，切换到 5 层保守方案：
-      仅移除 |ΔSMAPE| < 1% 的最安全层 {L6(+0.6%), L8(≈0%), L9(+0.8%), L13(+0.3%), L15(+0.8%)}
-      → 重跑 Step 1 验证 15 层模型，通过后继续
+  → 若 SMAPE 退化 ≥ 10%：层间依赖强，切换到 5 层保守方案
 
 Step 2：【实现】SpikeHead + 双头 forward pass（不训练，随机初始化 spike head）
   → 验证 spike head 的 skip connection 能正确接到新 L5 的输出
-  → 确认 TimesFM forward() 在训练模式下梯度可正常流通（见 9.3 先决条件第 5 条）
+  → 确认 TimesFM forward() 在训练模式下梯度可正常流通
 
-Step 3：【训练 Stage 1】冻结底层，只训顶层 + 两个 head，10 epoch
-  → 监控：训练 loss 下降，验证集 Pinball 不发散
+Step 3：【训练 Stage 1】冻结 tokenizer + L0-L6 + quant_head，训练 L7-L14 + spike_head，10 epoch
+  → 监控：训练 Pinball 下降，验证集 Pinball 跟随
 
-Step 4：【训练 Stage 2】解冻全部，低 LR 微调，40 epoch + early stopping
-  → 若验证集 Pinball 在 5 epoch 内反弹，切换至 LoRA 退路（见 6.2）
+Step 4：【训练 Stage 2】解冻骨干（quant_head 仍冻结），LR=5e-7，40 epoch + early stopping
 
 Step 5：【评估】在 W1/W2/W3 上跑滚动回测，生成 summary.csv
-  → 与 v1.0/v2.0 中 TimesFM 基准对比
-  → ⚠️ Spike head 推理阈值搜索（不能直接用 0.5）：
-      先在验证集上枚举阈值 {0.05, 0.10, ..., 0.90}，
-      找到使验证集 Spike-F1 最大的最优阈值 τ*，
-      再以 τ* 在三个测试窗口上输出最终 Spike-F1
-      （原因：pos_weight=19 训练后模型输出分布已偏移，0.5 不再是最优边界）
 
 Step 6：（可选）消融对比
-  → λ_spike 敏感性：{0.1, 0.2, 0.3, 0.4}，找 Pinball vs Spike-F1 的 Pareto 前沿
-  → SpikeHead V1 vs V2：对比单层 Linear 和 Linear-SiLU-Linear 的效果差异
+  → λ_spike 敏感性：{0.1, 0.2, 0.3, 0.4}
+  → SpikeHead V1 vs V2
+```
+
+### 当前执行顺序（LoRA 方案）
+
+```
+Step 1：【实现】添加 LoRA 支持
+  → 安装 peft，修改 model.py/train.py
+  → 验证 LoRA 参数正确识别（~4M 可训练）
+
+Step 2：【小规模验证】lsp 单个节点
+  → 确认 LoRA 训练正常（val pinball 下降）
+  → 调通 checkpoint 保存/加载
+
+Step 3：【全 ERCOT LoRA 训练】
+  → Stage 1: 5 epochs, LR=1e-3, LoRA r=8
+  → Stage 2: 20 epochs, LR=5e-4, Cosine decay
+  → 预期时间：~7 小时
+
+Step 4：【评估】W1/W2/W3 回测
+  → 对比 LoRA vs 非 LoRA
+  → 验证过拟合是否缓解
+
+Step 5：（若成功）lambda sweep
+  → λ_spike = 0.1, 0.2, 0.3
+  → 找 Pinball vs Spike-F1 的 Pareto 前沿
 ```

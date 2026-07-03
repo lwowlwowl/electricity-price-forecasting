@@ -1,0 +1,68 @@
+# ElecFM V7 — SwiGLU Adapter（Toto 组件移植）
+# 在 h_spike → spike_head 之间插入零初始化的 SwiGLU 残差旁路
+#
+# 三模型融合叙事：
+#   TimesFM 骨干（剪枝，消融驱动）
+#   + Toto SwiGLU adapter（FFN 是最关键组件的消融动机，零初始化不损害 SMAPE）
+#   + 自研 Spike Head（精度/尖峰通路功能分离发现）
+#   + Chronos CrossNodeAttention（V6 中单独验证）
+#
+# 可训练参数：SwiGLU adapter ~245K + spike_head ~334K = ~579K
+# 参数/样本比：579K / 91K ≈ 6.4 ✅
+# 训练数据：15 节点（同 v5a，无需改数据管道）
+
+market:       ERCOT
+nodes:
+  - HB_BUSAVG
+  - HB_HOUSTON
+  - HB_HUBAVG
+  - HB_NORTH
+  - HB_PAN
+  - HB_SOUTH
+  - HB_WEST
+  - LZ_AEN
+  - LZ_CPS
+  - LZ_HOUSTON
+  - LZ_LCRA
+  - LZ_NORTH
+  - LZ_RAYBN
+  - LZ_SOUTH
+  - LZ_WEST
+freq:         1h
+context_len:  168
+horizon:      24
+
+pretrained_id: google/timesfm-2.5-200m-pytorch
+
+# V7 核心配置
+spike_head_only:      true   # 冻结骨干
+use_swiglu_adapter:   true   # ← SwiGLU adapter（Toto 组件）
+swiglu_adapter_dim:   64     # W1/W2/W3 维度，总参数 3×1280×64 ≈ 245K
+use_lora:             false
+cross_node_only:      false
+
+batch_size:           32
+train_stride:         1
+
+stage1_epochs:        30
+stage1_lr:            1.0e-3
+
+stage2_epochs:        0
+stage2_lr:            0.0
+stage2_lr_min:        0.0
+
+gradient_clip:        1.0
+weight_decay:         0.01
+early_stop_patience:  5
+use_amp:              true
+
+lambda_pinball:       0.8
+lambda_spike:         0.2
+
+stride_hours:         24
+max_origins:          30
+spike_quantile:       0.95
+tau_search_range:     [0.05, 0.95]
+tau_search_step:      0.05
+
+checkpoint_dir:       data/checkpoints/electfm_ercot_full_v7

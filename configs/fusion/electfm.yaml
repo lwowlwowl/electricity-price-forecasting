@@ -19,14 +19,15 @@ pretrained_id: google/timesfm-2.5-200m-pytorch   # TimesFM 骨干（从 hf_cache
 batch_size:           32
 train_stride:         1        # 滑窗步长（1 = 全覆盖，约 25,000 训练样本）
 
-# Stage 1（冻结底层，热身顶层 + heads）
+# Stage 1（冻结底层 + quant_head，只训 L7-L14 + spike_head）
+# LR 降至 1e-5：上轮 1e-4 导致 val 第 1 epoch 即发散，说明梯度更新过激
 stage1_epochs:        10
-stage1_lr:            1.0e-4
+stage1_lr:            1.0e-5
 
-# Stage 2（全层解冻，Cosine decay）
+# Stage 2（解冻骨干，quant_head 永久冻结）
 stage2_epochs:        40
-stage2_lr:            5.0e-6
-stage2_lr_min:        5.0e-7
+stage2_lr:            5.0e-7
+stage2_lr_min:        5.0e-8
 
 # 公共训练参数
 gradient_clip:        1.0

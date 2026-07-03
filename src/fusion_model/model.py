@@ -38,6 +38,13 @@ from timesfm.torch import util as tfm_util
 
 from spike_head import SpikeHeadV2   # 同目录
 
+# ── LoRA 支持 ────────────────────────────────────────────────────────────────
+try:
+    from peft import LoraConfig, get_peft_model, TaskType
+    PEFT_AVAILABLE = True
+except ImportError:
+    PEFT_AVAILABLE = False
+
 # ── 剪枝配置（保守方案：仅移除独立测试时 |ΔSMAPE|<1% 的最安全 5 层）──────────
 # 原计划移除 8 层，但 Step 1 验证发现累积退化 +18%（超过 10% 阈值）
 # 保守方案：只移除 {L6(+0.6%), L8(≈0%), L9(+0.8%), L13(+0.3%), L15(+0.8%)}
@@ -70,6 +77,8 @@ class ElecFM(nn.Module):
         horizon: int = 24,
         spike_head_hidden: int = 256,
         spike_head_dropout: float = 0.1,
+        use_swiglu_adapter: bool = False,
+        swiglu_adapter_dim: int = 64,
     ):
         super().__init__()
         self.horizon = horizon
@@ -97,6 +106,12 @@ class ElecFM(nn.Module):
         self.layers       = nn.ModuleList([layer for _, layer in kept])
         self.quant_head   = module.output_projection_quantiles   # ResidualBlock(1280→10240)
         self.spike_head   = SpikeHeadV2(D_MODEL, spike_head_hidden, horizon, spike_head_dropout)
+
+        # ── V7：可选 SwiGLU adapter（Toto 的 SwiGLU FFN 思路移植）──────────────
+        # 插在 h_spike → spike_head 之间，零初始化，不影响初始性能
+        self.swiglu_adapter: Optional[SwiGLUAdapter] = (
+            SwiGLUAdapter(D_MODEL, swiglu_adapter_dim) if use_swiglu_adapter else None
+        )
 
         # 释放原始模型（避免重复保留内存）
         del module, tfm
@@ -196,7 +211,12 @@ class ElecFM(nn.Module):
 
         # Step 5: 逐层 Transformer，在 SPIKE_LAYER_IDX 捕获 h_spike
         h_spike: Optional[torch.Tensor] = None
-        for i, layer in enumerate(self.layers):
+        # 兼容 PeftModel（LoRA 包装后）和普通 ModuleList
+        layers = self.layers
+        if hasattr(layers, 'base_model'):
+            # PeftModel 情况：访问基础模型
+            layers = layers.base_model.model if hasattr(layers.base_model, 'model') else layers.base_model
+        for i, layer in enumerate(layers):
             h, _ = layer(h, patch_mask, None)        # (B, n_patches, 1280), cache=None
             if i == SPIKE_LAYER_IDX:
                 h_spike = h[:, -1, :]                # [B, 1280]，取最后一个 patch 位置
@@ -211,10 +231,51 @@ class ElecFM(nn.Module):
         # 取前 horizon 步，分位数索引 1-9 = q0.1 ~ q0.9
         quant_pred = q_last[:, :self.horizon, 1:10]  # [B, horizon, 9]
 
-        # Step 7: Spike head（从新 L6 = 原 L7 的 h_spike 分叉，在精度"压制"层之前）
+        # Step 7: SwiGLU adapter（可选，V7 Toto 组件移植）→ Spike head
+        if self.swiglu_adapter is not None:
+            h_spike = self.swiglu_adapter(h_spike)   # zero-init，初始不影响性能
         spike_logits = self.spike_head(h_spike)      # [B, horizon]
 
         return quant_pred, spike_logits
+
+    # ── 返回中间特征（供 ElecFMV6 使用）─────────────────────────────────────────
+
+    def forward_features(
+        self, x: torch.Tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        与 forward() 相同，但返回 h_spike 而不是 spike_logits。
+        供 ElecFMV6 在 CrossNodeAttention 之前提取各节点 hidden state。
+
+        返回
+        ----
+        quant_pred : [batch, horizon, 9]
+        h_spike    : [batch, d_model]   新 L6 的 hidden state
+        """
+        B = x.shape[0]
+        inputs, masks = self._make_patches(x)
+        normed, ctx_mu, ctx_sigma = self._normalize(inputs, masks)
+        tok_in = torch.cat([normed, masks.to(normed.dtype)], dim=-1)
+        h = self.tokenizer(tok_in)
+        patch_mask = masks[..., -1]
+
+        h_spike: Optional[torch.Tensor] = None
+        layers = self.layers
+        if hasattr(layers, 'base_model'):
+            layers = layers.base_model.model if hasattr(layers.base_model, 'model') else layers.base_model
+        for i, layer in enumerate(layers):
+            h, _ = layer(h, patch_mask, None)
+            if i == SPIKE_LAYER_IDX:
+                h_spike = h[:, -1, :]
+
+        assert h_spike is not None
+        q_raw    = self.quant_head(h)
+        q_denorm = tfm_util.revin(q_raw, ctx_mu, ctx_sigma, reverse=True)
+        q_last   = q_denorm[:, -1, :].reshape(B, QUANTILE_OS, N_Q)
+        quant_pred = q_last[:, :self.horizon, 1:10]
+        # 注意：forward_features 返回 adapter 前的 h_spike（供 V6 CrossNodeAttention 使用）
+        # V7 的 adapter 在 spike head 调用处应用，不在这里
+        return quant_pred, h_spike
 
     # ── 便捷推理方法（eval 模式，不计算梯度）────────────────────────────────────
 
@@ -260,3 +321,295 @@ class ElecFM(nn.Module):
         model = cls(**kwargs)
         model.load_state_dict(torch.load(path, map_location="cpu", weights_only=True))
         return model
+
+
+# ── LoRA 辅助函数 ────────────────────────────────────────────────────────────
+
+def get_target_modules_for_lora(model: nn.Module) -> list[str]:
+    """
+    自动识别模型中适合添加 LoRA 的目标模块名称。
+    主要匹配 Attention 和 FFN 中的线性投影层。
+
+    TimesFM 命名规范：
+    - Attention: attn.qkv_proj (合并 QKV), attn.out (输出投影)
+    - FFN: ff0, ff1
+    """
+    target_modules = []
+    for name, module in model.named_modules():
+        if isinstance(module, nn.Linear):
+            # TimesFM 特定的命名
+            if any(key in name for key in ["attn.qkv_proj", "attn.out", "ff0", "ff1"]):
+                target_modules.append(name)
+            # 其他常见命名（备用）
+            elif any(key in name for key in ["q_proj", "k_proj", "v_proj", "o_proj",
+                                            "query", "key", "value", "dense",
+                                            "gate_proj", "up_proj", "down_proj",
+                                            "fc1", "fc2"]):
+                target_modules.append(name)
+    return target_modules
+
+
+def apply_lora_to_model(
+    model: nn.Module,
+    r: int = 8,
+    lora_alpha: int = 16,
+    lora_dropout: float = 0.05,
+    target_modules: Optional[list[str]] = None,
+) -> nn.Module:
+    """
+    对模型应用 LoRA。
+
+    参数
+    ----
+    model : 基础模型（ElecFM 或 TimesFM 子模块）
+    r : LoRA 低秩维度（默认 8）
+    lora_alpha : 缩放因子（默认 16 = 2*r）
+    lora_dropout : LoRA dropout 概率（默认 0.05）
+    target_modules : 目标模块名称列表，None 则自动识别
+
+    返回
+    ----
+    应用 LoRA 后的模型
+    """
+    if not PEFT_AVAILABLE:
+        raise ImportError("peft 库未安装，请运行: pip install peft")
+
+    if target_modules is None:
+        target_modules = get_target_modules_for_lora(model)
+
+    if not target_modules:
+        raise ValueError("未找到适合 LoRA 的目标模块，请检查模型结构")
+
+    config = LoraConfig(
+        r=r,
+        lora_alpha=lora_alpha,
+        target_modules=target_modules,
+        lora_dropout=lora_dropout,
+        bias="none",
+        task_type=TaskType.SEQ_2_SEQ_LM,
+    )
+
+    lora_model = get_peft_model(model, config)
+    return lora_model
+
+
+def create_elecfm_with_lora(
+    horizon: int = 24,
+    spike_head_hidden: int = 256,
+    spike_head_dropout: float = 0.1,
+    lora_r: int = 8,
+    lora_alpha: int = 16,
+    lora_dropout: float = 0.05,
+    target_modules: Optional[list[str]] = None,
+    pretrained_id: str = "google/timesfm-2.5-200m-pytorch",
+) -> ElecFM:
+    """
+    创建带 LoRA 的 ElecFM 模型。
+
+    参数
+    ----
+    horizon, spike_head_hidden, spike_head_dropout : 模型架构参数
+    lora_r : LoRA 低秩维度（默认 8）
+    lora_alpha : LoRA 缩放因子（默认 16）
+    lora_dropout : LoRA dropout（默认 0.05）
+    target_modules : 目标模块列表，None 则使用 TimesFM 默认值
+    pretrained_id : TimesFM 预训练模型 ID
+
+    返回
+    ----
+    ElecFM 模型，其中 layers 已应用 LoRA
+    """
+    if not PEFT_AVAILABLE:
+        raise ImportError("peft 库未安装，请运行: pip install peft")
+
+    # 1. 创建基础 ElecFM 模型
+    base_model = ElecFM(
+        pretrained_id=pretrained_id,
+        horizon=horizon,
+        spike_head_hidden=spike_head_hidden,
+        spike_head_dropout=spike_head_dropout,
+    )
+
+    # 2. 对 layers 应用 LoRA
+    # 注意：我们需要对 transformer layers 应用 LoRA
+    if target_modules is None:
+        # TimesFM 默认目标：Transformer 层的投影矩阵
+        target_modules = ["attn.qkv_proj", "attn.out", "ff0", "ff1"]
+
+    config = LoraConfig(
+        r=lora_r,
+        lora_alpha=lora_alpha,
+        target_modules=target_modules,
+        lora_dropout=lora_dropout,
+        bias="none",
+        # 不指定 task_type，避免需要 prepare_inputs_for_generation
+    )
+
+    # 3. 对 layers 应用 LoRA（使用 ModuleList 包装）
+    from peft import PeftModel
+    # 先包装 ModuleList
+    lora_layers = get_peft_model(base_model.layers, config)
+    base_model.layers = lora_layers
+
+    # 4. 打印可训练参数信息
+    trainable_params = sum(p.numel() for p in base_model.parameters() if p.requires_grad)
+    total_params = sum(p.numel() for p in base_model.parameters())
+    print(f"LoRA 模型参数: {trainable_params:,} / {total_params:,} "
+          f"({100 * trainable_params / total_params:.2f}% 可训练)")
+
+    return base_model
+
+
+# 向后兼容：保留原始 create_elecfm_model 函数名
+create_elecfm_model = create_elecfm_with_lora
+
+
+# ── V7：SwiGLU Adapter（Toto 的 SwiGLU FFN 思路移植）─────────────────────────
+
+class SwiGLUAdapter(nn.Module):
+    """
+    零初始化 SwiGLU 残差旁路（V7 新增组件）。
+    插在 h_spike → spike_head 之间，给 spike head 的输入做一次 SwiGLU 风格变换。
+
+    设计原则：
+    - 零初始化 W3（输出投影）→ 训练起始时 adapter 输出为 0，等同于 identity
+    - 不改变骨干任何权重，不影响 SMAPE
+    - 消融依据：Toto 移除 SwiGLU FFN 后退化 +419%，FFN 是最关键组件
+      本 adapter 将 SwiGLU 逻辑移植到 TimesFM 的 spike 表征上
+
+    参数量：3 × d_model × d_hidden（d_hidden=64 时约 245K）
+    """
+
+    def __init__(self, d_model: int = D_MODEL, d_hidden: int = 64):
+        super().__init__()
+        self.W1 = nn.Linear(d_model, d_hidden, bias=False)  # gate
+        self.W2 = nn.Linear(d_model, d_hidden, bias=False)  # value
+        self.W3 = nn.Linear(d_hidden, d_model, bias=False)  # output（零初始化）
+        nn.init.zeros_(self.W3.weight)  # 零初始化：训练开始时旁路输出 = 0
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        参数
+        ----
+        x : [B, d_model]
+
+        返回
+        ----
+        [B, d_model]   x + SwiGLU(x)（零初始化时等于 x）
+        """
+        gate = F.silu(self.W1(x))          # [B, d_hidden]
+        val  = self.W2(x)                  # [B, d_hidden]
+        return x + self.W3(gate * val)     # 残差连接
+
+
+# ── V6：跨节点注意力 ─────────────────────────────────────────────────────────
+
+class CrossNodeAttention(nn.Module):
+    """
+    轻量跨节点注意力（V6 新增组件）。
+    在 spike head 分叉点（新 L6 = 原 L7）之后、spike_head 之前，
+    让 3 个节点的 hidden state 互相做注意力，引入跨节点价格相关性信息。
+
+    参数来源：Chronos skip_variate 消融（SMAPE 退化 +6.7%）提供动机，
+             但此为在 TimesFM 骨干上的移植实验，效果待验证。
+
+    参数量：4 × (1280×64) + 1280×2 ≈ 330K
+    """
+
+    def __init__(self, d_model: int = D_MODEL, d_attn: int = 64):
+        super().__init__()
+        self.q    = nn.Linear(d_model, d_attn, bias=False)
+        self.k    = nn.Linear(d_model, d_attn, bias=False)
+        self.v    = nn.Linear(d_model, d_attn, bias=False)
+        self.out  = nn.Linear(d_attn, d_model, bias=False)
+        self.norm = nn.LayerNorm(d_model)
+        self.scale = d_attn ** -0.5
+
+    def forward(self, h: torch.Tensor) -> torch.Tensor:
+        """
+        参数
+        ----
+        h : [B, N, d_model]   N 个节点的 hidden state（N=3）
+
+        返回
+        ----
+        [B, N, d_model]   注意力增强后的 hidden state
+        """
+        Q   = self.q(h)                                          # [B, N, d_attn]
+        K   = self.k(h)                                          # [B, N, d_attn]
+        V   = self.v(h)                                          # [B, N, d_attn]
+        attn = torch.softmax(Q @ K.transpose(-2, -1) * self.scale, dim=-1)  # [B, N, N]
+        ctx  = attn @ V                                          # [B, N, d_attn]
+        out  = self.out(ctx)                                     # [B, N, d_model]
+        return self.norm(h + out)                                # residual + norm
+
+
+class ElecFMV6(nn.Module):
+    """
+    ElecFM V6：3 节点联合 spike 检测模型。
+
+    骨干（base）完全冻结，权重在 3 个节点间共享。
+    CrossNodeAttention 和 spike_head 是唯一可训练的组件。
+
+    输入：[B, 3, context_len]   3 个节点的历史电价
+    输出：
+      quant_pred   : [B, 3, horizon, 9]   各节点分位数预测
+      spike_logits : [B, 3, horizon]       各节点尖峰 logits
+    """
+
+    def __init__(self, base: ElecFM, d_attn: int = 64):
+        super().__init__()
+        self.base       = base
+        self.cross_attn = CrossNodeAttention(D_MODEL, d_attn)
+        # spike_head 通过 self.base.spike_head 访问（共享参数）
+
+    def forward(
+        self, x: torch.Tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        B, N, _ = x.shape   # N = 3
+
+        # 1. 各节点独立跑冻结骨干，提取 h_spike 和 quant_pred
+        quant_preds, h_spikes = [], []
+        for n in range(N):
+            q_n, h_n = self.base.forward_features(x[:, n, :])
+            quant_preds.append(q_n)
+            h_spikes.append(h_n)
+
+        # 2. 跨节点注意力：[B, N, D_MODEL]
+        h_stack   = torch.stack(h_spikes, dim=1)        # [B, N, D_MODEL]
+        h_enhanced = self.cross_attn(h_stack)            # [B, N, D_MODEL]
+
+        # 3. 各节点 spike_head（共享权重）
+        spike_logits = torch.stack(
+            [self.base.spike_head(h_enhanced[:, n, :]) for n in range(N)],
+            dim=1)                                       # [B, N, horizon]
+
+        # 4. 堆叠 quant 预测
+        quant_pred = torch.stack(quant_preds, dim=1)    # [B, N, horizon, 9]
+
+        return quant_pred, spike_logits
+
+    def save(self, path: str):
+        """保存 V6 完整权重（base + cross_attn）。"""
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        torch.save(self.state_dict(), path)
+
+    @torch.no_grad()
+    def predict_node(self, x: torch.Tensor, node_idx: int) -> dict:
+        """
+        单节点推理接口（用于 evaluate.py 兼容）。
+        x: [B, context_len] 单节点输入，其余节点用零填充。
+        """
+        B = x.shape[0]
+        ctx = torch.zeros(B, 3, x.shape[1], device=x.device, dtype=x.dtype)
+        ctx[:, node_idx, :] = x
+        quant_pred, spike_logits = self.forward(ctx)
+        q = quant_pred[:, node_idx]      # [B, H, 9]
+        s = spike_logits[:, node_idx]    # [B, H]
+        return {
+            "mean":       q[:, :, 4].cpu().numpy(),
+            "q10":        q[:, :, 0].cpu().numpy(),
+            "q50":        q[:, :, 4].cpu().numpy(),
+            "q90":        q[:, :, 8].cpu().numpy(),
+            "spike_prob": torch.sigmoid(s).cpu().numpy(),
+        }

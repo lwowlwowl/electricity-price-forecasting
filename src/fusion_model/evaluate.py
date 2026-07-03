@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.join(_ROOT, "src", "evaluation"))
 import loader     # src/data_processing/loader.py
 import metrics as M  # src/evaluation/metrics.py
 
-from model import ElecFM
+from model import ElecFM, ElecFMV6
 
 
 # ── 评估配置（与 v1.0/v2.0 基准一致）──────────────────────────────────────────
@@ -389,5 +389,227 @@ def run_evaluation(
     # 跨窗口汇总
     cross_window = pd.concat(summaries, ignore_index=True)
     cross_path = os.path.join(output_root, "fusion_electfm_cross_window.csv")
+    cross_window.to_csv(cross_path, index=False)
+    print(f"\n跨窗口汇总已保存：{cross_path}")
+
+
+# ── V6 评估：修改 _inference_batch 和 find_optimal_tau 以自动处理 ElecFMV6 ──────
+
+def _inference_batch_v6_impl(
+    model: "ElecFMV6",
+    data: pd.DataFrame,
+    origins: List[int],
+    target_cols: List[str],
+    context_len: int,
+    horizon: int,
+    device: torch.device,
+) -> dict:
+    """
+    V6 专用推理：3 节点同时输入，返回与 _inference_batch 相同格式的结果。
+    内部由 _inference_batch 调用（自动识别 ElecFMV6）。
+    """
+    results = {}
+    model.eval()
+
+    for oi in origins:
+        ctx_list = [
+            data[col].iloc[oi - context_len: oi].to_numpy(np.float32)
+            for col in target_cols
+        ]
+        ctx_t = torch.from_numpy(np.stack(ctx_list)).unsqueeze(0).to(device)   # [1, 3, ctx]
+
+        with torch.no_grad():
+            q_pred, spike_logits = model(ctx_t)   # [1, 3, H, 9], [1, 3, H]
+
+        preds_per_node = {"mean": [], "q10": [], "q50": [], "q90": [], "spike_prob": []}
+        for n in range(len(target_cols)):
+            q_n = q_pred[0, n]
+            preds_per_node["mean"].append(q_n[:, 4].cpu().numpy())
+            preds_per_node["q10"].append(q_n[:, 0].cpu().numpy())
+            preds_per_node["q50"].append(q_n[:, 4].cpu().numpy())
+            preds_per_node["q90"].append(q_n[:, 8].cpu().numpy())
+            preds_per_node["spike_prob"].append(
+                torch.sigmoid(spike_logits[0, n]).cpu().numpy()
+            )
+
+        results[oi] = {k: np.stack(v, axis=-1) for k, v in preds_per_node.items()}
+
+    return results
+
+
+def run_evaluation_v6(
+    model: "ElecFMV6",
+    cfg: EvalConfig,
+    checkpoint_path: str,
+    output_root: str,
+    device: torch.device,
+):
+    """
+    V6 主评估函数：复用 run_evaluation，但用 V6 专用推理替换 _inference_batch。
+    """
+    from model import ElecFMV6 as _ElecFMV6
+
+    model.load_state_dict(
+        torch.load(checkpoint_path, map_location=device, weights_only=True))
+    model.to(device).eval()
+
+    # 使用 V6 节点（与 cfg.nodes 一致，应为 3 个波动节点）
+    print("加载 ERCOT 数据...")
+    df = loader.load_slice(
+        market=cfg.market, nodes=cfg.nodes, freq=cfg.freq,
+        start="2025-01-01", end="2026-06-05",
+    )
+    target_cols = [f"price__{n}" for n in cfg.nodes]
+
+    from dataset import EXCLUDED_RANGES as DS_EXCLUDED, VAL_START, VAL_END
+    train_mask = pd.Series(True, index=df.index)
+    for excl_s, excl_e in DS_EXCLUDED:
+        train_mask &= ~((df.index >= pd.Timestamp(excl_s, tz="UTC")) &
+                        (df.index <= pd.Timestamp(excl_e + " 23:59", tz="UTC")))
+    train_mask &= ~((df.index >= pd.Timestamp(VAL_START, tz="UTC")) &
+                    (df.index <= pd.Timestamp(VAL_END + " 23:59", tz="UTC")))
+
+    thresholds = {
+        node: float(np.nanquantile(
+            df.loc[train_mask, f"price__{node}"].dropna().values, cfg.spike_quantile
+        ))
+        for node in cfg.nodes
+    }
+    print(f"  尖峰阈值（P{cfg.spike_quantile*100:.0f}，训练数据口径）：{thresholds}")
+
+    # τ* 搜索（3 节点同时）
+    print("\n搜索最优 spike head 阈值 τ*（验证集）...")
+    val_start, val_end = VAL_WINDOW
+    val_origins = _build_origins(df.index, val_start, val_end,
+                                 cfg.context_len, cfg.horizon,
+                                 cfg.stride_hours, cfg.max_origins)
+    if not val_origins:
+        tau_star = 0.5
+        print(f"  警告：验证集无起报点，使用默认 τ*=0.5")
+    else:
+        all_prob, all_actual, all_thr = [], [], []
+        for oi in val_origins:
+            ctx_list = [df[c].iloc[oi - cfg.context_len: oi].to_numpy(np.float32)
+                        for c in target_cols]
+            ctx_t = torch.from_numpy(np.stack(ctx_list)).unsqueeze(0).to(device)
+            with torch.no_grad():
+                _, sl = model(ctx_t)
+            for n, node in enumerate(cfg.nodes):
+                all_prob.append(torch.sigmoid(sl[0, n]).cpu().numpy())
+                all_actual.append(df[target_cols[n]].iloc[oi: oi + cfg.horizon].to_numpy(float))
+                all_thr.append(np.full(cfg.horizon, thresholds[node]))
+
+        prob_flat   = np.concatenate(all_prob)
+        actual_flat = np.concatenate(all_actual)
+        thr_flat    = np.concatenate(all_thr)
+        true_spike  = actual_flat >= thr_flat
+
+        tau_range = np.arange(cfg.tau_search_range[0],
+                              cfg.tau_search_range[1] + cfg.tau_search_step / 2,
+                              cfg.tau_search_step)
+        best_f1, tau_star = -1.0, 0.5
+        for tau in tau_range:
+            pred = prob_flat >= tau
+            tp = np.sum(pred & true_spike)
+            fp = np.sum(pred & ~true_spike)
+            fn = np.sum(~pred & true_spike)
+            p  = tp / (tp + fp) if (tp + fp) else 0.0
+            r  = tp / (tp + fn) if (tp + fn) else 0.0
+            f1 = 2 * p * r / (p + r) if (p + r) else 0.0
+            if f1 > best_f1:
+                best_f1, tau_star = f1, float(tau)
+        print(f"  τ* = {tau_star:.2f}（val Spike-F1 = {best_f1:.4f}）")
+
+    # 三窗口评估
+    summaries = []
+    for win_name, (start, end) in TEST_WINDOWS.items():
+        print(f"\n评估 {win_name} ({start} ~ {end})...")
+        origins = _build_origins(df.index, start, end, cfg.context_len,
+                                 cfg.horizon, cfg.stride_hours, cfg.max_origins)
+        print(f"  {win_name}: {len(origins)} 起报点")
+
+        preds = _inference_batch_v6_impl(model, df, origins, target_cols,
+                                         cfg.context_len, cfg.horizon, device)
+
+        out_dir = os.path.join(output_root, f"fusion_electfm_{win_name}")
+        os.makedirs(out_dir, exist_ok=True)
+
+        # 收集指标（复用 evaluate_window 的统计逻辑）
+        per_origin_rows, record_rows = [], []
+        for oi in origins:
+            fut_idx = df.index[oi: oi + cfg.horizon]
+            actual  = df[target_cols].iloc[oi: oi + cfg.horizon].to_numpy(float)
+            mean_p  = preds[oi]["mean"]; q10 = preds[oi]["q10"]
+            q50     = preds[oi]["q50"];  q90 = preds[oi]["q90"]
+            m = M.all_point_prob_metrics(actual.ravel(), mean_p.ravel(),
+                                         q10.ravel(), q50.ravel(), q90.ravel())
+            per_origin_rows.append({"model": "ElecFMV6", "origin": df.index[oi], **m})
+            for j, node in enumerate(cfg.nodes):
+                for h in range(cfg.horizon):
+                    record_rows.append({
+                        "model": "ElecFMV6", "origin": df.index[oi],
+                        "node": node, "ts": fut_idx[h],
+                        "actual": actual[h, j], "mean": mean_p[h, j],
+                        "q10": q10[h, j], "q90": q90[h, j],
+                    })
+
+        per_origin = pd.DataFrame(per_origin_rows)
+        records    = pd.DataFrame(record_rows)
+        per_origin.to_csv(os.path.join(out_dir, "per_origin.csv"), index=False)
+        records.to_csv(os.path.join(out_dir, "records.csv"), index=False)
+        with open(os.path.join(out_dir, "thresholds.json"), "w") as f:
+            json.dump(thresholds, f, indent=2)
+        with open(os.path.join(out_dir, "tau_star.json"), "w") as f:
+            json.dump({"tau_star": tau_star}, f)
+
+        # 汇总行
+        row = {"model": "ElecFMV6", "n_origins": int(per_origin["origin"].nunique())}
+        for metric in ("mae", "rmse", "smape", "pinball", "coverage"):
+            if metric in per_origin:
+                row[f"{metric}_mean"] = float(per_origin[metric].mean())
+                row[f"{metric}_std"]  = float(per_origin[metric].std(ddof=0))
+        row["mase_mean"] = float("nan")
+
+        y_all, sig_mean_all, sig_q90_all, thr_all = [], [], [], []
+        for oi in origins:
+            for j, node in enumerate(cfg.nodes):
+                y_all.append(df[target_cols[j]].iloc[oi: oi + cfg.horizon].to_numpy(float))
+                sig_mean_all.append(preds[oi]["mean"][:, j])
+                sig_q90_all.append(preds[oi]["q90"][:, j])
+                thr_all.append(np.full(cfg.horizon, thresholds[node]))
+        y_all = np.concatenate(y_all); sig_mean_all = np.concatenate(sig_mean_all)
+        sig_q90_all = np.concatenate(sig_q90_all); thr_all = np.concatenate(thr_all)
+
+        sf_mean = _compute_spike_f1(y_all, sig_mean_all, thr_all)
+        sf_q90  = _compute_spike_f1(y_all, sig_q90_all,  thr_all)
+        row["spike_f1_mean_signal"] = sf_mean["spike_f1"]
+        row["spike_f1_q90_signal"]  = sf_q90["spike_f1"]
+
+        spike_prob_all = np.concatenate([preds[oi]["spike_prob"][:, j]
+                                         for oi in origins for j in range(len(cfg.nodes))])
+        true_spike_all = y_all >= thr_all
+        pred_spike_prob = spike_prob_all >= tau_star
+        tp = np.sum(pred_spike_prob & true_spike_all)
+        fp = np.sum(pred_spike_prob & ~true_spike_all)
+        fn = np.sum(~pred_spike_prob & true_spike_all)
+        p  = tp / (tp + fp) if (tp + fp) else 0.0
+        r  = tp / (tp + fn) if (tp + fn) else 0.0
+        row["spike_f1_spike_head"] = 2 * p * r / (p + r) if (p + r) else 0.0
+
+        summary_row = pd.DataFrame([row])
+        summary_row.to_csv(os.path.join(out_dir, "summary.csv"), index=False)
+
+        print(f"    SMAPE={row.get('smape_mean', float('nan')):.2f}  "
+              f"Pinball={row.get('pinball_mean', float('nan')):.4f}  "
+              f"SpikeF1(mean)={row['spike_f1_mean_signal']:.4f}  "
+              f"SpikeF1(head,τ*={tau_star:.2f})={row['spike_f1_spike_head']:.4f}")
+        print(f"    → {out_dir}")
+
+        row_df = pd.DataFrame([row])
+        row_df["window"] = win_name
+        summaries.append(row_df)
+
+    cross_window = pd.concat(summaries, ignore_index=True)
+    cross_path   = os.path.join(output_root, "fusion_electfm_cross_window.csv")
     cross_window.to_csv(cross_path, index=False)
     print(f"\n跨窗口汇总已保存：{cross_path}")

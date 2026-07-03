@@ -70,10 +70,17 @@ def _is_excluded_from_train(context_start: pd.Timestamp,
 
 
 def _is_in_val(context_start: pd.Timestamp, target_end: pd.Timestamp) -> bool:
-    """判断样本是否完全位于验证集时段内（context 和 target 都在 Dec 1-24）。"""
+    """
+    判断样本是否属于验证集：target 落在 Dec 1-24 即可，context 不限。
+
+    注意：原版要求 context_start >= VAL_START，当 context_len >= 验证窗口长度时
+    （如 720h > 23天 = 552h）会导致 val=0。
+    修正后只要求 target 完全落在验证时段内（context 允许延伸到 Dec 1 之前）。
+    """
     vs = pd.Timestamp(VAL_START, tz="UTC")
     ve = pd.Timestamp(VAL_END + " 23:59", tz="UTC")
-    return context_start >= vs and target_end <= ve
+    target_start = target_end - pd.Timedelta(hours=24)  # horizon = 24h
+    return target_start >= vs and target_end <= ve
 
 
 class ElecFMDataset(Dataset):
@@ -173,6 +180,157 @@ class ElecFMDataset(Dataset):
         return float(neg / pos) if pos > 0 else 19.0
 
 
+# V6 固定节点（ERCOT 高波动节点，消融实验 v1.0/v2.0 的测试节点）
+V6_NODES = ["LZ_LCRA", "LZ_WEST", "LZ_RAYBN"]
+
+# V6 15节点分组（5组×3节点，覆盖全部 ERCOT 节点）
+# 评估仍只用 V6_NODES（第一组）
+V6_NODE_GROUPS = [
+    ["LZ_LCRA",   "LZ_WEST",    "LZ_RAYBN"],   # G1: 测试节点（高波动）
+    ["HB_BUSAVG", "HB_HUBAVG",  "HB_HOUSTON"], # G2: Hub 均价节点
+    ["HB_NORTH",  "HB_PAN",     "HB_SOUTH"],   # G3: Hub 地理分区（北/平原/南）
+    ["HB_WEST",   "LZ_AEN",     "LZ_CPS"],     # G4: 西部 Hub + AEN/CPS 负荷区
+    ["LZ_HOUSTON","LZ_NORTH",   "LZ_SOUTH"],   # G5: 剩余负荷区
+]
+
+
+def build_datasets_v6(
+    market: str,
+    context_len: int = 168,
+    horizon: int = 24,
+    stride: int = 1,
+) -> Tuple["ElecFMDataset", "ElecFMDataset"]:
+    """
+    V6 专用：3 节点联合同步数据集。
+
+    每条样本包含 3 个节点在同一时间窗口的数据：
+      context  : [3, context_len]   同时刻、3 节点的历史电价
+      target   : [3, horizon]       同时刻、3 节点的未来电价
+      spike_lb : [3, horizon]       各节点独立 P95 阈值的尖峰标签
+
+    节点固定为 V6_NODES = {V6_NODES}，顺序固定不变。
+    各节点的 valid_starts 应完全相同（同一数据范围 + 同一时间过滤规则）。
+    """
+    import loader
+
+    node_trains, node_vals = [], []
+    for node in V6_NODES:
+        df = loader.load_slice(
+            market=market, nodes=[node], freq="1h",
+            start="2025-01-01", end="2026-06-05",
+        )
+        col    = f"price__{node}"
+        series = df[col].dropna()
+
+        tr = ElecFMDataset(series, context_len, horizon,
+                           spike_threshold=None,
+                           split="train", stride=stride)
+        va = ElecFMDataset(series, context_len, horizon,
+                           spike_threshold=tr.threshold,
+                           split="val", stride=1)
+
+        node_trains.append(tr)
+        node_vals.append(va)
+        print(f"  {node}: train={len(tr)}  val={len(va)}  "
+              f"threshold={tr.threshold:.2f}")
+
+    # 验证三个节点的 valid_starts 一致（保证同步）
+    assert len(node_trains[0]) == len(node_trains[1]) == len(node_trains[2]), \
+        f"三节点训练样本数不一致：{[len(d) for d in node_trains]}"
+
+    class Dataset3Node(torch.utils.data.Dataset):
+        """将 3 个单节点数据集 zip 成联合数据集。"""
+        def __init__(self, datasets):
+            self.datasets = datasets
+
+        def __len__(self):
+            return len(self.datasets[0])
+
+        def __getitem__(self, idx):
+            items = [d[idx] for d in self.datasets]
+            ctx      = torch.stack([it[0] for it in items])   # [3, context_len]
+            tgt      = torch.stack([it[1] for it in items])   # [3, horizon]
+            spike_lb = torch.stack([it[2] for it in items])   # [3, horizon]
+            return ctx, tgt, spike_lb
+
+        @property
+        def spike_pos_weight(self) -> float:
+            """取 3 个节点的平均 pos_weight。"""
+            return float(sum(d.spike_pos_weight for d in self.datasets) / len(self.datasets))
+
+    train_ds = Dataset3Node(node_trains)
+    val_ds   = Dataset3Node(node_vals)
+    return train_ds, val_ds
+
+
+def build_datasets_v6_allgroups(
+    market: str,
+    context_len: int = 168,
+    horizon: int = 24,
+    stride: int = 1,
+) -> Tuple["ElecFMDataset", "ElecFMDataset"]:
+    """
+    V6 全节点版：5组×3节点，训练数据量是单组的5倍（41K vs 8K）。
+
+    训练集：5组数据合并（ConcatDataset）
+    验证集：仅用第一组（LZ_LCRA/LZ_WEST/LZ_RAYBN）
+
+    评估时仍只在 V6_NODES 上做推理（评估节点不变）。
+    """
+    import loader
+
+    all_train_datasets = []
+
+    for g_idx, group in enumerate(V6_NODE_GROUPS):
+        node_trains, first_threshold = [], None
+        for n_idx, node in enumerate(group):
+            df = loader.load_slice(
+                market=market, nodes=[node], freq="1h",
+                start="2025-01-01", end="2026-06-05",
+            )
+            col    = f"price__{node}"
+            series = df[col].dropna()
+
+            tr = ElecFMDataset(series, context_len, horizon,
+                               spike_threshold=None,
+                               split="train", stride=stride)
+            node_trains.append(tr)
+
+        # 构建本组 3 节点联合数据集（与 build_datasets_v6 中的 Dataset3Node 相同）
+        class Dataset3Node(torch.utils.data.Dataset):
+            def __init__(self, datasets):
+                self.datasets = datasets
+
+            def __len__(self):
+                return len(self.datasets[0])
+
+            def __getitem__(self, idx):
+                items = [d[idx] for d in self.datasets]
+                ctx      = torch.stack([it[0] for it in items])
+                tgt      = torch.stack([it[1] for it in items])
+                spike_lb = torch.stack([it[2] for it in items])
+                return ctx, tgt, spike_lb
+
+            @property
+            def spike_pos_weight(self):
+                return float(sum(d.spike_pos_weight for d in self.datasets) / len(self.datasets))
+
+        group_ds = Dataset3Node(node_trains)
+        all_train_datasets.append(group_ds)
+        label = "+".join(group)
+        print(f"  G{g_idx+1}({label}): train={len(group_ds)}")
+
+    # 验证集只用第一组（测试节点）
+    _, val_ds = build_datasets_v6(market, context_len, horizon, stride=1)
+    val_only = val_ds   # 来自 G1 的验证集
+
+    from torch.utils.data import ConcatDataset
+    train_ds = ConcatDataset(all_train_datasets)
+    print(f"  总训练样本：{len(train_ds)}（5组合并）")
+    print(f"  验证样本（G1）：{len(val_only)}")
+    return train_ds, val_only
+
+
 def build_datasets(
     market: str,
     nodes: List[str],
@@ -189,30 +347,29 @@ def build_datasets(
 
     train_datasets = []
     val_datasets   = []
-    common_threshold = None
 
     for node in nodes:
         df = loader.load_slice(
             market=market, nodes=[node], freq="1h",
-            start="2025-01-01", end="2026-06-05",   # 全量，dataset 内部按 split 过滤
+            start="2025-01-01", end="2026-06-05",
         )
         col    = f"price__{node}"
         series = df[col].dropna()
 
+        # 每个节点独立计算 P95 阈值：各节点价格水平不同（71~90 $/MWh），
+        # 共用单一阈值会导致低价节点漏标、高价节点过标。
         tr = ElecFMDataset(series, context_len, horizon,
-                           spike_threshold=common_threshold,
+                           spike_threshold=None,   # 各节点独立计算
                            split="train", stride=stride)
-        if common_threshold is None:
-            common_threshold = tr.threshold
 
         va = ElecFMDataset(series, context_len, horizon,
-                           spike_threshold=common_threshold,
+                           spike_threshold=tr.threshold,  # val 用同节点的训练阈值
                            split="val", stride=1)
 
         train_datasets.append(tr)
         val_datasets.append(va)
         print(f"  {node}: train={len(tr)}  val={len(va)}  "
-              f"threshold={common_threshold:.2f}")
+              f"threshold={tr.threshold:.2f}")
 
     from torch.utils.data import ConcatDataset
     train_ds = ConcatDataset(train_datasets) if len(train_datasets) > 1 else train_datasets[0]

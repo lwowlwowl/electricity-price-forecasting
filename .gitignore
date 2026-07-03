@@ -136,3 +136,6 @@ htmlcov/
 # 如果 external/ 里有大文件，可以针对性忽略
 # external/**/build/
 # external/**/dist/
+
+# 模型 checkpoint（二进制大文件，不入库）
+data/checkpoints/

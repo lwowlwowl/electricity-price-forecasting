@@ -30,10 +30,10 @@ sys.path.insert(0, _SCRIPT_DIR)
 sys.path.insert(0, os.path.join(_ROOT, "src", "data_processing"))
 sys.path.insert(0, os.path.join(_ROOT, "src", "evaluation"))
 
-from model    import ElecFM
+from model    import ElecFM, ElecFMV6, create_elecfm_with_lora
 from train    import TrainConfig, train
-from evaluate import EvalConfig, run_evaluation
-from dataset  import build_datasets
+from evaluate import EvalConfig, run_evaluation, run_evaluation_v6
+from dataset  import build_datasets, build_datasets_v6, build_datasets_v6_allgroups, V6_NODES
 
 
 def _load_config(path: str) -> dict:
@@ -131,16 +131,38 @@ def main():
     if args.step1_only:
         return
 
+    # 提前读取模式标志（数据集构建和模型初始化都需要）
+    cross_node_only = cfg.get("cross_node_only", False)
+
     # ── 构建数据集 ────────────────────────────────────────────────────────────
     if not args.skip_train:
         print("\n构建训练/验证数据集...")
-        train_ds, val_ds = build_datasets(
-            market=cfg["market"],
-            nodes=cfg["nodes"],
-            context_len=cfg["context_len"],
-            horizon=cfg["horizon"],
-            stride=cfg.get("train_stride", 1),
-        )
+        if cross_node_only:
+            v6_allgroups = cfg.get("v6_allgroups", False)
+            if v6_allgroups:
+                # V6 15节点：5组×3节点，训练数据5倍
+                train_ds, val_ds = build_datasets_v6_allgroups(
+                    market=cfg["market"],
+                    context_len=cfg["context_len"],
+                    horizon=cfg["horizon"],
+                    stride=cfg.get("train_stride", 1),
+                )
+            else:
+                # V6 标准：3节点联合同步数据集
+                train_ds, val_ds = build_datasets_v6(
+                    market=cfg["market"],
+                    context_len=cfg["context_len"],
+                    horizon=cfg["horizon"],
+                    stride=cfg.get("train_stride", 1),
+                )
+        else:
+            train_ds, val_ds = build_datasets(
+                market=cfg["market"],
+                nodes=cfg["nodes"],
+                context_len=cfg["context_len"],
+                horizon=cfg["horizon"],
+                stride=cfg.get("train_stride", 1),
+            )
         print(f"  训练样本：{len(train_ds)}  验证样本：{len(val_ds)}")
 
         from torch.utils.data import DataLoader
@@ -155,18 +177,53 @@ def main():
         # 统计实际 pos_weight
         if hasattr(train_ds, "spike_pos_weight"):
             pos_weight = train_ds.spike_pos_weight
-        elif hasattr(train_ds, "datasets"):   # ConcatDataset
-            pos_weight = train_ds.datasets[0].spike_pos_weight
+        elif hasattr(train_ds, "datasets"):   # ConcatDataset（v6_allgroups 或多节点合并）
+            # 取第一个子数据集的 pos_weight（测试节点组）
+            ds0 = train_ds.datasets[0]
+            pos_weight = ds0.spike_pos_weight if hasattr(ds0, "spike_pos_weight") else 19.0
         else:
             pos_weight = 19.0
         print(f"  实际 spike pos_weight = {pos_weight:.1f}")
 
     # ── 初始化模型 ────────────────────────────────────────────────────────────
     print("\n初始化 ElecFM...")
-    model = ElecFM(
-        pretrained_id=cfg.get("pretrained_id", "google/timesfm-2.5-200m-pytorch"),
-        horizon=cfg["horizon"],
-    ).to(device)
+    use_lora        = cfg.get("use_lora", False)
+    spike_head_only = cfg.get("spike_head_only", False)
+    # cross_node_only 已在数据集构建前定义
+
+    if cross_node_only:
+        print("  使用 V6 Cross Node Only 模式（3节点联合 + CrossNodeAttention）")
+        base_model = ElecFM(
+            pretrained_id=cfg.get("pretrained_id", "google/timesfm-2.5-200m-pytorch"),
+            horizon=cfg["horizon"],
+        )
+        model = ElecFMV6(base_model, d_attn=cfg.get("cross_attn_dim", 64)).to(device)
+    elif spike_head_only:
+        use_swiglu = cfg.get("use_swiglu_adapter", False)
+        if use_swiglu:
+            print("  使用 V7 模式（Spike Head + SwiGLU Adapter，冻结骨干）")
+        else:
+            print("  使用 Spike Head Only 模式（完全冻结骨干，SMAPE = 零样本水平）")
+        model = ElecFM(
+            pretrained_id=cfg.get("pretrained_id", "google/timesfm-2.5-200m-pytorch"),
+            horizon=cfg["horizon"],
+            use_swiglu_adapter=use_swiglu,
+            swiglu_adapter_dim=cfg.get("swiglu_adapter_dim", 64),
+        ).to(device)
+    elif use_lora:
+        print("  使用 LoRA 模式")
+        model = create_elecfm_with_lora(
+            pretrained_id=cfg.get("pretrained_id", "google/timesfm-2.5-200m-pytorch"),
+            horizon=cfg["horizon"],
+            lora_r=cfg.get("lora_r", 8),
+            lora_alpha=cfg.get("lora_alpha", 16),
+            lora_dropout=cfg.get("lora_dropout", 0.05),
+        ).to(device)
+    else:
+        model = ElecFM(
+            pretrained_id=cfg.get("pretrained_id", "google/timesfm-2.5-200m-pytorch"),
+            horizon=cfg["horizon"],
+        ).to(device)
 
     # ── Step 2：两阶段训练 ────────────────────────────────────────────────────
     checkpoint_dir = os.path.join(_ROOT, cfg.get("checkpoint_dir", "data/checkpoints/electfm"))
@@ -186,6 +243,12 @@ def main():
             spike_pos_weight=pos_weight,
             use_amp=cfg.get("use_amp", True),
             checkpoint_dir=checkpoint_dir,
+            use_lora=cfg.get("use_lora", False),
+            lora_r=cfg.get("lora_r", 8),
+            lora_alpha=cfg.get("lora_alpha", 16),
+            lora_dropout=cfg.get("lora_dropout", 0.05),
+            spike_head_only=cfg.get("spike_head_only", False),
+            cross_node_only=cfg.get("cross_node_only", False),
         )
         print("\n开始两阶段训练...")
         best_ckpt = train(model, train_loader, val_loader, train_cfg, device)
@@ -197,9 +260,11 @@ def main():
 
     # ── Step 3：评估 ──────────────────────────────────────────────────────────
     print("\n开始三窗口评估...")
+    # V6 评估只用 3 个波动节点；其他模式用配置文件中的节点列表
+    eval_nodes = V6_NODES if cross_node_only else cfg["nodes"]
     eval_cfg = EvalConfig(
         market=cfg["market"],
-        nodes=cfg["nodes"],
+        nodes=eval_nodes,
         freq=cfg.get("freq", "1h"),
         context_len=cfg["context_len"],
         horizon=cfg["horizon"],
@@ -209,8 +274,13 @@ def main():
         tau_search_range=tuple(cfg.get("tau_search_range", [0.05, 0.95])),
         tau_search_step=cfg.get("tau_search_step", 0.05),
     )
-    output_root = os.path.join(_ROOT, "data", "results", "fusion")
-    run_evaluation(model, eval_cfg, best_ckpt, output_root, device)
+    config_name = os.path.splitext(os.path.basename(args.config))[0]
+    output_root = os.path.join(_ROOT, "data", "results", f"fusion_{config_name}")
+
+    if cross_node_only:
+        run_evaluation_v6(model, eval_cfg, best_ckpt, output_root, device)
+    else:
+        run_evaluation(model, eval_cfg, best_ckpt, output_root, device)
 
     print("\n✅ ElecFM 全流程完成")
 

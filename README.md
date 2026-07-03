@@ -1,247 +1,274 @@
-# 电价预测项目
+# 电价预测研究：消融驱动的时序基础模型融合
 
-基于时序基础模型（TimesFM-2.5 / Chronos-2 / Toto-1.0 / Toto-2.0）与多种基线，在 ERCOT 实时电价上做**多起报点滚动回测（walk-forward backtest）**的对比实验框架。
+基于 ERCOT 实时电价，通过**三阶段递进研究**构建面向尖峰检测的专用融合模型：
 
-整套实验配置驱动：市场、节点、频率、上下文长度、预测步长、起报点、协变量、模型清单全部写在 YAML 里，一条命令跑完「取数 → 选节点 → 构造模型 → 滚动回测 → 落盘结果」。
+```
+v1.0 参数消融  →  v2.0 结构消融  →  ElecFM 融合模型（消融驱动架构设计）
+  （11模型对比）     （68次实验）       （v1→V6，共9个版本）
+```
 
-## 设计要点
+研究问题：时序基础模型在电价预测中哪些组件真正有效？消融结论能否驱动更好的融合架构？
 
-- **统一接口**：所有模型实现同一个 `Forecaster` 抽象（`src/models/base.py`），带能力标志（是否需训练、是否支持协变量、是否支持多变量），不支持的能力自动降级。基线和基础模型因此能在同一回测里公平对比。
-- **无泄漏滚动回测**：每个起报点只用该点之前的历史（`data.iloc[oi-ctx_len : oi]`）作上下文，需训练的模型每个起报点重新 fit，绝不触碰未来数据。
-- **基础模型隔离运行**：TimesFM / Chronos-2 / Toto / Toto2 各装在独立 venv（依赖互相冲突，Toto2 与 Toto 共用 venv），主程序通过 npz 文件 + 子进程 worker 与它们通信，互不污染。
-- **丰富指标**：MAE、RMSE、MASE（以 SeasonalNaive 为分母）、sMAPE、Pinball、Coverage（q10–q90），以及电价场景关键的尖峰 F1（Spike-F1，P95 阈值）。
-- **三市场窗口**：在三种典型电价模式下做全量对比——W1 稳定期（2025 年 8 月）、W2 负电价期（2025 年 3 月）、W3 极端尖峰期（2026 年 1 月），检验模型在不同市场状态下的鲁棒性。
+---
+
+## 核心成果
+
+| 指标 | TimesFM 零样本 | **ElecFM v5a** | **ElecFM V6** |
+|------|--------------|--------------|--------------|
+| W1 SMAPE | 27.67 | **27.55** ✅ | 28.90（3节点口径）|
+| W1 Spike-F1 | 0.329 | **0.4159**（+26%）| **0.4439**（+35%）|
+| 可训练参数 | — | 334K | 664K |
+| 架构来源 | — | 逐层消融→spike head 分叉点 | + Chronos skip_variate 消融 |
+
+---
 
 ## 项目结构
 
 ```
 school/
 ├── configs/
-│   ├── nodes.yaml                      # 各市场代表性节点清单（由脚本生成）
-│   ├── parameter_ablation/             # 参数消融实验配置（v1.0）
-│   │   ├── baseline.yaml               # W1 基准配置，所有消融的出发点
-│   │   ├── baseline_w2_negative.yaml   # W2 负电价基准
-│   │   ├── baseline_w3_extreme.yaml    # W3 极端尖峰基准
-│   │   ├── ablation_A_covariates*.yaml # 消融A：协变量（×3 窗口）
-│   │   ├── ablation_B_context*.yaml    # 消融B：上下文长度（×3 窗口）
-│   │   ├── ablation_C_multivariate*.yaml # 消融C：单/多变量（×3 窗口）
-│   │   ├── ablation_D_horizon*.yaml    # 消融D：预测步长（×3 窗口）
-│   │   ├── ablation_E_finetune.yaml    # 消融E：微调（保留）
-│   │   ├── ablation_F_frequency*.yaml  # 消融F：数据频率（×3 窗口）
-│   │   └── smoke/                      # 冒烟测试配置
-│   └── structural_ablation/            # 结构消融实验配置（v2.0）
-│       ├── smoke_toto2.yaml            # 冒烟测试
-│       ├── full_toto2.yaml             # Toto-2.0 全消融扫描
-│       ├── full_chronos2.yaml          # Chronos-2 全消融扫描
-│       ├── full_timesfm.yaml           # TimesFM 全消融扫描
-│       └── cross_model_attention.yaml  # 跨模型注意力对比
+│   ├── parameter_ablation/        # v1.0 参数消融配置（5维度×3窗口）
+│   ├── structural_ablation/       # v2.0 结构消融配置（36+32次实验）
+│   └── fusion/                    # ElecFM 训练配置
+│       ├── electfm_ercot_full_v5.yaml          # v5a：纯 spike head，15节点
+│       ├── electfm_ercot_full_v5b.yaml         # v5b：720h context
+│       ├── electfm_ercot_full_v6.yaml          # V6：CrossNodeAttention
+│       ├── electfm_ercot_full_v6_allgroups.yaml # V6 15节点全分组
+│       ├── electfm_ercot_full_v7.yaml          # V7：SwiGLU adapter
+│       └── ...（其他变体）
 │
 ├── src/
 │   ├── data_processing/
-│   │   ├── loader.py                   # load_slice：从 raw 长表按需切片成宽表（主链路取数）
-│   │   └── build_nodes_config.py       # 统计各节点波动/尖峰，生成 nodes.yaml
-│   ├── models/
-│   │   ├── base.py                     # Forecaster 抽象基类 + Forecast 数据结构
-│   │   ├── forecasters.py              # 7 个基线：Naive/SeasonalNaive/ETS/Theta + RF/LightGBM/XGBoost
-│   │   ├── foundation.py               # 4 个基础模型的子进程适配器
-│   │   └── workers/                    # 各基础模型在自己 venv 里运行的 worker 脚本
-│   │       ├── worker_timesfm.py
-│   │       ├── worker_chronos2.py
-│   │       ├── worker_toto.py
-│   │       └── worker_toto2.py
-│   ├── evaluation/
-│   │   ├── backtest.py                 # 滚动回测引擎（起报点生成、无泄漏预测、指标计算）
-│   │   ├── metrics.py                  # MAE/RMSE/MASE/sMAPE/Pinball/Coverage/Spike-F1
-│   │   └── plotting.py                 # 单实验汇总图 + 消融旋钮扫描图
-│   ├── parameter_ablation/             # 参数消融执行器
-│   │   ├── run_experiment.py           # 配置驱动的单实验入口
-│   │   └── run_ablation.py             # 参数消融执行器（扫一个旋钮的多个取值）
-│   └── structural_ablation/            # 结构消融模块（v2.0）
-│       ├── ablations.py                # 14 种结构消融操作实现
-│       ├── foundation_ablation.py      # 消融适配器（调度 worker 子进程）
-│       ├── run_structural_ablation.py  # 结构消融实验入口
-│       └── workers/                    # 各模型的消融 worker
-│           ├── worker_toto2_ablation.py
-│           ├── worker_chronos2_ablation.py
-│           └── worker_timesfm_ablation.py
+│   │   ├── loader.py              # 从 raw 长表按需切片
+│   │   └── build_nodes_config.py # 节点分组（volatility/spikes/stable）
+│   ├── models/                   # v1.0 参数消融用到的模型框架
+│   │   ├── base.py               # Forecaster 抽象基类
+│   │   ├── forecasters.py        # 7 个统计/树模型基线
+│   │   ├── foundation.py         # 4 个基础模型的子进程适配器
+│   │   └── workers/              # 各基础模型 worker
+│   ├── parameter_ablation/       # v1.0 实验执行器
+│   ├── structural_ablation/      # v2.0 消融模块（14 种手术操作）
+│   └── fusion_model/             # ElecFM 融合模型
+│       ├── model.py              # ElecFM + CrossNodeAttention + SwiGLUAdapter
+│       ├── train.py              # 两阶段训练（spike_head_only / cross_node_only）
+│       ├── dataset.py            # 滑窗数据集 + 3节点同步数据集
+│       ├── evaluate.py           # 三窗口回测 + τ* 搜索
+│       ├── run_fusion.py         # 一键入口（Step1验证 → 训练 → 评估）
+│       └── loss.py               # Pinball + BCE Spike 联合损失
 │
-├── analysis/                           # 探索性数据画像脚本与图
-├── external/                           # 四个基础模型（各含独立 .venv，需自行克隆+建环境）
-│   ├── timesfm/                        #   git clone https://github.com/google-research/timesfm.git
-│   ├── chronos-forecasting/            #   git clone https://github.com/amazon-science/chronos-forecasting.git
-│   └── toto/                           #   git clone https://github.com/DataDog/toto.git（含 Toto-1.0 与 Toto-2.0）
-├── hf_cache/                           # HuggingFace 模型权重缓存（离线可用）
-├── data/
-│   ├── raw/<市场>/processed/           # 原始长表（loader 直接读取，如 actual_price_hourly.csv）
-│   ├── results/<实验名>/               # 每个实验的输出（summary.csv / per_origin.csv / 图）
-│   └── results/structural_ablation/report/  # 结构消融汇总报告
-│       ├── fig1_component_heatmap.png   # 组件贡献热力图
-│       ├── fig2_perlayer_curves.png     # 逐层贡献曲线
-│       ├── fig3_discordance_scatter.png # SMAPE vs Spike-F1 散点图
-│       ├── fig4_pruning_map.png         # 剪枝安全边界图
-│       ├── architecture_insight_report.md # 架构洞察报告
-│       ├── significance_summary.md      # 统计显著性检验摘要
-│       └── significance_tests.csv       # 完整检验记录
-├── docs/                               # 实验手册、结果汇报、概念说明、参考文献
-│   ├── specs/
-│   │   ├── experiment_manual.md        # v1.0 参数级消融手册
-│   │   └── experiment_manual_v2.md     # v2.0 结构级消融与模型融合手册
-│   ├── 参数消融汇报材料.md              # 参数消融汇报文档（含关键发现与结论）
-│   ├── 参数消融实验结果与问答.md         # 参数消融全量结果分析（11 模型 × 3 窗口 × 5 消融）
-│   ├── 结构消融汇报材料.md              # 结构消融汇报文档（含图表与核心发现）
-│   ├── 结构消融实验结果与问答.md         # 结构消融完整分析（组件级 + 逐层 + 显著性检验）
-│   └── concepts/                       # 核心概念说明
-└── run_all_ablations.sh                # 一键跑全部消融实验的脚本
+├── docs/
+│   ├── fusion/                   # ElecFM 当前活跃文档
+│   │   ├── README.md             # 文档导航入口
+│   │   ├── design.md             # 架构设计 + 全版本实验汇总
+│   │   ├── experiments.md        # 详细实验记录（按时间线）
+│   │   └── implementation.md    # 代码实现指南
+│   ├── archive/elecfm/           # 历史文档归档
+│   ├── 参数消融汇报材料.md        # v1.0 关键发现与结论
+│   ├── 参数消融实验结果与问答.md  # v1.0 完整分析
+│   ├── 结构消融汇报材料.md        # v2.0 + ElecFM 完整研究记录
+│   └── 结构消融实验结果与问答.md  # v2.0 完整分析
+│
+├── scripts/                      # 辅助脚本
+│   ├── run_lora_quick_test.sh    # LoRA 快速测试
+│   └── run_fusion_sweep.sh       # 参数扫描
+├── run_overnight.sh              # 多实验串行脚本
+├── CHANGELOG.md                  # 版本变更日志
+└── external/                     # 四个基础模型（各含独立 .venv）
+    ├── timesfm/                  # TimesFM-2.5（Google）
+    ├── chronos-forecasting/      # Chronos-2（Amazon）
+    └── toto/                     # Toto-1.0 & Toto-2.0（Datadog）
 ```
 
-## 实验矩阵
+---
 
-### 市场窗口
+## 第一阶段：v1.0 参数消融（已完成）
 
-| 窗口 | 别名 | 测试区间 | 特征 |
-|------|------|----------|------|
-| W1 | `w1_stable` | 2025-08-01 ~ 08-31 | 夏季稳定期，价格波动温和 |
-| W2 | `w2_negative` | 2025-03-01 ~ 03-31 | 春季低负荷，出现负电价 |
-| W3 | `w3_extreme` | 2026-01-01 ~ 01-31 | 冬季极端尖峰，价格剧烈波动 |
+**目的**：确定时序基础模型在电价预测中的最优输入配置，回答"给模型什么"的问题。
 
-### 参数消融维度（v1.0，已完成）
+**实验规模**：11 个模型（7 基线 + 4 基础模型）× 5 消融维度 × 3 测试窗口 = 15 组，60+ 次回测
 
-| 消融 | 旋钮 | 扫描取值 | 回答的问题 |
-|------|------|----------|------------|
-| A | 协变量 | `[]` → `[load]` → `[load,temp]` → `[load,temp,wind,solar]` | 外部信息是否提升预测？ |
-| B | 上下文长度 | 168 / 336 / 720 | 看多远的历史最合适？ |
-| C | 单/多变量 | False / True | 多节点联合预测是否更优？ |
-| D | 预测步长 | 24 / 48 / 168 | 预测越远衰减多快？ |
-| F | 数据频率 | 1h / 15min | 高频数据是否有增益？ |
+| 消融维度 | 扫描范围 | 关键结论 |
+|---------|---------|---------|
+| A 协变量 | 无 → 负荷 → +温度 → +风光 | Chronos 加全协变量 Spike-F1 从 0.317→0.417 |
+| B 上下文长度 | 168h / 336h / 720h | TimesFM 对长度不敏感；720h 在 W1 SMAPE=26.84（最优）|
+| C 单/多变量 | 单变量 / 多变量 | 跨节点增益有限（≤3%），不引入 |
+| D 预测步长 | 24h / 48h / 168h | 所有模型随步长恶化，Toto2 步长鲁棒性最好 |
+| F 数据频率 | 1h / 15min | 15min 对 Spike-F1 有微弱增益，对 MAE 无帮助 |
 
-每组消融均在 W1/W2/W3 三个窗口上完成，共 5 × 3 = 15 组实验，全部 11 个模型参与对比。
+**测试窗口**：
 
-### 结构消融（v2.0，已完成）
-
-在 v1.0 结论基础上，深入模型内部做结构级消融——逐一移除或替换 Transformer 内部组件（注意力层、位置编码、输出头、Patch 机制等），定位每个基础模型在电价预测上的关键组件。
-
-**已完成实验**：
-- 组件级消融：36 次（3 模型 × 12 类组件，含 FFN、注意力、位置编码、Patch 嵌入等）
-- 逐层消融：32 次（Toto2 6 层 + Chronos2 6 层 + TimesFM 20 层）
-- 统计显著性检验：Wilcoxon signed-rank + Bonferroni 校正
-
-**核心发现**：
-| 发现 | 说明 |
-|------|------|
-| FFN 是核心引擎 | 三模型移除 FFN 后 SMAPE 退化 +419%~+486% |
-| 精度 vs 尖峰通路分离 | 部分层专精度、部分层专尖峰检测，甚至互相抑制 |
-| 层冗余程度差异大 | TimesFM 40% 层可安全移除，Toto2 几乎无冗余 |
-| RoPE 不可或缺 | Chronos2 移除后 Spike-F1 归零，TimesFM 依赖最弱 |
-
-详见 `docs/specs/experiment_manual_v2.md`、汇报材料 `docs/结构消融汇报材料.md`、完整分析 `docs/结构消融实验结果与问答.md`。
-
-## 快速开始
-
-### 1. 准备基础模型环境（首次）
-
-四个基础模型中，TimesFM / Chronos-2 / Toto 各自克隆到 `external/` 并在各自目录建立 `.venv`（依赖见各自仓库）。Toto-2.0 与 Toto-1.0 共用同一个 venv。模型权重会缓存在 `hf_cache/`。若只跑基线，可跳过这一步。
-
-### 2. （可选）重新生成节点清单
+| 窗口 | 区间 | 市场特征 |
+|------|------|---------|
+| W1 | 2025-08-01 ~ 08-31 | 夏季稳定期（基准）|
+| W2 | 2025-03-01 ~ 03-31 | 春季负电价 |
+| W3 | 2026-01-01 ~ 01-31 | 冬季极端尖峰 |
 
 ```bash
-python src/data_processing/build_nodes_config.py ERCOT
-```
-
-按波动性/尖峰频次/平稳度把各市场节点分成 `volatility` / `spikes` / `stable` 三组，固化到 `configs/nodes.yaml`，保证不同实验间节点一致、结果可比。
-
-### 3. 跑一个实验
-
-```bash
-# 基准实验（7 基线 + 4 基础模型，W1 稳定期）
+# 运行单个基准实验
 python src/parameter_ablation/run_experiment.py configs/parameter_ablation/baseline.yaml
 
-# W2 负电价窗口
-python src/parameter_ablation/run_experiment.py configs/parameter_ablation/baseline_w2_negative.yaml
-
-# W3 极端尖峰窗口
-python src/parameter_ablation/run_experiment.py configs/parameter_ablation/baseline_w3_extreme.yaml
-```
-
-结果写入 `data/results/<实验名>/`，含 `summary.csv`（各模型指标汇总，按 MAE 升序）、`per_origin.csv`（逐起报点明细）、`thresholds.json`（尖峰阈值）、`records.csv`（逐时刻原始预测）及对比图（`summary_compare.png`、`timeseries_compare.png`、`ablation_*.png`）。
-
-> 后台运行：基础模型推理较慢，可放后台。建议加 `-u` 让日志实时可见：
-> ```bash
-> nohup python3 -u src/parameter_ablation/run_experiment.py configs/parameter_ablation/baseline.yaml > run.log 2>&1 &
-> ```
-
-### 4. 跑消融实验
-
-消融配置在基准配置基础上加一个 `ablate` 块，指定要扫的旋钮和取值：
-
-```bash
-# 单组消融
-python src/parameter_ablation/run_ablation.py configs/parameter_ablation/ablation_B_context.yaml
-
-# 一键跑全部消融（所有窗口 × 所有维度）
+# 一键运行全部消融
 bash run_all_ablations.sh
 ```
 
-会对该旋钮的每个取值各跑一次回测，输出合并对比表 `ablation_summary.csv` 和旋钮扫描折线图。
+---
 
-## 配置说明
+## 第二阶段：v2.0 结构消融（已完成）
 
-实验配置（`configs/parameter_ablation/*.yaml`）的主要字段：
+**目的**：打开模型内部，定位每个基础模型的关键组件，回答"模型哪里在干活"的问题。
 
-| 字段 | 含义 |
+**实验规模**：
+- 组件级消融：**36 次**（3 模型 × 12 类操作，含 FFN / 注意力 / 位置编码 / 输出头）
+- 逐层消融：**32 次**（Toto2 6层 + Chronos2 6层 + TimesFM 20层）
+- 统计检验：Wilcoxon signed-rank + Bonferroni 校正
+
+**核心发现**：
+
+| 发现 | 数据依据 |
+|------|---------|
+| **FFN 是所有模型最关键组件** | 移除后 TimesFM +486%、Toto2 +419%、Chronos2 +33% |
+| **精度通路与尖峰通路功能分离** | 部分层专精度、部分层专尖峰，甚至互相抑制 |
+| **TimesFM L7 是纯尖峰检测层** | ΔSpike-F1 = −6.7%，ΔSMAPE = +1.6%（精度几乎不变）|
+| **Chronos skip_variate 退化 +6.7%** | 跨变量注意力贡献显著 |
+| **TimesFM 40% 层可安全移除** | 逐层消融，双指标严格标准 |
+
+```bash
+# 运行结构消融
+python src/structural_ablation/run_structural_ablation.py configs/structural_ablation/full_timesfm.yaml
+```
+
+图表见 `data/results/structural_ablation/report/`。
+
+---
+
+## 第三阶段：ElecFM 融合模型（已完成）
+
+**核心思路**：把消融结论转化为架构决策，构建同时具备零样本精度和显式尖峰检测能力的专用模型。
+
+### 架构
+
+```
+原始电价序列 [B, 168h]
+  → Tokenizer → 15层 Transformer（TimesFM，剪枝5层，冻结）
+                          ↓ 新L6=原L7（"尖峰检测层"，消融发现）
+              ┌───────────────────────────┐
+              │  CrossNodeAttention（V6）  │  ← Chronos skip_variate 消融动机
+              │  [B, 3, 1280] → [B, 3, 1280]│
+              └───────────────────────────┘
+                          ↓
+              Spike Head（自研，334K）→ spike_logits [B, 24]
+              Quantile Head（TimesFM原版，冻结）→ q[0.1..0.9] × 24步
+```
+
+### 实验历程
+
+| 版本 | 核心改动 | W1 SMAPE | W1 Spike-F1 | 关键教训 |
+|------|---------|---------|------------|---------|
+| v1 | quant_head 可训 | 31.95 | 0.370 | quant_head 必须冻结 |
+| v2 | quant_head 冻结 | 29.19 | 0.335 | 数据太少 |
+| v3 | 全 ERCOT 非 LoRA | 未收敛 | — | 79M 参数 vs 125K 样本 |
+| v4 | LoRA | 29.39 | 0.351 | 骨干修改仍损害 SMAPE |
+| **v5a** | **纯 spike head，15节点** | **27.55** ✅ | **0.4159** ✅ | **冻结骨干是正确路线** |
+| v5b | 纯 spike head，720h | 27.52 | 0.3779 | 720h 稀释尖峰信号 |
+| **V6** | **+ CrossNodeAttention，3节点** | **28.90**\* | **0.4439** ✅ | **消融预测闭环验证** |
+| V7 | + SwiGLU adapter | 27.55 | 0.3980 | 冻结骨干表征已足够，SwiGLU 冗余 |
+
+\* V6 评估口径为 LZ_LCRA/LZ_WEST/LZ_RAYBN 三个高波动节点，零样本基准即 28.90。
+
+### 最终最优模型
+
+**日常精度（广泛节点）**：v5a（15节点，W1 SMAPE=27.55）
+
+**尖峰检测**：V6（3节点，W1 Spike-F1=0.4439）
+
+### 快速运行
+
+```bash
+# Step 1：零样本验证（确认剪枝基准）
+external/timesfm/.venv/bin/python src/fusion_model/run_fusion.py \
+    --config configs/fusion/electfm_ercot_full_v5.yaml --step1-only
+
+# v5a 完整训练（约 30 分钟）
+caffeinate -d external/timesfm/.venv/bin/python -u \
+    src/fusion_model/run_fusion.py \
+    --config configs/fusion/electfm_ercot_full_v5.yaml \
+    2>&1 | tee run_v5a.log
+
+# V6 完整训练（约 30 分钟）
+caffeinate -d external/timesfm/.venv/bin/python -u \
+    src/fusion_model/run_fusion.py \
+    --config configs/fusion/electfm_ercot_full_v6.yaml \
+    2>&1 | tee run_v6.log
+```
+
+---
+
+## 可用模型（v1.0 回测框架）
+
+| 模型 | 类型 | 运行位置 |
+|------|------|---------|
+| Naive / SeasonalNaive / ETS / Theta | 统计基线 | 进程内 |
+| RandomForest / LightGBM / XGBoost | 树模型 | 进程内（每起报点重训）|
+| TimesFM-2.5（Google）| 时序基础模型 | 独立 venv 子进程 |
+| Chronos-2（Amazon）| 时序基础模型 | 独立 venv 子进程 |
+| Toto-1.0 / Toto-2.0（Datadog）| 时序基础模型 | 独立 venv 子进程（共用 venv）|
+
+---
+
+## 方法论贡献
+
+### 三步递进关系
+
+```
+参数消融（v1.0）
+  → 确认精度瓶颈在模型内部，不在输入配置
+  
+结构消融（v2.0）
+  → 发现精度通路/尖峰通路功能分离
+  → 定位 TimesFM L7 为纯尖峰检测层
+  → 量化 Chronos 跨变量注意力贡献 (+6.7%)
+
+ElecFM 融合模型（v3.0）
+  → 消融结论→架构决策：spike head 在 L7 分叉
+  → 冻结骨干：SMAPE 保持零样本水平
+  → V6 CrossNodeAttention：实测 +6.7%，与消融预测完全吻合
+```
+
+### 核心工程决策
+
+- **quant_head 永久冻结**：小样本无法维持预训练分位数校准（Coverage 从 0.775 降至 0.582）
+- **骨干完全冻结**：任何骨干权重修改都导致 SMAPE 退化（4 轮实验一致）
+- **spike head 接入 L7**：消融数据直接给出，非拍脑袋
+- **CrossNodeAttention 使用同质节点**：跨价格区间节点混合导致数值不稳定（NaN 实验证实）
+
+---
+
+## 文档导航
+
+| 文档 | 内容 |
 |------|------|
-| `market` / `nodes_group` | 市场（如 ERCOT）与节点组（`volatility`/`spikes`/`stable`，引用 nodes.yaml）|
-| `freq` | 频率（`1h` / `15min` / `5min`）|
-| `context_len` | 回看窗口（零样本/统计/基础模型用）|
-| `train_context_len` | 需训练模型（树模型）的训练回看窗口，更长，仍无泄漏 |
-| `horizon` | 预测步长（如 24＝日前预测）|
-| `backtest.*` | 测试区间、起报点步长 `stride_hours`、起报点数量上限 `max_origins` |
-| `models` | 参与对比的模型名列表 |
-| `covariates` | 协变量列表（消融A 在此增减）|
-| `spike` | 尖峰定义（分位阈值 + global/rolling 模式）|
+| `docs/fusion/README.md` | ElecFM 入口 |
+| `docs/fusion/design.md` | 架构设计 + 全版本结果汇总表 |
+| `docs/fusion/experiments.md` | 所有实验的详细记录 |
+| `docs/fusion/implementation.md` | 代码结构与使用指南 |
+| `docs/结构消融汇报材料.md` | v1.0+v2.0+ElecFM 完整研究记录 |
+| `docs/参数消融汇报材料.md` | v1.0 结果与分析 |
+| `CHANGELOG.md` | 版本变更日志 |
 
-## 可用模型
-
-| 模型 | 类型 | 需训练 | 运行位置 |
-|------|------|:---:|------|
-| Naive | 随机游走 | ❌ | 进程内 |
-| SeasonalNaive | 季节性朴素（MASE 分母）| ❌ | 进程内 |
-| ETS | 指数平滑 / Holt-Winters | ❌ | 进程内 |
-| Theta | Theta 法（M3 冠军）| ❌ | 进程内 |
-| RandomForest | 随机森林 | ✅ | 进程内（每起报点重训）|
-| LightGBM | 梯度提升树 | ✅ | 进程内（每起报点重训）|
-| XGBoost | 梯度提升树 | ✅ | 进程内（每起报点重训）|
-| TimesFM-2.5 | 时序基础模型（Google）| ❌ | 独立 venv 子进程 |
-| Chronos-2 | 时序基础模型（Amazon）| ❌ | 独立 venv 子进程 |
-| Toto-1.0 | 时序基础模型（Datadog）| ❌ | 独立 venv 子进程 |
-| Toto-2.0 | 时序基础模型（Datadog，CPM 架构）| ❌ | 独立 venv 子进程（共用 Toto venv）|
+---
 
 ## 注意事项
 
-- **基础模型 venv**：四个基础模型依赖互相冲突，TimesFM / Chronos-2 / Toto 各用一个 `external/<model>/.venv`，Toto-2.0 与 Toto-1.0 共用 toto 的 venv。由 `foundation.py` 通过子进程调用，不要在主环境里直接 import。
-- **数据来源**：主链路 `loader.load_slice` 直接读 `data/raw/<市场>/processed/` 下的原始长表并在内存里透视，无需预先生成中间宽表文件。
-- **运行目录**：脚本内部用绝对路径定位项目根，从项目根目录运行最稳妥。
-- **实验结果**：所有结果按 `data/results/<实验名_窗口后缀>/` 组织，每个目录包含 summary.csv、per_origin.csv、records.csv、thresholds.json 及对比图（summary_compare.png / timeseries_compare.png）。
+- **基础模型 venv 独立**：TimesFM / Chronos / Toto 依赖冲突，各自使用 `external/<model>/.venv`，不要在主环境 import
+- **数据范围**：ERCOT 实时电价 2025-01-01 ~ 2026-06-02，约 17 个月
+- **测试隔离**：W1/W2/W3 测试窗口及前 168h buffer 已严格排除于训练集之外
+- **运行目录**：所有脚本从项目根目录运行
 
-## 实验进度
-
-- ✅ **v1.0 参数消融**：全部完成。5 类消融 × 3 窗口 = 15 组实验，11 个模型全部跑完，结果文档见 `docs/参数消融汇报材料.md` 和 `docs/参数消融实验结果与问答.md`。
-- ✅ **v2.0 结构消融**：全部完成。36 次组件级消融 + 32 次逐层消融 + Wilcoxon 显著性检验，结果文档见 `docs/结构消融汇报材料.md` 和 `docs/结构消融实验结果与问答.md`，图表见 `data/results/structural_ablation/report/`。
-
-### 5. 跑结构消融实验
-
-```bash
-# 冒烟测试
-python src/structural_ablation/run_structural_ablation.py configs/structural_ablation/smoke_toto2.yaml
-
-# 完整实验
-python src/structural_ablation/run_structural_ablation.py configs/structural_ablation/full_toto2.yaml
-```
+---
 
 ## 参考
 
 - TimesFM: https://github.com/google-research/timesfm
 - Chronos: https://github.com/amazon-science/chronos-forecasting
-- Toto: https://github.com/DataDog/toto
-- Toto-2.0 论文: `docs/reference/toto2.pdf`
-
-更详细的方法论见 `docs/specs/experiment_manual.md` 与 `docs/concepts/`。
+- Toto / Toto-2.0: https://github.com/DataDog/toto
+- 详细方法论见 `docs/specs/experiment_manual_v2.md` 与 `docs/结构消融汇报材料.md`

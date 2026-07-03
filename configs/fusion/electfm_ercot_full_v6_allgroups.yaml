@@ -1,0 +1,43 @@
+# ElecFM V6 CrossNodeAttention — 15节点全分组版
+# 5组×3节点，训练样本从 8307 升至 41535（5倍）
+# 参数/样本比：664K / 41535 ≈ 16（与 v4 LoRA 相当，合理范围）
+# 评估仍只在 LZ_LCRA/LZ_WEST/LZ_RAYBN 上进行
+
+market:       ERCOT
+nodes: [LZ_LCRA, LZ_WEST, LZ_RAYBN]   # 评估节点（不变）
+freq:         1h
+context_len:  168
+horizon:      24
+
+pretrained_id: google/timesfm-2.5-200m-pytorch
+
+cross_node_only:      true
+v6_allgroups:         true   # ← 关键：使用全部5组节点训练
+spike_head_only:      false
+use_lora:             false
+cross_attn_dim:       64
+
+batch_size:           32
+train_stride:         1
+
+stage1_epochs:        30
+stage1_lr:            1.0e-3
+stage2_epochs:        0
+stage2_lr:            0.0
+stage2_lr_min:        0.0
+
+gradient_clip:        1.0
+weight_decay:         0.01
+early_stop_patience:  5
+use_amp:              true
+
+lambda_pinball:       0.8
+lambda_spike:         0.2
+
+stride_hours:         24
+max_origins:          30
+spike_quantile:       0.95
+tau_search_range:     [0.05, 0.95]
+tau_search_step:      0.05
+
+checkpoint_dir:       data/checkpoints/electfm_ercot_full_v6_allgroups
