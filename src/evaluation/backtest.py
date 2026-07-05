@@ -185,6 +185,34 @@ def _as_2d(forecast: Forecast):
     return mean, q10, q50, q90
 
 
+def _compute_naive7_mae(data: pd.DataFrame, oi: int, horizon: int,
+                        target_cols: List[str]) -> float:
+    """
+    计算 naive7（period=168）在起报点 oi 的 horizon 步预测 MAE。
+
+    naive7 预测：p̂_{d,h} = p_{d-7,h}，即用 168 步（7 × 24h）前同时刻
+    的实际价格作为预测（Lago 2021 定义的 rMAE 分母基线）。
+
+    结果对 horizon × 所有节点取均值，作为单个起报点的 naive7_mae。
+    若数据不足（oi + h - 168 < 0），对应步跳过，不影响其余步。
+
+    返回 nan 而非 0/inf，让调用方能安全用 np.isnan() 过滤。
+    """
+    n = len(data)
+    errors: List[float] = []
+    for h in range(horizon):
+        actual_idx = oi + h
+        naive_idx = oi + h - 168          # 168 步 = 7 天 × 24 小时
+        if naive_idx < 0 or actual_idx >= n:
+            continue
+        for col in target_cols:
+            v_actual = float(data.iloc[actual_idx][col])
+            v_naive = float(data.iloc[naive_idx][col])
+            if not (np.isnan(v_actual) or np.isnan(v_naive)):
+                errors.append(abs(v_actual - v_naive))
+    return float(np.mean(errors)) if errors else float("nan")
+
+
 # ── 主回测函数 ────────────────────────────────────────────────────────────────
 def run_backtest(
     data: pd.DataFrame,
@@ -236,10 +264,22 @@ def run_backtest(
             vals = data[col].to_numpy(dtype=float)   # 兜底
         thresholds[node] = M.compute_spike_threshold(vals, cfg.spike_quantile)
 
-    # ── 先跑一遍季节性朴素，得到 MASE 的分母（每模型同口径）──────────────
-    # 这里直接在汇总阶段用记录里的 naive，简单起见用全局 naive_mae 占位。
+    # ── 预计算所有起报点的 naive7 MAE（rMAE 分母，与模型无关）──────────────
+    # naive7: p̂ = p_{t-168}（7 天前同时刻价格），Lago 2021 checklist #6。
+    # 早于测试期 168 步的起报点（数据头部）会返回 nan，由 metrics.rmae 跳过。
+    print("  [准备] 计算 naive7 (period=168) 基线 MAE …", flush=True)
+    naive7_mae_by_origin: Dict[int, float] = {
+        oi: _compute_naive7_mae(data, oi, cfg.horizon, target_cols)
+        for oi in origins
+    }
+    n_nan = sum(1 for v in naive7_mae_by_origin.values() if np.isnan(v))
+    if n_nan:
+        print(f"      ↳ {n_nan}/{len(origins)} 个起报点 naive7_mae=nan"
+              "（历史数据不足 168 步，跳过 rMAE）", flush=True)
+
     rec = _Records()
     per_origin_rows = []
+    model_elapsed: Dict[str, float] = {}   # 记录每个模型的推理用时（秒）
 
     import time as _time
     for _mi, fc in enumerate(forecasters, 1):
@@ -252,7 +292,10 @@ def run_backtest(
         preds = _predict_all_origins(
             fc, data, origins, cfg, target_cols, cov_cols,
             use_cov, future_covariates_known)
-        print(f"      ↳ {fc.name} 完成，用时 {_time.time() - _t0:.1f}s", flush=True)
+        _elapsed = _time.time() - _t0
+        model_elapsed[fc.name] = _elapsed
+        print(f"      ↳ {fc.name} 完成，用时 {_elapsed:.1f}s  "
+              f"（{_elapsed / max(len(origins), 1):.2f}s/起报点）", flush=True)
 
         for oi in origins:
             if oi not in preds:
@@ -268,15 +311,18 @@ def run_backtest(
                             actual[h, j], mean[h, j], q10[h, j], q90[h, j])
 
             # 记录这个 (模型, 起报点) 的指标（按所有节点汇总）
+            n7_mae = naive7_mae_by_origin.get(oi, None)
             m = M.all_point_prob_metrics(
                 actual.ravel(), mean.ravel(),
-                q10.ravel(), q50.ravel(), q90.ravel())
+                q10.ravel(), q50.ravel(), q90.ravel(),
+                naive7_mae=n7_mae)   # → 含 rmae（若 n7_mae 非 nan）
             # multivariate_used：实验要求多变量 且 模型原生支持，才算真正用上。
             mv_used = bool(cfg.multivariate
                            and getattr(fc, "supports_multivariate", False)
                            and len(nodes) > 1)
             per_origin_rows.append({
                 "model": fc.name, "origin": origin_ts,
+                "naive7_mae": n7_mae,          # rMAE 分母，供汇总用
                 "covariates_used": use_cov,
                 "multivariate_used": mv_used, **m})
 
@@ -285,7 +331,7 @@ def run_backtest(
 
     summary = _summarize(per_origin, records, forecasters, nodes,
                          target_cols, thresholds, cfg, data, origins,
-                         cov_cols, future_covariates_known)
+                         cov_cols, future_covariates_known, model_elapsed)
 
     return {
         "summary": summary,
@@ -296,7 +342,8 @@ def run_backtest(
 
 
 def _summarize(per_origin, records, forecasters, nodes, target_cols,
-               thresholds, cfg, data, origins, cov_cols, future_known):
+               thresholds, cfg, data, origins, cov_cols, future_known,
+               model_elapsed: Optional[Dict[str, float]] = None):
     """
     汇总每个模型：点/概率指标的均值±标准差 + 全局 Spike-F1。
     Spike-F1 需要逐时刻信号，因此这里按模型重跑一次轻量收集（带模型名）。
@@ -320,11 +367,25 @@ def _summarize(per_origin, records, forecasters, nodes, target_cols,
                if "multivariate_used" in sub else False,
                "n_origins": int(sub["origin"].nunique())}
         for metric in ("mae", "rmse", "smape", "pinball", "coverage"):
-            if metric in sub:
+            if metric in sub.columns:
                 row[f"{metric}_mean"] = float(sub[metric].mean())
                 row[f"{metric}_std"] = float(sub[metric].std(ddof=0))
         if naive_mae:
             row["mase_mean"] = float(sub["mae"].mean() / naive_mae)
+        # rMAE（Lago checklist #6）：每起报点独立算后取均值，比"均MAE/均naive7MAE"
+        # 更准确（前者是调和意义上的比值，不等于比值的均值）。
+        if "rmae" in sub.columns:
+            valid_rmae = sub["rmae"].dropna()
+            if len(valid_rmae):
+                row["rmae_mean"] = float(valid_rmae.mean())
+                row["rmae_std"] = float(valid_rmae.std(ddof=0))
+
+        # 计算成本（Lago checklist #3）
+        n_ori = max(int(sub["origin"].nunique()), 1)
+        if model_elapsed and fc.name in model_elapsed:
+            elapsed = model_elapsed[fc.name]
+            row["inference_time_s"]       = round(elapsed, 2)
+            row["inference_time_per_day_s"] = round(elapsed / n_ori, 3)
 
         # Spike-F1：对该模型逐时刻收集 mean/q90 信号
         sf_mean, sf_q90 = _spike_f1_for_model(

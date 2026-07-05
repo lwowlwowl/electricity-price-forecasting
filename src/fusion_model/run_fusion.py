@@ -57,7 +57,7 @@ def step1_verify_pruning(cfg: dict, device: torch.device):
         market=cfg["market"], nodes=cfg["nodes"],
         context_len=cfg["context_len"], horizon=cfg["horizon"],
         stride_hours=cfg.get("stride_hours", 24),
-        max_origins=cfg.get("max_origins", 30),
+        max_origins=cfg.get("max_origins", None),  # None = 跑满连续测试期
     )
 
     # 加载 ElecFM（已剪枝，随机初始化 spike head，但 backbone 是预训练权重）
@@ -269,7 +269,7 @@ def main():
         context_len=cfg["context_len"],
         horizon=cfg["horizon"],
         stride_hours=cfg.get("stride_hours", 24),
-        max_origins=cfg.get("max_origins", 30),
+        max_origins=cfg.get("max_origins", None),  # None = 跑满连续测试期
         spike_quantile=cfg.get("spike_quantile", 0.95),
         tau_search_range=tuple(cfg.get("tau_search_range", [0.05, 0.95])),
         tau_search_step=cfg.get("tau_search_step", 0.05),

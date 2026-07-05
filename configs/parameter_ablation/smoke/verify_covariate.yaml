@@ -9,7 +9,7 @@
 
 name: verify_covariate
 market: ERCOT
-nodes_group: volatility
+nodes_group: ablation
 freq: 1h
 context_len: 168
 horizon: 24

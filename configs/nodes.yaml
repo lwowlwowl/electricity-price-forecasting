@@ -1,7 +1,119 @@
-# 各市场代表性电价节点清单（由 build_nodes_config.py 自动生成）
-# volatility=波动最大  spikes=尖峰最多  stable=最平稳(对照)
+# 各市场节点配置
+# 最后更新：2026-07-05（简化结构，基于测试期 2025-07-01~2026-06-01 统计）
+#
+# 两种用途：
+#   ablation : 参数消融 + 结构消融（每市场 3 个代表节点，各市场统一）
+#   all      : ElecFM 训练 + 测试（全部节点）
+#
+# 代表节点选取原则（对应 Lago 2021 checklist #5，论文方法部分说明）：
+#   节点1：高波动（std 最高）      — 极端情况，模型差异最明显
+#   节点2：系统均价（hub均价/RTO） — 最贴近实际调度场景
+#   节点3：高负价格/极端尖峰      — 与本文 spike 预测主题最相关
 
+# ─────────────────────────────────────────────────────────────────────────────
+# ERCOT：15 节点
+# 测试期统计：std 30~50，负价格 1.6~19.9%，最高价 1306 $/MWh
+# ─────────────────────────────────────────────────────────────────────────────
 ERCOT:
-  volatility: [LZ_LCRA, LZ_WEST, LZ_RAYBN]
-  spikes: [LZ_HOUSTON, HB_HOUSTON, HB_SOUTH]
-  stable: [HB_HUBAVG, HB_BUSAVG, LZ_SOUTH]
+  ablation:
+    - LZ_WEST      # 高波动：std=50.1（全市场最高），负价格 9.8%
+    - HB_HUBAVG    # 系统均价：hub 均价节点，最接近系统平均
+    - HB_PAN       # 高负价格：neg=19.9%（全市场最高），西部高风电/光伏区
+  all:
+    - HB_BUSAVG
+    - HB_HOUSTON
+    - HB_HUBAVG
+    - HB_NORTH
+    - HB_PAN
+    - HB_SOUTH
+    - HB_WEST
+    - LZ_AEN
+    - LZ_CPS
+    - LZ_HOUSTON
+    - LZ_LCRA
+    - LZ_NORTH
+    - LZ_RAYBN
+    - LZ_SOUTH
+    - LZ_WEST
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PJM：35 节点
+# 测试期统计：std 40~132，负价格 0~5.2%，最高价 2042 $/MWh
+# ─────────────────────────────────────────────────────────────────────────────
+PJM:
+  ablation:
+    - "ZONE:DOM"          # 高波动：std=132.1（全市场最高），弗吉尼亚/马里兰负荷区
+    - "ZONE:PJM-RTO"      # 系统均价：PJM 全系统均价，无负价格
+    - "HUB:CHICAGO HUB"   # 高负价格：neg=5.2%（全市场最高），芝加哥地区风电
+  all:
+    - "HUB:AEP GEN HUB"
+    - "HUB:AEP-DAYTON HUB"
+    - "HUB:ATSI GEN HUB"
+    - "HUB:CHICAGO GEN HUB"
+    - "HUB:CHICAGO HUB"
+    - "HUB:DOMINION HUB"
+    - "HUB:EASTERN HUB"
+    - "HUB:N ILLINOIS HUB"
+    - "HUB:NEW JERSEY HUB"
+    - "HUB:OHIO HUB"
+    - "HUB:WEST INT HUB"
+    - "HUB:WESTERN HUB"
+    - "ZONE:AECO"
+    - "ZONE:AEP"
+    - "ZONE:APS"
+    - "ZONE:ATSI"
+    - "ZONE:BGE"
+    - "ZONE:COMED"
+    - "ZONE:DAY"
+    - "ZONE:DEOK"
+    - "ZONE:DOM"
+    - "ZONE:DPL"
+    - "ZONE:DUQ"
+    - "ZONE:EKPC"
+    - "ZONE:JCPL"
+    - "ZONE:METED"
+    - "ZONE:MID-ATL/APS"
+    - "ZONE:OVEC"
+    - "ZONE:PECO"
+    - "ZONE:PENELEC"
+    - "ZONE:PEPCO"
+    - "ZONE:PJM-RTO"
+    - "ZONE:PPL"
+    - "ZONE:PSEG"
+    - "ZONE:RECO"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CAISO：仅 3 个节点（ablation = all）
+# 测试期统计：std 22~25，负价格 6~13%（太阳能过剩），最高 722 $/MWh
+# ─────────────────────────────────────────────────────────────────────────────
+CAISO:
+  ablation:
+    - TH_SP15_GEN-APND    # 高波动：std=24.7，neg=12.7%（南加州，光伏最密集）
+    - TH_NP15_GEN-APND    # 系统均价：mean=33.2（北加州，最稳定）
+    - TH_ZP26_GEN-APND    # 高负价格：neg=12.2%（中部，与 SP15 差异化覆盖）
+  all:
+    - TH_NP15_GEN-APND
+    - TH_SP15_GEN-APND
+    - TH_ZP26_GEN-APND
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NYISO：11 节点
+# 测试期统计：std 61~91，负价格 0~0.5%，最高价 3342 $/MWh（NYC）
+# ─────────────────────────────────────────────────────────────────────────────
+NYISO:
+  ablation:
+    - "N.Y.C."    # 高波动：std=90.1，NYC 负荷中心，最高价 3342 $/MWh
+    - WEST        # 系统均价：std=61.3（最低），上州西部，最稳定
+    - LONGIL      # 极端尖峰：max=3279 $/MWh（长岛，与本文 spike 主题最相关）
+  all:
+    - CAPITL
+    - CENTRL
+    - DUNWOD
+    - GENESE
+    - "HUD VL"
+    - LONGIL
+    - "MHK VL"
+    - MILLWD
+    - "N.Y.C."
+    - NORTH
+    - WEST

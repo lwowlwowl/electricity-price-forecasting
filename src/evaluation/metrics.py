@@ -11,6 +11,13 @@
   关键防泄露约束（手册 §5.3）：尖峰阈值 P95 只能用起报点之前的历史算，
   绝不能用包含测试期/未来的全量数据算。本模块只负责"给定阈值算 F1"，
   阈值的计算时机由 backtest.py 控制，从流程上杜绝泄露。
+
+★ 两种 naive 基线口径（勿混用）：
+  ├─ MASE 分母：SeasonalNaive（period=24，日周期），in-sample 平均 MAE，
+  │   由 backtest._summarize 从 SeasonalNaive 预测器的结果算出后传入 mase()。
+  └─ rMAE 分母：naive7（period=168，周周期），即 p_{d-7,h}（168 步前同时刻
+      实际价格），out-of-sample per-origin MAE，由 backtest._compute_naive7_mae
+      逐起报点算出后传入 rmae()。对应 Lago 2021 checklist #6。
 """
 
 from __future__ import annotations
@@ -45,9 +52,26 @@ def mase(y_true: np.ndarray, y_pred: np.ndarray,
     """
     平均绝对标度误差 = MAE / 季节性Naive的MAE。
     跨节点/跨市场可比（消除量纲）。naive_mae 由回测引擎传入
-    （同一配置下季节性朴素基线的 MAE）。<1 表示比朴素好。
+    （同一配置下季节性朴素基线的 MAE，period=24）。<1 表示比朴素好。
     """
     return float(mae(y_true, y_pred) / (naive_mae + eps))
+
+
+def rmae(y_true: np.ndarray, y_pred: np.ndarray,
+         naive7_mae: float, floor: float = 1.0) -> float:
+    """
+    相对平均绝对误差（Lago 2021 checklist #6）：
+        rMAE = MAE_model / MAE_naive7
+
+    naive7_mae : naive7（period=168）在同一预测窗口的 MAE，由
+                 backtest._compute_naive7_mae 逐起报点算出后传入。
+    floor      : 分母下限（默认 1.0 USD/MWh）。防止负价格市场（如 CAISO）
+                 naive7_mae 趋近于零导致 rMAE 爆炸；论文中需注明此约定。
+    <1 表示优于 naive7（7天前同时刻价格）基线。
+    """
+    model_mae = mae(y_true, y_pred)
+    denom = max(float(naive7_mae), float(floor))
+    return float(model_mae / denom)
 
 
 # ── 2. 概率预测指标 ───────────────────────────────────────────────────────────
@@ -139,11 +163,13 @@ def all_point_prob_metrics(
     q10: Optional[np.ndarray] = None,
     q50: Optional[np.ndarray] = None,
     q90: Optional[np.ndarray] = None,
-    naive_mae: Optional[float] = None,
+    naive_mae: Optional[float] = None,     # MASE 分母（period=24 SeasonalNaive）
+    naive7_mae: Optional[float] = None,    # rMAE 分母（period=168 naive7，Lago #6）
+    rmae_floor: float = 1.0,               # rMAE 分母下限（防 CAISO 负价格爆炸）
 ) -> Dict[str, float]:
     """
     一次性算齐点误差 + 概率误差（不含 Spike-F1，后者需阈值另算）。
-    分位数缺失时自动跳过概率项。
+    分位数缺失时自动跳过概率项。naive_mae / naive7_mae 缺失时跳过对应标度误差。
     """
     out = {
         "mae": mae(y_true, mean),
@@ -152,6 +178,8 @@ def all_point_prob_metrics(
     }
     if naive_mae is not None:
         out["mase"] = mase(y_true, mean, naive_mae)
+    if naive7_mae is not None and not np.isnan(naive7_mae):
+        out["rmae"] = rmae(y_true, mean, naive7_mae, floor=rmae_floor)
     if q10 is not None and q90 is not None:
         q50_eff = q50 if q50 is not None else mean
         out["pinball"] = avg_pinball(y_true, q10, q50_eff, q90)
@@ -170,11 +198,17 @@ if __name__ == "__main__":
     print("=" * 60)
     print("metrics 自测")
     print("=" * 60)
-    m = all_point_prob_metrics(y, pred, pred - 8, pred, pred + 8, naive_mae=9.0)
+    m = all_point_prob_metrics(y, pred, pred - 8, pred, pred + 8,
+                               naive_mae=9.0, naive7_mae=8.5, rmae_floor=1.0)
     for k, v in m.items():
         print(f"  {k:10s}= {v:.4f}")
     sf = spike_f1(y, pred, thr)
     print(f"  spike阈值  = {thr:.2f}")
     print(f"  Spike-F1   = P={sf['precision']:.3f} R={sf['recall']:.3f} "
           f"F1={sf['spike_f1']:.3f} (TP={sf['tp']} FP={sf['fp']} FN={sf['fn']})")
+
+    # 单独测试 rmae 和 floor
+    print(f"\n  rmae(floor=1.0) = {rmae(y, pred, naive7_mae=8.5):.4f}")
+    print(f"  rmae(floor=1.0, naive7_mae→0) = {rmae(y, pred, naive7_mae=0.0):.4f}"
+          "  ← floor 生效，不爆炸")
     print("\n✅ metrics 工作正常")

@@ -10,7 +10,7 @@
 
 name: verify_multivariate
 market: ERCOT
-nodes_group: volatility       # 3 节点，触发多变量
+nodes_group: ablation
 freq: 1h
 context_len: 168
 horizon: 24

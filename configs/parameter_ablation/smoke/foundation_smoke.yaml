@@ -7,7 +7,7 @@
 
 name: foundation_smoke
 market: ERCOT
-nodes_group: volatility      # 引用 configs/nodes.yaml 里的节点组（3 节点）
+nodes_group: ablation
 freq: 1h
 context_len: 168             # 回看 7 天
 horizon: 24                  # 预测未来 24 小时（日前预测）

@@ -4,23 +4,23 @@
 #
 # 用法：python src/parameter_ablation/run_ablation.py configs/parameter_ablation/ablation_B_context.yaml
 
-name: ablation_B_context_w1_stable
+name: ablation_B_context
 market: ERCOT
-nodes_group: volatility
+nodes_group: ablation
 freq: 1h
 context_len: 168             # 会被 ablate 覆盖，这里只是占位
 train_context_len: 1440      # 树模型训练窗口固定（不随消融变化）
 horizon: 24
-data_start: 2025-04-01       # 给 720h 上下文 + 1440h 训练窗口留足历史
-data_end: 2025-09-01
+data_start: 2025-01-01       # 连续测试期起点前 6 个月，给最长上下文留足历史
+data_end: 2026-06-05
 
 backtest:
-  test_start: 2025-08-01
-  test_end: 2025-08-31
+  test_start: 2025-07-01
+  test_end: 2026-06-01
   stride_hours: 24
-  max_origins: 30
+  # max_origins: 30  ← 连续 12 个月跑满，不限起报点
 
-models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto, Toto2]
+models: [Naive, SeasonalNaive, LEAR, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto, Toto2]
 
 covariates: []
 

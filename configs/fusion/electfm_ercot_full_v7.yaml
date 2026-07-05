@@ -60,7 +60,7 @@ lambda_pinball:       0.8
 lambda_spike:         0.2
 
 stride_hours:         24
-max_origins:          30
+# max_origins: 30  ← 注释掉以跑满连续 12 个月；设置具体数字则限制起报点
 spike_quantile:       0.95
 tau_search_range:     [0.05, 0.95]
 tau_search_step:      0.05

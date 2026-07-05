@@ -1,0 +1,13 @@
+Hyndman, R. J., & Athanasopoulos, G. (2021). Forecasting: Principles and Practice (3rd ed.). OTexts. https://otexts.com/fpp3/
+
+Section 5.10 "Time series cross-validation" 概括与理解：
+
+本节将传统 train/test 评估与 time series cross-validation（时间序列交叉验证）做了直观对比。传统做法是把数据一刀切——前面一大段做 training data，后面一小段做 test data，只产生一组预测误差。而 time series cross-validation 是一种"更复杂的版本"（原文用词 "a more sophisticated version of training/test sets"）：它设置一系列 test set，每个 test set 由一个（或若干个）观测值构成，对应的 training set 严格只包含该 test 观测之前的所有数据。原文明确写道："The corresponding training set consists only of observations that occurred prior to the observation that forms the test set. Thus, no future observations can be used in constructing the forecast."
+
+书中用图示展示了这个过程：training set 从初始长度开始，每一步向前扩展一个时间点（stretching window），然后在新的 test point 上做 h=1、h=2、h=3、h=4 等不同 horizon 的预测。每一步都重新拟合模型（书中示例是对每个 rolling window 重新 estimate 一个 Random Walk with drift 模型），然后在对应的 test 观测上计算预测误差。最终的预测精度是所有 test set 上误差的平均值。原文注明此方法也叫 "evaluation on a rolling forecasting origin"。
+
+书中还展示了三种滚动窗口方式：Stretch（expanding window，窗口越来越长）、Slide（fixed-length sliding window，窗口固定长度平移）、Tile（固定长度不重叠），并指出 time series cross-validation 最常用 stretching window。
+
+书中结论原文："A good way to choose the best forecasting model is to find the model with the smallest RMSE computed using time series cross-validation." 即用 time series cross-validation 得到的 RMSE 来选模型是推荐做法。书中还对比了 cross-validation 误差和 training set 误差，前者通常更大（更诚实），证明 training set accuracy 会低估真实预测误差。
+
+核心要点：不要只用单次 train/test split 评估模型，应该用 rolling origin（多个起报点 + 逐步扩展训练集）来获得更可靠的预测精度估计。

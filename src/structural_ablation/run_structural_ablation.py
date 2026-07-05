@@ -139,8 +139,30 @@ def _parse_scalar(v: str):
 
 
 def _read_nodes_group(market: str, group: str):
+    """
+    从 nodes.yaml 取某市场某组的节点清单。
+    支持新格式（market.ablation.group）和旧格式（market.group）。
+    """
     cfg = _load_yaml(NODES_YAML)
-    return cfg[market][group]
+    market_cfg = cfg.get(market, {})
+
+    if group == "all":
+        nodes = market_cfg.get("all", [])
+        return list(nodes) if not isinstance(nodes, list) else nodes
+
+    abl = market_cfg.get("ablation", {})
+    if group in abl:
+        entry = abl[group]
+        return entry if isinstance(entry, list) else [entry]
+
+    if group in market_cfg:
+        entry = market_cfg[group]
+        return entry if isinstance(entry, list) else [entry]
+
+    available = list(abl.keys()) or list(market_cfg.keys())
+    raise KeyError(
+        f"节点组 '{group}' 不存在于 nodes.yaml[{market}]。可用组：{available}"
+    )
 
 
 # ── 让 run_backtest 识别 AblationForecaster 的批量接口 ─────────────────────
@@ -229,6 +251,82 @@ def _filter_applicable(models: List[str], ablations: List[str]) -> List[tuple]:
             else:
                 print(f"  ⚠️  跳过不适用组合：{model} × {abl}")
     return pairs
+
+
+def _run_structural_dm_tests(
+    records: pd.DataFrame,
+    models: List[str],
+    ablations: List[str],
+    out_dir: str,
+) -> None:
+    """
+    对每个模型，执行 baseline vs 各消融变体的 DM test（3c improvement）。
+    结果保存至 out_dir/dm_tests.csv，并打印摘要表格。
+    """
+    try:
+        from stat_tests import dm_test as _dm_test   # noqa: E402
+    except ImportError:
+        print("  ⚠️  stat_tests 未找到，跳过 DM test。")
+        return
+
+    available_models = set(records["model"].unique())
+    dm_rows = []
+    for model in models:
+        baseline_name = f"{model.capitalize()}[baseline]"
+        if baseline_name not in available_models:
+            continue
+        for abl in ablations:
+            # 尝试多种命名格式
+            abl_name = None
+            for candidate in [
+                f"{model.capitalize()}[{abl}]",
+                f"{model}[{abl}]",
+                f"Toto2[{abl}]",
+                f"Chronos2[{abl}]",
+                f"TimesFM[{abl}]",
+            ]:
+                if candidate in available_models:
+                    abl_name = candidate
+                    break
+            if abl_name is None:
+                continue
+            try:
+                res = _dm_test(records, baseline_name, abl_name)
+                sig = res["p_value"] < 0.05
+                sig_hours = int(sig.sum())
+                baseline_wins = int((sig & (res["mean_loss_diff"] < 0)).sum())
+                ablation_wins = int((sig & (res["mean_loss_diff"] > 0)).sum())
+                dm_rows.append({
+                    "model_type": model,
+                    "baseline": baseline_name,
+                    "ablation": abl_name,
+                    "ablation_type": abl,
+                    "dm_stat_mean": float(res["dm_stat"].mean()),
+                    "p_value_mean": float(res["p_value"].mean()),
+                    "sig_hours": sig_hours,
+                    "baseline_wins_h": baseline_wins,
+                    "ablation_wins_h": ablation_wins,
+                })
+            except Exception as e:
+                print(f"  ⚠️  DM test 失败 ({baseline_name} vs {abl_name})：{e}")
+
+    if not dm_rows:
+        print("  ⚠️  无有效 DM test 结果（可能数据不足）。")
+        return
+
+    dm_df = pd.DataFrame(dm_rows)
+    dm_path = os.path.join(out_dir, "dm_tests.csv")
+    dm_df.to_csv(dm_path, index=False)
+    print("\n── DM test：baseline vs 消融变体（α=0.05）──")
+    print(f"{'模型':10s} | {'消融类型':25s} | {'DM均值':>8s} | {'p均值':>8s} | "
+          f"{'显著h':>6s} | {'baseline胜':>8s} | {'消融胜':>8s}")
+    print("-" * 85)
+    for _, row in dm_df.iterrows():
+        print(f"  {row['model_type']:10s} | {row['ablation_type']:25s} | "
+              f"{row['dm_stat_mean']:>8.3f} | {row['p_value_mean']:>8.4f} | "
+              f"{int(row['sig_hours']):>6d} | {int(row['baseline_wins_h']):>8d} | "
+              f"{int(row['ablation_wins_h']):>8d}")
+    print(f"\n  DM test 结果已保存：{dm_path}")
 
 
 # ── 主函数 ────────────────────────────────────────────────────────────────
@@ -324,10 +422,11 @@ def run_structural_ablation(cfg: dict) -> dict:
     summary = result["summary"]
     print("\n── 结果汇总（按 MAE 升序）──")
     show_cols = [c for c in ["model", "n_origins",
-                             "mae_mean", "mae_std", "rmse_mean", "mase_mean",
+                             "mae_mean", "mae_std", "rmse_mean", "rmae_mean", "mase_mean",
                              "coverage_mean", "spike_f1_mean_signal"]
                  if c in summary.columns]
-    summary_sorted = summary.sort_values("mae_mean")
+    sort_col = "rmae_mean" if "rmae_mean" in summary.columns else "mae_mean"
+    summary_sorted = summary.sort_values(sort_col)
     print(summary_sorted[show_cols].round(4).to_string(index=False))
 
     # 5) 落盘
@@ -372,6 +471,7 @@ def run_structural_ablation(cfg: dict) -> dict:
 
         # 打印 delta 对比
         _print_delta(merged)
+        _run_structural_dm_tests(result["records"], models, ablations, out_dir)
 
     # 6) 折线图
     png_path = None
@@ -407,14 +507,18 @@ def run_structural_ablation(cfg: dict) -> dict:
 
 
 def _print_delta(merged: pd.DataFrame):
-    """打印消融相对 baseline 的指标变化百分比。"""
-    print("\n── 消融 vs. Baseline（MAE 变化%）──")
+    """打印消融相对 baseline 的指标变化百分比（MAE 及 rMAE，如有）。"""
+    has_rmae = "rmae_mean" in merged.columns
+    header = ("── 消融 vs. Baseline（MAE / rMAE 变化%）──"
+              if has_rmae else "── 消融 vs. Baseline（MAE 变化%）──")
+    print(f"\n{header}")
     for model in merged["model_type"].unique():
         sub = merged[merged["model_type"] == model]
         baseline = sub[sub["ablation_type"] == "baseline"]
         if baseline.empty or "mae_mean" not in baseline.columns:
             continue
         base_mae = baseline["mae_mean"].values[0]
+        base_rmae = baseline["rmae_mean"].values[0] if has_rmae else np.nan
         if base_mae == 0:
             continue
         for _, row in sub.iterrows():
@@ -423,8 +527,14 @@ def _print_delta(merged: pd.DataFrame):
             abl_mae = row.get("mae_mean", np.nan)
             delta = (abl_mae - base_mae) / base_mae * 100
             arrow = "↑" if delta > 0 else "↓"
-            print(f"  {model:10s} | {row['ablation_type']:25s} | "
-                  f"MAE: {abl_mae:.4f} ({arrow}{abs(delta):.1f}%)")
+            line = (f"  {model:10s} | {row['ablation_type']:25s} | "
+                    f"MAE: {abl_mae:.4f} ({arrow}{abs(delta):.1f}%)")
+            if has_rmae and not np.isnan(base_rmae) and base_rmae != 0:
+                abl_rmae = row.get("rmae_mean", np.nan)
+                rdelta = (abl_rmae - base_rmae) / base_rmae * 100
+                rarrow = "↑" if rdelta > 0 else "↓"
+                line += f"  rMAE: {abl_rmae:.4f} ({rarrow}{abs(rdelta):.1f}%)"
+            print(line)
 
 
 # ── CLI ────────────────────────────────────────────────────────────────────

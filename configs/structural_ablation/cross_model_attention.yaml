@@ -2,17 +2,17 @@
 # 同时对三个模型做 attention 相关的消融，对比哪个模型最依赖注意力机制
 name: structural_cross_attention
 market: ERCOT
-nodes_group: volatility
+nodes_group: ablation
 freq: 1h
 context_len: 168
 horizon: 24
-data_start: "2025-06-01"
-data_end: "2025-09-01"
+data_start: 2025-01-01
+data_end: 2026-06-05
 backtest:
-  test_start: "2025-08-01"
-  test_end: "2025-08-31"
+  test_start: 2025-07-01
+  test_end: 2026-06-01
   stride_hours: 24
-  max_origins: 30
+  # max_origins: 30  ← 连续 12 个月跑满，不限起报点
 spike:
   quantile: 0.95
   mode: global
@@ -21,4 +21,4 @@ structural_ablation:
   models: [toto2, chronos2, timesfm]
   ablations: [skip_attention, halve_heads]
   include_baseline: true
-  baseline_models: [Naive, SeasonalNaive]
+  baseline_models: [Naive, SeasonalNaive, LEAR]

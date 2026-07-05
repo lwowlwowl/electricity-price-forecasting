@@ -5,7 +5,7 @@
 
 name: ablation_B_context_w2_negative
 market: ERCOT
-nodes_group: volatility
+nodes_group: ablation
 freq: 1h
 context_len: 168
 train_context_len: 1440

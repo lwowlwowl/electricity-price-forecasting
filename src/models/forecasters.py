@@ -404,6 +404,215 @@ class XGBoostForecaster(_TreeForecaster):
         )
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+#  LEAR baseline（Lasso Estimated AutoRegressive，Lago 2021）
+#  对应 Lago checklist #2/#13：开源 SOTA 基线 + epftoolbox 工具
+# ══════════════════════════════════════════════════════════════════════════════
+class LEARForecaster(NaiveForecaster):
+    """
+    LEAR（Lasso Estimated AutoRegressive）日前电价预测基线。
+
+    实现依据：Lago et al. (2021) Applied Energy 293, Section 4.2
+    代码基础：epftoolbox (https://github.com/jeslago/epftoolbox) LEAR 类
+
+    特征结构（对应 Lago Eq. 3）：
+      [p_{d-1,0:24}, p_{d-2,0:24}, p_{d-3,0:24}, p_{d-7,0:24}, z_{d,0:7}]
+      ─ 4 天价格 lag（4×24=96 维）＋ 7 维星期哑变量 = 103 特征
+      ─ 对每个小时 h=0..23 独立拟合一个 LASSO 模型（共 24 个）
+      ─ lambda 每次用 LassoLarsIC (AIC) 选定（高效、准确）
+      ─ 价格做 asinh-median Invariant 变换后再估计（epftoolbox 内部处理）
+
+    回测用法（BacktestConfig 推荐）：
+      needs_training = True → backtest 使用 train_context_len 作为历史长度
+      建议 train_context_len = 84 * 24 = 2016（12 周滚动窗口）
+        → context_len 必须 ≥ (min_calib_days + 7) * 24
+      LEAR 不支持协变量（当前版本）：supports_covariates = False
+
+    定位说明（TODO 4d / 2d）：
+      参数消融 / 结构消融中：LEAR 是"外部定标参照"，不与消融配置并列排名
+      ElecFM 评估中：LEAR 是必须超越的基准，做 DM/GW test 对比
+    """
+
+    name = "LEAR"
+    needs_training = True         # 每日 recalibrate → 对 backtest 引擎：needs_training=True
+    supports_covariates = False   # 当前版本仅使用价格 lag（Lago Eq. 3 基本版）
+    supports_multivariate = False # 逐节点独立预测
+
+    #: 最小校准天数（Lago §5.1：≥ 8 周）
+    MIN_CALIB_DAYS: int = 56
+
+    def _to_daily(self, series_1d: np.ndarray,
+                  index: pd.DatetimeIndex) -> np.ndarray:
+        """
+        把 1-D 小时序列按 UTC 日期重组成 [n_days, 24] 矩阵。
+
+        只保留完整的 24 小时天（不完整天丢弃），从最早的完整天开始。
+        返回 None 若有效天数不足 MIN_CALIB_DAYS + 7（无法构建特征）。
+        """
+        dates = pd.DatetimeIndex(index).normalize()          # UTC 日期（无时分秒）
+        days, first_idx = [], None
+        for date, group in pd.Series(series_1d, index=index).groupby(dates):
+            if len(group) == 24:                              # 跳过不完整天
+                days.append(group.to_numpy(dtype=float))
+        if len(days) < self.MIN_CALIB_DAYS + 7:
+            return None
+        return np.stack(days, axis=0)                        # [n_days, 24]
+
+    @staticmethod
+    def _dow_dummies(prices_daily: np.ndarray,
+                     ref_index: pd.DatetimeIndex) -> np.ndarray:
+        """
+        生成 [n_days, 7] 的星期哑变量矩阵（epftoolbox 特征格式末 7 列）。
+        ref_index：与 prices_daily 行数等长的 DatetimeIndex（每天一个时间戳）。
+        """
+        n = prices_daily.shape[0]
+        dows = ref_index[:n].dayofweek.to_numpy()   # 0=Mon … 6=Sun
+        dummies = np.zeros((n, 7), dtype=float)
+        for i, d in enumerate(dows):
+            dummies[i, d] = 1.0
+        return dummies
+
+    @staticmethod
+    def _build_lear_matrices(
+        prices_daily: np.ndarray,
+        dow_dummies: np.ndarray,
+        n_calib_days: int,
+    ):
+        """
+        构建 LEAR 特征矩阵。
+
+        prices_daily : [n_days, 24]  — 按日重组的小时价格
+        dow_dummies  : [n_days, 7]   — 星期哑变量（Monday=0 … Sunday=6）
+        n_calib_days : 校准窗口天数
+
+        返回 (Xtrain, Ytrain, Xtest)
+          Xtrain : [n_calib_days, 103]  — 训练特征（96 价格 lag + 7 星期哑变量）
+          Ytrain : [n_calib_days, 24]   — 训练目标（各天 24 小时价格）
+          Xtest  : [1, 103]             — 测试特征（预测"下一天"用）
+        """
+        n = prices_daily.shape[0]
+        # 构建所有合法天的特征向量（需 d ≥ 7 才有 d-7 lag）
+        X_rows, Y_rows, dow_rows = [], [], []
+        for d in range(7, n):
+            x_price = np.concatenate([
+                prices_daily[d - 1],   # d-1，前一天 24h
+                prices_daily[d - 2],   # d-2
+                prices_daily[d - 3],   # d-3
+                prices_daily[d - 7],   # d-7，上周同一天
+            ])                          # (96,)
+            X_rows.append(x_price)
+            Y_rows.append(prices_daily[d])
+            dow_rows.append(dow_dummies[d])
+
+        X_price = np.stack(X_rows)    # [n-7, 96]
+        Y_all = np.stack(Y_rows)      # [n-7, 24]
+        dow_all = np.stack(dow_rows)  # [n-7, 7]
+        X_all = np.concatenate([X_price, dow_all], axis=1)   # [n-7, 103]
+
+        # 取最后 n_calib_days 行作为训练集
+        Xtrain = X_all[-n_calib_days:]
+        Ytrain = Y_all[-n_calib_days:]
+
+        # 测试特征：预测"prices_daily[n]"（即下一天），lag 来自现有最后几天
+        x_test_price = np.concatenate([
+            prices_daily[-1],   # d-1 = 最后一天（完整 24h）
+            prices_daily[-2],   # d-2
+            prices_daily[-3],   # d-3
+            prices_daily[-7],   # d-7
+        ])
+        # 下一天星期 = (最后一天星期 + 1) % 7
+        last_dow = np.argmax(dow_dummies[n - 1])
+        next_dow_dummy = np.zeros(7, dtype=float)
+        next_dow_dummy[(last_dow + 1) % 7] = 1.0
+        Xtest = np.concatenate([x_test_price, next_dow_dummy]).reshape(1, -1)
+
+        return Xtrain, Ytrain, Xtest
+
+    def predict(self, context_df: pd.DataFrame,
+                future_covariates=None, horizon: int = 24) -> "Forecast":
+        try:
+            from epftoolbox.models import LEAR as _LEAR
+        except ImportError:
+            warnings.warn("epftoolbox 未安装，LEAR 退化为 SeasonalNaive。"
+                          "安装：python -m pip install "
+                          "git+https://github.com/jeslago/epftoolbox.git")
+            return SeasonalNaiveForecaster(period=24).predict(
+                context_df, future_covariates, horizon)
+
+        # LEAR 是日前（24h）预测器，不支持其他 horizon：退化为 SeasonalNaive
+        if horizon != 24:
+            warnings.warn(
+                f"LEAR 仅支持 horizon=24（日前预测），"
+                f"收到 horizon={horizon}，退化为 SeasonalNaive。",
+                stacklevel=2)
+            return SeasonalNaiveForecaster(period=24).predict(
+                context_df, future_covariates, horizon)
+
+        cols = self._target_columns(context_df)
+        n_series = len(cols)
+
+        means = np.empty((horizon, n_series))
+        for j, col in enumerate(cols):
+            series_1d = context_df[col].to_numpy(dtype=float)
+            series_1d_clean = series_1d.copy()
+            # 简单线性插值填 NaN（LEAR 不能有 NaN）
+            mask = np.isnan(series_1d_clean)
+            if mask.any():
+                idx = np.arange(len(series_1d_clean))
+                series_1d_clean[mask] = np.interp(
+                    idx[mask], idx[~mask], series_1d_clean[~mask])
+
+            # 按 UTC 日期重组为 [n_days, 24]
+            prices_daily = self._to_daily(series_1d_clean, context_df.index)
+
+            if prices_daily is None:
+                # 历史不足，退化为 SeasonalNaive
+                fb = SeasonalNaiveForecaster(period=24).predict(
+                    context_df[[col]], future_covariates, horizon)
+                means[:, j] = (fb.mean[:, 0] if fb.mean.ndim == 2
+                               else fb.mean[:horizon])
+                continue
+
+            n_days = prices_daily.shape[0]
+            n_calib_days = min(n_days - 7, 84)   # 最多 12 周（Lago 推荐上限）
+            n_calib_days = max(n_calib_days, self.MIN_CALIB_DAYS)
+
+            # 星期哑变量：用 context_df 的 DatetimeIndex 按 UTC 日对齐
+            daily_dates = (pd.DatetimeIndex(context_df.index)
+                           .normalize().unique().sort_values())
+            # 仅保留完整天（与 _to_daily 同口径）
+            full_days = [
+                d for d in daily_dates
+                if context_df.loc[context_df.index.normalize() == d].shape[0] == 24
+            ]
+            full_day_idx = pd.DatetimeIndex(full_days)
+            dow_dummies = self._dow_dummies(prices_daily, full_day_idx)
+
+            try:
+                Xtrain, Ytrain, Xtest = self._build_lear_matrices(
+                    prices_daily, dow_dummies, n_calib_days)
+                lear_model = _LEAR(calibration_window=n_calib_days)
+                Y_pred = lear_model.recalibrate_predict(Xtrain, Ytrain, Xtest)
+                pred_24 = np.asarray(Y_pred, dtype=float).ravel()[:24]
+                if not np.all(np.isfinite(pred_24)):
+                    raise ValueError("LEAR 预测含非有限值")
+                means[:, j] = pred_24[:horizon]
+            except Exception as e:
+                warnings.warn(f"LEAR 预测失败（{col}）：{e}，退化为 SeasonalNaive")
+                fb = SeasonalNaiveForecaster(period=24).predict(
+                    context_df[[col]], future_covariates, horizon)
+                means[:, j] = (fb.mean[:, 0] if fb.mean.ndim == 2
+                               else fb.mean[:horizon])
+
+        # LEAR 是点预测器，无分位数（q10/q90 用残差估计作 stub）
+        band = np.nanstd(means, axis=0, keepdims=True) * _Z
+        q10 = means - band
+        q90 = means + band
+
+        return self._pack(means, q10, means.copy(), q90,
+                          context_df, horizon, cols)
+
+
 # ── 注册表：名字 → 构造器 ─────────────────────────────────────────────────────
 BASELINE_REGISTRY = {
     # 免训练（零样本）
@@ -412,7 +621,8 @@ BASELINE_REGISTRY = {
     # ETS/Theta 的季节周期同样按频率传入（1h→24，15min→96，5min→288）
     "ETS":           lambda **kw: ETSForecaster(season=kw.get("period", 24)),
     "Theta":         lambda **kw: ThetaForecaster(season=kw.get("period", 24)),
-    # 需训练
+    # 需训练（每起报点 recalibrate）
+    "LEAR":          lambda **kw: LEARForecaster(),        # Lago 2021 开源基准
     "RandomForest":  lambda **kw: RandomForestForecaster(),
     "LightGBM":      lambda **kw: LightGBMForecaster(),
     "XGBoost":       lambda **kw: XGBoostForecaster(),

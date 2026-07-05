@@ -1,19 +1,19 @@
-# 消融 A：协变量 — 窗口 W2：负价期（2025-03）
-# 用法：python src/parameter_ablation/run_ablation.py configs/parameter_ablation/ablation_A_covariates_w2_negative.yaml
+# 消融 A：协变量 — 窗口 W3：极端尖峰期（2026-01）
+# 用法：python src/parameter_ablation/run_ablation.py configs/parameter_ablation/ablation_A_covariates_w3_extreme.yaml
 
-name: ablation_A_covariates_w2_negative
+name: ablation_A_covariates_w3_extreme
 market: ERCOT
-nodes_group: volatility
+nodes_group: ablation
 freq: 1h
 context_len: 168
 train_context_len: 1440
 horizon: 24
-data_start: 2025-01-01
-data_end: 2025-04-01
+data_start: 2025-09-01
+data_end: 2026-02-01
 
 backtest:
-  test_start: 2025-03-01
-  test_end: 2025-03-31
+  test_start: 2026-01-01
+  test_end: 2026-01-31
   stride_hours: 24
   max_origins: 30
 

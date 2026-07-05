@@ -95,16 +95,45 @@ def _parse_scalar(v: str):
 
 
 def _read_nodes_group(market: str, group: str):
-    """从 nodes.yaml 取某市场某组的节点清单。"""
+    """
+    从 nodes.yaml 取某市场某组的节点清单。
+
+    支持两种格式：
+    ─ 新格式（多市场版）：market.ablation.group → 返回该组列表
+    ─ 旧格式（ERCOT 单市场版）：market.group     → 返回该组列表
+    ─ group="all" → 返回 market.all 下的全部节点
+    """
     cfg = _load_yaml(NODES_YAML)
-    return cfg[market][group]
+    market_cfg = cfg.get(market, {})
+
+    # "all"：返回全节点列表
+    if group == "all":
+        nodes = market_cfg.get("all", [])
+        return list(nodes) if not isinstance(nodes, list) else nodes
+
+    # 新格式：market.ablation.group
+    abl = market_cfg.get("ablation", {})
+    if group in abl:
+        entry = abl[group]
+        return entry if isinstance(entry, list) else [entry]
+
+    # 旧格式兼容：market.group（如旧版 ERCOT 只有三个顶层组）
+    if group in market_cfg:
+        entry = market_cfg[group]
+        return entry if isinstance(entry, list) else [entry]
+
+    available = list(abl.keys()) or list(market_cfg.keys())
+    raise KeyError(
+        f"节点组 '{group}' 不存在于 nodes.yaml[{market}]。"
+        f"可用组：{available}"
+    )
 
 
 # ── 内置基准配置（不传 YAML 时用，用于快速冒烟）──────────────────────────────
 DEFAULT_CONFIG = {
     "name": "baseline_smoke",
     "market": "ERCOT",
-    "nodes_group": "volatility",
+    "nodes_group": "ablation",
     "freq": "1h",
     "context_len": 168,
     "horizon": 24,
@@ -171,12 +200,18 @@ def run(cfg: dict) -> dict:
 
     summary = result["summary"]
     print("\n── 结果汇总（按 MAE 升序）──")
-    show_cols = [c for c in ["model", "covariates_used", "n_origins",
-                             "mae_mean", "mae_std", "rmse_mean", "mase_mean",
-                             "coverage_mean", "spike_f1_mean_signal",
-                             "spike_recall", "spike_f1_q90_signal"]
-                 if c in summary.columns]
-    summary_sorted = summary.sort_values("mae_mean")
+    # 按 rMAE 排序（Lago 主指标）；若无 rMAE（数据不足 168 步）则回落到 MAE
+    sort_col = "rmae_mean" if "rmae_mean" in summary.columns else "mae_mean"
+    summary_sorted = summary.sort_values(sort_col)
+    show_cols = [c for c in [
+        "model", "covariates_used", "n_origins",
+        "rmae_mean",                          # ← Lago checklist #6 主指标
+        "mae_mean", "mae_std",
+        "rmse_mean", "smape_mean",
+        "mase_mean",
+        "pinball_mean", "coverage_mean",
+        "spike_f1_mean_signal", "spike_recall", "spike_f1_q90_signal",
+    ] if c in summary.columns]
     print(summary_sorted[show_cols].round(4).to_string(index=False))
 
     # 5) 落盘
@@ -210,15 +245,54 @@ def run(cfg: dict) -> dict:
 
 
 def main():
-    if len(sys.argv) > 1:
-        cfg_path = sys.argv[1]
+    """
+    用法：
+        python run_experiment.py <config.yaml> [--market PJM] [--nodes_group ablation]
+
+    CLI 覆盖项（优先于 YAML 中的同名字段，便于多市场批量运行）：
+        --market        : 覆盖 YAML 的 market 字段（如 PJM / CAISO / NYISO）
+        --nodes_group   : 覆盖 YAML 的 nodes_group 字段
+        --suffix        : 附加到实验 name 末尾，避免多市场结果互覆
+                          （默认 = --market 值；若不指定 --market 则不附加）
+    """
+    import argparse
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("config", nargs="?", default=None,
+                        help="YAML 配置文件路径（可选，默认内置基准配置）")
+    parser.add_argument("--market",      default=None,
+                        help="覆盖配置中的 market（如 PJM / CAISO / NYISO）")
+    parser.add_argument("--nodes_group", default=None,
+                        help="覆盖配置中的 nodes_group（ablation=3代表节点 / all=全节点）")
+    parser.add_argument("--suffix",      default=None,
+                        help="附加到实验 name 末尾（默认 = --market 值）")
+    parser.add_argument("-h", "--help",  action="store_true")
+    args, _ = parser.parse_known_args()
+
+    if args.help:
+        parser.print_help()
+        return
+
+    if args.config:
+        cfg_path = args.config
         if not os.path.isabs(cfg_path):
             cfg_path = os.path.join(ROOT, cfg_path)
         cfg = _load_yaml(cfg_path)
         print(f"加载配置：{cfg_path}")
     else:
-        cfg = DEFAULT_CONFIG
+        cfg = DEFAULT_CONFIG.copy()
         print("未指定配置文件，使用内置基准配置（冒烟）")
+
+    # CLI 覆盖（多市场批量运行时不需要修改 YAML）
+    if args.market:
+        cfg["market"] = args.market
+        # 自动更新 name 以区分多市场结果目录
+        suffix = args.suffix or args.market.lower()
+        cfg["name"] = f"{cfg['name']}_{suffix}"
+        print(f"  覆盖 market → {args.market}（name 更新为 {cfg['name']}）")
+    if args.nodes_group:
+        cfg["nodes_group"] = args.nodes_group
+        print(f"  覆盖 nodes_group → {args.nodes_group}")
+
     run(cfg)
 
 

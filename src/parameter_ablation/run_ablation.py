@@ -76,6 +76,7 @@ def run_ablation(cfg: dict) -> dict:
     print("=" * 70)
 
     per_level = []          # [(label, summary_df), ...] 给画图
+    per_level_records = []  # [records_df, ...] 给 DM test
     merged_rows = []        # 跨档总表
 
     for val, label, linked in zip(values, labels, linked_list):
@@ -92,6 +93,7 @@ def run_ablation(cfg: dict) -> dict:
         result = RE.run(sub)
         summ = result["summary"].copy()
         per_level.append((label, summ))
+        per_level_records.append((label, result["records"].copy()))
 
         tagged = summ.copy()
         tagged.insert(0, "knob", key)
@@ -118,37 +120,169 @@ def run_ablation(cfg: dict) -> dict:
         title=f"消融：{key}（{base_name}）",
     )
 
+    # ── DM test（消融配置间显著性检验，Lago checklist #7）──────────────────
+    dm_result = _run_ablation_dm_tests(per_level_records, labels, out_dir, key)
+
     print(f"\n{'=' * 70}")
     print(f"✅ 消融完成")
     print(f"   跨档总表：{merged_path}")
     print(f"   折线图　：{png_path}")
+    if dm_result is not None:
+        print(f"   DM test ：{os.path.join(out_dir, 'ablation_dm_tests.csv')}")
     print("=" * 70)
 
-    # 打印一张精简跨档对比（每模型在各档的 MAE / Spike-F1）
+    # 打印一张精简跨档对比（每模型在各档的 rMAE / Spike-F1）
     _print_pivot(merged, key)
 
-    return {"merged": merged, "summary_path": merged_path, "png": png_path}
+    return {
+        "merged": merged,
+        "summary_path": merged_path,
+        "png": png_path,
+        "dm_tests": dm_result,
+    }
 
 
 def _print_pivot(merged: pd.DataFrame, key: str):
-    for metric, name in [("mae_mean", "MAE"), ("spike_f1_mean_signal", "Spike-F1")]:
+    # rMAE 优先（Lago 主指标），MAE 备用，Spike-F1 单独一张
+    metrics = [
+        ("rmae_mean", "rMAE"),
+        ("mae_mean", "MAE"),
+        ("spike_f1_mean_signal", "Spike-F1(mean)"),
+    ]
+    for metric, name in metrics:
         if metric not in merged.columns:
             continue
         piv = merged.pivot_table(index="model", columns="knob_value",
                                  values=metric, aggfunc="first")
         print(f"\n── {name} 随 {key} 变化（行=模型，列=档位）──")
-        print(piv.round(3).to_string())
+        print(piv.round(4).to_string())
+
+
+def _run_ablation_dm_tests(
+    per_level_records: list,   # [(label, records_df), ...]
+    labels: list,
+    out_dir: str,
+    key: str,
+) -> "pd.DataFrame | None":
+    """
+    消融配置间 DM test（Lago checklist #7）。
+
+    对每个模型，以第一档（baseline）为参照，依次对其余各档做 per-hour DM test。
+    正 dm_stat → baseline 损失更大（challenger 更好）。
+    负 dm_stat → baseline 更好。
+
+    输出 ablation_dm_tests.csv：行 = (模型, 档位对)，含显著小时数和均值 p 值。
+    """
+    sys.path.insert(0, os.path.join(ROOT, "src", "evaluation"))
+    try:
+        from stat_tests import dm_test
+    except ImportError:
+        print("  ⚠️  stat_tests 未找到，跳过 DM test")
+        return None
+
+    if len(per_level_records) < 2:
+        return None
+
+    baseline_label, baseline_records = per_level_records[0]
+    dm_rows = []
+
+    for challenger_label, challenger_records in per_level_records[1:]:
+        # 将两份 records 合并，用"虚拟"模型名区分，再逐模型做 DM test
+        models = set(baseline_records["model"].unique()) & \
+                 set(challenger_records["model"].unique())
+
+        for model in sorted(models):
+            rec_b = baseline_records[baseline_records["model"] == model].copy()
+            rec_c = challenger_records[challenger_records["model"] == model].copy()
+            # 重命名为虚拟名以供 dm_test 区分
+            rec_b["model"] = f"baseline"
+            rec_c["model"] = f"challenger"
+            combined = pd.concat([rec_b, rec_c], ignore_index=True)
+
+            try:
+                dm_res = dm_test(combined, "baseline", "challenger")
+                sig = dm_res[dm_res["p_value"] < 0.05]
+                dm_rows.append({
+                    "model":               model,
+                    "baseline_config":     baseline_label,
+                    "challenger_config":   challenger_label,
+                    "sig_hours_p05":       int(len(sig)),
+                    "baseline_wins":       int((sig["mean_loss_diff"] < 0).sum()),
+                    "challenger_wins":     int((sig["mean_loss_diff"] > 0).sum()),
+                    "mean_dm_stat":        round(float(dm_res["dm_stat"].mean()), 4),
+                    "mean_p_value":        round(float(dm_res["p_value"].mean()), 4),
+                })
+            except Exception as e:
+                dm_rows.append({
+                    "model": model,
+                    "baseline_config": baseline_label,
+                    "challenger_config": challenger_label,
+                    "error": str(e),
+                })
+
+    if not dm_rows:
+        return None
+
+    dm_df = pd.DataFrame(dm_rows)
+    dm_path = os.path.join(out_dir, "ablation_dm_tests.csv")
+    dm_df.to_csv(dm_path, index=False)
+
+    # 终端摘要
+    print(f"\n── DM test（{baseline_label} vs 各档，α=0.05）──")
+    print(f"{'模型':20s}  {'对比档':20s}  {'显著h/24':8s}  {'base赢':6s}  "
+          f"{'chall赢':7s}  {'均值p':7s}")
+    for _, r in dm_df.iterrows():
+        if "error" in r and pd.notna(r.get("error", None)):
+            print(f"  {r['model']:20s}  {r['challenger_config']:20s}  ERROR: {r['error']}")
+        else:
+            print(f"  {r['model']:20s}  {r['challenger_config']:20s}  "
+                  f"{r.get('sig_hours_p05','?'):8}  "
+                  f"{r.get('baseline_wins','?'):6}  "
+                  f"{r.get('challenger_wins','?'):7}  "
+                  f"{r.get('mean_p_value','?'):7}")
+    return dm_df
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("用法：python run_ablation.py <消融配置.yaml>")
+    """
+    用法：
+        python run_ablation.py <config.yaml> [--market PJM] [--nodes_group ablation]
+
+    与 run_experiment.py 相同的 CLI 覆盖约定，便于多市场批量消融。
+    """
+    import argparse
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("config", nargs="?", default=None)
+    parser.add_argument("--market",      default=None)
+    parser.add_argument("--nodes_group", default=None)
+    parser.add_argument("--suffix",      default=None)
+    parser.add_argument("-h", "--help",  action="store_true")
+    args, _ = parser.parse_known_args()
+
+    if args.help:
+        parser.print_help()
+        return
+
+    if not args.config:
+        print("用法：python run_ablation.py <消融配置.yaml> [--market PJM]")
         sys.exit(1)
-    cfg_path = sys.argv[1]
+
+    cfg_path = args.config
     if not os.path.isabs(cfg_path):
         cfg_path = os.path.join(ROOT, cfg_path)
     cfg = RE._load_yaml(cfg_path)
     print(f"加载消融配置：{cfg_path}")
+
+    # 多市场 CLI 覆盖
+    if args.market:
+        cfg["market"] = args.market
+        suffix = args.suffix or args.market.lower()
+        cfg["name"] = f"{cfg['name']}_{suffix}"
+        print(f"  覆盖 market → {args.market}（name → {cfg['name']}）")
+    if args.nodes_group:
+        cfg["nodes_group"] = args.nodes_group
+        print(f"  覆盖 nodes_group → {args.nodes_group}")
+
     run_ablation(cfg)
 
 

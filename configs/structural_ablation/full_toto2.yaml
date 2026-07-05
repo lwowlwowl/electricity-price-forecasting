@@ -2,17 +2,17 @@
 # 对 Toto-2.0 跑所有适用的结构消融类型
 name: structural_full_toto2
 market: ERCOT
-nodes_group: volatility
+nodes_group: ablation
 freq: 1h
 context_len: 168
 horizon: 24
-data_start: "2025-06-01"
-data_end: "2025-09-01"
+data_start: 2025-01-01
+data_end: 2026-06-05
 backtest:
-  test_start: "2025-08-01"
-  test_end: "2025-08-31"
+  test_start: 2025-07-01
+  test_end: 2026-06-01
   stride_hours: 24
-  max_origins: 30
+  # max_origins: 30  ← 连续 12 个月跑满，不限起报点
 spike:
   quantile: 0.95
   mode: global
@@ -33,4 +33,4 @@ structural_ablation:
     - truncate_front_half
     - truncate_back_half
   include_baseline: true
-  baseline_models: [Naive, SeasonalNaive, ETS]
+  baseline_models: [Naive, SeasonalNaive, ETS, LEAR]

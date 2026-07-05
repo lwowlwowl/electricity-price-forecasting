@@ -1,13 +1,21 @@
 """
 evaluate.py — ElecFM 滚动回测评估
 ====================================
-在 W1/W2/W3 三个测试窗口上运行滚动回测，输出与 v1.0/v2.0 完全兼容的
-summary.csv / per_origin.csv / records.csv / thresholds.json。
+支持两种评估模式（对应 Lago 2021 checklist #1 #12）：
+
+  [主结果] 连续 12 个月测试期（2025-07-01 ~ 2026-06-01）
+    ─ run_evaluation() / run_evaluation_v6() 默认走这条路径
+    ─ 对应 TEST_PERIOD = (TEST_START, TEST_END)
+    ─ 输出主指标：rMAE + spike-F1(head)；辅助：MAE/SMAPE/pinball
+
+  [子分析] W1/W2/W3 三窗口（保留，用于论文"不同市场状态"对比表）
+    ─ run_evaluation(subwindows=True) 额外生成每窗口结果
+    ─ 对应 TEST_WINDOWS 字典（2025-08、2025-03、2026-01 各一个月）
 
 关键设计：
-  1. Spike head 推理阈值 τ* 在验证集上搜索（不用默认 0.5）
-  2. 输出格式完全匹配现有 structural_full_* 目录下的 CSV 列名
-  3. 不修改任何现有文件
+  1. 尖峰阈值 τ 仅用训练段（2025-01 ~ 2025-05-31）的数据计算
+  2. τ* 在验证集（2025-06）上搜索
+  3. 输出格式与现有 structural_full_* 目录兼容
 
 运行环境：external/timesfm/.venv/bin/python
 """
@@ -37,36 +45,84 @@ import metrics as M  # src/evaluation/metrics.py
 from model import ElecFM, ElecFMV6
 
 
+# ── 时间划分常量（与 dataset.py 保持完全一致）────────────────────────────────
+# 导入 dataset.py 的常量以确保单一数据源（不重复硬编码日期）
+from dataset import (
+    TRAIN_START, TRAIN_END,
+    VAL_START,   VAL_END,
+    TEST_START,  TEST_END,
+)
+
+# 主评估窗口：连续 12 个月（Lago checklist #1 #12）
+TEST_PERIOD = (TEST_START, TEST_END)   # ("2025-07-01 00:00", "2026-06-01 23:00")
+
+# 验证集窗口（τ* 搜索用）
+VAL_WINDOW = (VAL_START, VAL_END)     # ("2025-06-01 00:00", "2025-06-30 23:00")
+
+# 子分析窗口（保留 W1/W2/W3，用于"不同市场状态"子表）
+TEST_WINDOWS = {
+    "w1_stable":   ("2025-08-01", "2025-08-31"),  # 平稳夏季
+    "w2_negative": ("2025-03-01", "2025-03-31"),  # 负价格频繁春季
+    "w3_extreme":  ("2026-01-01", "2026-01-31"),  # 极端冬季
+}
+
+
 # ── 评估配置（与 v1.0/v2.0 基准一致）──────────────────────────────────────────
 @dataclass
 class EvalConfig:
-    market:      str   = "ERCOT"
-    nodes:       List[str] = None   # 由 YAML 注入
-    freq:        str   = "1h"
-    context_len: int   = 168
-    horizon:     int   = 24
-    stride_hours: int  = 24         # 起报点间隔
-    max_origins: Optional[int] = 30 # 每窗口起报点数量（≥30 满足手册要求）
+    market:       str   = "ERCOT"
+    nodes:        List[str] = None   # 由 YAML 注入
+    freq:         str   = "1h"
+    context_len:  int   = 168
+    horizon:      int   = 24
+    stride_hours: int   = 24          # 起报点间隔（24h = 逐日滚动）
+    max_origins:  Optional[int] = None  # None = 跑满连续测试期（~335 个起报点）
     spike_quantile: float = 0.95
     tau_search_range: Tuple[float, float] = (0.05, 0.95)
     tau_search_step:  float = 0.05
+    run_subwindows: bool = True       # 是否额外运行 W1/W2/W3 子窗口分析
 
 
-# 三个测试窗口（与 v1.0/v2.0 相同）
-TEST_WINDOWS = {
-    "w1_stable":   ("2025-08-01", "2025-08-31"),
-    "w2_negative": ("2025-03-01", "2025-03-31"),
-    "w3_extreme":  ("2026-01-01", "2026-01-31"),
-}
-VAL_WINDOW = ("2025-12-01", "2025-12-24")   # 与 dataset.py 训练验证集保持一致
+def _compute_naive7_mae(data: pd.DataFrame, oi: int, horizon: int,
+                        target_cols: list, floor: float = 1.0) -> float:
+    """
+    naive7（period=168）在起报点 oi 的 horizon 步预测 MAE，对所有节点取均值。
+    naive7_pred[h] = p_{oi+h-168}（168 步前同时刻实际价格）。
+    分母 floor 防止 CAISO 负价格区间 naive7_mae → 0 导致 rMAE 爆炸。
+    返回 nan 若数据不足。
+    """
+    n = len(data)
+    errors = []
+    for h in range(horizon):
+        actual_idx = oi + h
+        naive_idx  = oi + h - 168
+        if naive_idx < 0 or actual_idx >= n:
+            continue
+        for col in target_cols:
+            v_a = float(data.iloc[actual_idx][col])
+            v_n = float(data.iloc[naive_idx][col])
+            if not (np.isnan(v_a) or np.isnan(v_n)):
+                errors.append(abs(v_a - v_n))
+    if not errors:
+        return float("nan")
+    raw = float(np.mean(errors))
+    return max(raw, floor)          # floor 防爆
 
 
 def _build_origins(index: pd.DatetimeIndex, test_start: str, test_end: str,
                    context_len: int, horizon: int, stride_hours: int,
                    max_origins: Optional[int]) -> List[int]:
-    """在测试窗口内生成合法的起报点下标列表。"""
-    lo = max(index.searchsorted(pd.Timestamp(test_start, tz="UTC")), context_len)
-    hi_ts = pd.Timestamp(test_end + " 23:59", tz="UTC")
+    """在测试窗口内生成合法的起报点下标列表。
+
+    test_start / test_end：日期字符串，可带或不带时间部分
+    （兼容 "2025-07-01" 和 "2025-07-01 00:00" 两种格式）。
+    """
+    lo_ts = pd.Timestamp(test_start, tz="UTC")
+    # test_end 取当天最后一刻：去掉可能已有的时间后缀，再接 23:00
+    end_date = str(test_end).split()[0]   # 取日期部分（"2025-06-01"）
+    hi_ts = pd.Timestamp(end_date + " 23:00", tz="UTC")
+
+    lo = max(index.searchsorted(lo_ts), context_len)
     hi = min(index.searchsorted(hi_ts, side="right"), len(index) - horizon)
 
     origins = list(range(lo, hi + 1, stride_hours))
@@ -217,9 +273,15 @@ def evaluate_window(
                              cfg.context_len, cfg.horizon, cfg.stride_hours, cfg.max_origins)
     print(f"  {window_name}: {len(origins)} 起报点")
 
-    # ── 推理 ─────────────────────────────────────────────────────────────────
+    # ── 推理（含计时，Lago checklist #3）────────────────────────────────────
+    import time as _time
+    _t0 = _time.time()
     preds = _inference_batch(model, data, origins, target_cols,
                              cfg.context_len, cfg.horizon, device)
+    _elapsed = _time.time() - _t0
+    _per_day_s = _elapsed / max(len(origins), 1)
+    print(f"  推理完成：{_elapsed:.1f}s 总计  "
+          f"{_per_day_s:.2f}s/起报点（{len(origins)} 起报点）", flush=True)
 
     # ── 收集 per_origin 和 records ────────────────────────────────────────────
     per_origin_rows = []
@@ -233,10 +295,15 @@ def evaluate_window(
         q50    = preds[oi]["q50"]
         q90    = preds[oi]["q90"]
 
+        # naive7 MAE（rMAE 分母，Lago checklist #6）
+        n7_mae = _compute_naive7_mae(data, oi, cfg.horizon, target_cols)
+
         m = M.all_point_prob_metrics(actual.ravel(), mean_p.ravel(),
-                                     q10.ravel(), q50.ravel(), q90.ravel())
+                                     q10.ravel(), q50.ravel(), q90.ravel(),
+                                     naive7_mae=n7_mae)
         per_origin_rows.append({
             "model": "ElecFM", "origin": data.index[oi],
+            "naive7_mae": n7_mae,
             "covariates_used": False, "multivariate_used": False, **m})
 
         for j, node in enumerate(nodes):
@@ -259,10 +326,20 @@ def evaluate_window(
         "n_origins": int(per_origin["origin"].nunique()),
     }
     for metric in ("mae", "rmse", "smape", "pinball", "coverage"):
-        if metric in per_origin:
+        if metric in per_origin.columns:
             row[f"{metric}_mean"] = float(per_origin[metric].mean())
             row[f"{metric}_std"]  = float(per_origin[metric].std(ddof=0))
     row["mase_mean"] = float("nan")   # 无 SeasonalNaive，留空
+
+    # rMAE（Lago checklist #6 主指标）— per-origin 均值，已逐起报点独立计算
+    if "rmae" in per_origin.columns:
+        valid = per_origin["rmae"].dropna()
+        row["rmae_mean"] = float(valid.mean()) if len(valid) else float("nan")
+        row["rmae_std"]  = float(valid.std(ddof=0)) if len(valid) > 1 else float("nan")
+
+    # 计算成本（Lago checklist #3）
+    row["inference_time_s"]         = round(_elapsed, 2)
+    row["inference_time_per_day_s"] = round(_per_day_s, 3)
 
     # Spike-F1（mean signal 和 q90 signal 两种口径）
     y_all, sig_mean_all, sig_q90_all, thr_all = [], [], [], []
@@ -316,8 +393,9 @@ def evaluate_window(
     with open(os.path.join(output_dir, "tau_star.json"), "w") as f:
         json.dump({"tau_star": tau_star}, f)
 
-    print(f"    SMAPE={row['smape_mean']:.2f}  "
-          f"Pinball={row['pinball_mean']:.4f}  "
+    rmae_str = f"rMAE={row['rmae_mean']:.4f}  " if "rmae_mean" in row else ""
+    print(f"    {rmae_str}"
+          f"MAE={row['mae_mean']:.2f}  SMAPE={row['smape_mean']:.2f}  "
           f"SpikeF1(mean)={row['spike_f1_mean_signal']:.4f}  "
           f"SpikeF1(head,τ*={tau_star:.2f})={row['spike_f1_spike_head']:.4f}")
     print(f"    → {output_dir}")
@@ -353,18 +431,8 @@ def run_evaluation(
     target_cols = [f"price__{n}" for n in cfg.nodes]
     nodes = cfg.nodes
 
-    # 计算尖峰阈值 —— 与 dataset.py 保持一致：只用训练段数据（排除测试窗口和验证集）
-    # 导入 dataset.py 的时间常量以确保一致性
-    from dataset import EXCLUDED_RANGES as DS_EXCLUDED, VAL_START, VAL_END
-
-    train_mask = pd.Series(True, index=df.index)
-    for excl_s, excl_e in DS_EXCLUDED:
-        es = pd.Timestamp(excl_s, tz="UTC")
-        ee = pd.Timestamp(excl_e + " 23:59", tz="UTC")
-        train_mask &= ~((df.index >= es) & (df.index <= ee))
-    train_mask &= ~((df.index >= pd.Timestamp(VAL_START, tz="UTC")) &
-                    (df.index <= pd.Timestamp(VAL_END + " 23:59", tz="UTC")))
-
+    # 计算尖峰阈值：只用训练段（2025-01-01 ~ TRAIN_END）数据，与 dataset.py 一致
+    train_mask = df.index <= pd.Timestamp(TRAIN_END, tz="UTC")
     thresholds = {}
     for node, col in zip(nodes, target_cols):
         vals = df.loc[train_mask, col].dropna().to_numpy(float)
@@ -376,21 +444,34 @@ def run_evaluation(
     tau_star = find_optimal_tau(model, df, target_cols, thresholds,
                                 cfg.context_len, cfg.horizon, device, cfg)
 
-    # 三窗口评估
-    summaries = []
-    for win_name, (start, end) in TEST_WINDOWS.items():
-        print(f"\n评估 {win_name} ({start} ~ {end})...")
-        out_dir = os.path.join(output_root, f"fusion_electfm_{win_name}")
-        row = evaluate_window(model, df, win_name, start, end,
-                              thresholds, tau_star, cfg, out_dir, device)
-        row["window"] = win_name
-        summaries.append(row)
+    # ── 主评估：连续 12 个月测试期（Lago checklist #1 #12）──────────────────
+    print(f"\n[主] 连续 12 个月评估 ({TEST_PERIOD[0]} ~ {TEST_PERIOD[1]})...")
+    main_dir = os.path.join(output_root, "fusion_electfm_continuous")
+    main_row = evaluate_window(model, df, "continuous",
+                               TEST_PERIOD[0].split()[0],  # strip time portion
+                               TEST_PERIOD[1].split()[0],
+                               thresholds, tau_star, cfg, main_dir, device)
+    main_row["window"] = "continuous"
+    main_row.to_csv(os.path.join(main_dir, "summary.csv"), index=False)
 
-    # 跨窗口汇总
+    # ── 子分析：W1/W2/W3（论文"不同市场状态"子表，run_subwindows=True 时运行）──
+    summaries = [main_row]
+    if cfg.run_subwindows:
+        for win_name, (start, end) in TEST_WINDOWS.items():
+            print(f"\n[子] {win_name} ({start} ~ {end})...")
+            out_dir = os.path.join(output_root, f"fusion_electfm_{win_name}")
+            # 子窗口限制最多 30 个起报点（控速）
+            sub_cfg = EvalConfig(**{**cfg.__dict__, "max_origins": 30})
+            row = evaluate_window(model, df, win_name, start, end,
+                                  thresholds, tau_star, sub_cfg, out_dir, device)
+            row["window"] = win_name
+            summaries.append(row)
+
+    # 汇总（主窗口 + 子窗口）
     cross_window = pd.concat(summaries, ignore_index=True)
-    cross_path = os.path.join(output_root, "fusion_electfm_cross_window.csv")
+    cross_path = os.path.join(output_root, "fusion_electfm_all_windows.csv")
     cross_window.to_csv(cross_path, index=False)
-    print(f"\n跨窗口汇总已保存：{cross_path}")
+    print(f"\n汇总（连续 + 子窗口）已保存：{cross_path}")
 
 
 # ── V6 评估：修改 _inference_batch 和 find_optimal_tau 以自动处理 ElecFMV6 ──────
@@ -461,14 +542,8 @@ def run_evaluation_v6(
     )
     target_cols = [f"price__{n}" for n in cfg.nodes]
 
-    from dataset import EXCLUDED_RANGES as DS_EXCLUDED, VAL_START, VAL_END
-    train_mask = pd.Series(True, index=df.index)
-    for excl_s, excl_e in DS_EXCLUDED:
-        train_mask &= ~((df.index >= pd.Timestamp(excl_s, tz="UTC")) &
-                        (df.index <= pd.Timestamp(excl_e + " 23:59", tz="UTC")))
-    train_mask &= ~((df.index >= pd.Timestamp(VAL_START, tz="UTC")) &
-                    (df.index <= pd.Timestamp(VAL_END + " 23:59", tz="UTC")))
-
+    # 计算尖峰阈值：只用训练段（~ TRAIN_END），与 dataset.py 一致
+    train_mask = df.index <= pd.Timestamp(TRAIN_END, tz="UTC")
     thresholds = {
         node: float(np.nanquantile(
             df.loc[train_mask, f"price__{node}"].dropna().values, cfg.spike_quantile
@@ -520,12 +595,17 @@ def run_evaluation_v6(
                 best_f1, tau_star = f1, float(tau)
         print(f"  τ* = {tau_star:.2f}（val Spike-F1 = {best_f1:.4f}）")
 
-    # 三窗口评估
+    # 评估：连续 12 个月（主）+ W1/W2/W3（子分析，可选）
+    windows_to_eval = {"continuous": TEST_PERIOD}
+    if cfg.run_subwindows:
+        windows_to_eval.update(TEST_WINDOWS)
+
     summaries = []
-    for win_name, (start, end) in TEST_WINDOWS.items():
+    for win_name, (start, end) in windows_to_eval.items():
+        _max_ori = None if win_name == "continuous" else 30
         print(f"\n评估 {win_name} ({start} ~ {end})...")
         origins = _build_origins(df.index, start, end, cfg.context_len,
-                                 cfg.horizon, cfg.stride_hours, cfg.max_origins)
+                                 cfg.horizon, cfg.stride_hours, _max_ori)
         print(f"  {win_name}: {len(origins)} 起报点")
 
         preds = _inference_batch_v6_impl(model, df, origins, target_cols,
@@ -610,6 +690,6 @@ def run_evaluation_v6(
         summaries.append(row_df)
 
     cross_window = pd.concat(summaries, ignore_index=True)
-    cross_path   = os.path.join(output_root, "fusion_electfm_cross_window.csv")
+    cross_path   = os.path.join(output_root, "fusion_electfm_all_windows.csv")
     cross_window.to_csv(cross_path, index=False)
-    print(f"\n跨窗口汇总已保存：{cross_path}")
+    print(f"\n汇总（连续 + 子窗口）已保存：{cross_path}")
