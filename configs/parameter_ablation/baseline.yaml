@@ -9,7 +9,7 @@ market: ERCOT
 nodes_group: ablation
 freq: 1h
 context_len: 168             # 零样本/统计/基础模型回看 7 天
-train_context_len: 1440      # 需训练模型(树模型)回看 60 天用于 fit（仍只用起报点之前的历史，无泄漏）
+train_context_len: 3360      # 需训练模型(树模型)回看 140 天用于 fit（LEAR 特征 103 维需 n_samples>103，3360h 确保 ~132 完整天）（仍只用起报点之前的历史，无泄漏）
 horizon: 24                  # 预测未来 24 小时（日前预测）
 data_start: 2025-01-01       # 连续测试期起点前 6 个月，给树模型留足训练窗口
 data_end: 2026-06-05

@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.join(ROOT, "src", "data_processing"))
 sys.path.insert(0, os.path.join(ROOT, "src", "models"))
 sys.path.insert(0, os.path.join(ROOT, "src", "evaluation"))
 
-from loader import load_slice                     # noqa: E402
+from loader import load_slice, load_slice_model_ready   # noqa: E402
 from forecasters import build_forecaster          # noqa: E402
 from backtest import run_backtest, BacktestConfig  # noqa: E402
 
@@ -162,11 +162,21 @@ def run(cfg: dict) -> dict:
     print(f"上下文={cfg['context_len']}  步长={cfg['horizon']}  协变量={covariates or '无'}")
 
     # 1) 取数
-    data = load_slice(
-        market=market, nodes=nodes, freq=freq,
-        covariates=covariates,
-        start=cfg.get("data_start"), end=cfg.get("data_end"),
-    )
+    #    covariates_source=model_ready → 协变量从 model_ready 读（政策B，已滞后无泄漏）
+    #    否则 → load_slice 直读市场+天气（load/temp/wind/solar 未滞后，oracle）
+    if cfg.get("covariates_source") == "model_ready" and covariates:
+        data = load_slice_model_ready(
+            market=market, nodes=nodes, freq=freq,
+            covariates=covariates,
+            start=cfg.get("data_start"), end=cfg.get("data_end"),
+        )
+        print(f"  协变量来源：model_ready（政策B，已滞后无泄漏）")
+    else:
+        data = load_slice(
+            market=market, nodes=nodes, freq=freq,
+            covariates=covariates,
+            start=cfg.get("data_start"), end=cfg.get("data_end"),
+        )
     print(f"\n取数完成：{data.shape}  {data.index[0]} → {data.index[-1]}")
 
     # 2) 构造模型

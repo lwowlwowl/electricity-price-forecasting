@@ -1,0 +1,43 @@
+# 消融 A（去 LEAR 版）：本机暂未装 epftoolbox，LEAR 会退化刷屏，故本次先去掉 LEAR 跑 11 个模型。
+# 等 `python3 -m pip install --no-deps git+https://github.com/jeslago/epftoolbox.git` 装好后，
+# 用原配置 ablation_A_covariates.yaml（12 模型含 LEAR）补跑即可。
+# 注：LEAR 是单变量、不吃协变量，去掉它不影响"协变量有没有用"的结论（那只有 Chronos2 决定）。
+#
+# 用法：python3 src/parameter_ablation/run_ablation.py configs/parameter_ablation/ablation_A_covariates_no_lear.yaml
+
+name: ablation_A_covariates_no_lear     # 结果单独落 ablation_A_covariates_no_lear/，不覆盖原 12 模型目录
+market: ERCOT
+nodes_group: ablation
+freq: 1h
+context_len: 168
+train_context_len: 3360
+horizon: 24
+data_start: 2025-01-01
+data_end: 2026-06-05
+
+backtest:
+  test_start: 2025-07-01
+  test_end: 2026-06-01
+  stride_hours: 24
+  # max_origins: 30  ← 连续 12 个月跑满，不限起报点
+
+models: [Naive, SeasonalNaive, ETS, Theta, RandomForest, LightGBM, XGBoost, TimesFM, Chronos2, Toto, Toto2]   # 去掉 LEAR，11 个
+
+covariates: []
+
+covariates_source: model_ready   # 政策B：协变量从 model_ready 读（已滞后无泄漏）
+
+spike:
+  quantile: 0.95
+  mode: global
+
+ablate:
+  key: covariates
+  values:
+    - []
+    - [load]
+    - [load, temperature]
+    - [load, temperature, wind, solar]
+    - [load, temperature, wind, solar, henry_hub_usd_per_mmbtu, natgas_storage_bcf, wti_usd_per_barrel, storm_event_count]
+  labels: ["无协变量", "+负荷", "+负荷+温度", "+负荷+温度+风光", "+经济(气价/库存/WTI/风暴)"]
+  axis_label: "协变量组合"

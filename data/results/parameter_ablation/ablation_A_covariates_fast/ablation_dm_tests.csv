@@ -1,0 +1,5 @@
+model,baseline_config,challenger_config,sig_hours_p05,baseline_wins,challenger_wins,mean_dm_stat,mean_p_value
+Chronos2,无协变量,+负荷,3,0,3,0.5565,0.4118
+Chronos2,无协变量,+负荷+温度,4,3,1,-0.4821,0.395
+Chronos2,无协变量,+负荷+温度+风光,2,2,0,-0.6655,0.4356
+Chronos2,无协变量,+经济(气价/库存/WTI/风暴),3,3,0,-1.016,0.353

@@ -9,7 +9,7 @@ market: ERCOT
 nodes_group: ablation
 freq: 1h
 context_len: 168             # 会被 ablate 覆盖，这里只是占位
-train_context_len: 1440      # 树模型训练窗口固定（不随消融变化）
+train_context_len: 3360      # 树模型训练窗口固定（不随消融变化）
 horizon: 24
 data_start: 2025-01-01       # 连续测试期起点前 6 个月，给最长上下文留足历史
 data_end: 2026-06-05

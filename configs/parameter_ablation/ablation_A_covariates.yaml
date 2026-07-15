@@ -13,7 +13,7 @@ market: ERCOT
 nodes_group: ablation
 freq: 1h
 context_len: 168             # 7 天回看，与基准一致
-train_context_len: 1440      # 树模型训练窗口固定
+train_context_len: 3360      # 树模型训练窗口固定
 horizon: 24
 data_start: 2025-01-01
 data_end: 2026-06-05
@@ -28,6 +28,10 @@ models: [Naive, SeasonalNaive, LEAR, ETS, Theta, RandomForest, LightGBM, XGBoost
 
 covariates: []               # 会被 ablate 覆盖
 
+# 协变量来源：model_ready = 政策B（所有协变量已 shift 滞后，无泄漏、自洽）
+# load/temp/wind/solar + 经济(气价/库存/WTI/风暴) 都从 data/covariates/model_ready 读
+covariates_source: model_ready
+
 spike:
   quantile: 0.95
   mode: global
@@ -40,5 +44,9 @@ ablate:
     - [load]
     - [load, temperature]
     - [load, temperature, wind, solar]
-  labels: ["无协变量", "+负荷", "+负荷+温度", "+负荷+温度+风光"]
+    - [load, temperature, wind, solar, henry_hub_usd_per_mmbtu, natgas_storage_bcf, wti_usd_per_barrel, storm_event_count]
+  labels: ["无协变量", "+负荷", "+负荷+温度", "+负荷+温度+风光", "+经济(气价/库存/WTI/风暴)"]
+# 注：经济档暂只放 gap-free 的 4 个（气价/库存/WTI/风暴计数），保证各档 N 可比；
+#    发电结构类(gas_share/total_gen 等)有 EIA ~24h 源数据缺口，会让该档少 ~24 起报点，
+#    先不加；如需测供给侧，单开一档并做缺口插补。
   axis_label: "协变量组合"

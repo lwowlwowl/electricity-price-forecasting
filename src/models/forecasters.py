@@ -341,6 +341,12 @@ class _TreeForecaster(NaiveForecaster):
                     with warnings.catch_warnings():
                         warnings.simplefilter("ignore")
                         pred, resid_std = self._fit_forecast_1d(col, horizon)
+                except ImportError as e:
+                    # 依赖未安装（如 lightgbm/xgboost），只打印一次
+                    if not getattr(self, "_import_error_shown", False):
+                        print(f"  ⚠️  {self.name} 依赖未安装（{e}）→ 退化为 SeasonalNaive")
+                        self._import_error_shown = True
+                    pred = None
                 except Exception:
                     pred = None
             if pred is None or not np.all(np.isfinite(pred)):
@@ -566,7 +572,17 @@ class LEARForecaster(NaiveForecaster):
             prices_daily = self._to_daily(series_1d_clean, context_df.index)
 
             if prices_daily is None:
-                # 历史不足，退化为 SeasonalNaive
+                # 完整 UTC 日不足（需 ≥ MIN_CALIB_DAYS+7 天），退化为 SeasonalNaive
+                if not getattr(self, "_calib_warn_shown", False):
+                    dates = pd.DatetimeIndex(context_df.index).normalize()
+                    n_complete = sum(
+                        1 for _, g in pd.Series(series_1d_clean,
+                                                 index=context_df.index).groupby(dates)
+                        if len(g) == 24)
+                    print(f"  ⚠️  LEAR: 完整 UTC 日数={n_complete} < "
+                          f"{self.MIN_CALIB_DAYS + 7}（需增大 train_context_len，"
+                          f"当前={len(context_df)}h）→ 退化为 SeasonalNaive")
+                    self._calib_warn_shown = True
                 fb = SeasonalNaiveForecaster(period=24).predict(
                     context_df[[col]], future_covariates, horizon)
                 means[:, j] = (fb.mean[:, 0] if fb.mean.ndim == 2
@@ -574,7 +590,9 @@ class LEARForecaster(NaiveForecaster):
                 continue
 
             n_days = prices_daily.shape[0]
-            n_calib_days = min(n_days - 7, 84)   # 最多 12 周（Lago 推荐上限）
+            # LEAR 特征维度 = 4×24 + 7 = 103，LassoLarsIC 要求 n_samples > n_features
+            # 因此校准窗口下限 = 103+10 = 113，上限 130（约 4.5 个月，平衡稳定性与适应性）
+            n_calib_days = min(n_days - 7, 130)
             n_calib_days = max(n_calib_days, self.MIN_CALIB_DAYS)
 
             # 星期哑变量：用 context_df 的 DatetimeIndex 按 UTC 日对齐
@@ -592,13 +610,18 @@ class LEARForecaster(NaiveForecaster):
                 Xtrain, Ytrain, Xtest = self._build_lear_matrices(
                     prices_daily, dow_dummies, n_calib_days)
                 lear_model = _LEAR(calibration_window=n_calib_days)
-                Y_pred = lear_model.recalibrate_predict(Xtrain, Ytrain, Xtest)
-                pred_24 = np.asarray(Y_pred, dtype=float).ravel()[:24]
+                lear_model.recalibrate(Xtrain, Ytrain)
+                # epftoolbox predict() 在新版 numpy 下有 array→scalar 赋值 bug，
+                # 直接手动逐小时预测绕开（等价于 recalibrate_predict 但无 bug）
+                pred_24 = np.array([
+                    float(lear_model.models[h].predict(Xtest)[0])
+                    for h in range(24)
+                ], dtype=float)
                 if not np.all(np.isfinite(pred_24)):
                     raise ValueError("LEAR 预测含非有限值")
                 means[:, j] = pred_24[:horizon]
             except Exception as e:
-                warnings.warn(f"LEAR 预测失败（{col}）：{e}，退化为 SeasonalNaive")
+                print(f"  ⚠️  LEAR 预测失败（{col}）：{e}，退化为 SeasonalNaive")
                 fb = SeasonalNaiveForecaster(period=24).predict(
                     context_df[[col]], future_covariates, horizon)
                 means[:, j] = (fb.mean[:, 0] if fb.mean.ndim == 2

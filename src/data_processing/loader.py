@@ -200,6 +200,58 @@ def load_slice(
     return out
 
 
+def load_slice_model_ready(market: str, nodes=None, freq: str = "1h",
+                           covariates=None, start=None, end=None,
+                           dropna: bool = True, forecast: bool = False) -> pd.DataFrame:
+    """price + 协变量全部从 model_ready 读取（已按政策B滞后，无泄漏）。
+
+    与 load_slice 的区别：load_slice 的 load/temp/wind/solar 是未滞后的实测
+    （oracle，forecast 窗口会泄漏）；本函数改读 model_ready，里面所有协变量
+    （含 load/temp/wind/solar + 经济/风暴/发电）都已 shift 滞后到起报时刻已知值，
+    配合 backtest 的 future_known=True 即为政策B（无泄漏、自洽）。
+
+    covariates 里若某列在 model_ready 缺失（如 PJM 无 wind/solar），跳过并告警。
+
+    forecast : True → 读 {market}_features_forecast_hourly.csv（"预报版"）：
+        load/temperature/wind/solar 用日前预报，经济类协变量保持 shift(24) 滞后
+        （即"四个协变量为预报的，其他原来是 lag 就也是 lag"）。False → 读普通滞后版。
+    """
+    freq = _norm_freq(freq)
+    covariates = covariates or []
+    # 1) 电价（目标），与 load_slice 同
+    out = _pivot_price(market, freq, nodes)
+    # 2) 协变量：从 model_ready 读（已滞后）
+    if covariates:
+        fname = (f"{market.lower()}_features_forecast_hourly.csv"
+                 if forecast else f"{market.lower()}_features_hourly.csv")
+        mr_path = os.path.join(
+            RAW_DIR, "..", "covariates", "model_ready", fname,
+        )
+        if not os.path.exists(mr_path):
+            raise FileNotFoundError(
+                f"找不到 model_ready 文件：{mr_path}（先跑 scripts/covariates/10_build_model_ready.py）"
+            )
+        mr = pd.read_csv(mr_path)
+        mr["timestamp_utc"] = pd.to_datetime(mr["timestamp_utc"], utc=True)
+        mr = mr.set_index("timestamp_utc").sort_index()
+        have = [c for c in covariates if c in mr.columns]
+        missing = [c for c in covariates if c not in mr.columns]
+        if missing:
+            print(f"  ⚠ model_ready 缺列（该市场无此数据，已跳过）：{missing}")
+        if have:
+            out = out.join(mr[have], how="left")
+    # 3) 时间窗口 + 缺失
+    out = out.sort_index()
+    if start is not None:
+        out = out[out.index >= pd.to_datetime(start, utc=True)]
+    if end is not None:
+        out = out[out.index <= pd.to_datetime(end, utc=True)]
+    if dropna:
+        out = out.dropna()
+    out.index.name = "timestamp_utc"
+    return out
+
+
 # ── 自测：直接运行本文件时做一次冒烟测试 ──────────────────────────────────────
 if __name__ == "__main__":
     print("=" * 70)

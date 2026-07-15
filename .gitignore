@@ -30,6 +30,7 @@ wheels/
 # 2. 虚拟环境（所有 .venv 目录）
 # --------------------------------------------
 **/.venv/
+.venv_forecast/
 venv/
 ENV/
 env/
@@ -54,6 +55,13 @@ external/
 # 4. 数据文件（选择性忽略）
 # --------------------------------------------
 data/raw/
+
+# 协变量（派生数据，与 raw 同性质，可由 scripts/covariates 重新生成）
+# 注：忽略"目录下内容"而非目录本身，否则 ! 例外无法生效（git 不进入被忽略目录）
+data/covariates/**
+# 例外：保留实验文档（体积小，需入库）
+!data/covariates/experiment.md
+!data/covariates/README.md
 
 # 处理后的数据（可重新生成）
 data/processed/*.csv

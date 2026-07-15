@@ -13,7 +13,7 @@ market: ERCOT
 nodes_group: ablation
 freq: 1h                     # 会被 ablate 覆盖
 context_len: 168             # 会被 linked 覆盖
-train_context_len: 1440      # 会被 linked 覆盖
+train_context_len: 3360      # 会被 linked 覆盖
 horizon: 24                  # 会被 linked 覆盖
 data_start: 2025-01-01
 data_end: 2026-06-05
@@ -40,5 +40,5 @@ ablate:
   axis_label: "数据频率"
   # 联动旋钮：每档与 freq 同步调整，保证时间跨度一致
   linked:
-    - {context_len: 168, horizon: 24, backtest.stride_hours: 24, train_context_len: 1440}
+    - {context_len: 168, horizon: 24, backtest.stride_hours: 24, train_context_len: 3360}
     - {context_len: 672, horizon: 96, backtest.stride_hours: 96, train_context_len: 5760}

@@ -16,7 +16,7 @@ market: ERCOT
 nodes_group: ablation
 freq: 1h
 context_len: 168
-train_context_len: 1440
+train_context_len: 3360
 horizon: 24
 data_start: 2025-04-01
 data_end: 2025-09-01

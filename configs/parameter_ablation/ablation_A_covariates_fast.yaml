@@ -1,0 +1,43 @@
+# 消融 A 快版：只跑 Chronos2（唯一 supports_covariates=True 的模型）+ 起报点限 60
+# 目的：~30 分钟快速回答"协变量对 Chronos2 有没有用"，不用等 12 模型全跑。
+# 12 个模型里只有 Chronos2 真正吃协变量，其余对协变量档结果不变，所以快版只看协变量效果。
+# 跑完确认有信号后，再用 ablation_A_covariates.yaml 跑全量 12 模型做完整对比表。
+#
+# 用法：python src/parameter_ablation/run_ablation.py configs/parameter_ablation/ablation_A_covariates_fast.yaml
+
+name: ablation_A_covariates_fast
+market: ERCOT
+nodes_group: ablation
+freq: 1h
+context_len: 168
+train_context_len: 3360
+horizon: 24
+data_start: 2025-01-01
+data_end: 2026-06-05
+
+backtest:
+  test_start: 2025-07-01
+  test_end: 2026-06-01
+  stride_hours: 24
+  max_origins: 60        # ← 快版：只取前 60 个起报点（~2 个月），够看协变量趋势
+
+models: [Chronos2]       # ← 快版：只跑协变量能力模型
+
+covariates: []
+
+covariates_source: model_ready   # 政策B：协变量从 model_ready 读（已滞后无泄漏）
+
+spike:
+  quantile: 0.95
+  mode: global
+
+ablate:
+  key: covariates
+  values:
+    - []
+    - [load]
+    - [load, temperature]
+    - [load, temperature, wind, solar]
+    - [load, temperature, wind, solar, henry_hub_usd_per_mmbtu, natgas_storage_bcf, wti_usd_per_barrel, storm_event_count]
+  labels: ["无协变量", "+负荷", "+负荷+温度", "+负荷+温度+风光", "+经济(气价/库存/WTI/风暴)"]
+  axis_label: "协变量组合"

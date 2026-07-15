@@ -5,6 +5,7 @@ market: PJM
 nodes_group: ablation
 freq: 1h
 context_len: 168
+train_context_len: 3360  # LEAR 需要 ≥103 完整天校准，3360h≈140天
 horizon: 24
 data_start: 2025-01-01
 data_end: 2026-06-05
