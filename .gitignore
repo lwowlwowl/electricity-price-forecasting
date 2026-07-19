@@ -89,6 +89,12 @@ data/results/*.png
 .env.*.local
 secrets.yaml
 secrets.json
+token.txt
+*.token
+*_token.txt
+api_key.txt
+*.pem
+*.key
 
 # --------------------------------------------
 # 7. IDE 和编辑器配置
@@ -147,3 +153,8 @@ htmlcov/
 
 # 模型 checkpoint（二进制大文件，不入库）
 data/checkpoints/
+
+# --------------------------------------------
+# 13. 团队内部资料（按周归档，含个人/同学产出，不适合公开仓库）
+# --------------------------------------------
+docs/team_notes/
