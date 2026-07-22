@@ -130,7 +130,7 @@ wind/solar 目前使用 Open-Meteo 的 wind_speed_10m (m/s) 和 shortwave_radiat
 | 1 | 无协变量 | — |
 | 2 | +load | EIA 日前负荷预报 ✅ |
 | 3 | +temperature | Open-Meteo 日前温度预报 ✅ |
-| 4 | +wind, +solar | Open-Meteo 代理变量 ⚠️（待 ISO 官方 MW 替换） |
+| 4 | +wind, +solar | Open-Meteo 代理变量 （待 ISO 官方 MW 替换） |
 | 5 | +henry_hub, +natgas_storage, +wti, +storm_event | shift(24)/shift(168) 滞后实测 ✅ |
 
 ## 优先级

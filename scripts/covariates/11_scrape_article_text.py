@@ -9,7 +9,8 @@
 
 特性:
   - 按 URL 去重（同一 URL 多市场/多日只抓一次，保留全部 market/date 关联）
-  - 断点续传（已抓的 URL 跳过，可中断重跑）
+  - 断点续传：ok/short 及永久性失败（403/404/410/451/401/406/405/421/TooManyRedirects）
+    直接计入已完成、不再重试；timeout/conn_error/429/5xx 等瞬时性失败下次重跑会继续重试
   - 线程并发（默认 8）、超时重试、浏览器 UA
   - 正文用 trafilatura 抽取（优于 newspaper3k，去导航/广告/评论）
 
@@ -85,16 +86,30 @@ def fetch_text(url):
     return {"status": last_err or "failed", "text": "", "text_len": 0}
 
 
+# 永久性失败状态：重跑基本不会变好（页面不存在/无权限/法律下线等），
+# 计入 done 避免反复重试浪费时间、并防止同一 URL 被反复追加冗余失败记录。
+PERMANENT_FAIL = {
+    "http_403", "http_404", "http_410", "http_451",
+    "http_401", "http_406", "http_405", "http_421",
+    "TooManyRedirects",
+}
+# 瞬时性失败状态（timeout/conn_error/http_429/5xx/ChunkedEncodingError 等）不计入上面的集合，
+# 默认会被 load_done() 判定为未完成，下次继续重试补全。
+
+
 def load_done():
-    """已成功的 URL 集合（只跳过 ok/short；失败的 timeout/403/404/conn 下次重试，
-    这样反复跑能补全漏掉的）。"""
+    """已完成（无需再抓）的 URL 集合：
+      - ok/short：抓取成功（含短文），跳过
+      - 永久性失败（403/404/410/451/401/406/405/421/TooManyRedirects）：重跑也大概率不会变好，跳过
+      - 其余瞬时性失败（timeout/conn_error/429/5xx等）：不计入 done，下次继续重试补全
+    """
     done = set()
     if os.path.exists(OUT):
         with open(OUT, encoding="utf-8") as f:
             for line in f:
                 try:
                     r = json.loads(line)
-                    if r.get("status") in ("ok", "short"):
+                    if r.get("status") in ("ok", "short") or r.get("status") in PERMANENT_FAIL:
                         done.add(r["url"])
                 except Exception:
                     pass
