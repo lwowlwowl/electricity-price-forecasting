@@ -1,5 +1,13 @@
 # 电价预测研究：消融驱动的时序基础模型融合
 
+> ⚠️ **方向已切换**（2026-07）：本 README 描述的是**旧范式**（冻结零样本 ElecFM 融合）。
+> 新方向为 **Decision-aware 多模态 TSFM**（从零训练 + 业务损失闭环），见：
+> - `docs/todo3.md`（模型搭建决策清单）
+> - `docs/team_notes/w8/研究方案_Decision-aware_多模态TSFM.md`、`docs/team_notes/w9/模型相关.md`
+> - `docs/model_architecture_v2.drawio`（新架构图，基于 w9 材料）
+> - 旧代码已归档至各 `*/archive/` 目录（说明见 `src/archive/README.md`）。
+>   主线保留：`src/data_processing/`、`src/evaluation/`、`src/models/`（`base`/`forecasters` 基线 + `foundation`+`workers` 外部 TSFM 基线层，见 `src/models/README.md`）、`scripts/covariates/`、`data/covariates/`、`external/`（改作从零训练对照基线）。
+
 基于 ERCOT 实时电价，通过**三阶段递进研究**构建面向尖峰检测的专用融合模型：
 
 ```
