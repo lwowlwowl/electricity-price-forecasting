@@ -1,8 +1,8 @@
 # 模型搭建决策清单（todo3）
 
-> 日期：2026-07-22
-> 状态：待逐项确认
-> 关联文档：w9/模型相关.md、w9/decision_aware_multimodal_tsfm_modeling.pdf、w8/研究方案.md
+> 日期：2026-07-22（2026-07-31 根据 w10 PDF 全面更新）
+> 状态：先行版 v1/v2/v3 实验完成，正式版规划对齐 w10
+> 关联文档：w10/decision_aware_multimodal_tsfm_modeling(3).pdf（数学建模规范）、w9/模型相关.md、w8/研究方案.md、w8/two_settlement_bess_external_model.pdf、docs/model_architecture_v2.drawio
 
 ---
 
@@ -10,145 +10,173 @@
 
 ### 1. 策略 π 的实现方式 ⭐ 最高优先级
 
-端到端可微的核心瓶颈：策略 π 把预测价格 p̂ 变成充放电动作 u，这一步涉及离散判断（电价高于阈值就放电），导数为零或不存在。∂u/∂p̂ 不可微，导致 L_bus 的梯度无法回传到 f_θ。
+端到端可微的核心瓶颈：策略 π 把预测价格 p̂ 变成充放电动作 u，这一步涉及离散判断，导数为零。
 
 | 选项 | 方案 | 优点 | 缺点 | 依赖 |
 |------|------|------|------|------|
-| A | Greedy 规则 + 代理梯度 g=2Δt(u_ref-u*) | 实现简单，几十行代码 | 近似梯度，无理论收敛保证 | 无 |
-| B | 凸优化层(LP/QP) + 扰动法 (Perturbed DFL) | 理论干净，有凸性和收敛证明 | 每 step 多一次 LP 求解 | cvxpy/Gurobi |
-| C | SPO+ (Smart Predict-then-Optimize) | 类似 B，梯度计算方式不同 | 需要凸优化 oracle | Gurobi |
+| ~~A~~ | ~~Greedy + 代理梯度~~ | ~~实现简单~~ | ~~无理论保证~~ | ~~无~~ |
+| B | 凸优化层(LP) + 扰动法 | 理论干净 | 每 step 多一次 LP | cvxpy/Gurobi |
+| **w10** | **TopK/BotK + 零阶双点高斯梯度** | w10 规范，有理论引用 [7,8] | 每 step 跑 K 次策略仿真 | 无（scipy 足够）|
+| 先行版实际 | STE（先行版 v1/v3-ste）/ soft TopK（v2/v3）| 实现简单，无需额外仿真 | 近似梯度，无理论保证；soft TopK 在高波动 DA 价上会爆炸 | 无 |
 
-决策：先行版用 A，正式实验版用 B，A→B 消融对比写进论文。
-参考论文：Perturbed Decision-Focused Learning (Columbia, 2024, IEEE Trans. Smart Grid, arXiv:2406.17085)
+决策：**正式版用 w10 的 TopK + 零阶双点梯度**（Nesterov-Spokoiny 高斯平滑，w10 第 6 节）。
+先行版实证：
+- v1 STE 占 LP oracle 52%（先行版最优）
+- v2/v3 soft TopK 占 33% / -77%（soft TopK 正反馈爆炸，验证了 w10 用零阶梯度的必要性）
+参考论文：Nesterov & Spokoiny [7], Duchi et al. [8]（w10 参考文献）
 
 ### 2. Loss 配比 α 和 β
 
 L = αL_pred + βL_bus
 
-| 选项 | 方案 | 说明 |
-|------|------|------|
-| A | 固定比例 α=0.8, β=0.2 | 简单，但可能不是最优 |
-| B | 退火策略：前期 α=1,β=0 → 逐步 α→0,β→1 | 先热启动再切业务损失 |
-| C | 纯 L_bus (α=0, β=1) | 老师可能的意思，但需要 π 可微 |
-
-决策：用退火策略（B）。需跟老师确认"不要 MAE"的确切含义——是最终不要，还是完全不要。
+决策：退火策略（B）：前期 α=1,β=0 → 逐步 α→0,β→1。
+先行版实测：**β≈0.8 最优**（不是 β=1）；β=1 平台期或恶化。monitor=val regret 自动选 ckpt。
+w10 第 6.2 节：TSFM 用 L = αL_pred + βL_proxy，其中 L_proxy 是零阶梯度注入的局部代理。
 
 ### 3. L_pred 的具体损失函数
 
-| 选项 | 说明 |
-|------|------|
-| MAE (L1) | 最简单 |
-| Huber Loss | 对电价尖峰更鲁棒 |
-| Quantile / Pinball Loss | 输出分位数预测，量化不确定性 |
+决策：先行版用 Huber，正式版可换 Quantile Loss。
+w10 第 3 节：日前阶段同时约束两条 48h 曲线（pDA + pRT|DA），实时阶段对 24 个滚动窗口取平均。
 
-决策：先行版用 Huber，正式版可换 Quantile Loss。如果最终 α→0，此项影响不大。
+### 4. 双结算收益公式 ⭐ w10 新增
+
+w10 第 5 节定义：
+```
+R_base = Δt·Σ_t ( pDA_t · uDA_t + pRT_t · Δu_t − κ|u_t| )
+```
+- 日前腿按 DA 价结算、实时偏差按 RT 价结算、扣退化成本 κ
+- Δu = uRT − uDA（实时实际动作相对日前计划的偏差）
+
+先行版实现：
+- v1/v2：退化版（只有 RT 价，无 DA 价，无 κ）→ 两腿都用 realized RT
+- v3：简化版（有 DA 价 + κ，但 uDA=uRT，不分离决策）→ DA 腿用全量，无 RT 偏差腿
+
+**正式版需补**：DA/RT 分离决策（先报 uDA 计划，实时再纠偏 Δu），需要先有实时滚动预测（#7）。
+
+出处：w8/two_settlement_bess_external_model.pdf（双结算收益公式 + FERC/ISO 手册引用）、w10 第 5 节等价数学式 + 学术文献 [1] Alghumayjan 2024、[2] Krishnamurthy 2018。
+
+### 5. 偏差罚金（可选）⭐ w10 新增
+
+w10 第 5.1 节：偏差超 3% 容忍阈值按双倍 RT 价考核：
+```
+P_dev = Δt·Σ 2|pRT|·max(0, |Δu| − 0.03|uDA|)
+R = R_base − P_dev
+```
+决策：正式版实现（先行版未做）。
+
+### 6. Oracle ⭐ w10 新增
+
+w10 第 5.2 节：LP Oracle R* = max R(u; p)，约束含功率/SOC/效率/循环。
+先行版已实现（scipy.linprog）。
+指标 PCR = ΣR_i / ΣR*_i（先行版用"占 LP %"替代，等价）。
 
 ---
 
-## 二、Encoder 层面
+## 二、预测阶段 ⭐ w10 新增
 
-### 4. 各 Encoder 的基础结构 ⭐ 高优先级
+### 7. 日前联合预测 + 实时滚动预测
 
-老师原话(w9)："可以引入 GRU 来提高训练效率"，未指定加在哪个 Encoder。
+w10 第 2 节：
+- **日前联合预测**：预测交易日及后一日共 48h 的 pDA + pRT 两条曲线
+- **实时滚动预测**：每个执行小时预测未来 H=4h 的 pRT，只执行第一个动作，下一小时更新
 
-| 选项 | 方案 | 参数量 | 适用场景 |
-|------|------|--------|----------|
-| A | 全部 Transformer (Self-Attn + FFN + RoPE) | 最大 | 表达力最强 |
-| B | 全部 GRU | 约 A 的 1/4~1/3 | 快速验证 |
-| C | 混合：Price/Load 用 Transformer，Weather/System 用 GRU，Calendar/News 用 Embedding/MLP | 中等 | 平衡精度和效率 |
+先行版：只做 24h 单曲线日前预测。**正式版需补 48h + 滚动。**
 
-决策：先行版全部 GRU（B），正式版混合（C），消融对比。
-【待确认】问老师：GRU 只在某个 Encoder 上用，还是所有 Encoder 都可以先 GRU 起步？
+### 8. 各 Encoder 的基础结构
 
-### 5. Attention 机制：MHA vs MQA
+决策：混合方案 C（Price/Load Transformer, Weather/System GRU, Econ MLP, Calendar Embedding）。
+先行版已实现。w10 第 3 节：TSFM 编码历史价格，其余模态由适配层编码，融合模块形成共享表示。
 
-老师提到 MQA (Multi-Query Attention)，目前标 [待确认]。
+### 9. Attention / 位置编码
 
-MHA：每个 head 独立 Q/K/V 投影，标准做法。
-MQA：所有 head 共享 K/V，只 Q 独立。参数减少约 30%，推理更快。
-
-决策：先用 MHA。模型才 ~100M 参数，MQA 省的参数和速度意义不大。优先级低。
-
-### 6. 位置编码
-
-| 选项 | 说明 |
-|------|------|
-| RoPE | TimesFM 使用，对相对位置和周期性建模好 |
-| Sinusoidal | 原始 Transformer 做法 |
-| Learnable PE | 可学习 |
-
-决策：用 RoPE，跟 TimesFM 对齐。
+MHA + RoPE（跟 TimesFM 对齐）。先行版已实现。
 
 ---
 
 ## 三、Decoder 层面
 
-### 7. Learnable Queries 数量
+### 10. Learnable Queries 数量
 
-取决于预测窗口和数据粒度：
-- 小时级数据 → 24 queries（24h 日前预测）
-- 15 分钟级数据 → 96 queries
+- 小时级 → 24 queries（先行版）
+- w10：48h 联合预测 → 需要 48 queries（正式版）
 
-决策：跟数据粒度对齐。先确认数据是小时级还是 15 分钟级。
+### 11. Decoder 结构
 
-### 8. Decoder 结构
-
-| 选项 | 方案 | 参数量 | 说明 |
-|------|------|--------|------|
-| A | DETR-like (Learnable Queries + Cross Attention + FFN) | 较大 | 能建模时间点之间的依赖 |
-| B | 直接线性投影 p̂ = Linear(h_i) | 极小 | 简单但丢失时间交互 |
-
-决策：先行版用 B（线性投影），正式版用 A（DETR-like），消融对比。
+DETR-like（Learnable Queries + Cross Attention + FFN）。先行版已实现。
 
 ---
 
 ## 四、输出头层面
 
-### 9. Head_DA 和 Head_RT 是否共享 Decoder
+### 12. Head_DA / Head_RT 共享 Decoder
 
-| 选项 | 方案 | 说明 |
-|------|------|------|
-| A | 共享 Decoder + 分叉 Head | w9 PDF 的设计，参数量小 |
-| B | 两个独立 Decoder | 参数量翻倍，DA/RT 可学不同模式 |
+决策：共享 Decoder + 分叉 Head（A）。
+w10 第 3 节：日前模块输出两条曲线（pDA + pRT|DA），实时模块输出一条（pRT）。
 
-决策：用 A（共享 Decoder + 分叉 Head），跟 w9 一致。
+### 13. 额外输出头
 
-### 10. 额外输出头（Load / BESS 等）
-
-老师(w9)："Decoder 的输出不止电价一种，可以扩展预测 BESS、Load 等。"
-
-决策：第一轮只做电价预测（Head_DA + Head_RT）。跑通后再加 Load Head 做多任务学习。代码留好接口。
+第一轮只做电价预测（Head_DA + Head_RT）。跑通后加 Load Head。
+先行版已实现 DA/RT 双头。**正式版需补**：日前头输出 48h pDA + 48h pRT 两条曲线。
 
 ---
 
-## 五、数据与训练层面
+## 五、BESS 参数 ⭐ w10 新增
 
-### 11. 上下文窗口长度
+### 14. 储能物理参数（w10 第 7 节）
 
-老师指定 7 天历史 (168h)。可尝试 3 天 / 14 天作为超参数调。
-决策：先按 7 天。
+| 参数 | 先行版 v1/v2 | 先行版 v3 | w10 规范 |
+|---|---|---|---|
+| P_max | 1 MW | 1 MW | 1 MW |
+| E_max | 4 MWh | 4 MWh | 4 MWh |
+| η | 0.9 | 0.95 | 0.95 |
+| SOC min/max | [0, 4] | [0.4, 3.6] | [0.4, 3.6] MWh |
+| κ（退化成本）| 0 | 27 USD/MWh | 27 USD/MWh |
+| E_cyc（日循环上限）| 无 | 无 | 4 MWh/天 |
+| 偏差罚金 | 无 | 无 | 3%, 双倍 RT 价 |
 
-### 12. 先跑哪个市场
+先行版 v3 已对齐 η/SOC/κ；**正式版需补** E_cyc + 偏差罚金。
 
-可选：CAISO / ERCOT / NYISO / PJM。
-建议：ERCOT（波动最大，decision-aware 优势更明显）。
+### 15. 上下文窗口
 
-### 13. 参数配置
+7 天历史（168h）。先行版已实现。
 
-| 版本 | d_model | n_layers | 参数量 | 训练时长(M3 Pro) |
-|------|---------|----------|--------|-----------------|
-| 先行版 | 256 | 2 | ~15M | 几小时 |
-| 正式版 | 512 | 4 | ~100M | 数天或云 GPU |
+### 16. 市场与数据
 
-决策：先行版跑通验证，再上正式版。
+ERCOT LZ_LCRA（先行版）。ERCOT 统一小时表 2020-2026（6.5 年 DA+RT）已接入。
+NYISO 也有 DA+RT 6.5 年数据（618K 行），可做泛化性验证。
+
+### 17. 参数配置
+
+| 版本 | d_model | n_layers | 参数量 | 训练样本 | 训练时长 |
+|------|---------|----------|--------|----------|----------|
+| 先行版 v1/v2 | 128 | 1 | 1.13M | 3,259 | 17 min |
+| 先行版 v3 | 256 | 1 | 4.36M | 43,640 | 3 h |
+| **正式版** | **512** | **4** | **~100M** | **~650,000（15 节点）** | **云 GPU** |
 
 ---
 
-## 六、需要问老师确认的清单
+## 六、待确认 / 正式版待补清单
 
-1. GRU 具体用在哪些 Encoder？还是所有都可以先 GRU 起步？
-2. 日内任务是"复用架构自己训练"还是"复用日前模型只微调 Head"？
-3. "不要 MAE"的确切含义——最终以 L_bus 为主，还是完全不用任何预测损失？
-4. MQA 是否需要在第一版就引入？
-5. 数据粒度确认：小时级还是 15 分钟级？
-6. 对比实验的具体基线清单：TimesFM / Chronos / Moirai / Toto，还有别的吗？
+### 先行版已完成的
+1. ✅ 混合 Encoder（Price/Load Transformer, Weather/System GRU, Econ MLP, Calendar Emb）
+2. ✅ Cross-Attn 融合 + Query Decoder（DETR-like）
+3. ✅ STE 可微 π + α-β 退火
+4. ✅ LP Oracle（scipy.linprog）
+5. ✅ 6.5 年 ERCOT DA+RT 双价数据
+6. ✅ 真双结算收益公式（简化版 uDA=uRT）
+7. ✅ w10 BESS 参数（η=0.95, κ=27, SOC 0.4-3.6）
+8. ✅ 真节假日
+9. ✅ TopK 策略（soft 近似，验证了需换零阶梯度）
+10. ✅ B 对比（STE 模型 vs TimesFM/Chronos/Toto 零样本）
+
+### 正式版待补的
+1. **零阶双点梯度**（w10 第 6 节，替代 STE/soft TopK）— 需云 GPU
+2. **48h 联合预测**（pDA + pRT 两曲线）— 架构改动
+3. **实时滚动预测**（H=4）— 架构改动
+4. **DA/RT 分离决策**（先报 uDA，实时纠偏 Δu）— 依赖 #2/#3
+5. **偏差罚金**（3% 双倍 RT 价）— 一行公式
+6. **日循环上限 E_cyc** — TopK K=4 已隐式约束，影响小
+7. **多节点联合训练**（15 节点 650K 样本）— 支撑 100M 参数
+8. **模型放大**（d=512, 4 层, ~100M）— 依赖 #7
+9. **XGBoost 并列路径**（w10 第 6.3 节）
+10. **PCR 指标**（表述形式，等价于"占 LP %"）

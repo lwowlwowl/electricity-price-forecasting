@@ -153,6 +153,11 @@ htmlcov/
 
 # 模型 checkpoint（二进制大文件，不入库）
 data/checkpoints/
+# 归档区旧 ElecFM checkpoint（8 GiB，纯本地存档，绝不入库）
+data/archive/checkpoints/
+# 兜底：任何 .pt/.pth 权重都不入库（需要共享请用 git-lfs 或网盘）
+*.pt
+*.pth
 
 # --------------------------------------------
 # 13. 团队内部资料（按周归档，含个人/同学产出，不适合公开仓库）

@@ -1,0 +1,61 @@
+# 先行版 (Pilot) — Decision-aware 多模态 TSFM 配置
+# 架构对应 docs/model_architecture_v2.drawio「先行版」两页。
+# 数据: ERCOT LZ_LCRA（高波动节点，decision-aware 优势明显），小时级，model_ready forecast 版（无泄漏）。
+# 运行: external/chronos-forecasting/.venv/bin/python scripts/decision_aware/train_pilot.py \
+#         --config configs/decision_aware/pilot_ercot.yaml
+
+market: ERCOT
+node: LZ_LCRA
+freq: 1h
+context_len: 168          # 7 天历史
+horizon_da: 24            # 日前 24 点
+horizon_rt: 6             # 实时 6 点（较短窗口）
+train_stride: 1
+eval_stride: 24
+
+# 模型（同正式版骨架、仅缩小规模）
+d_model: 128
+n_heads_enc: 4
+n_heads_fusion: 1         # 融合 single-head（drawio「1层 single-head」）
+dim_ff: 512
+dropout: 0.1
+use_rope: true            # 与 TimesFM 对齐（todo3 #6）
+
+# BESS 模拟器（假定参数，非数据）
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.9
+bess_init_soc_frac: 0.5
+
+# 策略（v1=STE/greedy, v2=TopK/LP）
+ste_k: 5.0
+policy_type: topk         # "ste"(v1) 或 "topk"(v2，w10 第4节)
+oracle_type: lp           # "greedy"(v1) 或 "lp"(v2 真上界，w10 第5.2节)
+topk_k_charge: 4          # TopK 充电时段数（4MWh/1MW→4h）
+topk_k_discharge: 4       # TopK 放电时段数
+
+# 损失 / α-β 退火（todo3 #2 决策 B）
+alpha0: 1.0
+beta0: 0.0
+alpha_end: 0.0
+beta_end: 1.0
+anneal_epochs: 10
+huber_delta: 1.0
+# DFL 稳定性：regret(~$250) vs pred(~$25) 尺度差 ~10×，β→1 不归一化会梯度爆炸→NaN
+pred_scale: 25.0          # L_pred / pred_scale → O(1)
+bus_scale: 250.0          # L_bus  / bus_scale  → O(1)
+pred_clamp: [-100.0, 5000.0]   # 预测硬截断，防 STE 反馈把 p̂ 推到 inf
+
+# 训练（镜像归档 train.py）
+lr: 1.0e-3
+weight_decay: 0.01
+batch_size: 32
+epochs: 30
+grad_clip: 1.0
+early_stop_patience: 5
+use_amp: true
+monitor: regret          # early-stop 监控 val regret（业务指标）；切 "mae" 则存预测最优 ckpt
+num_workers: 0
+
+checkpoint_dir: data/checkpoints/da_tsfm_pilot_v2_topk_lp
+seed: 0

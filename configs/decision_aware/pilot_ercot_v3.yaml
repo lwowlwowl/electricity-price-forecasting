@@ -1,0 +1,66 @@
+# 先行版 v3 — ERCOT 6.5年 DA+RT 双结算，d=256/2层 ~5M 参数
+# 数据: ERCOT LZ_LCRA，2020-2026，统一小时表（DA+RT+load+wind+solar+holiday）
+# 运行: external/chronos-forecasting/.venv/bin/python scripts/decision_aware/train_pilot_v3.py \
+#         --config configs/decision_aware/pilot_ercot_v3.yaml
+
+market: ERCOT
+node: LZ_LCRA
+freq: 1h
+context_len: 168
+horizon_da: 24
+horizon_rt: 6
+train_stride: 1
+eval_stride: 24
+
+# 数据版本
+data_version: v3
+use_dual_settlement: true
+
+# 模型（v3 放大：d=256, dim_ff=1024, ~5M 参数）
+d_model: 256
+n_heads_enc: 4
+n_heads_fusion: 1
+dim_ff: 1024
+dropout: 0.1
+use_rope: true
+
+# BESS（w10 第7节规范值）
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_init_soc_frac: 0.5
+bess_kappa: 27.0
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+
+# 策略 + Oracle
+policy_type: ste
+oracle_type: lp
+topk_k_charge: 4
+topk_k_discharge: 4
+ste_k: 5.0
+
+# 损失 / 退火
+alpha0: 1.0
+beta0: 0.0
+alpha_end: 0.0
+beta_end: 1.0
+anneal_epochs: 10
+huber_delta: 1.0
+pred_scale: 400.0
+bus_scale: 400.0
+pred_clamp: [-500.0, 10000.0]
+
+# 训练
+lr: 1.0e-3
+weight_decay: 0.01
+batch_size: 64
+epochs: 30
+grad_clip: 1.0
+early_stop_patience: 5
+use_amp: true
+monitor: regret
+num_workers: 0
+
+checkpoint_dir: data/checkpoints/da_tsfm_pilot_v3_ste
+seed: 0
