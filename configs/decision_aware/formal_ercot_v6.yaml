@@ -1,0 +1,70 @@
+# 正式版 v6 — 完整 w10 §1-10 双结算闭环
+# v5 基础上 + 48h联合预测 + fD双曲线(pDA+pRT|DA) + 滚动RT预测 + L_proxy三项 + 偏差罚金
+# uRT 用 p̂RT 预测做 TopK（不再用真实 RT 价开天眼）
+# 运行: external/chronos-forecasting/.venv/bin/python \
+#         scripts/decision_aware/train_formal.py \
+#         --config configs/decision_aware/formal_ercot_v6.yaml --no-early-stop --no-oracle-train
+
+market: ERCOT
+node: LZ_LCRA
+freq: 1h
+context_len: 168
+horizon_da: 24
+horizon_rt: 6
+train_stride: 1
+eval_stride: 24
+
+data_version: v3
+use_dual_settlement: true
+use_dual_split: true             # DA/RT 分离决策
+use_deviation_penalty: false     # 偏差罚金先关，等基础跑通再开
+
+d_model: 256
+n_heads_enc: 4
+n_heads_fusion: 1
+dim_ff: 1024
+dropout: 0.1
+use_rope: true
+
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_init_soc_frac: 0.5
+bess_kappa: 27.0
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+
+policy_type: hard_topk
+oracle_type: lp
+topk_k_charge: 4
+topk_k_discharge: 4
+ste_k: 5.0
+
+zo_rho: 0.05
+zo_K: 2
+zo_sigma: 0.0
+proxy_scale: 80.0
+
+alpha0: 1.0
+beta0: 0.0
+alpha_end: 0.5
+beta_end: 0.5
+pretrain_epochs: 8
+anneal_epochs: 12
+huber_delta: 1.0
+pred_scale: 25.0
+bus_scale: 400.0
+pred_clamp: [-500.0, 10000.0]
+
+lr: 1.0e-3
+weight_decay: 0.01
+batch_size: 64
+epochs: 20
+grad_clip: 1.0
+early_stop_patience: 5
+use_amp: true
+monitor: regret
+num_workers: 0
+
+checkpoint_dir: data/checkpoints/da_tsfm_formal_v6
+seed: 0

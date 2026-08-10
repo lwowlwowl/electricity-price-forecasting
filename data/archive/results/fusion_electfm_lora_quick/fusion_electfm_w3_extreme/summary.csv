@@ -1,2 +1,0 @@
-model,covariates_used,multivariate_used,n_origins,mae_mean,mae_std,rmse_mean,rmse_std,smape_mean,smape_std,pinball_mean,pinball_std,coverage_mean,coverage_std,mase_mean,spike_f1_mean_signal,spike_precision,spike_recall,spike_f1_q90_signal,spike_f1_spike_head,spike_precision_head,spike_recall_head
-ElecFM,False,False,10,6.895616907278696,4.15797382988745,8.431895586483696,4.86364768177399,43.34782569707077,27.050301206071737,2.5302495859022494,1.7846566530975385,0.7375,0.28324140665595565,,0.0,0.0,0.0,0.0,0.0,0.0,0.0

@@ -50,10 +50,12 @@ def _run_epoch(model, loader, sim, pol, cfg, dev, opt=None, alpha=1.0, beta=0.0,
                 price_da_tgt = batch["price_da_tgt"]
                 price_rt_tgt = batch["price_rt_tgt"]
                 l_pred = huber_loss(p_da, price_da_tgt, delta=cfg.huber_delta)
-                # 双结算收益：DA 腿按 DA 价、RT 腿按 RT 价
+                # 收益：模型预测 DA 价、策略按 DA 价排名 → R_model 和 R* 都必须在 DA 价上算
+                # （双结算 RT 偏差腿暂未分离 Δu=0，当前等价于 DA 单结算；
+                #  正式版分离 DA/RT 决策后，R_model 用双结算公式、R* 用对应 oracle，须同步切）
                 u = pol(p_da)
-                R_model = sim(u, price_rt_tgt, price_da=price_da_tgt if cfg.use_dual_settlement else None)
-                R_star = lp_oracle_revenue(price_rt_tgt, sim)
+                R_model = sim(u, price_da_tgt, price_da=price_da_tgt if cfg.use_dual_settlement else None)
+                R_star = lp_oracle_revenue(price_da_tgt, sim)
                 regret = (R_star - R_model).mean()
                 l_pred_n = l_pred / cfg.pred_scale
                 l_bus_n = regret / cfg.bus_scale
@@ -101,7 +103,8 @@ def main():
     model = model.to(dev)
     sim = BESSSimulator(cfg.bess_power_mw, cfg.bess_energy_mwh, cfg.bess_eta,
                         cfg.bess_init_soc_frac, kappa=cfg.bess_kappa,
-                        soc_min=cfg.bess_soc_min, soc_max=cfg.bess_soc_max)
+                        soc_min=cfg.bess_soc_min, soc_max=cfg.bess_soc_max,
+                        e_cyc=cfg.bess_e_cyc)
     pol = TopKPolicy(cfg.topk_k_charge, cfg.topk_k_discharge) if cfg.policy_type == "topk" else STEPolicy(cfg.ste_k)
     opt = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad],
                             lr=cfg.lr, weight_decay=cfg.weight_decay)

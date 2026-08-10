@@ -1,0 +1,124 @@
+{
+  "A0_baseline": {
+    "desc": "price lag + calendar",
+    "features": [],
+    "MAE": 10.690115704203166,
+    "R_model_sum": -12019.339976454294,
+    "R_star_sum": 4725.997437119113,
+    "regret": 16745.337413573405,
+    "PCR": -254.32387842726123,
+    "n_samples": 62
+  },
+  "A1_load": {
+    "desc": "+load",
+    "features": [
+      "load"
+    ],
+    "MAE": 10.805055308649619,
+    "R_model_sum": -11147.490502423823,
+    "R_star_sum": 4725.997437119113,
+    "regret": 15873.487939542936,
+    "PCR": -235.87593202799414,
+    "n_samples": 62
+  },
+  "A2_wind_solar": {
+    "desc": "+wind +solar (统一表现有流)",
+    "features": [
+      "load",
+      "wind",
+      "solar"
+    ],
+    "MAE": 10.476876632846812,
+    "R_model_sum": -8779.253005955678,
+    "R_star_sum": 4725.997437119113,
+    "regret": 13505.25044307479,
+    "PCR": -185.76508182169815,
+    "n_samples": 62
+  },
+  "A3_temp": {
+    "desc": "+temperature",
+    "features": [
+      "load",
+      "wind",
+      "solar",
+      "temperature"
+    ],
+    "MAE": 10.315229204188109,
+    "R_model_sum": -8299.184145706371,
+    "R_star_sum": 4725.997437119113,
+    "regret": 13025.181582825484,
+    "PCR": -175.6070386437918,
+    "n_samples": 62
+  },
+  "A4_econ": {
+    "desc": "+henry_hub +wti +natgas_storage",
+    "features": [
+      "load",
+      "wind",
+      "solar",
+      "henry_hub_usd_per_mmbtu",
+      "wti_usd_per_barrel",
+      "natgas_storage_bcf"
+    ],
+    "MAE": 13.162294460445322,
+    "R_model_sum": -10932.941677146817,
+    "R_star_sum": 4725.997437119113,
+    "regret": 15658.93911426593,
+    "PCR": -231.33617448195974,
+    "n_samples": 62
+  },
+  "A5_storm": {
+    "desc": "+storm_event_count",
+    "features": [
+      "load",
+      "wind",
+      "solar",
+      "storm_event_count"
+    ],
+    "MAE": 10.517272864003335,
+    "R_model_sum": -9605.034564473683,
+    "R_star_sum": 4725.997437119113,
+    "regret": 14331.032001592795,
+    "PCR": -203.23825165526853,
+    "n_samples": 62
+  },
+  "A6_genmix": {
+    "desc": "+gas_share +renewable_share",
+    "features": [
+      "load",
+      "wind",
+      "solar",
+      "gas_share",
+      "renewable_share"
+    ],
+    "MAE": 10.775179555621197,
+    "R_model_sum": -9532.494743421052,
+    "R_star_sum": 4725.997437119113,
+    "regret": 14258.492180540165,
+    "PCR": -201.7033413634667,
+    "n_samples": 62
+  },
+  "A7_all": {
+    "desc": "全部协变量",
+    "features": [
+      "load",
+      "wind",
+      "solar",
+      "temperature",
+      "henry_hub_usd_per_mmbtu",
+      "wti_usd_per_barrel",
+      "natgas_storage_bcf",
+      "storm_event_count",
+      "gas_share",
+      "renewable_share",
+      "renewable_shock",
+      "gas_share_diff"
+    ],
+    "MAE": 11.454968531394517,
+    "R_model_sum": -8001.7901614958455,
+    "R_star_sum": 4725.997437119113,
+    "regret": 12727.78759861496,
+    "PCR": -169.31431444816016,
+    "n_samples": 62
+  }
+}

@@ -7,6 +7,7 @@
 market: ERCOT
 node: LZ_LCRA
 freq: 1h
+data_version: v12         # v1/v2 旧 17 月单 RT 数据（6 流结构）；v3 用 pilot_ercot_v3.yaml
 context_len: 168          # 7 天历史
 horizon_da: 24            # 日前 24 点
 horizon_rt: 6             # 实时 6 点（较短窗口）

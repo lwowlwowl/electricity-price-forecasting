@@ -1,0 +1,70 @@
+# 正式版 v4 — v2 基础上 + beta_end=0.5 + 更多 pretrain
+# v2 证明: pred_scale=25, proxy_scale=80, huber_delta=1.0 能学(train MAE 53→42)
+# v2 问题: β>0.8 后 train MAE 回升(42→171), val MAE 极不稳定
+# v4 修复: beta_end=0.5(停在 sweet spot), pretrain=8(让预测更充分收敛)
+# 不改: huber_delta=1.0(v3 证明 5.0 不行), pred_clamp=[-500,10000](不改, v3 winsorize 无效)
+# 运行: external/chronos-forecasting/.venv/bin/python \
+#         scripts/decision_aware/train_formal.py \
+#         --config configs/decision_aware/formal_ercot_v4.yaml --no-early-stop --no-oracle-train
+
+market: ERCOT
+node: LZ_LCRA
+freq: 1h
+context_len: 168
+horizon_da: 24
+horizon_rt: 6
+train_stride: 1
+eval_stride: 24
+
+data_version: v3
+use_dual_settlement: true
+
+d_model: 256
+n_heads_enc: 4
+n_heads_fusion: 1
+dim_ff: 1024
+dropout: 0.1
+use_rope: true
+
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_init_soc_frac: 0.5
+bess_kappa: 27.0
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+
+policy_type: hard_topk
+oracle_type: lp
+topk_k_charge: 4
+topk_k_discharge: 4
+ste_k: 5.0
+
+zo_rho: 0.05
+zo_K: 2
+zo_sigma: 0.0
+proxy_scale: 80.0
+
+alpha0: 1.0
+beta0: 0.0
+alpha_end: 0.5              # v2=0.0, v4=0.5（保留预测锚）
+beta_end: 0.5               # v2=1.0, v4=0.5（停在 sweet spot，不退到纯业务损失）
+pretrain_epochs: 8           # v2=5, v4=8（更多预训练让预测充分收敛）
+anneal_epochs: 12            # 8→20 退火
+huber_delta: 1.0             # v2 值（v3 证明 5.0 不行）
+pred_scale: 25.0             # v2 值
+bus_scale: 400.0
+pred_clamp: [-500.0, 10000.0]  # v2 值（不改）
+
+lr: 1.0e-3
+weight_decay: 0.01
+batch_size: 64
+epochs: 20
+grad_clip: 1.0
+early_stop_patience: 5
+use_amp: true
+monitor: regret
+num_workers: 0
+
+checkpoint_dir: data/checkpoints/da_tsfm_formal_v4
+seed: 0

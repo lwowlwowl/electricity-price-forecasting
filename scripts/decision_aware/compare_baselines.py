@@ -19,8 +19,8 @@ os.chdir(_ROOT)
 
 import numpy as np, pandas as pd, torch
 import loader
-from decision_aware.config import PilotConfig, ALL_COVARIATES
-from decision_aware.policy import BESSSimulator, STEPolicy, oracle_revenue
+from decision_aware.config import PilotConfig, ALL_COVARIATES_V12 as ALL_COVARIATES
+from decision_aware.policy import BESSSimulator, STEPolicy, lp_oracle_revenue as oracle_revenue
 from decision_aware.dataset import DecisionAwareDataset
 from decision_aware.forecaster import DecisionAwareForecaster
 import foundation as F
@@ -89,9 +89,12 @@ def main():
     ap.add_argument("--n-origins", type=int, default=30)
     ap.add_argument("--ckpt", default="last", help="best 或 last（last=β=1）")
     ap.add_argument("--models", default="timesfm,chronos2,toto,toto2")
+    ap.add_argument("--ckpt-dir", default=None, help="覆盖 yaml 的 checkpoint_dir（v1/v2 不同目录）")
     args = ap.parse_args()
 
     cfg = PilotConfig.from_yaml(args.config)
+    if args.ckpt_dir:
+        cfg.checkpoint_dir = args.ckpt_dir
     print("="*70); print(f"B 对比: foundation 零样本 vs DA-TSFM({args.ckpt}) | {args.n_origins} 个 test 起报点 | 收益裁判台"); print("="*70)
 
     wide_df = loader.load_slice_model_ready(
@@ -109,6 +112,9 @@ def main():
     print(f"  Oracle R* (均值, 开天眼基准): {R_star.mean():.1f}\n")
 
     results = []  # (name, R_mean, regret_mean, pct, mae, err)
+
+    # "不充不放"基线：电池不动 R=0，看模型是否至少比不操作强
+    results.append(("不充不放(R=0)", 0.0, R_star.mean(), 0.0, float('nan'), None))
 
     # 我的模型
     print(f"--- 你的模型 (β={'1' if args.ckpt=='last' else '0.5'}, ckpt={args.ckpt}) ---")
@@ -136,10 +142,12 @@ def main():
     for name, R, Reg, pct, mae, err in results:
         if err:
             print(f"{name:24s}  ❌ {err[:40]}")
+        elif name.startswith("不充不放"):
+            print(f"{name:24s} {0.0:9.1f} {Reg:9.1f} {0:8.0f}% {'—':>7s}")
         else:
             print(f"{name:24s} {R:9.1f} {Reg:9.1f} {pct:8.0f}% {mae:7.1f}")
     print("="*70)
-    print("注: 所有模型过同一 BESS(1MW/4MWh/η0.9)+greedy策略, oracle=greedy开天眼(非LP最优)。")
+    print("注: 所有模型过同一 BESS(1MW/4MWh/η0.9)+STE策略, oracle=LP开天眼(真上界)。")
 
 
 if __name__ == "__main__":

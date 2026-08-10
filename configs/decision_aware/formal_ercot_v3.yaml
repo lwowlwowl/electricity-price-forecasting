@@ -1,0 +1,72 @@
+# 正式版 v3 — winsorize 尖峰 + β 不退到 1 + 更大 huber_delta
+# v2 问题: val/test MAE 极不稳定(16~1975), 因为 DA 价尖峰到 9052 模型预测不了
+#          β>0.8 后 train MAE 开始上升(42→171), 说明 β=1 太激进
+# v3 修复: 1. pred_clamp 上限从 10000 降到 3000（winsorize 尖峰，std=418 均值=65）
+#          2. beta_end 从 1.0 降到 0.5（不退到纯业务损失，停在 mid-anneal sweet spot）
+#          3. huber_delta 从 1.0 提到 5.0（对尖峰更鲁棒）
+# 运行: external/chronos-forecasting/.venv/bin/python \
+#         scripts/decision_aware/train_formal.py \
+#         --config configs/decision_aware/formal_ercot_v3.yaml --no-early-stop --no-oracle-train
+
+market: ERCOT
+node: LZ_LCRA
+freq: 1h
+context_len: 168
+horizon_da: 24
+horizon_rt: 6
+train_stride: 1
+eval_stride: 24
+
+data_version: v3
+use_dual_settlement: true
+
+d_model: 256
+n_heads_enc: 4
+n_heads_fusion: 1
+dim_ff: 1024
+dropout: 0.1
+use_rope: true
+
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_init_soc_frac: 0.5
+bess_kappa: 27.0
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+
+policy_type: hard_topk
+oracle_type: lp
+topk_k_charge: 4
+topk_k_discharge: 4
+ste_k: 5.0
+
+zo_rho: 0.05
+zo_K: 2
+zo_sigma: 0.0
+proxy_scale: 80.0
+
+# 损失 / 退火 — v3 核心修复
+alpha0: 1.0
+beta0: 0.0
+alpha_end: 0.5              # v2=0.0, v3=0.5（不退到纯业务损失，保留预测锚）
+beta_end: 0.5               # v2=1.0, v3=0.5（停在 mid-anneal sweet spot）
+pretrain_epochs: 5
+anneal_epochs: 15
+huber_delta: 5.0            # v2=1.0, v3=5.0（对尖峰更鲁棒）
+pred_scale: 25.0
+bus_scale: 400.0
+pred_clamp: [-200.0, 3000.0]  # v2=[-500,10000], v3=[-200,3000]（winsorize 尖峰）
+
+lr: 1.0e-3
+weight_decay: 0.01
+batch_size: 64
+epochs: 20
+grad_clip: 1.0
+early_stop_patience: 5
+use_amp: true
+monitor: regret
+num_workers: 0
+
+checkpoint_dir: data/checkpoints/da_tsfm_formal_v3
+seed: 0

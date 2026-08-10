@@ -58,18 +58,21 @@ class PilotConfig:
     freq: str = "1h"
     context_len: int = 168
     horizon_da: int = 24
-    horizon_rt: int = 6
+    horizon_rt: int = 4            # w10 §2: 实时滚动预测 H=4
     train_stride: int = 1
     eval_stride: int = 24
 
     # ── 数据版本（v12=旧17月单RT，v3=新6.5年DA+RT）─────────────────────────
     data_version: str = "v3"
     use_dual_settlement: bool = True  # v3: 真双结算（DA+RT）
+    use_dual_split: bool = False      # DA/RT 分离决策（w10 §4.3），False=简化版(uDA=uRT)
+    use_deviation_penalty: bool = False  # 偏差罚金（w10 §5.1），3%容忍+双倍RT价
 
     # ── 模型（v3: d256/2层~5M；v1/v2: d128/1层~1.1M）───────────────────────
     d_model: int = 256
     n_heads_enc: int = 4
-    n_heads_fusion: int = 1
+    n_heads_fusion: int = 4          # C1: 融合层多头（原 1，跨模态融合最该用多头）
+    n_layers_enc: int = 1            # B1: 编码器层数（v7 设 2；原硬编码 1）
     dim_ff: int = 1024               # v3 放大（v1/v2=512）
     dropout: float = 0.1
     use_rope: bool = True
@@ -82,13 +85,21 @@ class PilotConfig:
     bess_kappa: float = 27.0         # 退化+交易成本 USD/MWh（w10，v1/v2=0）
     bess_soc_min: float = 0.4        # SOC 下限 MWh（w10: 0.4）
     bess_soc_max: float = 3.6        # SOC 上限 MWh（w10: 3.6）
+    bess_e_cyc: float = 4.0          # 每日放电上限 MWh（w10 §4.2 E_cyc）
 
     # ── 策略与 Oracle ────────────────────────────────────────────────────────
-    policy_type: str = "topk"        # "ste" 或 "topk"
+    policy_type: str = "topk"        # "ste" / "topk"(soft) / "hard_topk"(正式版)
     oracle_type: str = "lp"          # "greedy" 或 "lp"
     topk_k_charge: int = 4
     topk_k_discharge: int = 4
+    topk_spread_threshold: float = -1.0   # <0 = 自动 κ/η（w10 §4.1 价差门控）；0=关闭
     ste_k: float = 5.0
+
+    # ── 零阶梯度（w10 §6，正式版 hard_topk 专用）────────────────────────────
+    zo_rho: float = 0.05             # 扰动比例 ε = ρ·σ_train（w10 §6.1，搜索范围 0.02~0.2）
+    zo_K: int = 2                    # 成对扰动方向数（w10: 2 或 4）
+    zo_sigma: float = 0.0            # 训练集价格 std（从 norm_stats 自动填充，0=自动）
+    proxy_scale: float = 1.0         # L_proxy 归一化（1.0=不归一；若梯度爆炸调大）
 
     # ── 损失 / 退火 ──────────────────────────────────────────────────────────
     alpha0: float = 1.0
@@ -96,6 +107,8 @@ class PilotConfig:
     alpha_end: float = 0.0
     beta_end: float = 1.0
     anneal_epochs: int = 10
+    pretrain_epochs: int = 0   # 前 N epoch 纯预测(β=0)，之后才开始退火
+    use_mse_loss: bool = True  # w10 §3 半平方误差（False=Huber，向后兼容）
     huber_delta: float = 1.0
     pred_scale: float = 25.0
     bus_scale: float = 250.0
@@ -120,6 +133,13 @@ class PilotConfig:
     @property
     def horizon(self) -> int:
         return self.horizon_da
+
+    @property
+    def resolved_spread_threshold(self) -> float:
+        """w10 §4.1 价差门控阈值：<0 → 自动 κ/η，0 → 关闭。"""
+        if self.topk_spread_threshold < 0:
+            return self.bess_kappa / self.bess_eta
+        return self.topk_spread_threshold
 
     @property
     def price_col(self) -> str:

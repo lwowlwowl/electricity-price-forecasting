@@ -1,0 +1,88 @@
+# 正式版 v7 — w10 口径全修 + 架构完善（本地可跑版）
+# v6 基础上修：
+#   1. DA 策略用价差 d̂=p̂DA−p̂RT|DA（§4.1）
+#   2. LP Oracle 双结算（§5.2）
+#   3. 零阶梯度用 forward_dual（§6.1）
+#   4. ε 分任务独立 ε_DA/ε_RT（§6.1）
+#   5. TopK 价差门控（§4.1）
+#   6. 预测损失改 MSE + /96 归一化（§3）
+#   7. RT 滚动预测 24 窗口×H=4（§2/§3，一次性前向简化版，完整逐小时重预测待云 GPU）
+#   8. LR = 24 窗口取平均（§3）
+#   9. fD/fRT 结构分离（独立 RT decoder，§3，信息截止完整分离待云 GPU）
+#   10. 日循环 E_cyc=4 + q_t（§4.2）
+#   11. 48h SOC 连续 + 计划/实际 SOC 分离（§4.3）
+#   12. 偏差罚金开启（§5.1）
+#   13. 计划跟踪优先规则（§4.3）
+#   17. PCR 非正不报告（§7）
+#   18. RMSE 指标（§7）
+# 运行: external/chronos-forecasting/.venv/bin/python \
+#         scripts/decision_aware/train_formal.py \
+#         --config configs/decision_aware/formal_ercot_v7.yaml --no-early-stop --no-oracle-train
+
+market: ERCOT
+node: LZ_LCRA
+freq: 1h
+context_len: 168
+horizon_da: 24
+horizon_rt: 4               # w10 §2: 实时滚动 H=4
+train_stride: 1
+eval_stride: 24
+
+data_version: v3
+use_dual_settlement: true
+use_dual_split: true             # DA/RT 分离决策
+use_deviation_penalty: true      # v7 开启偏差罚金（§5.1）
+
+d_model: 256
+n_heads_enc: 4
+n_heads_fusion: 4              # C1: 融合层多头（原 1）
+n_layers_enc: 2                # B1: 编码器 2 层（原 1，加 final LN 保 pre-LN 稳定）
+dim_ff: 1024
+dropout: 0.1
+use_rope: true
+
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_init_soc_frac: 0.5
+bess_kappa: 27.0
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+bess_e_cyc: 4.0                  # w10 §4.2 每日放电上限
+
+policy_type: hard_topk
+oracle_type: lp
+topk_k_charge: 4
+topk_k_discharge: 4
+topk_spread_threshold: -1.0      # <0 = 自动 κ/η（w10 §4.1 价差门控）
+ste_k: 5.0
+
+zo_rho: 0.05
+zo_K: 2
+zo_sigma: 0.0
+proxy_scale: 80.0
+
+alpha0: 1.0
+beta0: 0.0
+alpha_end: 0.5
+beta_end: 0.5
+pretrain_epochs: 8
+anneal_epochs: 12
+use_mse_loss: false              # 用 Huber（MSE 在尖峰价上数值爆炸；w10 §3 半平方误差为建议非强制）
+huber_delta: 1.0
+pred_scale: 25.0
+bus_scale: 400.0
+pred_clamp: [-500.0, 10000.0]
+
+lr: 1.0e-3
+weight_decay: 0.01
+batch_size: 64
+epochs: 20
+grad_clip: 1.0
+early_stop_patience: 5
+use_amp: true
+monitor: regret
+num_workers: 0
+
+checkpoint_dir: data/checkpoints/da_tsfm_formal_v7
+seed: 0

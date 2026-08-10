@@ -1,0 +1,97 @@
+# 正式版 v8 — 架构缺陷修复 + 代码正确性 bug 修复（本地可跑版）
+# v7 基础上修：
+#   架构（todo3_2 架构缺陷清单）:
+#     N1  pre-LN 每栈出口加 final LayerNorm
+#     A1  融合层关 RoPE（位置先验反事实）
+#     A2  每条流加 modality embedding
+#     B1  编码器多层（n_layers_enc=2）+ final LN
+#     B2  QueryDecoder 加 query 间 self-attn
+#     B3  query 加位置编码 + 输入条件化
+#     B4  非 dual_split RT 独立 query
+#     C1  融合层多头（1→4）
+#     C2  GRU 残差
+#     C3  删融合层冗余 LayerNorm
+#     C4  Calendar linear→mlp
+#     C5  v3 system GRU→Transformer
+#     C6  GRU fp32 workaround（v1/v2 保留）
+#   代码正确性 bug（todo3_2 代码正确性 bug 两轮）:
+#     D1  L_proxy detach 截断 RT 梯度（致命）
+#     D2  单结算 Oracle 没减 κ
+#     D3  单结算 Oracle 缺 E_cyc
+#     D4  BESSSimulator 构造补 e_cyc
+#     D6  删 forward_dual 死代码 plan SOC
+#     E1  L_proxy .mean()→sum（DA 项梯度 48× 偏小）
+#     E2  LP Oracle 含偏差罚金（uRT=uDA 最优）
+#     E3  forward_dual RT 偏差腿用 clipped actual
+# 参数量：4.36M（v7）→ 9.92M（v8）
+# 运行: external/chronos-forecasting/.venv/bin/python \
+#         scripts/decision_aware/train_formal.py \
+#         --config configs/decision_aware/formal_ercot_v8.yaml --no-early-stop --no-oracle-train
+
+market: ERCOT
+node: LZ_LCRA
+freq: 1h
+context_len: 168
+horizon_da: 24
+horizon_rt: 4               # w10 §2: 实时滚动 H=4
+train_stride: 1
+eval_stride: 24
+
+data_version: v3
+use_dual_settlement: true
+use_dual_split: true             # DA/RT 分离决策
+use_deviation_penalty: true      # 偏差罚金（§5.1）
+
+d_model: 256
+n_heads_enc: 4
+n_heads_fusion: 4              # C1: 融合层多头
+n_layers_enc: 2                # B1: 编码器 2 层
+dim_ff: 1024
+dropout: 0.1
+use_rope: true
+
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_init_soc_frac: 0.5
+bess_kappa: 27.0
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+bess_e_cyc: 4.0                  # w10 §4.2 每日放电上限
+
+policy_type: hard_topk
+oracle_type: lp
+topk_k_charge: 4
+topk_k_discharge: 4
+topk_spread_threshold: -1.0      # <0 = 自动 κ/η（w10 §4.1 价差门控）
+ste_k: 5.0
+
+zo_rho: 0.05
+zo_K: 2
+zo_sigma: 0.0
+proxy_scale: 80.0
+
+alpha0: 1.0
+beta0: 0.0
+alpha_end: 0.5
+beta_end: 0.5
+pretrain_epochs: 8
+anneal_epochs: 12
+use_mse_loss: false              # Huber（MSE 在尖峰价上数值爆炸）
+huber_delta: 1.0
+pred_scale: 25.0
+bus_scale: 400.0
+pred_clamp: [-500.0, 10000.0]
+
+lr: 1.0e-3
+weight_decay: 0.01
+batch_size: 64
+epochs: 20
+grad_clip: 1.0
+early_stop_patience: 5
+use_amp: true
+monitor: regret
+num_workers: 0
+
+checkpoint_dir: data/checkpoints/da_tsfm_formal_v8
+seed: 0

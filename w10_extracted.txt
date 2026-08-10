@@ -1,0 +1,457 @@
+      Decision-aware 多模态 TSFM 的数学建模说明
+                              日前–实时电价预测与储能双结算
+
+
+
+
+1 研究目标与完整闭环
+
+   设 i 表示交易日，t = 1, . . . , 24 表示日内小时。本文只预测日前价格 pDA 和实时价格 pRT 两
+类变量，但按照信息到达顺序分为两个决策阶段：
+                                 
+                          RT |D        π                            π
+                  p̂DA
+                    i , p̂i           −−DA
+                                        −→ uDA
+                                            i ,               i,t −−−→ ui,t −→ Ri .
+                                                            p̂RT    RT  RT
+
+
+                                                                            RT |D
+日前阶段使用日前价格预测 p̂DA
+               i  和日前时点形成的实时价格预期 p̂i                                                制定日前计划 uDA
+                                                                                            i ；进
+入交易日后，再用最新信息滚动更新实时价格预测 p̂RT              RT
+                         i,t ，并执行当前小时动作 ui,t 。两个实时价
+格符号对应同一真实价格，只是预测时点不同。最终收益 Ri 始终使用真实日前和实时价格结算。
+本文约定 u > 0 表示放电，u < 0 表示充电。
+   固定策略 π 的规则和参数在训练前确定，训练过程中不更新。主实验采用价格接受者和申报
+量完全成交假设，将市场出清简化为从预测价格到成交动作的固定映射。该假设保留两结算会计
+关系，但不模拟完整的报价曲线和市场出清过程。
+
+
+2 预测阶段与信息时点
+
+   完整建模分为日前联合预测和实时滚动预测两个阶段。日前阶段每天运行一次，同时输出日
+前价格和预期实时价格；实时阶段在交易日内逐小时更新，只预测实时价格。
+   日前联合预测。主实验将日前信息截止时点设为交易日前一日 4:00（NYISO 当地时间）。模
+型根据该时点能够获得的信息，联合预测交易日及其后一日共 48 小时的日前价格和实时价格：
+                                              
+                                       RT |D
+                              p̂DA
+                                i , p̂i            = f D (XiD ) ∈ R48 × R48 .
+
+                               RT |D
+其中，p̂DA
+     i  是日前价格预测，p̂i                    是日前时点对同一组未来实时价格的预期。日前策略使用两
+条曲线的预测价差
+                                                            RT |D
+                                           d̂i = p̂DA
+                                                   i  − p̂i
+
+制定计划。在价格接受者假设下，日前计划应考虑预期实时价格，实时动作则可根据实时市场机
+会更新 [1, 2]。
+   实时滚动预测。进入交易日后，模型在每个执行小时开始前，以当时已经公开的最新信息预
+测未来 H 小时实时价格：
+                                      p̂RT
+                                        i,t = f
+                                                RT   RT
+                                                   (Xi,t ) ∈ RH .
+
+主实验取 H = 4。每次预测后只执行第一个动作，下一小时使用更新后的信息重新预测和决策。
+
+
+                                                       1
+  日前模型使用完整的 48 小时曲线形成滚动前瞻，但只提交前 24 小时动作。
+  按照 NYISO 当前市场规则，一般日前投标须在交易日前一日 5:00 前提交，实时投标可在相
+应小时的实时调度窗口关闭前更新 [3]。因此，主实验在 4:00 生成预测并于 5:00 前提交前 24 小
+时动作。数据制作时，所有输入必须在相应预测时点已经公开；天气使用当时发布的预报版本，新
+闻发布时间必须早于预测时点，负荷和系统变量也不得使用事后修订值。
+  对任一任务，输入统一表示为
+
+           X = (X price , X load , X weather , X calendar , X system , X news ).
+
+所有模态只通过预测模型影响价格预测，不直接输入固定储能策略。
+
+
+3 价格预测模型
+
+  多模态 TSFM。TSFM 编码历史价格序列，其余数值模态和文本模态由相应适配层编码，再
+通过融合模块形成共享表示：
+                                                             
+                  h = Fuse TSFMθs (X price ), Encθo (X other ) .
+
+日前联合预测模块输出两条价格曲线，实时滚动模块输出一条价格曲线：
+                                       
+            f D (X D ) −→ p̂DA , p̂RT |D ,           f RT (X RT ) −→ p̂RT .
+
+两个阶段可以共享编码器，但必须使用各自预测时点允许的信息。
+  XGBoost。 XGBoost 沿用相同的两阶段接口。日前阶段由日前价格回归器和预期实时价格
+回归器组成，实时阶段使用一个滚动实时价格回归器。多步预测展开成长表，每一行对应一个预
+测时点和一个预测步长，步长及目标小时的日历变量作为特征。文本不直接输入树模型，而使用
+训练集内生成并固定的文本嵌入或聚合指标。
+  预测损失。预测损失按两个阶段计算。日前阶段同时约束两条 48 小时价格曲线：
+                        1            2    1    RT |D                    2
+               LD
+                i =       p̂DA
+                            i  − pDA
+                                  i    +    p̂       − pRT
+                                                        i                   .
+                       96            2   96 i                           2
+
+实时阶段对一天内 24 个滚动窗口取平均：
+
+                             1 X 1
+                                  24
+                                                      2
+                                     i,t − pi,t:t+H−1
+                                   p̂RT     RT
+                     LR
+                      i =                               .
+                             24 2H                    2
+                                 t=1
+
+总预测损失为
+                                  Lpred
+                                   i    = LD    R
+                                           i + Li .
+
+
+
+4 固定储能策略
+
+  固定策略负责把价格信号转换为可执行动作。
+
+
+
+
+                                            2
+4.1 候选时段与基础动作
+
+   给定长度为 T 的策略输入 c，定义低值和高值候选集合：
+
+                        C(c) = BotK(c, Kc ),          D(c) = TopK(c, Kd ).
+
+并列值按时间顺序处理，使两个集合互不重叠。候选充放电对只有在预测价差足以覆盖效率损失
+和运行成本时才保留 [4]。对应的基础动作为
+                                           
+                                           
+                                            −P max , t ∈ C(c),
+                                           
+                                           
+                                      ūt = P max ,   t ∈ D(c),
+                                           
+                                           
+                                           
+                                           
+                                             0,       其他时段.
+
+   日前阶段使用 c = d̂i 。预测日前价格相对实时价格较低的时段形成低值候选，预测日前价格
+相对实时价格较高的时段形成高值候选。实时阶段使用 c = p̂RT
+                               i,t ，按照未来实时价格寻找充放电
+机会。
+
+
+4.2 SOC 与循环约束
+
+   记 st 为时段开始时的 SOC，qt 为当日累计放电量，[x]+ = max(x, 0)。基础动作按时间顺序
+修正为                                               
+                                       smax − st
+                         
+                          max ūt , −                  ,                 ūt < 0,
+                         
+                                          ηc ∆t
+                         
+                         
+                                               min ) E cyc − q
+                                                                   
+                     ut = min ūt , η d (s t − s                 t
+                                                     ,              ,    ūt > 0,
+                         
+                                            ∆t            ∆t
+                         
+                         
+                         
+                         
+                         0,                                              ūt = 0.
+
+随后更新
+               st+1 = st + ηc [−ut ]+ ∆t − ηd−1 [ut ]+ ∆t,      qt+1 = qt + [ut ]+ ∆t.
+
+因此动作满足
+                    |ut | ≤ P max ,      smin ≤ st ≤ smax ,        0 ≤ qt ≤ E cyc .
+
+退化成本和循环次数会显著影响储能套利结果，主实验将其作为固定业务参数并进行敏感性分析
+[5]。
+
+
+4.3 日前提交与实时执行
+
+   日前策略在完整 48 小时窗口上运行，但只提交前 24 小时：
+                      h                   i
+                                      plan
+               uDA
+                i,t =   πDA   d̂  ; s
+                                 i i,1        , t = 1, . . . , 24.
+                                                      t
+
+splan
+ i,1 是对交易日开始时 SOC 的计划值。48 小时窗口内 SOC 连续传递，日循环计数在第 25 小时
+重置 [6]。
+   交易日内，实时策略使用实际 SOC 运行，并且每次只执行滚动计划的第一个动作：
+                       h                i
+                              RT
+                 uRT
+                  i,t = πRT p̂i,t ; si,t    .
+                                                               1
+
+
+                                                  3
+实际 SOC 只由 uRT
+           i,t 更新。日前计划使用计划 SOC 检查提交可行性，实时动作使用实际 SOC 检
+查物理可行性，两条状态轨迹不混用。
+  若启用第 5.1 节的计划–执行偏差罚金，实时策略增加固定的“计划跟踪优先”规则：先在当
+前 SOC 下尽量执行日前动作 uDA
+                 i,t ，再用剩余功率和 SOC 执行实时 TopK 套利。该规则仍是预先
+确定的业务环境，不参与参数学习。
+
+
+5 双结算收益与后悔值
+
+  预测价格只用于制定动作，所有收益均使用真实价格计算。定义计划–执行偏差
+
+                                        i,t − ui,t .
+                               ∆ui,t = uRT     DA
+
+
+
+日前计划按日前价格结算，计划–执行偏差按实时价格结算。基础收益为
+
+                             X
+                             24
+                                                                    
+               Ribase = ∆t           i,t ui,t + pi,t ∆ui,t − κ|ui,t | .
+                                    pDA   DA     RT             RT
+
+                             t=1
+
+其中 κ 是单位实际充放电量的交易与退化成本。将前两项展开后可知，日前计划的价值由日前与
+实时价格之差决定，因此日前阶段需要同时预测两条价格曲线；进入交易日后，日前计划已经固
+定，实时阶段只需滚动更新实时价格并修正实际动作。
+
+
+5.1 计划–执行偏差罚金（可选场景）
+
+  价格预测会影响日前与实时两阶段动作，但罚金直接考核的是储能实际动作相对日前计划的
+偏差 ∆ui,t ，不需要额外的负荷或新能源出力数据。以日前申报量为基准，3% 容忍阈值为
+
+                                                 i,t |.
+                                    τi,t = 0.03|uDA
+
+超出容忍区间的部分按双倍实时价格考核，偏差罚金为
+
+                             X
+                             24
+                                                                  
+                Pidev = ∆t             i,t | |∆ui,t | − 0.03|ui,t | + .
+                                    2|pRT                     DA
+
+                              t=1
+
+启用罚金后的净收益为
+                               Ri = Ribase − Pidev .
+
+未启用该场景时，令 Pidev = 0，即 Ri = Ribase 。当 uDA
+                                      i,t = 0 时，上式的容忍阈值为零；若实际规
+则改以额定功率或承诺容量为基准，应相应替换阈值定义。本文将 3% 和双倍实时价格视为给定
+的实验场景。
+
+
+5.2 后悔值
+
+  训练时的业务损失直接定义为
+
+                        F (p̂) = Lbus = −R(π(p̂); p) ,
+
+其中 p̂ 统一表示参与当天决策的全部预测曲线，p 表示相应真实价格。
+
+
+                                            4
+     验证和测试阶段另外求解一个已知真实价格的线性规划 Oracle：
+
+                                              R⋆ = max R(u; p),
+                                                      u∈A
+
+其中 A 包含相同的功率、SOC、效率和循环约束。总收益后悔值为
+
+                                           Regret = R⋆ − R ≥ 0.
+
+
+6 Decision-aware 训练
+
+     固定策略包含排序和截断，无法直接反向传播，使用函数值的双点零阶梯度。
+
+
+6.1 双点零阶业务梯度
+
+     对业务损失 F 定义高斯平滑目标
+
+                           Fϵ (p̂) = Ez [F (p̂ + ϵz)] ,              z ∼ N (0, I).
+
+     使用 K 个成对扰动方向得到 Monte Carlo 估计
+
+                                  1 X
+                                          K
+                          ĝ =        [F (p̂ + ϵz k ) − F (p̂ − ϵz k )] z k .
+                                 2Kϵ
+                                         k=1
+
+该公式是高斯平滑业务损失梯度的无偏估计，而不是原始非光滑损失的精确梯度。双点随机函数
+评价及其在非光滑零阶优化中的理论依据见 [7, 8]。
+     实际计算时，日前阶段分别扰动两条输出曲线，实时阶段扰动滚动实时价格曲线，并保持其
+他输出不变，得到
+                                        ĝ DA ,       ĝ RT |D ,     ĝ RT .
+
+扰动尺度取 ϵm = ρσm ，其中 σm 是相应任务训练集价格标准差。若扰动过小，TopK 集合可能不
+变化而产生零梯度；若扰动过大，则估计偏离当前预测，因此 ρ 和 K 必须在验证集选择。
+
+
+6.2 TSFM 接口
+
+     TSFM 使用
+                                          L = αLpred + βLproxy ,
+
+其中                              ⊤                                                 
+                                                             RT |D ⊤               RT |D
+           Lproxy =       p̂DA
+                            i          stopgrad ĝ DA
+                                                   i   +  p̂ i       stopgrad   ĝ i
+
+                            1 X  RT ⊤
+                                 24                    
+                      +          p̂i,t  stopgrad ĝ RT
+                                                    i,t   .
+                           24
+                                 t=1
+
+因此
+                                                  ∇p̂ Lproxy = ĝ,
+
+再由标准链式法则更新 TSFM 参数。Lproxy 是用于注入业务梯度的局部代理，其数值本身不等于
+真实业务损失；每次模型预测更新后都要重新运行策略仿真并计算梯度。
+
+
+
+                                                         5
+6.3 XGBoost 接口
+
+   XGBoost 不使用神经网络反向传播，而是在每轮 boosting 中接收逐行一阶梯度和二阶曲率。
+将任一预测长表中的一行记为 j，并用 ωj > 0 表示 α 与损失归一化共同产生的行权重。若预测项
+使用半平方误差，则返回
+                            Gj = ωj (p̂j − pj ) + βĝj ,
+
+                         Hj = ωj + hmin ,       hmin > 0.
+
+这里的业务一阶项来自同一个零阶估计器。Hj 保留预测损失的精确曲率，并加入正值稳定项；它
+不是业务损失的精确 Hessian。对应地，第 r 轮树模型优化的是当前预测附近的局部二次代理
+                       X           1
+                                                  
+                                                2
+                  Qr =    Gr,j ∆fj + Hr,j (∆fj ) .
+                                    2
+                             j
+
+   日前价格、日前时点实时价格和滚动实时价格分别使用一个回归器。更新其中一个回归器时，
+其余两类输出保持为当前预测，只重新计算该输出对应的业务梯度。
+   每轮更新依次执行：生成当前标量预测，按交易日和预测步长恢复完整价格曲线，运行成对
+扰动下的固定策略与双结算仿真，将业务梯度按原长表顺序展开，再增加一棵树。由于 SOC 使同
+一天各行相互依赖，这是一种梯度一致的局部代理训练，而不是对原始跨时段业务损失的精确二
+阶优化。函数梯度提升和 XGBoost 的二阶局部近似分别见 [9, 10]。
+
+
+7 实验设置与推进顺序
+
+   现有数据为小时级，主实验采用 1 MW/4 MWh 储能。建议的初始参数如下，所有搜索均只使
+用训练集和验证集。
+
+           项目               含义                         主实验设定
+
+           日前预测             预测长度、提交长度                  48 小时、前 24 小时
+           实时预测             滚动长度、执行长度                  4 小时、第 1 小时
+           ∆t               时间间隔                       1 小时
+           P max            最大充放电功率                    1 MW
+           E max            额定容量                       4 MWh
+           smin , smax      SOC 范围                     0.4, 3.6 MWh
+           ηc , η d         充放电效率                      0.95，0.95
+           E cyc            每日放电上限                     4 MWh
+           κ                运行与退化成本                    27 USD/MWh
+           偏差罚金（可选） 容忍率、价格倍数                           3%、2
+           K                成对扰动方向数                    2或4
+           hmin             XGBoost 稳定项                10−3
+
+
+
+
+                                         6
+     退化成本使用 10、25 和 50 USD/MWh 进行敏感性分析；扰动比例搜索
+
+                                             ρ ∈ {0.02, 0.05, 0.1, 0.2},
+
+业务权重搜索
+                                            β ∈ {0, 0.01, 0.05, 0.1, 0.5}.
+
+     实施时首先训练标准 XGBoost，分别验证日前联合预测和实时滚动预测的标签与时间戳；随后
+完成固定策略及双结算收益单元测试；在此基础上加入零阶梯度，训练 Decision-aware XGBoost。
+TSFM 使用完全相同的数据接口、固定策略、收益函数和评价方法，从而保证模型比较公平。最
+后才增加 LP Oracle 和 48 小时前瞻消融。
+     数据按时间顺序划分训练、验证和测试集，不随机打乱。预测指标报告 MAE 和 RMSE；业
+务指标报告累计收益、LP Oracle Regret 和
+                                                         P
+                                                            Ri
+                                                   PCR = P i ⋆ .
+                                                          i Ri
+
+当 Oracle 总收益非正时不报告 PCR。主实验至少比较标准 TSFM、Decision-aware TSFM、标准
+XGBoost 和 Decision-aware XGBoost，并对 β = 0、扰动方向数、固定策略参数、偏差罚金开关
+和多模态输入进行消融。
+
+
+参考文献
+ [1] S. Alghumayjan, J. Han, N. Zheng, M. Yi, and B. Xu, “Energy Storage Arbitrage in Two-Settlement Markets: A
+    Transformer-Based Approach,” Electric Power Systems Research, vol. 235, 110755, 2024. doi:10.1016/j.epsr.2024.110755.
+
+ [2] D. Krishnamurthy, C. Uckun, Z. Zhou, P. R. Thimmapuram, and A. Botterud, “Energy Storage Arbitrage Under Day-
+    Ahead and Real-Time Price Uncertainty,” IEEE Transactions on Power Systems, vol. 33, no. 1, pp. 84–93, 2018. IEEE
+    Xplore; doi:10.1109/TPWRS.2017.2685347.
+
+ [3] New York Independent System Operator, “Market Services Tariff, Sections 4.2 and 4.4: Day-Ahead and Real-Time
+    Markets and Schedules,” Market Administration and Control Area Services Tariff, effective March 16, 2026. oﬀicial
+    tariff.
+
+ [4] B. Flamm, A. Eichler, R. S. Smith, and J. Lygeros, “Price Arbitrage Using Variable-Eﬀiciency Energy Storage,” Journal
+    of Physics: Conference Series, vol. 1343, 012060, 2019. doi:10.1088/1742-6596/1343/1/012060.
+
+ [5] B. Xu, J. Zhao, T. Zheng, E. Litvinov, and D. S. Kirschen, “Factoring the Cycle Aging Cost of Batteries Par-
+    ticipating in Electricity Markets,” IEEE Transactions on Power Systems, vol. 33, no. 2, pp. 2248–2259, 2018.
+    doi:10.1109/TPWRS.2017.2733339.
+
+ [6] Y. Wang, Y. Dvorkin, R. Fernández-Blanco, B. Xu, T. Qiu, and D. S. Kirschen, “Look-Ahead Bidding Strategy for Energy
+    Storage,” IEEE Transactions on Sustainable Energy, vol. 8, no. 3, pp. 1106–1117, 2017. doi:10.1109/TSTE.2017.2656800.
+
+ [7] Y. Nesterov and V. Spokoiny, “Random Gradient-Free Minimization of Convex Functions,” Foundations of Computational
+    Mathematics, vol. 17, no. 2, pp. 527–566, 2017. doi:10.1007/s10208-015-9296-2.
+
+ [8] J. C. Duchi, M. I. Jordan, M. J. Wainwright, and A. Wibisono, “Optimal Rates for Zero-Order Convex Optimization:
+    The Power of Two Function Evaluations,” IEEE Transactions on Information Theory, vol. 61, no. 5, pp. 2788–2806,
+    2015. doi:10.1109/TIT.2015.2409256.
+
+ [9] J. H. Friedman, “Greedy Function Approximation: A Gradient Boosting Machine,” The Annals of Statistics, vol. 29, no.
+    5, pp. 1189–1232, 2001. doi:10.1214/aos/1013203451.
+
+[10] T. Chen and C. Guestrin, “XGBoost: A Scalable Tree Boosting System,” in Proceedings of the 22nd ACM SIGKDD
+    International Conference on Knowledge Discovery and Data Mining, pp. 785–794, 2016. doi:10.1145/2939672.2939785.
+
+
+
+                                                            7
+

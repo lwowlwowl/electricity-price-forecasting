@@ -1,0 +1,74 @@
+# 正式版 (Formal) — Decision-aware 多模态 TSFM 配置
+# 核心改动: STE/soft-TopK → Hard TopK + 零阶双点高斯梯度（w10 §6）
+# 数据: ERCOT LZ_LCRA，2020-2026，统一小时表（DA+RT+load+wind+solar+holiday）
+# 运行: external/chronos-forecasting/.venv/bin/python \
+#         scripts/decision_aware/train_formal.py \
+#         --config configs/decision_aware/formal_ercot.yaml
+
+market: ERCOT
+node: LZ_LCRA
+freq: 1h
+context_len: 168
+horizon_da: 24
+horizon_rt: 6
+train_stride: 1
+eval_stride: 24
+
+# 数据版本
+data_version: v3
+use_dual_settlement: true
+
+# 模型（与 v3 相同：d=256, 1层, ~5M 参数）
+d_model: 256
+n_heads_enc: 4
+n_heads_fusion: 1
+dim_ff: 1024
+dropout: 0.1
+use_rope: true
+
+# BESS（w10 第7节规范值，与 v3 相同）
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_init_soc_frac: 0.5
+bess_kappa: 27.0
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+
+# 策略 + Oracle（正式版核心改动）
+policy_type: hard_topk          # 硬 TopK（不可微，配合零阶梯度）
+oracle_type: lp
+topk_k_charge: 4
+topk_k_discharge: 4
+ste_k: 5.0                      # 保留（向后兼容，hard_topk 模式不使用）
+
+# 零阶梯度（w10 §6）
+zo_rho: 0.05                    # 扰动比例 ε=ρ·σ_train，搜索范围 0.02~0.2
+zo_K: 2                         # 成对扰动方向数（2 或 4）
+zo_sigma: 0.0                   # 0=从 norm_stats 自动填充训练集价格 std
+proxy_scale: 1.0                # L_proxy 归一化（1.0=不归一；若梯度爆炸调大）
+
+# 损失 / 退火
+alpha0: 1.0
+beta0: 0.0
+alpha_end: 0.0
+beta_end: 1.0
+anneal_epochs: 10
+huber_delta: 1.0
+pred_scale: 400.0               # v3 DA 价尺度（std~370）
+bus_scale: 400.0                # 保留（正式版用 proxy_scale 代替）
+pred_clamp: [-500.0, 10000.0]   # DA 价尖峰到 9052，上限 10000
+
+# 训练
+lr: 1.0e-3
+weight_decay: 0.01
+batch_size: 64
+epochs: 30
+grad_clip: 1.0
+early_stop_patience: 5
+use_amp: true
+monitor: regret                 # early-stop 监控 val regret
+num_workers: 0
+
+checkpoint_dir: data/checkpoints/da_tsfm_formal_v1
+seed: 0

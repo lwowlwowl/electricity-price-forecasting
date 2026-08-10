@@ -1,32 +1,27 @@
-# 电价预测研究：消融驱动的时序基础模型融合
+# 电价预测研究：Decision-aware 多模态 TSFM
 
-> ⚠️ **方向已切换**（2026-07）：本 README 描述的是**旧范式**（冻结零样本 ElecFM 融合）。
-> 新方向为 **Decision-aware 多模态 TSFM**（从零训练 + 业务损失闭环），见：
-> - `docs/todo3.md`（模型搭建决策清单）
-> - `docs/team_notes/w8/研究方案_Decision-aware_多模态TSFM.md`、`docs/team_notes/w9/模型相关.md`
-> - `docs/model_architecture_v2.drawio`（新架构图，基于 w9 材料）
-> - 旧代码已归档至各 `*/archive/` 目录（说明见 `src/archive/README.md`）。
->   主线保留：`src/data_processing/`、`src/evaluation/`、`src/models/`（`base`/`forecasters` 基线 + `foundation`+`workers` 外部 TSFM 基线层，见 `src/models/README.md`）、`scripts/covariates/`、`data/covariates/`、`external/`（改作从零训练对照基线）。
-
-基于 ERCOT 实时电价，通过**三阶段递进研究**构建面向尖峰检测的专用融合模型：
-
-```
-v1.0 参数消融  →  v2.0 结构消融  →  ElecFM 融合模型（消融驱动架构设计）
-  （11模型对比）     （68次实验）       （v1→V6，共9个版本）
-```
-
-研究问题：时序基础模型在电价预测中哪些组件真正有效？消融结论能否驱动更好的融合架构？
+> 当前方向：**Decision-aware 多模态时序基础模型（从零训练 + 业务损失闭环）**。
+> 目标不是"预测得准"，而是"按预测调度储能（BESS）能多赚钱"——把预测损失和调度收益（零阶梯度代理）联合训练。
+>
+> 旧方向（冻结零样本 TimesFM + 消融驱动的 ElecFM 融合模型）已废弃并清理，历史结论仍见 `docs/archive/`（v1.0 参数消融、v2.0 结构消融的方法论与数据洞察，指导当前模型的输入设计）。
 
 ---
 
-## 核心成果
+## 核心成果（v7，最新有完整结果的正式版本）
 
-| 指标 | TimesFM 零样本 | **ElecFM v5a** | **ElecFM V6** |
-|------|--------------|--------------|--------------|
-| W1 SMAPE | 27.67 | **27.55** ✅ | 28.90（3节点口径）|
-| W1 Spike-F1 | 0.329 | **0.4159**（+26%）| **0.4439**（+35%）|
-| 可训练参数 | — | 334K | 664K |
-| 架构来源 | — | 逐层消融→spike head 分叉点 | + Chronos skip_variate 消融 |
+在 ERCOT LZ_LCRA 节点、单节点小模型（4.36M 参数）上，v7 是第一个 **w10 方案口径完全一致**的版本（价差决策、双结算 LP Oracle、零阶梯度全部对齐同一套结算公式）：
+
+| 指标 | 含义 | v4 | v6 | **v7** |
+|------|------|----|----|--------|
+| MAE | 预测误差（美元）| 49.5 | 20.2 | **21.1** |
+| RMSE | 均方根误差（美元）| — | — | 53.2 |
+| R_model | 模型实际调度收益 | -81.9 | -149.0 | **-19.0**（少亏 77%）|
+| R*_LP | 双结算 LP Oracle 上界 | — | — | 276.0 |
+| PCR | 收益占 Oracle 比例 | -54% | -99% | **-6.9%**（接近盈亏平衡）|
+
+> regret 指标口径在 v4/v6/v7 间不一致（v7 是双结算 Oracle），不可直接横向比较，仅 MAE/R_model/PCR 可比。详细训练动态、验证标准、MSE 数值爆炸的教训见 `docs/正式版实验结果.md`。
+
+**下一步 v8**（`configs/decision_aware/formal_ercot_v8.yaml`，配置已就绪，尚未训练出结果）：在 v7 基础上修复了两轮交叉代码审查发现的架构缺陷（Pre-LN 缺 final LayerNorm、融合层误开 RoPE、多流缺 modality embedding 等）和正确性 bug（L_proxy 梯度被 detach 截断、LP Oracle 缺 κ/E_cyc 等），参数量增至 9.92M，详见 `docs/todo3_2.md`。
 
 ---
 
@@ -35,186 +30,119 @@ v1.0 参数消融  →  v2.0 结构消融  →  ElecFM 融合模型（消融驱�
 ```
 school/
 ├── configs/
-│   ├── parameter_ablation/        # v1.0 参数消融配置（5维度×3窗口）
-│   ├── structural_ablation/       # v2.0 结构消融配置（36+32次实验）
-│   └── fusion/                    # ElecFM 训练配置
-│       ├── electfm_ercot_full_v5.yaml          # v5a：纯 spike head，15节点
-│       ├── electfm_ercot_full_v5b.yaml         # v5b：720h context
-│       ├── electfm_ercot_full_v6.yaml          # V6：CrossNodeAttention
-│       ├── electfm_ercot_full_v6_allgroups.yaml # V6 15节点全分组
-│       ├── electfm_ercot_full_v7.yaml          # V7：SwiGLU adapter
-│       └── ...（其他变体）
+│   ├── nodes.yaml                    # 节点分组配置（volatility/spikes/stable）
+│   ├── decision_aware/               # 当前方向：Decision-aware 训练配置
+│   │   ├── pilot_ercot.yaml / pilot_ercot_v3.yaml   # 先行版（小规模验证）
+│   │   └── formal_ercot.yaml ~ v8.yaml              # 正式版迭代（v7 最新有结果，v8 待跑）
+│   └── archive/                      # 旧范式配置（v1.0 参数消融、v2.0 结构消融）
 │
 ├── src/
-│   ├── data_processing/
-│   │   ├── loader.py              # 从 raw 长表按需切片
-│   │   └── build_nodes_config.py # 节点分组（volatility/spikes/stable）
-│   ├── models/                   # v1.0 参数消融用到的模型框架
-│   │   ├── base.py               # Forecaster 抽象基类
-│   │   ├── forecasters.py        # 7 个统计/树模型基线
-│   │   ├── foundation.py         # 4 个基础模型的子进程适配器
-│   │   └── workers/              # 各基础模型 worker
-│   ├── parameter_ablation/       # v1.0 实验执行器
-│   ├── structural_ablation/      # v2.0 消融模块（14 种手术操作）
-│   └── fusion_model/             # ElecFM 融合模型
-│       ├── model.py              # ElecFM + CrossNodeAttention + SwiGLUAdapter
-│       ├── train.py              # 两阶段训练（spike_head_only / cross_node_only）
-│       ├── dataset.py            # 滑窗数据集 + 3节点同步数据集
-│       ├── evaluate.py           # 三窗口回测 + τ* 搜索
-│       ├── run_fusion.py         # 一键入口（Step1验证 → 训练 → 评估）
-│       └── loss.py               # Pinball + BCE Spike 联合损失
+│   ├── data_processing/              # 数据加载与节点分组
+│   │   ├── loader.py                 # 从 raw 长表按需切片
+│   │   └── build_nodes_config.py
+│   ├── decision_aware/                # 当前方向核心代码
+│   │   ├── model.py                   # 多流 Encoder + CrossModalFusion + DA/RT 双 Decoder
+│   │   ├── policy.py                  # BESS 模拟器 + HardTopK 策略 + LP Oracle（单/双结算）
+│   │   ├── loss.py                    # 预测损失（Huber/MSE）+ L_proxy 决策感知损失
+│   │   ├── zero_order.py              # 零阶梯度估计（双点高斯扰动）
+│   │   ├── dataset.py / dataset_v3.py # 滑窗数据集
+│   │   └── train.py                   # 先行版训练循环
+│   ├── evaluation/                    # 指标 / 统计检验 / 回测
+│   ├── models/                        # 预测器层：统计/树基线 + 外部 TSFM 适配器
+│   │   └── workers/                   # TimesFM / Chronos-2 / Toto 子进程 worker
+│   └── archive/                       # 旧范式代码（v1.0/v2.0 消融），已废弃不维护
+│
+├── scripts/
+│   ├── decision_aware/
+│   │   ├── train_formal.py            # 正式版训练入口（v3+，支持 dual_split）
+│   │   ├── train_pilot.py / train_pilot_v3.py  # 先行版训练入口
+│   │   ├── compare_baselines_formal.py / compare_baselines.py  # 基线对比
+│   │   ├── eval_v3_da_oracle.py       # Oracle 评估
+│   │   └── covariate_screen_xgb.py    # XGBoost 协变量筛选
+│   └── covariates/                    # 协变量数据管线（下载/清洗/合并/特征构建，15 个步骤脚本）
 │
 ├── docs/
-│   ├── fusion/                   # ElecFM 当前活跃文档
-│   │   ├── README.md             # 文档导航入口
-│   │   ├── design.md             # 架构设计 + 全版本实验汇总
-│   │   ├── experiments.md        # 详细实验记录（按时间线）
-│   │   └── implementation.md    # 代码实现指南
-│   ├── archive/elecfm/           # 历史文档归档
-│   ├── 参数消融汇报材料.md        # v1.0 关键发现与结论
-│   ├── 参数消融实验结果与问答.md  # v1.0 完整分析
-│   ├── 结构消融汇报材料.md        # v2.0 + ElecFM 完整研究记录
-│   └── 结构消融实验结果与问答.md  # v2.0 完整分析
+│   ├── todo3.md / todo3_2.md          # 当前决策清单（模型搭建 + v7 改动清单 + 架构/bug 审查记录）
+│   ├── 正式版实验结果.md               # 正式版 v4~v7 完整实验记录（本 README 摘要来源）
+│   ├── 先行版实验结果.md / 先行版汇报材料.md
+│   ├── model_architecture_v2/v3.drawio  # 架构图
+│   ├── covariate_conclusions.md       # 协变量结论（多模态输入设计依据）
+│   ├── specs/                         # 实验方法论手册
+│   ├── concepts/                      # 概念说明（起报点与滚动回测等）
+│   ├── reference/                     # 论文 PDF（TimesFM/Chronos/Toto 等）
+│   ├── team_notes/                    # 团队周会纪要与研究方案（w1, w7~w11）
+│   └── archive/                       # 旧范式文档归档（v1.0/v2.0 消融结论，仍有复用价值）
 │
-├── scripts/                      # 辅助脚本
-│   ├── run_lora_quick_test.sh    # LoRA 快速测试
-│   └── run_fusion_sweep.sh       # 参数扫描
-├── run_overnight.sh              # 多实验串行脚本
-├── CHANGELOG.md                  # 版本变更日志
-└── external/                     # 四个基础模型（各含独立 .venv）
-    ├── timesfm/                  # TimesFM-2.5（Google）
-    ├── chronos-forecasting/      # Chronos-2（Amazon）
-    └── toto/                     # Toto-1.0 & Toto-2.0（Datadog）
+├── data/
+│   ├── raw/                           # 原始数据源（EIA/ERCOT/NYISO/PJM/CAISO/weather，不入库）
+│   ├── covariates/                    # 协变量派生数据（gas/oil/steel/storm/news/generation_mix）
+│   ├── results/                       # 实验输出（parameter_ablation/structural_ablation 为旧范式产物）
+│   ├── checkpoints/                   # 训练 checkpoint（不入库，本地产物）
+│   └── market_hourly.parquet          # 主数据表
+│
+└── external/                          # 三个基础模型，各含独立 .venv
+    ├── timesfm/                        # TimesFM-2.5（Google）
+    ├── chronos-forecasting/            # Chronos-2（Amazon）
+    └── toto/                           # Toto-1.0 & Toto-2.0（Datadog）
 ```
 
 ---
 
-## 第一阶段：v1.0 参数消融（已完成）
+## Decision-aware 训练框架
 
-**目的**：确定时序基础模型在电价预测中的最优输入配置，回答"给模型什么"的问题。
-
-**实验规模**：11 个模型（7 基线 + 4 基础模型）× 5 消融维度 × 3 测试窗口 = 15 组，60+ 次回测
-
-| 消融维度 | 扫描范围 | 关键结论 |
-|---------|---------|---------|
-| A 协变量 | 无 → 负荷 → +温度 → +风光 | Chronos 加全协变量 Spike-F1 从 0.317→0.417 |
-| B 上下文长度 | 168h / 336h / 720h | TimesFM 对长度不敏感；720h 在 W1 SMAPE=26.84（最优）|
-| C 单/多变量 | 单变量 / 多变量 | 跨节点增益有限（≤3%），不引入 |
-| D 预测步长 | 24h / 48h / 168h | 所有模型随步长恶化，Toto2 步长鲁棒性最好 |
-| F 数据频率 | 1h / 15min | 15min 对 Spike-F1 有微弱增益，对 MAE 无帮助 |
-
-**测试窗口**：
-
-| 窗口 | 区间 | 市场特征 |
-|------|------|---------|
-| W1 | 2025-08-01 ~ 08-31 | 夏季稳定期（基准）|
-| W2 | 2025-03-01 ~ 03-31 | 春季负电价 |
-| W3 | 2026-01-01 ~ 01-31 | 冬季极端尖峰 |
-
-```bash
-# 运行单个基准实验
-python src/parameter_ablation/run_experiment.py configs/parameter_ablation/baseline.yaml
-
-# 一键运行全部消融
-bash run_all_ablations.sh
-```
-
----
-
-## 第二阶段：v2.0 结构消融（已完成）
-
-**目的**：打开模型内部，定位每个基础模型的关键组件，回答"模型哪里在干活"的问题。
-
-**实验规模**：
-- 组件级消融：**36 次**（3 模型 × 12 类操作，含 FFN / 注意力 / 位置编码 / 输出头）
-- 逐层消融：**32 次**（Toto2 6层 + Chronos2 6层 + TimesFM 20层）
-- 统计检验：Wilcoxon signed-rank + Bonferroni 校正
-
-**核心发现**：
-
-| 发现 | 数据依据 |
-|------|---------|
-| **FFN 是所有模型最关键组件** | 移除后 TimesFM +486%、Toto2 +419%、Chronos2 +33% |
-| **精度通路与尖峰通路功能分离** | 部分层专精度、部分层专尖峰，甚至互相抑制 |
-| **TimesFM L7 是纯尖峰检测层** | ΔSpike-F1 = −6.7%，ΔSMAPE = +1.6%（精度几乎不变）|
-| **Chronos skip_variate 退化 +6.7%** | 跨变量注意力贡献显著 |
-| **TimesFM 40% 层可安全移除** | 逐层消融，双指标严格标准 |
-
-```bash
-# 运行结构消融
-python src/structural_ablation/run_structural_ablation.py configs/structural_ablation/full_timesfm.yaml
-```
-
-图表见 `data/results/structural_ablation/report/`。
-
----
-
-## 第三阶段：ElecFM 融合模型（已完成）
-
-**核心思路**：把消融结论转化为架构决策，构建同时具备零样本精度和显式尖峰检测能力的专用模型。
-
-### 架构
+**核心思路**：不满足于预测准确，而是让模型直接对储能调度收益负责。用一个共享 Encoder-Decoder 同时预测日前价格 p̂DA 和日前口径下的实时价格 p̂RT|DA，再用价差 d̂ = p̂DA − p̂RT|DA 驱动 HardTopK 调度策略，通过零阶梯度（双点高斯扰动，模拟器不可导）把调度收益的代理损失 L_proxy 传回预测头，和预测损失 L_pred 加权（α/β 退火）联合训练。
 
 ```
-原始电价序列 [B, 168h]
-  → Tokenizer → 15层 Transformer（TimesFM，剪枝5层，冻结）
-                          ↓ 新L6=原L7（"尖峰检测层"，消融发现）
-              ┌───────────────────────────┐
-              │  CrossNodeAttention（V6）  │  ← Chronos skip_variate 消融动机
-              │  [B, 3, 1280] → [B, 3, 1280]│
-              └───────────────────────────┘
-                          ↓
-              Spike Head（自研，334K）→ spike_logits [B, 24]
-              Quantile Head（TimesFM原版，冻结）→ q[0.1..0.9] × 24步
+历史价格/日历/系统特征等多流输入
+  → StreamEncoder（每流独立编码）
+  → CrossModalFusion（跨流注意力）
+  → QueryDecoder（DA 48h 双曲线 + RT 24×4h 滚动窗口）
+  → p̂DA, p̂RT|DA, p̂RT
+        ↓                          ↓
+   L_pred（Huber）          价差 d̂ → HardTopK 策略 → BESS 模拟器
+        ↓                          ↓
+        └──────→ α·L_pred + β·L_proxy ←──────┘
+              （零阶梯度估计 L_proxy 对预测头的梯度）
 ```
-
-### 实验历程
-
-| 版本 | 核心改动 | W1 SMAPE | W1 Spike-F1 | 关键教训 |
-|------|---------|---------|------------|---------|
-| v1 | quant_head 可训 | 31.95 | 0.370 | quant_head 必须冻结 |
-| v2 | quant_head 冻结 | 29.19 | 0.335 | 数据太少 |
-| v3 | 全 ERCOT 非 LoRA | 未收敛 | — | 79M 参数 vs 125K 样本 |
-| v4 | LoRA | 29.39 | 0.351 | 骨干修改仍损害 SMAPE |
-| **v5a** | **纯 spike head，15节点** | **27.55** ✅ | **0.4159** ✅ | **冻结骨干是正确路线** |
-| v5b | 纯 spike head，720h | 27.52 | 0.3779 | 720h 稀释尖峰信号 |
-| **V6** | **+ CrossNodeAttention，3节点** | **28.90**\* | **0.4439** ✅ | **消融预测闭环验证** |
-| V7 | + SwiGLU adapter | 27.55 | 0.3980 | 冻结骨干表征已足够，SwiGLU 冗余 |
-
-\* V6 评估口径为 LZ_LCRA/LZ_WEST/LZ_RAYBN 三个高波动节点，零样本基准即 28.90。
-
-### 最终最优模型
-
-**日常精度（广泛节点）**：v5a（15节点，W1 SMAPE=27.55）
-
-**尖峰检测**：V6（3节点，W1 Spike-F1=0.4439）
 
 ### 快速运行
 
 ```bash
-# Step 1：零样本验证（确认剪枝基准）
-external/timesfm/.venv/bin/python src/fusion_model/run_fusion.py \
-    --config configs/fusion/electfm_ercot_full_v5.yaml --step1-only
+# v7 训练（~8 小时，M3 Pro MPS）
+external/chronos-forecasting/.venv/bin/python \
+    scripts/decision_aware/train_formal.py \
+    --config configs/decision_aware/formal_ercot_v7.yaml --no-early-stop --no-oracle-train \
+    2>&1 | tee /tmp/v7_train.log
 
-# v5a 完整训练（约 30 分钟）
-caffeinate -d external/timesfm/.venv/bin/python -u \
-    src/fusion_model/run_fusion.py \
-    --config configs/fusion/electfm_ercot_full_v5.yaml \
-    2>&1 | tee run_v5a.log
-
-# V6 完整训练（约 30 分钟）
-caffeinate -d external/timesfm/.venv/bin/python -u \
-    src/fusion_model/run_fusion.py \
-    --config configs/fusion/electfm_ercot_full_v6.yaml \
-    2>&1 | tee run_v6.log
+# 基线对比
+external/chronos-forecasting/.venv/bin/python \
+    scripts/decision_aware/compare_baselines_formal.py \
+    --config configs/decision_aware/formal_ercot_v7.yaml
 ```
 
 ---
 
-## 可用模型（v1.0 回测框架）
+## 旧范式：三阶段消融研究（已归档，结论仍有效）
+
+在切换到 Decision-aware 方向之前，项目经历了"参数消融 → 结构消融 → ElecFM 融合模型"三阶段递进研究，用于回答"时序基础模型在电价预测中哪些组件真正有效"。ElecFM 融合模型本身（冻结零样本骨干 + 挂尖峰检测头）与当前"从零训练 + 业务闭环"范式架构不可调和，代码与实验产物已删除；消融阶段的**结论**被沉淀为文档，仍用于指导当前模型设计。
+
+| 阶段 | 规模 | 核心结论 | 详情文档 |
+|------|------|---------|---------|
+| v1.0 参数消融 | 11 模型 × 5 维度 × 3 窗口 | 协变量加全提升 Spike-F1；720h context 在稳定期最优；单变量已够，跨节点增益有限 | `docs/archive/参数消融汇报材料.md` |
+| v2.0 结构消融 | 36 次组件消融 + 32 次逐层消融 | FFN 是所有模型最关键组件；精度通路与尖峰通路功能分离；TimesFM 40% 层可安全移除 | `docs/archive/结构消融汇报材料.md` |
+| ElecFM 融合模型 | v1→V6 共 9 个版本 | 冻结骨干 + spike head 在消融定位的分叉层接入，可用极少参数（334K）提升尖峰检测；已废弃 | `docs/archive/README.md`（索引） |
+
+```bash
+# 旧范式脚本仍保留，仅供查阅（run_experiment.py 依赖已删除的部分配置，不保证可直接运行）
+external/timesfm/.venv/bin/python src/archive/parameter_ablation/run_ablation.py configs/archive/parameter_ablation/baseline.yaml
+```
+
+---
+
+## 可用模型（预测器层，跨阶段复用）
 
 | 模型 | 类型 | 运行位置 |
-|------|------|---------|
+|------|------|----------|
 | Naive / SeasonalNaive / ETS / Theta | 统计基线 | 进程内 |
 | RandomForest / LightGBM / XGBoost | 树模型 | 进程内（每起报点重训）|
 | TimesFM-2.5（Google）| 时序基础模型 | 独立 venv 子进程 |
@@ -223,45 +151,18 @@ caffeinate -d external/timesfm/.venv/bin/python -u \
 
 ---
 
-## 方法论贡献
-
-### 三步递进关系
-
-```
-参数消融（v1.0）
-  → 确认精度瓶颈在模型内部，不在输入配置
-  
-结构消融（v2.0）
-  → 发现精度通路/尖峰通路功能分离
-  → 定位 TimesFM L7 为纯尖峰检测层
-  → 量化 Chronos 跨变量注意力贡献 (+6.7%)
-
-ElecFM 融合模型（v3.0）
-  → 消融结论→架构决策：spike head 在 L7 分叉
-  → 冻结骨干：SMAPE 保持零样本水平
-  → V6 CrossNodeAttention：实测 +6.7%，与消融预测完全吻合
-```
-
-### 核心工程决策
-
-- **quant_head 永久冻结**：小样本无法维持预训练分位数校准（Coverage 从 0.775 降至 0.582）
-- **骨干完全冻结**：任何骨干权重修改都导致 SMAPE 退化（4 轮实验一致）
-- **spike head 接入 L7**：消融数据直接给出，非拍脑袋
-- **CrossNodeAttention 使用同质节点**：跨价格区间节点混合导致数值不稳定（NaN 实验证实）
-
----
-
 ## 文档导航
 
 | 文档 | 内容 |
 |------|------|
-| `docs/fusion/README.md` | ElecFM 入口 |
-| `docs/fusion/design.md` | 架构设计 + 全版本结果汇总表 |
-| `docs/fusion/experiments.md` | 所有实验的详细记录 |
-| `docs/fusion/implementation.md` | 代码结构与使用指南 |
-| `docs/结构消融汇报材料.md` | v1.0+v2.0+ElecFM 完整研究记录 |
-| `docs/参数消融汇报材料.md` | v1.0 结果与分析 |
-| `CHANGELOG.md` | 版本变更日志 |
+| `docs/todo3.md` | 当前决策清单（Decision-aware 模型搭建）|
+| `docs/todo3_2.md` | v7 改动清单 + 两轮架构缺陷/代码 bug 交叉审查记录 |
+| `docs/正式版实验结果.md` | 正式版 v4~v7 完整实验记录（训练动态、口径说明、下一步计划）|
+| `docs/先行版实验结果.md` / `docs/先行版汇报材料.md` | 先行版验证结果 |
+| `docs/covariate_conclusions.md` | 协变量结论（多模态输入设计依据）|
+| `docs/新闻特征初步汇报材料.md` | LLM 新闻特征提取（Event Encoder 可选输入）|
+| `docs/team_notes/w8/研究方案_Decision-aware_多模态TSFM.md`、`w9/模型相关.md` | 方向切换的研究方案原始记录 |
+| `docs/archive/README.md` | 旧范式文档归档索引 |
 
 ---
 
@@ -269,8 +170,9 @@ ElecFM 融合模型（v3.0）
 
 - **基础模型 venv 独立**：TimesFM / Chronos / Toto 依赖冲突，各自使用 `external/<model>/.venv`，不要在主环境 import
 - **数据范围**：ERCOT 实时电价 2025-01-01 ~ 2026-06-02，约 17 个月
-- **测试隔离**：W1/W2/W3 测试窗口及前 168h buffer 已严格排除于训练集之外
+- **测试隔离**：W1（稳定期）/W2（负电价）/W3（极端尖峰）测试窗口及前 168h buffer 已严格排除于训练集之外
 - **运行目录**：所有脚本从项目根目录运行
+- **checkpoint 与日志不入库**：`data/checkpoints/`、`logs/` 均已 gitignore，为本地训练产物，清理前如需保留请自行备份
 
 ---
 
@@ -279,4 +181,4 @@ ElecFM 融合模型（v3.0）
 - TimesFM: https://github.com/google-research/timesfm
 - Chronos: https://github.com/amazon-science/chronos-forecasting
 - Toto / Toto-2.0: https://github.com/DataDog/toto
-- 详细方法论见 `docs/specs/experiment_manual_v2.md` 与 `docs/结构消融汇报材料.md`
+- 详细方法论见 `docs/specs/experiment_manual_v2.md` 与 `docs/archive/结构消融汇报材料.md`

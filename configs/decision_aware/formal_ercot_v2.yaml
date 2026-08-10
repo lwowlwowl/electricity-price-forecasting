@@ -1,0 +1,75 @@
+# 正式版 v2 — 修复 pred_scale/proxy_scale 尺度不匹配
+# v1 问题: pred_scale=400 把 Huber 梯度压没(梯度~0.0025), 模型 8 epoch 没学动
+# v2 修复: pred_scale=25(和 MAE 同尺度), proxy_scale=80(让 L_proxy 和 L_pred 同量级)
+#          先 5 epoch 纯预测预训练(β=0), 再 15 epoch 退火
+# 运行: external/chronos-forecasting/.venv/bin/python \
+#         scripts/decision_aware/train_formal.py \
+#         --config configs/decision_aware/formal_ercot_v2.yaml --no-early-stop
+
+market: ERCOT
+node: LZ_LCRA
+freq: 1h
+context_len: 168
+horizon_da: 24
+horizon_rt: 6
+train_stride: 1
+eval_stride: 24
+
+data_version: v3
+use_dual_settlement: true
+
+# 模型
+d_model: 256
+n_heads_enc: 4
+n_heads_fusion: 1
+dim_ff: 1024
+dropout: 0.1
+use_rope: true
+
+# BESS
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_init_soc_frac: 0.5
+bess_kappa: 27.0
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+
+# 策略
+policy_type: hard_topk
+oracle_type: lp
+topk_k_charge: 4
+topk_k_discharge: 4
+ste_k: 5.0
+
+# 零阶梯度
+zo_rho: 0.05
+zo_K: 2
+zo_sigma: 0.0
+proxy_scale: 80.0              # v1=1.0(L_proxy~60 >> L_pred~1.4), v2=80(让两者同量级)
+
+# 损失 / 退火 — v2 核心修复
+alpha0: 1.0
+beta0: 0.0
+alpha_end: 0.0
+beta_end: 1.0
+pretrain_epochs: 5             # v2新增: 前5epoch纯预测(β=0), 让模型先学会预测
+anneal_epochs: 15              # 退火跨15epoch(5→20), 比v1的10更慢
+huber_delta: 1.0
+pred_scale: 25.0               # v1=400(梯度被压没), v2=25(和MAE同尺度, 梯度~0.04)
+bus_scale: 400.0
+pred_clamp: [-500.0, 10000.0]
+
+# 训练
+lr: 1.0e-3
+weight_decay: 0.01
+batch_size: 64
+epochs: 20                     # 5预训练+15退火=20
+grad_clip: 1.0
+early_stop_patience: 5
+use_amp: true
+monitor: regret
+num_workers: 0
+
+checkpoint_dir: data/checkpoints/da_tsfm_formal_v2
+seed: 0

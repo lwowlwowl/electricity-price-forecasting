@@ -60,6 +60,9 @@ class DecisionAwareDatasetV3(Dataset):
         self.split = split
         self.context_len = cfg.context_len
         self.horizon = cfg.horizon_da
+        # w10 §2: dual_split 模式下 target 窗口为 48h（交易日+后一日）
+        self.use_dual_split = getattr(cfg, "use_dual_split", False)
+        self.horizon_tgt = cfg.horizon_da * 2 if self.use_dual_split else cfg.horizon_da
 
         df = wide_df.sort_index()
         if df.index.tz is None:
@@ -104,9 +107,9 @@ class DecisionAwareDatasetV3(Dataset):
         n = len(self.price_da)
         stride = stride or (cfg.train_stride if split == "train" else cfg.eval_stride)
         self.valid_starts: List[int] = []
-        for i in range(0, n - self.context_len - self.horizon + 1, stride):
+        for i in range(0, n - self.context_len - self.horizon_tgt + 1, stride):
             tgt_start = self.index[i + self.context_len]
-            tgt_end = self.index[i + self.context_len + self.horizon - 1]
+            tgt_end = self.index[i + self.context_len + self.horizon_tgt - 1]
             if tgt_start >= split_lo and tgt_end <= split_hi:
                 self.valid_starts.append(i)
 
@@ -119,7 +122,7 @@ class DecisionAwareDatasetV3(Dataset):
     def __getitem__(self, idx):
         i = self.valid_starts[idx]
         c_lo, c_hi = i, i + self.context_len
-        t_lo, t_hi = c_hi, c_hi + self.horizon
+        t_lo, t_hi = c_hi, c_hi + self.horizon_tgt
 
         da_st = self.norm_stats["price_da"]
         rt_st = self.norm_stats["price_rt"]

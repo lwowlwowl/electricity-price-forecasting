@@ -1,0 +1,70 @@
+# 正式版 v5 — DA/RT 分离决策（w10 §4.3）
+# v4 基础上 + use_dual_split: true
+# 改动: uDA 由 p̂DA 的 TopK 决定，uRT 由真实 RT 价的 TopK 决定（实时纠偏）
+#        R = pDA·uDA + pRT·Δu − κ|uRT|（真双结算，RT 腿不再为零）
+# 运行: external/chronos-forecasting/.venv/bin/python \
+#         scripts/decision_aware/train_formal.py \
+#         --config configs/decision_aware/formal_ercot_v5.yaml --no-early-stop --no-oracle-train
+
+market: ERCOT
+node: LZ_LCRA
+freq: 1h
+context_len: 168
+horizon_da: 24
+horizon_rt: 6
+train_stride: 1
+eval_stride: 24
+
+data_version: v3
+use_dual_settlement: true
+use_dual_split: true             # v5 新增: DA/RT 分离决策
+
+d_model: 256
+n_heads_enc: 4
+n_heads_fusion: 1
+dim_ff: 1024
+dropout: 0.1
+use_rope: true
+
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_init_soc_frac: 0.5
+bess_kappa: 27.0
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+
+policy_type: hard_topk
+oracle_type: lp
+topk_k_charge: 4
+topk_k_discharge: 4
+ste_k: 5.0
+
+zo_rho: 0.05
+zo_K: 2
+zo_sigma: 0.0
+proxy_scale: 80.0
+
+alpha0: 1.0
+beta0: 0.0
+alpha_end: 0.5
+beta_end: 0.5
+pretrain_epochs: 8
+anneal_epochs: 12
+huber_delta: 1.0
+pred_scale: 25.0
+bus_scale: 400.0
+pred_clamp: [-500.0, 10000.0]
+
+lr: 1.0e-3
+weight_decay: 0.01
+batch_size: 64
+epochs: 20
+grad_clip: 1.0
+early_stop_patience: 5
+use_amp: true
+monitor: regret
+num_workers: 0
+
+checkpoint_dir: data/checkpoints/da_tsfm_formal_v5
+seed: 0
