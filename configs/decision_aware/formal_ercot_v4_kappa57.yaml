@@ -1,0 +1,85 @@
+# 正式版 v4-kappa57 — 单变量对照实验：只把退化成本 κ 改对，其他一律不动
+#
+# 目的（W11 纪要 §6.2 / §十 首要待办）：
+#   会上认定「亏损 19」的头号嫌疑是退化成本用错了——
+#     旧值 27 USD/MWh ≈ 189 元/MWh
+#     正确 0.4 元/Wh ÷ 10000 次 = 40 元/MWh ≈ 5.7 USD/MWh
+#     高估 4.7 倍，足以吞掉全部套利空间
+#   本配置用来回答一个问题：κ 改对之后，收益能不能转正？
+#
+# 与 formal_ercot_v4.yaml 的唯一差别：
+#   bess_kappa: 27.0 → 5.7
+#   checkpoint_dir  （避免覆盖 v4 结果）
+#   其余每一项逐字保持一致 —— 这样跑出来的差异只可能来自 κ。
+#
+# 为什么拿 v4 当底座而不是 v8：
+#   v4 是纯日前（无 use_dual_split、无偏差罚金、无 RT 滚动预测），
+#   符合 W11 §1「只做日前，不做实时」的范围收敛。
+#   v8 把 κ 修复和双结算改造混在了一起，跑出来无法归因。
+#
+# 运行: external/chronos-forecasting/.venv/bin/python \
+#         scripts/decision_aware/train_formal.py \
+#         --config configs/decision_aware/formal_ercot_v4_kappa57.yaml \
+#         --no-early-stop --no-oracle-train
+
+market: ERCOT
+node: LZ_LCRA
+freq: 1h
+context_len: 168
+horizon_da: 24
+horizon_rt: 6
+train_stride: 1
+eval_stride: 24
+
+data_version: v3
+use_dual_settlement: true
+
+d_model: 256
+n_heads_enc: 4
+n_heads_fusion: 1
+dim_ff: 1024
+dropout: 0.1
+use_rope: true
+
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_init_soc_frac: 0.5
+bess_kappa: 5.7             # ← 唯一的实验变量（v4=27.0）。W11 §6.2 电芯口径 40 元/MWh
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+
+policy_type: hard_topk
+oracle_type: lp
+topk_k_charge: 4
+topk_k_discharge: 4
+ste_k: 5.0
+
+zo_rho: 0.05
+zo_K: 2
+zo_sigma: 0.0
+proxy_scale: 80.0
+
+alpha0: 1.0
+beta0: 0.0
+alpha_end: 0.5
+beta_end: 0.5
+pretrain_epochs: 8
+anneal_epochs: 12
+huber_delta: 1.0
+pred_scale: 25.0
+bus_scale: 400.0
+pred_clamp: [-500.0, 10000.0]
+
+lr: 1.0e-3
+weight_decay: 0.01
+batch_size: 64
+epochs: 20
+grad_clip: 1.0
+early_stop_patience: 5
+use_amp: true
+monitor: regret
+num_workers: 0
+
+checkpoint_dir: data/checkpoints/da_tsfm_formal_v4_kappa57
+seed: 0

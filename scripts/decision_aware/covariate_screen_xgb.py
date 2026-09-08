@@ -38,17 +38,18 @@ CONTEXT = 168     # 7 天历史上下文（lag 特征）
 
 def load_merged_data():
     """合并统一表 + model_ready 协变量，返回 2025-2026 重叠段 DataFrame。"""
-    # 统一表
-    df = pd.read_csv("data/raw/ERCOT/processed/ercot_unified_hourly_2020_2026.csv")
-    df = df[df["节点/地区"] == "LZ_LCRA"].copy()
-    df["ts"] = pd.to_datetime(df["UTC时间"], utc=True)
+    # 统一表（从 data/unified/ 读取 parquet）
+    df = pd.read_parquet("data/unified/ERCOT_统一小时数据_20200101_20260601.parquet")
+    df = df[df["node"] == "LZ_LCRA"].copy()
+    df["ts"] = pd.to_datetime(df["timestamp_utc"], utc=True)
     df = df.set_index("ts").sort_index()
     out = pd.DataFrame({
-        "price_da": df["日前价格 (USD/MWh)"].astype(float),
-        "price_rt": df["实时价格 (USD/MWh)"].astype(float),
-        "load": df["实际负荷 (MW)"].astype(float),
-        "wind": df["风电实际 (MW)"].astype(float),
-        "solar": df["光伏实际 (MW)"].astype(float),
+        "price_da": df["day_ahead_price_usd_mwh"].astype(float),
+        "price_rt": df["real_time_price_usd_mwh"].astype(float),
+        "load": df["actual_load_mw"].astype(float),
+        "wind": df["wind_actual_mw"].astype(float),
+        "solar": df["solar_actual_mw"].astype(float),
+        "temperature": df["actual_temperature_2m_c"].astype(float),  # 天气已内嵌
     })
     idx = out.index
     out["hour_sin"] = np.sin(2 * np.pi * idx.hour / 24)
@@ -56,7 +57,7 @@ def load_merged_data():
     out["dow_sin"] = np.sin(2 * np.pi * idx.dayofweek / 7)
     out["dow_cos"] = np.cos(2 * np.pi * idx.dayofweek / 7)
     out["is_weekend"] = (idx.dayofweek >= 5).astype(float)
-    out["is_holiday"] = df["是否节假日"].astype(float).values
+    out["is_holiday"] = df["is_holiday"].astype(float).values
 
     # model_ready 协变量
     mr = pd.read_csv("data/covariates/model_ready/ercot_features_forecast_hourly.csv")

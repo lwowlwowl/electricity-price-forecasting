@@ -1,0 +1,92 @@
+# 正式版 v4-kappa57-fast — κ 单变量对照实验的「快速版」
+#
+# 目的（W11 §6.2）：只回答一个问题——退化成本 κ 改对之后，收益能不能转正？
+#   旧值 27 USD/MWh ≈ 189 元/MWh（会上认定高估 4.7 倍，疑为「亏损 19」根因）
+#   正确 0.4 元/Wh ÷ 10000 次 = 40 元/MWh ≈ 5.7 USD/MWh
+#   价差门控阈值 κ/η 随之从 28.42 → 6.00 $/MWh
+#
+# 与 formal_ercot_v4.yaml 的差异（共 5 项，其中只有 bess_kappa 是实验变量）：
+#   bess_kappa      27.0 → 5.7     ← 唯一的实验变量
+#   train_stride    1    → 6       ← 提速：相邻窗口 168h 历史重叠 167h，冗余极高
+#   epochs          20   → 11      ← 提速：4 轮预训练 + 6 轮退火 + 第 11 轮 β 打满
+#   pretrain_epochs 8    → 4
+#   anneal_epochs   12   → 6
+#
+# 为什么 epochs=11 而不是 10：
+#   anneal_alpha_beta 的 frac = (epoch - pretrain) / anneal_epochs。
+#   epochs=10 时最后一轮 frac=5/6 → β 只到 0.42，永远摸不到 beta_end=0.5。
+#   epochs=11 时 epoch10 的 frac=1.0 → β=0.5 打满，才算真正测到了决策损失。
+#
+# 预计耗时：约 1.5 小时（完整版 train_stride=1 + 20 epoch 需 ~19 小时）
+#   实测本机 MPS：训练步 1.81 s/batch + 零阶 4 次扰动前向 0.78 s ≈ 4.9 s/batch
+#   stride=6 后每 epoch 约 114 batch（原 681）
+#
+# 注意：这是「看正负翻转」的粗粒度实验，不是最终成绩。
+#   若收益转正，再用 formal_ercot_v4_kappa57.yaml（完整设置）跑一次拿正式数字。
+#
+# 运行: external/chronos-forecasting/.venv/bin/python \
+#         scripts/decision_aware/train_formal.py \
+#         --config configs/decision_aware/formal_ercot_v4_kappa57_fast.yaml \
+#         --no-early-stop --no-oracle-train
+
+market: ERCOT
+node: LZ_LCRA
+freq: 1h
+context_len: 168
+horizon_da: 24
+horizon_rt: 6
+train_stride: 6             # 提速（v4=1）
+eval_stride: 24
+
+data_version: v3
+use_dual_settlement: true
+
+d_model: 256
+n_heads_enc: 4
+n_heads_fusion: 1
+dim_ff: 1024
+dropout: 0.1
+use_rope: true
+
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_kappa: 5.7             # ← 实验变量（v4=27.0）。W11 §6.2 电芯口径 40 元/MWh
+bess_init_soc_frac: 0.5
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+
+policy_type: hard_topk
+oracle_type: lp
+topk_k_charge: 4
+topk_k_discharge: 4
+ste_k: 5.0
+
+zo_rho: 0.05
+zo_K: 2
+zo_sigma: 0.0
+proxy_scale: 80.0
+
+alpha0: 1.0
+beta0: 0.0
+alpha_end: 0.5
+beta_end: 0.5
+pretrain_epochs: 4          # 提速（v4=8）
+anneal_epochs: 6            # 提速（v4=12）
+huber_delta: 1.0
+pred_scale: 25.0
+bus_scale: 400.0
+pred_clamp: [-500.0, 10000.0]
+
+lr: 1.0e-3
+weight_decay: 0.01
+batch_size: 64
+epochs: 11                  # 4 预训练 + 6 退火 + 1 轮 β 打满（v4=20）
+grad_clip: 1.0
+early_stop_patience: 5
+use_amp: true
+monitor: regret
+num_workers: 0
+
+checkpoint_dir: data/checkpoints/da_tsfm_formal_v4_kappa57_fast
+seed: 0

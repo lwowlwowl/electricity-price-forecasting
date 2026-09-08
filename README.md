@@ -65,7 +65,9 @@ school/
 │   ├── todo3.md / todo3_2.md          # 当前决策清单（模型搭建 + v7 改动清单 + 架构/bug 审查记录）
 │   ├── 正式版实验结果.md               # 正式版 v4~v7 完整实验记录（本 README 摘要来源）
 │   ├── 先行版实验结果.md / 先行版汇报材料.md
-│   ├── model_architecture_v2/v3.drawio  # 架构图
+│   ├── model_architecture.drawio      # 正式版 (v8) 架构图（由根目录 gen_arch.py 生成）
+│   ├── training_loop.drawio           # 正式版 (v8) 训练回路图（由根目录 gen_train.py 生成）
+│   ├── model_architecture_v2.drawio   # 先行版架构图（历史版本，保留）
 │   ├── covariate_conclusions.md       # 协变量结论（多模态输入设计依据）
 │   ├── specs/                         # 实验方法论手册
 │   ├── concepts/                      # 概念说明（起报点与滚动回测等）
@@ -75,10 +77,10 @@ school/
 │
 ├── data/
 │   ├── raw/                           # 原始数据源（EIA/ERCOT/NYISO/PJM/CAISO/weather，不入库）
+│   ├── unified/                       # 统一小时数据表（4 ISO × parquet+xlsx，含市场+天气，31列）
 │   ├── covariates/                    # 协变量派生数据（gas/oil/steel/storm/news/generation_mix）
 │   ├── results/                       # 实验输出（parameter_ablation/structural_ablation 为旧范式产物）
-│   ├── checkpoints/                   # 训练 checkpoint（不入库，本地产物）
-│   └── market_hourly.parquet          # 主数据表
+│   └── checkpoints/                   # 训练 checkpoint（不入库，本地产物）
 │
 └── external/                          # 三个基础模型，各含独立 .venv
     ├── timesfm/                        # TimesFM-2.5（Google）

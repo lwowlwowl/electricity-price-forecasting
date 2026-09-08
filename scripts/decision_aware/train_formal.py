@@ -159,11 +159,24 @@ def main():
               f"| α={alpha:.2f} β={beta:.2f} | {el:.0f}s")
 
         monitor = va["regret"] if cfg.monitor == "regret" else va.get("mae", float("inf"))
-        if monitor < best_val:
+        # 退火起点：保存 pretrain 末 ckpt 作 β=0 消融，重置 best/patience。
+        # 排除 pretrain 参选——v7 曾选到 epoch 2（β=0、未学决策）的模型，
+        # 竞选改为从退火重新开始，pretrain 期间不累计 patience（防误触 early-stop）。
+        if epoch == cfg.pretrain_epochs:
+            if cfg.pretrain_epochs > 0:
+                abl_path = cfg.checkpoint_path("pretrain")
+                model.save(abl_path)
+                print(f"  pretrain 末 → β=0 消融 ckpt: {abl_path}")
+            best_val, patience = float("inf"), 0
+        # 用 beta!=0 而非 epoch>=pretrain：anneal_alpha_beta 在 epoch==pretrain_epochs
+        # 时 frac=0 → beta 仍为 0.0（边界轮仍是纯预测），epoch 判据会把这轮误纳入
+        # 竞选、重蹈 v7 覆辙（best 选到 β=0 模型）。beta!=0 才是"真正在学决策"的判据。
+        in_anneal = beta != 0
+        if in_anneal and monitor < best_val:
             best_val = monitor
             patience = 0
             model.save(best_path)
-        else:
+        elif in_anneal:
             patience += 1
             if patience >= cfg.early_stop_patience:
                 print(f"  early stop @ epoch {epoch+1}")

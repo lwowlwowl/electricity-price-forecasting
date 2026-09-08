@@ -92,23 +92,29 @@ class TransformerBlock(nn.Module):
         return x
 
 
-# ── 跨模态融合：concat N 流 token → 1 层 TransformerBlock（多头，无 RoPE）──────
+# ── 跨模态融合：concat N 流 token → n_layers 层 TransformerBlock（多头，无 RoPE）──
 # A1: 融合层关 RoPE —— 流间 token 的「物理时刻」对齐靠同时间步跨流注意力，
 #     RoPE 会给「位置相近=同流」的错误先验，抑制跨模态注意力。
 # A2: modality embedding 在 DecisionAwareTSFM.forward 里加（见下）。
 # C3: 去掉冗余输入 LayerNorm —— 各 StreamEncoder 出口已有 final_norm，
 #     且 TransformerBlock 内部 pre-LN(n1) 会再归一化，连续三次 LN 多余。
 class CrossModalFusion(nn.Module):
-    def __init__(self, d_model: int, n_heads: int, dim_ff: int, dropout: float):
+    def __init__(self, d_model: int, n_heads: int, dim_ff: int, dropout: float, n_layers: int = 1):
         super().__init__()
         # A1: use_rope=False（融合层不做位置旋转）
         # C3: 无 self.norm，直接进 block（block 内 n1 归一化）
-        self.block = TransformerBlock(d_model, n_heads, dim_ff, dropout, use_rope=False)
+        # 融合层可配多层（n_layers_fusion，v8 设 2；原硬编码 1 层被指"多源数据处理太薄"）
+        self.blocks = nn.ModuleList([
+            TransformerBlock(d_model, n_heads, dim_ff, dropout, use_rope=False)
+            for _ in range(max(1, n_layers))
+        ])
         self.final_norm = nn.LayerNorm(d_model)   # N1: pre-LN 栈出口 final norm
 
     def forward(self, tokens: torch.Tensor) -> torch.Tensor:
         # tokens: [B, N*T, d] → 全跨模态自注意力（覆盖 Weather→Load/Load→Price/... 所有对）
-        return self.final_norm(self.block(tokens))
+        for blk in self.blocks:
+            tokens = blk(tokens)
+        return self.final_norm(tokens)
 
 
 # ── Query Decoder：N learnable queries + query self-attn + cross-attn + FFN ────
@@ -230,7 +236,7 @@ class DecisionAwareTSFM(nn.Module):
             self.enc_price_rt  = StreamEncoder(1, d, "transformer", he, ff, dp, cfg.use_rope, n_layers)
             self.enc_load      = StreamEncoder(1, d, "transformer", he, ff, dp, cfg.use_rope, n_layers)
             self.enc_system    = StreamEncoder(2, d, "transformer", he, ff, dp, cfg.use_rope, n_layers)
-            self.enc_calendar  = StreamEncoder(6, d, "mlp",        he, ff, dp)
+            self.enc_calendar  = StreamEncoder(8, d, "mlp",        he, ff, dp)
             self.n_streams = 5  # DA + RT + Load + System + Calendar
         else:
             # v1/v2: 6 流（Price / Load / Weather / System / Econ / Calendar）
@@ -247,7 +253,9 @@ class DecisionAwareTSFM(nn.Module):
         self.modality_emb = nn.Parameter(torch.randn(self.n_streams, d) * 0.02)
 
         # C1: 融合层多头（n_heads_fusion 默认已改 4）
-        self.fusion = CrossModalFusion(d, hf, ff, dp)
+        # 融合层数（默认 1，v8 设 2；原 1 层被指"多源数据处理太薄"）
+        n_layers_f = getattr(cfg, "n_layers_fusion", 1)
+        self.fusion = CrossModalFusion(d, hf, ff, dp, n_layers_f)
 
         # w10 §2: 日前联合预测 48h，输出 pDA + pRT|DA 两条曲线
         # use_dual_split 模式下用 48 queries + 双输出 head

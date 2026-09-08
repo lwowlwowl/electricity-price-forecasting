@@ -37,15 +37,17 @@ horizon_rt: 4               # w10 §2: 实时滚动 H=4
 train_stride: 1
 eval_stride: 24
 
-data_version: v3
+data_version: v3              # 日历流：本地 hour/dow/month 的 sin/cos + weekend/holiday，共 8 维
 use_dual_settlement: true
 use_dual_split: true             # DA/RT 分离决策
 use_deviation_penalty: true      # 偏差罚金（§5.1）
+val_stride: 6                    # val 加密 4 个/天（179→724），止住 regret 摇号；test 仍用 eval_stride=24 保独立窗口
 
 d_model: 256
 n_heads_enc: 4
 n_heads_fusion: 4              # C1: 融合层多头
 n_layers_enc: 2                # B1: 编码器 2 层
+n_layers_fusion: 2             # 融合层 2 层（原 1 层被指"多源数据处理太薄"，W11 §2.1）
 dim_ff: 1024
 dropout: 0.1
 use_rope: true
@@ -54,7 +56,7 @@ bess_power_mw: 1.0
 bess_energy_mwh: 4.0
 bess_eta: 0.95
 bess_init_soc_frac: 0.5
-bess_kappa: 27.0
+bess_kappa: 5.7                 # W11 纪要 §6.2：电芯 0.4元/Wh ÷ 10000次 = 40元/MWh ≈ 5.7 USD/MWh（原 27 高估 4.7×，疑为亏损 19 根因）
 bess_soc_min: 0.4
 bess_soc_max: 3.6
 bess_e_cyc: 4.0                  # w10 §4.2 每日放电上限

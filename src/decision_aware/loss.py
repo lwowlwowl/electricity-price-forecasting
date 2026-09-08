@@ -159,7 +159,21 @@ def total_loss_zo(
     da_tgt_24 = price_da_tgt[:, :H_action]
     rt_tgt_24 = price_rt_tgt[:, :H_action]
 
-    if use_dual_split:
+    # _make_u_rt 提到守卫外：β=0 时跳过 ZO 块，但下方 metrics 仍要算 R_model（需 _make_u_rt）
+    def _make_u_rt(u_da_24_cur, p_rt_signal):
+        """构造 uRT：plan_track 时先跟 uDA，否则纯 TopK。"""
+        u_rt_topk = policy_hard(p_rt_signal)
+        if use_dev_penalty:   # 偏差罚金启用 → 计划跟踪优先（w10 §4.3）
+            return plan_track_override(u_da_24_cur, u_rt_topk)
+        return u_rt_topk
+
+    if beta == 0:
+        # β=0（pretrain）→ L_proxy 项在 total = α·l_pred + β·l_proxy 中被乘 0 丢掉，
+        # 跳过 6× BESS 仿真（省 pretrain 大头时间）。数值等价：β·l_proxy=0、梯度=0，
+        # 对参数更新无影响。l_proxy/g_norm 占位供下方 metrics 日志，避免 NameError。
+        l_proxy = torch.zeros((), device=p_da.device)
+        g_norm = 0.0
+    elif use_dual_split:
         # ── 双结算零阶梯度（w10 §6.1+§5+§4.1）──────────────────────────────
         # uDA 由价差 d̂=p̂DA−p̂RT|DA 决定（§4.1），uRT 由 p̂RT 决定。
         # 扰动某条曲线时其余保持不变（§6.2），收益用 forward_dual。
@@ -179,13 +193,6 @@ def total_loss_zo(
         p_rt_24 = p_rt_24_orig.detach()                                # 闭包用
         da_tgt_48 = price_da_tgt[:, :H_da]                              # [B, 48]
         rt_tgt_48 = price_rt_tgt[:, :H_da]                              # [B, 48]
-
-        def _make_u_rt(u_da_24_cur, p_rt_signal):
-            """构造 uRT：plan_track 时先跟 uDA，否则纯 TopK。"""
-            u_rt_topk = policy_hard(p_rt_signal)
-            if use_dev_penalty:   # 偏差罚金启用 → 计划跟踪优先（w10 §4.3）
-                return plan_track_override(u_da_24_cur, u_rt_topk)
-            return u_rt_topk
 
         u_da_48_fixed = policy_hard(p_da_full_d - p_rt_da_full)         # [B, 48]
         u_da_24_fixed = u_da_48_fixed[:, :H_action]

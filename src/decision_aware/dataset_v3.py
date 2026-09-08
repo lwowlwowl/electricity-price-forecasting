@@ -1,11 +1,13 @@
 """dataset_v3.py — v3 数据集（6.5年 ERCOT 统一表，DA+RT 双价，真节假日）.
 
 与 dataset.py 区别：
-- 读 ercot_unified_hourly_2020_2026.csv（loader_v2.py）
-- 4 流：Price(DA+RT)/Load/System(wind,solar)/Calendar(hour,dow,weekend,holiday)
+- 读 data/unified/ERCOT_统一小时数据_20200101_20260601.parquet（loader_v2.py）
+- 当前实际输入为 5 流：DA price / RT price / Load / System(wind,solar) / Calendar
 - 返回 price_da + price_rt 两条目标（真双结算）
 - 真节假日 is_holiday（不再用 is_weekend 代理）
 - 归一化 stats 按 train 段算
+
+统一表虽含实际天气与 t+24 天气预报，但本 Dataset 尚未把它们作为模型输入。
 """
 from __future__ import annotations
 
@@ -35,7 +37,7 @@ STREAMS_V3 = {
     "price": [],     # price_da, price_rt 特殊处理（目标，不进 encoder 而是作为 target）
     "load":   ["load"],
     "system": ["wind", "solar"],
-    "cal":    ["hour_sin", "hour_cos", "dow_sin", "dow_cos", "is_weekend", "is_holiday"],
+    "cal":    ["hour_sin", "hour_cos", "dow_sin", "dow_cos", "month_sin", "month_cos", "is_weekend", "is_holiday"],
 }
 
 
@@ -50,7 +52,7 @@ class DecisionAwareDatasetV3(Dataset):
       price_da_mean/std, price_rt_mean/std : float（反归一化用）
       load_ctx      : [context_len, 1]
       system_ctx    : [context_len, 2]
-      cal_ctx       : [context_len, 6]
+      cal_ctx       : [context_len, 8]（本地时钟的 hour/dow/month 循环编码 + 周末/节假日）
     """
 
     def __init__(self, wide_df: pd.DataFrame, cfg: PilotConfig, split: str,
@@ -150,7 +152,7 @@ def build_datasets_v3(cfg: PilotConfig):
 
     train_ds = DecisionAwareDatasetV3(wide_df, cfg, split="train", stride=cfg.train_stride)
     stats = train_ds.norm_stats
-    val_ds = DecisionAwareDatasetV3(wide_df, cfg, split="val", norm_stats=stats, stride=cfg.eval_stride)
+    val_ds = DecisionAwareDatasetV3(wide_df, cfg, split="val", norm_stats=stats, stride=cfg.val_stride)
     test_ds = DecisionAwareDatasetV3(wide_df, cfg, split="test", norm_stats=stats, stride=cfg.eval_stride)
     print(f"  [data v3] train={len(train_ds)}  val={len(val_ds)}  test={len(test_ds)}")
     print(f"  [data v3] DA price train mean={stats['price_da']['mean']:.2f} std={stats['price_da']['std']:.2f}")

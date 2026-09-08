@@ -21,15 +21,16 @@ STREAM_COLS_V12 = {
 }
 ALL_COVARIATES_V12 = sum(STREAM_COLS_V12.values(), [])
 
-# ── v3 新协变量列分组（6.5年统一表，含 DA+RT+load+wind+solar+holiday）─────
+# ── v3 当前启用协变量列（6.5年统一表）─────────────────────────────────────
+# 统一表还提供实际天气和 t+24 天气预报；当前 v8 尚未将天气接入 Dataset/Model，
+# 不能据此声称 v8 已使用 Xweather。DA-only 设计时须先定义预报发布时间与目标时点映射。
 STREAM_COLS_V3 = {
     "load":    ["load"],
-    "system":  ["wind", "solar"],       # 风光出力
-    # weather/econ 在 v3 统一表里没有，后续可从 model_ready 合并
+    "system":  ["wind", "solar"],       # 市场级实际风光出力
 }
 STREAM_COLS_V3_ALL = ["price_da", "price_rt", "load", "wind", "solar",
                       "hour_sin", "hour_cos", "dow_sin", "dow_cos",
-                      "is_weekend", "is_holiday"]
+                      "month_sin", "month_cos", "is_weekend", "is_holiday"]
 
 
 # ── 时间划分 ────────────────────────────────────────────────────────────────
@@ -60,7 +61,8 @@ class PilotConfig:
     horizon_da: int = 24
     horizon_rt: int = 4            # w10 §2: 实时滚动预测 H=4
     train_stride: int = 1
-    eval_stride: int = 24
+    eval_stride: int = 24           # test 用（保持独立日窗口，DM/GW 检验 i.i.d. 前提）
+    val_stride: int = 24            # val 用（v8 设 6 加密止住 regret 摇号；默认 24 向后兼容）
 
     # ── 数据版本（v12=旧17月单RT，v3=新6.5年DA+RT）─────────────────────────
     data_version: str = "v3"
@@ -73,6 +75,7 @@ class PilotConfig:
     n_heads_enc: int = 4
     n_heads_fusion: int = 4          # C1: 融合层多头（原 1，跨模态融合最该用多头）
     n_layers_enc: int = 1            # B1: 编码器层数（v7 设 2；原硬编码 1）
+    n_layers_fusion: int = 1         # 融合层数（v8 设 2；原硬编码 1，被指多源数据处理太薄）
     dim_ff: int = 1024               # v3 放大（v1/v2=512）
     dropout: float = 0.1
     use_rope: bool = True

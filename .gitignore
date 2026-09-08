@@ -63,6 +63,10 @@ data/covariates/**
 !data/covariates/experiment.md
 !data/covariates/README.md
 
+# 统一小时数据表（ERCOT/PJM/CAISO/NYISO，xlsx 40~121MB 超出 GitHub 限制，
+# parquet 10~41MB 也不适合入库；loader_v2.py 本地读取 data/unified/）
+data/unified/
+
 # 处理后的数据（可重新生成）
 data/processed/*.csv
 
