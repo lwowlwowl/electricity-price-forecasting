@@ -17,9 +17,9 @@ import sys
 # 指向本地权重缓存，禁止联网
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "..", ".."))
-os.environ.setdefault("HF_HOME", os.path.join(ROOT, "hf_cache"))
-os.environ.setdefault("HF_HUB_OFFLINE", "1")
-os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+from runtime_env import configure_runtime_environment
+
+configure_runtime_environment(ROOT, "timesfm")
 
 import numpy as np
 

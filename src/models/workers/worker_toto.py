@@ -1,6 +1,6 @@
 """
-Toto worker（运行在 external/toto/.venv）
-==========================================
+Toto worker（运行在 external/toto/.venv；Windows 下解释器位于 Scripts/python.exe）
+================================================================================
 读取 request.npz，加载一次 Toto-1.0，批量预测所有任务，写回 response.npz。
 协议见同目录 README.md。
 
@@ -19,11 +19,11 @@ import sys
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "..", ".."))
-os.environ.setdefault("HF_HOME", os.path.join(ROOT, "hf_cache"))
-os.environ.setdefault("HF_HUB_OFFLINE", "1")
-os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+from runtime_env import configure_runtime_environment
 
-# toto 包以源码树形式存在于 external/toto/toto，未 pip 安装；把仓库根加入路径
+configure_runtime_environment(ROOT, "toto")
+
+# 优先使用 external/toto/toto 的本地源码树，避免导入到其他同名包。
 TOTO_REPO = os.path.join(ROOT, "external", "toto")
 if TOTO_REPO not in sys.path:
     sys.path.insert(0, TOTO_REPO)

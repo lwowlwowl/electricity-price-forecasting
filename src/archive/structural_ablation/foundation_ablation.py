@@ -32,7 +32,7 @@ import pandas as pd
 
 # ── 路径常量 ────────────────────────────────────────────────────────────────
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-SRC_DIR = os.path.dirname(SCRIPT_DIR)
+SRC_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, "..", ".."))
 ROOT = os.path.dirname(SRC_DIR)
 
 # 添加原 models 目录以导入 base
@@ -42,11 +42,18 @@ from base import Forecaster, Forecast  # noqa: E402
 # 消融 worker 脚本位置
 ABLATION_WORKERS_DIR = os.path.join(SCRIPT_DIR, "workers")
 
+def _venv_python(repo_dir: str, venv_name: str = ".venv") -> str:
+    if os.name == "nt":
+        return os.path.join(
+            ROOT, "external", repo_dir, venv_name, "Scripts", "python.exe")
+    return os.path.join(ROOT, "external", repo_dir, venv_name, "bin", "python")
+
+
 # 各模型 venv python
 VENV_PYTHON = {
-    "timesfm":  os.path.join(ROOT, "external", "timesfm", ".venv", "bin", "python"),
-    "chronos2": os.path.join(ROOT, "external", "chronos-forecasting", ".venv", "bin", "python"),
-    "toto2":    os.path.join(ROOT, "external", "toto", ".venv", "bin", "python"),
+    "timesfm":  _venv_python("timesfm"),
+    "chronos2": _venv_python("chronos-forecasting"),
+    "toto2":    _venv_python("toto", ".venv-toto2"),
 }
 
 # 消融 worker 脚本
@@ -114,9 +121,27 @@ def _run_ablation_worker(kind: str, tasks: List[Task], horizon: int,
     np.savez(req_path, **payload)
 
     env = dict(os.environ)
-    env.setdefault("HF_HOME", os.path.join(ROOT, "hf_cache"))
-    env.setdefault("HF_HUB_OFFLINE", "1")
-    env.setdefault("TRANSFORMERS_OFFLINE", "1")
+    hf_home = os.path.join(ROOT, "hf_cache")
+    runtime_dir = os.path.join(ROOT, "temp", "foundation_workers", f"ablation_{kind}")
+    cache_dir = os.path.join(runtime_dir, "cache")
+    os.makedirs(cache_dir, exist_ok=True)
+    env.update({
+        "HF_HOME": hf_home,
+        "HF_HUB_CACHE": os.path.join(hf_home, "hub"),
+        "HF_XET_CACHE": os.path.join(hf_home, "xet"),
+        "HF_ASSETS_CACHE": os.path.join(hf_home, "assets"),
+        "HF_HUB_OFFLINE": "1",
+        "HF_HUB_DISABLE_XET": "1",
+        "HF_HUB_DISABLE_TELEMETRY": "1",
+        "TRANSFORMERS_OFFLINE": "1",
+        "XDG_CACHE_HOME": cache_dir,
+        "TORCH_HOME": os.path.join(cache_dir, "torch"),
+        "TORCHINDUCTOR_CACHE_DIR": os.path.join(cache_dir, "torchinductor"),
+        "TRITON_CACHE_DIR": os.path.join(cache_dir, "triton"),
+        "MPLCONFIGDIR": os.path.join(cache_dir, "matplotlib"),
+        "TEMP": runtime_dir,
+        "TMP": runtime_dir,
+    })
 
     proc = subprocess.run(
         [py, script, req_path, resp_path],

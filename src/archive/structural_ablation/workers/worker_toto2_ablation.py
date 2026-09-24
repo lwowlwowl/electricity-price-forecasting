@@ -17,11 +17,12 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 # structural_ablation/workers/ → structural_ablation/ → src/ → ROOT
 SA_DIR = os.path.dirname(SCRIPT_DIR)
 SRC_DIR = os.path.dirname(SA_DIR)
-ROOT = os.path.dirname(SRC_DIR)
+ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, "..", "..", "..", ".."))
 
-os.environ.setdefault("HF_HOME", os.path.join(ROOT, "hf_cache"))
-os.environ.setdefault("HF_HUB_OFFLINE", "1")
-os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+sys.path.insert(0, os.path.join(ROOT, "src", "models", "workers"))
+from runtime_env import configure_runtime_environment
+
+configure_runtime_environment(ROOT, "ablation_toto2")
 
 # ── 解决 toto-ts editable install 的 finder hook 劫持问题 ───────────────────
 TOTO_REPO = os.path.join(ROOT, "external", "toto")
