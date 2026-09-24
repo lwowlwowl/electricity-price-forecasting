@@ -31,7 +31,7 @@ matplotlib.use("Agg")  # 无显示器环境保存图片
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 
-rcParams["font.family"] = ["PingFang HK", "Arial Unicode MS", "DejaVu Sans"]
+rcParams["font.family"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
 rcParams["axes.unicode_minus"] = False
 
 # 稳定的模型→颜色映射（同一模型在所有图里颜色一致，方便横向比对）

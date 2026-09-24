@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""train_pilot.py — 先行版训练入口.
+"""train_pilot.py — 已归档的先行版训练入口.
 
 用法（用带 torch 的 venv）:
   external/chronos-forecasting/.venv/bin/python \\
@@ -16,7 +16,7 @@ import os
 import sys
 
 # 让 `import decision_aware` 与 `import loader` 都可用
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 sys.path.insert(0, os.path.join(_ROOT, "src"))
 sys.path.insert(0, os.path.join(_ROOT, "src", "data_processing"))
 os.chdir(_ROOT)

@@ -39,7 +39,8 @@ def _make_loaders(cfg: PilotConfig, train_ds, val_ds):
 
 
 def _run_epoch(model, loader, simulator, policy, cfg, device,
-               optimizer=None, alpha=1.0, beta=0.0, amp_ok=False):
+               optimizer=None, alpha=1.0, beta=0.0, amp_ok=False,
+               scaler=None):
     """训练(optimizer!=None) 或评估(optimizer==None) 一个 epoch。返回平均 metrics。"""
     is_train = optimizer is not None
     model.train(is_train)
@@ -57,10 +58,18 @@ def _run_epoch(model, loader, simulator, policy, cfg, device,
                 mae = (out["p_da"] - batch["price_tgt"]).abs().mean()
                 m["mae"] = float(mae.detach().item())
             if is_train:
-                optimizer.zero_grad()
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
-                optimizer.step()
+                optimizer.zero_grad(set_to_none=True)
+                if scaler is not None and scaler.is_enabled():
+                    scaler.scale(loss).backward()
+                    # clip_grad_norm_ 必须看到反缩放后的真实梯度。
+                    scaler.unscale_(optimizer)
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
+                    scaler.step(optimizer)
+                    scaler.update()
+                else:
+                    loss.backward()
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
+                    optimizer.step()
             for k, v in m.items():
                 agg[k] = agg.get(k, 0.0) + v
             n += 1
@@ -84,6 +93,7 @@ def train(model: DecisionAwareTSFM, train_ds, val_ds, cfg: PilotConfig,
     params = [p for p in model.parameters() if p.requires_grad]
     optimizer = torch.optim.AdamW(params, lr=cfg.lr, weight_decay=cfg.weight_decay)
     amp_ok = cfg.use_amp and device.type in ("cuda", "mps")
+    scaler = torch.amp.GradScaler("cuda", enabled=amp_ok and device.type == "cuda")
 
     best_val = float("inf")
     best_path = cfg.checkpoint_path("best")
@@ -94,7 +104,8 @@ def train(model: DecisionAwareTSFM, train_ds, val_ds, cfg: PilotConfig,
         alpha, beta = anneal_alpha_beta(epoch, cfg)
         t0 = time.time()
         tr = _run_epoch(model, train_loader, simulator, policy, cfg, device,
-                        optimizer=optimizer, alpha=alpha, beta=beta, amp_ok=amp_ok)
+                        optimizer=optimizer, alpha=alpha, beta=beta, amp_ok=amp_ok,
+                        scaler=scaler)
         va = _run_epoch(model, val_loader, simulator, policy, cfg, device,
                         optimizer=None, alpha=alpha, beta=beta, amp_ok=amp_ok)
         elapsed = time.time() - t0
@@ -154,13 +165,15 @@ def evaluate(model, test_ds, cfg: PilotConfig, device: torch.device = None,
             out = model(batch)
             preds.append(out["p_da"].cpu().numpy())
             acts.append(batch["price_tgt"].cpu().numpy())
-            from .policy import oracle_revenue, lp_oracle_revenue
+            from .policy import lp_oracle_revenue
             R = simulator(policy(out["p_da"]), batch["price_tgt"])
             R_m.append(R.cpu().numpy())
-            if cfg.oracle_type == "lp":
-                R_s.append(lp_oracle_revenue(batch["price_tgt"], simulator).cpu().numpy())
-            else:
-                R_s.append(oracle_revenue(batch["price_tgt"], simulator).cpu().numpy())
+            if cfg.oracle_type != "lp":
+                raise ValueError(
+                    "Evaluation Regret requires oracle_type='lp'. "
+                    "Report Greedy hindsight baseline separately as R_greedy/gap_to_greedy."
+                )
+            R_s.append(lp_oracle_revenue(batch["price_tgt"], simulator).cpu().numpy())
     preds = np.concatenate(preds); acts = np.concatenate(acts)
     R_m = np.concatenate(R_m); R_s = np.concatenate(R_s)
     mae = float(np.mean(np.abs(preds - acts)))

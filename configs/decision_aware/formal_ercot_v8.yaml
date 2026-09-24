@@ -21,7 +21,7 @@
 #     D4  BESSSimulator 构造补 e_cyc
 #     D6  删 forward_dual 死代码 plan SOC
 #     E1  L_proxy .mean()→sum（DA 项梯度 48× 偏小）
-#     E2  LP Oracle 含偏差罚金（uRT=uDA 最优）
+#     E2  偏差罚金下的 plan_track 受限策略类 LP 参考（非无限制 DA/RT 全局上界）
 #     E3  forward_dual RT 偏差腿用 clipped actual
 # 参数量：4.36M（v7）→ 9.92M（v8）
 # 运行: external/chronos-forecasting/.venv/bin/python \

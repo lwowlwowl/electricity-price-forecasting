@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # ============================================================================
 # 协变量全流程一键复现：下载→清洗→对齐→合并→相关→稳健性→model_ready
-# 用法:  bash scripts/covariates/run_all.sh
+# 用法:  bash scripts/archive/run_all.sh
 #        （或 PY=python3.11 bash ... 指定解释器）
 # 产物:  data/covariates/model_ready/{market}_features_hourly.csv  (喂模型)
 #        data/covariates/analysis/*.csv + analysis/figures/covariates/*.png
 # 需网络: 01(FRED+EIA) 02(FRED WTI) 05(NOAA)；02 的 HRC 需手动放 raw
 # ============================================================================
 set -euo pipefail
-cd "$(dirname "$0")/../.."          # 切到 repo 根 school/
+cd "$(dirname "$0")/../.."          # 切到 repo 根
 PY="${PY:-python3}"
 
 step() { echo; echo "==== [$1] $2 ===="; }

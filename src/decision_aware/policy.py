@@ -10,9 +10,35 @@ LP Oracle 用 scipy（无需 cvxpy/Gurobi），逐样本求解。
 """
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import numpy as np
 import torch
 import torch.nn as nn
+
+
+@dataclass(frozen=True)
+class LPSolveStatus:
+    """One HiGHS solve record exposed for audit/debugging."""
+
+    sample_index: int
+    leg: str
+    success: bool
+    status_code: int
+    message: str
+    objective: float | None
+
+
+class LPOracleSolveError(RuntimeError):
+    """Raised when an LP Oracle solve is not certified optimal."""
+
+    def __init__(self, solve_status: LPSolveStatus):
+        self.solve_status = solve_status
+        super().__init__(
+            "LP Oracle solve failed "
+            f"(sample={solve_status.sample_index}, leg={solve_status.leg}, "
+            f"status={solve_status.status_code}): {solve_status.message}"
+        )
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -228,28 +254,32 @@ class TopKPolicy(nn.Module):
 
 
 # ════════════════════════════════════════════════════════════════════════════
-# Oracle 1：greedy（v1，保留向后兼容）
+# Greedy hindsight baseline（v1 历史参考，非 Oracle）
 # ════════════════════════════════════════════════════════════════════════════
-def oracle_revenue(price: torch.Tensor, simulator: BESSSimulator) -> torch.Tensor:
-    """greedy oracle（v1）：sign(price-mean)。偏弱，模型可能超过。保留向后兼容。"""
+def greedy_hindsight_revenue(price: torch.Tensor,
+                             simulator: BESSSimulator) -> torch.Tensor:
+    """Greedy hindsight baseline: sign(price-mean), not an optimal bound."""
     with torch.no_grad():
         thr = price.mean(dim=-1, keepdim=True)
-        u_oracle = torch.sign(price - thr)
-        R_star = simulator(u_oracle, price)
-    return R_star.detach()
+        u_greedy = torch.sign(price - thr)
+        R_greedy = simulator(u_greedy, price)
+    return R_greedy.detach()
 
 
 # ════════════════════════════════════════════════════════════════════════════
 # Oracle 2：LP（v2，真上界，对应 w10 第 5.2 节）
 # ════════════════════════════════════════════════════════════════════════════
-def lp_oracle_revenue(price: torch.Tensor, simulator: BESSSimulator) -> torch.Tensor:
+def lp_oracle_revenue(price: torch.Tensor, simulator: BESSSimulator,
+                      *, return_status: bool = False):
     """LP Oracle：用真实电价解线性规划求最优充放电 → R*（真上界）。
 
     对每个样本解：
         max  Σ_t (discharge_t - charge_t) · price_t - κ·(dis_t + chg_t)
         s.t. SOC 守恒 + 容量/功率约束 + 效率 + E_cyc 循环约束（w10 §4.2）
 
-    用 scipy.linprog（无需 cvxpy）。返回 [B] 张量，无梯度。
+    用 scipy.linprog（无需 cvxpy）。默认返回 [B] 张量，无梯度。
+    return_status=True 时额外返回每个样本的 LPSolveStatus，用于审计求解状态。
+    任一样本未获得最优证明时抛出 LPOracleSolveError，不回退到 Greedy。
     模型不可能超过 LP oracle（它是真最优），故 Regret ≥ 0 恒成立。
 
     修复：原版收益没减 κ、缺 E_cyc 约束 → R* 被高估、regret 被放大。
@@ -266,21 +296,27 @@ def lp_oracle_revenue(price: torch.Tensor, simulator: BESSSimulator) -> torch.Te
     price_np = price.detach().cpu().numpy().astype(np.float64)  # [B,H]
     B = price_np.shape[0]
     results = np.empty(B, dtype=np.float64)
+    statuses = []
 
     for b in range(B):
-        results[b] = _lp_revenue_one(price_np[b], P, E, eta, s0, s_min, s_max,
-                                     kappa, dt, e_cyc)
+        results[b], status = _lp_revenue_one(
+            price_np[b], P, E, eta, s0, s_min, s_max, kappa, dt, e_cyc,
+            sample_index=b, leg="single",
+        )
+        statuses.append(status)
 
-    return torch.from_numpy(results).to(device=device, dtype=dtype).detach()
+    values = torch.from_numpy(results).to(device=device, dtype=dtype).detach()
+    return (values, tuple(statuses)) if return_status else values
 
 
 # ════════════════════════════════════════════════════════════════════════════
 # Oracle 3：双结算 LP（w10 §5.2，正式版）
 # ════════════════════════════════════════════════════════════════════════════
-def _lp_revenue_one(price_np, P, E, eta, s0, s_min, s_max, kappa, dt, e_cyc):
+def _lp_revenue_one(price_np, P, E, eta, s0, s_min, s_max, kappa, dt, e_cyc,
+                    *, sample_index: int = -1, leg: str = "single"):
     """单序列 LP：max Σ(dis-chg)·p − κ(dis+chg)  s.t. SOC + 容量/功率 + E_cyc 循环约束。
 
-    返回最优收益标量。kappa=0 时退化为无退化成本（用于 DA 腿）。
+    返回 (最优收益, LPSolveStatus)。kappa=0 时退化为无退化成本（用于 DA 腿）。
     w10 §4.2: 累计放电量 q_t = Σ_{τ≤t} dis_τ ≤ E_cyc。
     """
     from scipy.optimize import linprog
@@ -303,29 +339,26 @@ def _lp_revenue_one(price_np, P, E, eta, s0, s_min, s_max, kappa, dt, e_cyc):
     bounds = [(0, P * dt)] * (2 * H)
     res = linprog(c, A_ub=np.array(A_ub), b_ub=np.array(b_ub),
                   bounds=bounds, method='highs')
-    if res.success:
-        x = res.x
-        dis, chg = x[:H], x[H:]
-        return float(np.sum((dis - chg) * price_np) - kappa * np.sum(dis + chg))
-    # LP 求解失败，退回 greedy 兜底
-    thr = price_np.mean()
-    u = np.sign(price_np - thr)
-    soc, q, rev = s0, 0.0, 0.0
-    for t in range(H):
-        ut = u[t]
-        d = max(ut, 0) * P * dt
-        ch = max(-ut, 0) * P * dt
-        d_act = min(d, max(0.0, (soc - s_min) * eta), max(0.0, e_cyc - q))
-        c_act = min(ch, max(0.0, (s_max - soc) / eta))
-        rev += (d_act - c_act) * price_np[t] - kappa * (d_act + c_act)
-        soc = soc - d_act / eta + c_act * eta
-        q += d_act
-    return float(rev)
+    status = LPSolveStatus(
+        sample_index=sample_index,
+        leg=leg,
+        success=bool(res.success),
+        status_code=int(res.status),
+        message=str(res.message),
+        objective=float(res.fun) if res.success else None,
+    )
+    if not res.success:
+        raise LPOracleSolveError(status)
+    x = res.x
+    dis, chg = x[:H], x[H:]
+    revenue = float(np.sum((dis - chg) * price_np) - kappa * np.sum(dis + chg))
+    return revenue, status
 
 
 def lp_oracle_revenue_dual(price_da: torch.Tensor, price_rt: torch.Tensor,
                            simulator: BESSSimulator,
-                           use_deviation_penalty: bool = False) -> torch.Tensor:
+                           use_deviation_penalty: bool = False,
+                           *, return_status: bool = False):
     """双结算 LP Oracle（w10 §5.2）。
 
     无偏差罚金（use_deviation_penalty=False）:
@@ -333,13 +366,14 @@ def lp_oracle_revenue_dual(price_da: torch.Tensor, price_rt: torch.Tensor,
         DA 腿: max Σ(pDA−pRT)·uDA   s.t. 计划 SOC + 功率，无 κ（退化只对 uRT）
         RT 腿: max Σ(pRT·uRT − κ|uRT|)  s.t. 实际 SOC + 功率
       两个 LP 结构相同、独立求解相加。返回 [B] 张量，无梯度。
+      return_status=True 时同时返回 DA/RT 各腿的 LPSolveStatus。
 
-    有偏差罚金（use_deviation_penalty=True，E2 修复）:
-      罚金 P_dev = Σ 2|pRT|·[|Δu|−0.03|uDA|]+ 耦合 uDA 和 uRT，两个独立 LP 无法表达。
-      但分析表明：罚金倍数 2×|pRT| 使偏差收益 = Δu·pRT − 2|pRT|·|Δu| ≤ −|pRT|·|Δu| < 0
-      （对任意 Δu 符号），即偏差永远不划算 → 最优 uRT=uDA（无偏差）→ 罚金=0。
-      此时 R* 退化为单结算 LP: max Σ pDA·uDA − κ|uDA|  s.t. SOC+E_cyc+功率。
-      这与模型 plan_track 行为一致（uRT 跟 uDA），是公平的真上界。
+    有偏差罚金（use_deviation_penalty=True）:
+      当前评估的是 plan_track 受限策略类：uDA≠0 时业务规则强制 uRT=uDA；
+      uDA=0 时，2×|pRT| 罚金使任意偏差都不划算。因此该受限策略类下退化为
+      单结算 LP: max Σ pDA·uDA − κ|uDA|  s.t. SOC+E_cyc+功率。
+      注意：由于罚金含 3% 免罚容忍带，这不是“所有可行 DA/RT 动作”的无限制全局上界；
+      R* 及 Regret 必须明确标注为 plan_track 策略类口径。
     """
     P, E, eta = simulator.P, simulator.E, simulator.eta
     s0 = E * simulator.init_soc_frac
@@ -353,21 +387,33 @@ def lp_oracle_revenue_dual(price_da: torch.Tensor, price_rt: torch.Tensor,
     rt_np = price_rt.detach().cpu().numpy().astype(np.float64)
     B = da_np.shape[0]
     results = np.empty(B, dtype=np.float64)
+    statuses = []
 
     if use_deviation_penalty:
-        # E2: 偏差罚金下 uRT=uDA 最优 → 单结算 LP（DA 价）
-        # R* = max Σ pDA·uDA − κ|uDA|  s.t. SOC + E_cyc + 功率
+        # plan_track 受限策略类下 uRT=uDA → 单结算 LP（DA 价）。
+        # 这是受限策略类上界，非含 3% 容忍带的无限制 DA/RT 全局上界。
         for b in range(B):
-            results[b] = _lp_revenue_one(da_np[b], P, E, eta, s0, s_min, s_max,
-                                         kappa, dt, e_cyc)
+            results[b], status = _lp_revenue_one(
+                da_np[b], P, E, eta, s0, s_min, s_max, kappa, dt, e_cyc,
+                sample_index=b, leg="penalty_plan_tracking_restricted",
+            )
+            statuses.append(status)
     else:
         # 无罚金：双 LP 独立求解（DA腿 spread + RT腿 pRT）
         for b in range(B):
             spread = da_np[b] - rt_np[b]                   # DA 腿价格 = 价差
-            r_da = _lp_revenue_one(spread, P, E, eta, s0, s_min, s_max, 0.0, dt, e_cyc)
-            r_rt = _lp_revenue_one(rt_np[b], P, E, eta, s0, s_min, s_max, kappa, dt, e_cyc)
+            r_da, status_da = _lp_revenue_one(
+                spread, P, E, eta, s0, s_min, s_max, 0.0, dt, e_cyc,
+                sample_index=b, leg="day_ahead",
+            )
+            r_rt, status_rt = _lp_revenue_one(
+                rt_np[b], P, E, eta, s0, s_min, s_max, kappa, dt, e_cyc,
+                sample_index=b, leg="real_time",
+            )
             results[b] = r_da + r_rt
-    return torch.from_numpy(results).to(device=device, dtype=dtype).detach()
+            statuses.extend((status_da, status_rt))
+    values = torch.from_numpy(results).to(device=device, dtype=dtype).detach()
+    return (values, tuple(statuses)) if return_status else values
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -396,18 +442,22 @@ def plan_track_override(u_da: torch.Tensor, u_rt_topk: torch.Tensor) -> torch.Te
 # ════════════════════════════════════════════════════════════════════════════
 def compute_regret(p_hat: torch.Tensor, price: torch.Tensor,
                    simulator: BESSSimulator, policy,
-                   oracle: str = "greedy"):
+                   oracle: str = "lp"):
     """返回 (R_model, R_star, regret)。
 
-    oracle: "greedy"（v1，向后兼容）或 "lp"（v2，真上界）。
+    Oracle/Regret 只保留给求解成功的 LP。Greedy hindsight baseline
+    应单独用 greedy_hindsight_revenue 计算 R_greedy 和 gap_to_greedy。
     regret 的梯度穿过 policy 回传到 p_hat；R_star 无梯度。
     """
     u = policy(p_hat)
     R_model = simulator(u, price)
-    if oracle == "lp":
-        R_star = lp_oracle_revenue(price, simulator)
-    else:
-        R_star = oracle_revenue(price, simulator)
+    if oracle != "lp":
+        raise ValueError(
+            "compute_regret only accepts oracle='lp'. For the historical Greedy "
+            "hindsight baseline, compute R_greedy with greedy_hindsight_revenue "
+            "and report gap_to_greedy instead of Regret."
+        )
+    R_star = lp_oracle_revenue(price, simulator)
     regret = R_star - R_model
     return R_model, R_star, regret
 

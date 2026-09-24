@@ -10,8 +10,7 @@ v3 失败原因: soft TopK/STE 在高波动 DA 价（std=370）上正反馈把�
 正式版修复: 零阶梯度对 p̂ 加 ±εz 扰动 → 跑硬策略仿真 → 估计 ĝ → L_proxy=p̂·ĝ 注入。
 
 用法:
-  external/chronos-forecasting/.venv/bin/python \\
-    scripts/decision_aware/train_formal.py \\
+  .venv/Scripts/python.exe scripts/decision_aware/train_formal.py `
     --config configs/decision_aware/formal_ercot.yaml [--no-early-stop] [--no-oracle-train]
 
   --no-oracle-train: 训练时跳过 LP oracle（省时间，regret 只在 val 上算）
@@ -44,7 +43,8 @@ def get_device():
 
 
 def _run_epoch(model, loader, sim, pol_hard, cfg, dev, eps_da, eps_rt,
-               opt=None, alpha=1.0, beta=0.0, amp_ok=False, oracle_train=True):
+               opt=None, alpha=1.0, beta=0.0, amp_ok=False, oracle_train=True,
+               scaler=None):
     """训练(opt!=None) 或评估(opt==None) 一个 epoch。
 
     核心改动（vs v3）: 用 total_loss_zo（零阶梯度 + L_proxy）替代直接 regret。
@@ -70,10 +70,18 @@ def _run_epoch(model, loader, sim, pol_hard, cfg, dev, eps_da, eps_rt,
                 )
 
             if is_train:
-                opt.zero_grad()
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
-                opt.step()
+                opt.zero_grad(set_to_none=True)
+                if scaler is not None and scaler.is_enabled():
+                    scaler.scale(loss).backward()
+                    # clip_grad_norm_ 必须看到反缩放后的真实梯度。
+                    scaler.unscale_(opt)
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
+                    scaler.step(opt)
+                    scaler.update()
+                else:
+                    loss.backward()
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
+                    opt.step()
 
             for k, v in m.items():
                 agg[k] = agg.get(k, 0.0) + v
@@ -126,6 +134,7 @@ def main():
     opt = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad],
                             lr=cfg.lr, weight_decay=cfg.weight_decay)
     amp_ok = cfg.use_amp and dev.type in ("cuda", "mps")
+    scaler = torch.amp.GradScaler("cuda", enabled=amp_ok and dev.type == "cuda")
 
     tr_loader = DataLoader(train_ds, batch_size=cfg.batch_size, shuffle=True,
                            collate_fn=collate_v3, num_workers=cfg.num_workers, drop_last=True)
@@ -144,7 +153,8 @@ def main():
         alpha, beta = anneal_alpha_beta(epoch, cfg)
         t0 = time.time()
         tr = _run_epoch(model, tr_loader, sim, pol_hard, cfg, dev, eps_da, eps_rt,
-                        opt, alpha, beta, amp_ok, oracle_train=not args.no_oracle_train)
+                        opt, alpha, beta, amp_ok, oracle_train=not args.no_oracle_train,
+                        scaler=scaler)
         va = _run_epoch(model, va_loader, sim, pol_hard, cfg, dev, eps_da, eps_rt,
                         None, alpha, beta, amp_ok, oracle_train=True)  # val 始终算 oracle
         el = time.time() - t0

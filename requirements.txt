@@ -1,0 +1,9 @@
+# Decision-aware 主环境的跨平台依赖。
+# PyTorch 单独放在平台文件中，以便 Windows/CUDA 与云服务器选择不同构建。
+numpy>=1.26,<3
+pandas>=2.2,<4
+scipy>=1.13,<2
+PyYAML>=6,<7
+pyarrow>=16,<24
+matplotlib>=3.8,<4
+xgboost>=2.1,<4

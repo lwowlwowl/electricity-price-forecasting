@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""eval_v3_da_oracle.py — 用 DA 价 oracle 重新评估 v3 checkpoints（修复 #1）.
+"""eval_v3_da_oracle.py — 已归档的 v3 checkpoint 重评脚本（修复 #1）.
 
 修复 #1：oracle 从 RT 价改为 DA 价。
 验证：训练梯度不受影响（R_star 是 detached，R_model 计算里 prt_t 未使用），
@@ -8,18 +8,18 @@
 本脚本同时报 R*_RT（旧，错）和 R*_DA（新，对），以验证 R_model 不变、只有 R* 变。
 
 用法:
-  external/chronos-forecasting/.venv/bin/python scripts/decision_aware/eval_v3_da_oracle.py \
+  external/chronos-forecasting/.venv/bin/python scripts/archive/decision_aware_legacy/eval_v3_da_oracle.py \
       --config configs/decision_aware/pilot_ercot_v3.yaml \
       --policy topk --ckpt-dir data/checkpoints/da_tsfm_pilot_v3 --tags best last
 
   # v3-STE（只有 best，训练崩溃无 last）:
-  external/chronos-forecasting/.venv/bin/python scripts/decision_aware/eval_v3_da_oracle.py \
+  external/chronos-forecasting/.venv/bin/python scripts/archive/decision_aware_legacy/eval_v3_da_oracle.py \
       --config configs/decision_aware/pilot_ercot_v3.yaml \
       --policy ste --ckpt-dir data/checkpoints/da_tsfm_pilot_v3_ste --tags best
 """
 from __future__ import annotations
 import argparse, os, sys
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 sys.path.insert(0, os.path.join(_ROOT, "src"))
 sys.path.insert(0, os.path.join(_ROOT, "src", "data_processing"))
 os.chdir(_ROOT)

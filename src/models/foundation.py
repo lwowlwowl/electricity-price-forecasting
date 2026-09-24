@@ -123,57 +123,63 @@ def _run_worker(kind: str, tasks: List[Task], horizon: int,
             payload[f"hist_cov__{i}"] = t.hist_cov.astype(np.float32)
             payload[f"future_cov__{i}"] = t.future_cov.astype(np.float32)
 
-    workdir = tempfile.mkdtemp(prefix=f"fm_{kind}_")
-    req_path = os.path.join(workdir, "request.npz")
-    resp_path = os.path.join(workdir, "response.npz")
-    np.savez(req_path, **payload)
-
-    env = dict(os.environ)
     hf_home = os.path.join(ROOT, "hf_cache")
     runtime_dir = os.path.join(ROOT, "temp", "foundation_workers", kind)
     cache_dir = os.path.join(runtime_dir, "cache")
+    ipc_dir = os.path.join(runtime_dir, "ipc")
     os.makedirs(cache_dir, exist_ok=True)
-    env.update({
-        "HF_HOME": hf_home,
-        "HF_HUB_CACHE": os.path.join(hf_home, "hub"),
-        "HF_XET_CACHE": os.path.join(hf_home, "xet"),
-        "HF_ASSETS_CACHE": os.path.join(hf_home, "assets"),
-        "HF_HUB_OFFLINE": "1",
-        "HF_HUB_DISABLE_XET": "1",
-        "HF_HUB_DISABLE_TELEMETRY": "1",
-        "TRANSFORMERS_OFFLINE": "1",
-        "XDG_CACHE_HOME": cache_dir,
-        "TORCH_HOME": os.path.join(cache_dir, "torch"),
-        "TORCHINDUCTOR_CACHE_DIR": os.path.join(cache_dir, "torchinductor"),
-        "TRITON_CACHE_DIR": os.path.join(cache_dir, "triton"),
-        "MPLCONFIGDIR": os.path.join(cache_dir, "matplotlib"),
-        "TEMP": runtime_dir,
-        "TMP": runtime_dir,
-    })
+    os.makedirs(ipc_dir, exist_ok=True)
 
-    proc = subprocess.run(
-        [py, script, req_path, resp_path],
-        capture_output=True, text=True, env=env,
-    )
-    if proc.returncode != 0 or not os.path.exists(resp_path):
-        raise RuntimeError(
-            f"[{kind} worker 失败] returncode={proc.returncode}\n"
-            f"--- STDOUT ---\n{proc.stdout[-2000:]}\n"
-            f"--- STDERR ---\n{proc.stderr[-3000:]}"
-        )
+    # 请求和响应可能包含真实电价及协变量。明确放在项目内，并在成功或异常时
+    # 都关闭文件后自动删除，避免落到 Windows 的 C:\Users\...\Temp。
+    with tempfile.TemporaryDirectory(prefix="run_", dir=ipc_dir) as workdir:
+        req_path = os.path.join(workdir, "request.npz")
+        resp_path = os.path.join(workdir, "response.npz")
+        np.savez(req_path, **payload)
 
-    resp = np.load(resp_path, allow_pickle=True)
-    if int(resp.get("ok", 0)) != 1:
-        raise RuntimeError(f"[{kind} worker] response.ok != 1")
-
-    results = []
-    for i in range(len(tasks)):
-        results.append({
-            "mean": np.asarray(resp[f"mean__{i}"], dtype=float),
-            "q10":  np.asarray(resp[f"q10__{i}"], dtype=float),
-            "q90":  np.asarray(resp[f"q90__{i}"], dtype=float),
+        env = dict(os.environ)
+        env.update({
+            "HF_HOME": hf_home,
+            "HF_HUB_CACHE": os.path.join(hf_home, "hub"),
+            "HF_XET_CACHE": os.path.join(hf_home, "xet"),
+            "HF_ASSETS_CACHE": os.path.join(hf_home, "assets"),
+            "HF_HUB_OFFLINE": "1",
+            "HF_HUB_DISABLE_XET": "1",
+            "HF_HUB_DISABLE_TELEMETRY": "1",
+            "TRANSFORMERS_OFFLINE": "1",
+            "XDG_CACHE_HOME": cache_dir,
+            "TORCH_HOME": os.path.join(cache_dir, "torch"),
+            "TORCHINDUCTOR_CACHE_DIR": os.path.join(cache_dir, "torchinductor"),
+            "TRITON_CACHE_DIR": os.path.join(cache_dir, "triton"),
+            "MPLCONFIGDIR": os.path.join(cache_dir, "matplotlib"),
+            "TEMP": runtime_dir,
+            "TMP": runtime_dir,
         })
-    return results
+
+        proc = subprocess.run(
+            [py, script, req_path, resp_path],
+            capture_output=True, text=True, env=env,
+        )
+        if proc.returncode != 0 or not os.path.exists(resp_path):
+            raise RuntimeError(
+                f"[{kind} worker 失败] returncode={proc.returncode}\n"
+                f"--- STDOUT ---\n{proc.stdout[-2000:]}\n"
+                f"--- STDERR ---\n{proc.stderr[-3000:]}"
+            )
+
+        # Windows 不允许删除仍被打开的文件；上下文退出前复制结果并关闭 npz。
+        with np.load(resp_path, allow_pickle=True) as resp:
+            if int(resp.get("ok", 0)) != 1:
+                raise RuntimeError(f"[{kind} worker] response.ok != 1")
+
+            results = []
+            for i in range(len(tasks)):
+                results.append({
+                    "mean": np.asarray(resp[f"mean__{i}"], dtype=float).copy(),
+                    "q10":  np.asarray(resp[f"q10__{i}"], dtype=float).copy(),
+                    "q90":  np.asarray(resp[f"q90__{i}"], dtype=float).copy(),
+                })
+        return results
 
 
 # ── 基础模型适配器基类 ───────────────────────────────────────────────────────

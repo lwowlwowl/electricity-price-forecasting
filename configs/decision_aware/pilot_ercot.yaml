@@ -1,7 +1,7 @@
 # 先行版 (Pilot) — Decision-aware 多模态 TSFM 配置
 # 架构对应 docs/model_architecture_v2.drawio「先行版」两页。
 # 数据: ERCOT LZ_LCRA（高波动节点，decision-aware 优势明显），小时级，model_ready forecast 版（无泄漏）。
-# 运行: external/chronos-forecasting/.venv/bin/python scripts/decision_aware/train_pilot.py \
+# 运行: external/chronos-forecasting/.venv/bin/python scripts/archive/decision_aware_legacy/train_pilot.py \
 #         --config configs/decision_aware/pilot_ercot.yaml
 
 market: ERCOT
@@ -28,10 +28,10 @@ bess_energy_mwh: 4.0
 bess_eta: 0.9
 bess_init_soc_frac: 0.5
 
-# 策略（v1=STE/greedy, v2=TopK/LP）
+# 策略/参考（v1=STE + Greedy hindsight baseline，v2=TopK + LP Oracle）
 ste_k: 5.0
 policy_type: topk         # "ste"(v1) 或 "topk"(v2，w10 第4节)
-oracle_type: lp           # "greedy"(v1) 或 "lp"(v2 真上界，w10 第5.2节)
+oracle_type: lp           # Regret 只使用求解成功的 LP Oracle
 topk_k_charge: 4          # TopK 充电时段数（4MWh/1MW→4h）
 topk_k_discharge: 4       # TopK 放电时段数
 

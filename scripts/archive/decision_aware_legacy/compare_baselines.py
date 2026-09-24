@@ -1,17 +1,18 @@
 #!/usr/bin/env python
-"""compare_baselines.py — B 对比：foundation 零样本 vs 你的 decision-aware 模型，同台比收益。
+"""compare_baselines.py — 已归档的先行版 B 对比脚本。
 
 每个模型（你的 β=1 + TimesFM/Chronos2/Toto/Toto2 零样本）在相同 test 起报点上：
-  预测 24h 电价 → 喂进【同一套 BESS 模拟器 + greedy 策略】→ 算 R_model、R*(oracle)、regret。
+  预测 24h 电价 → 喂进【同一套 BESS 模拟器 + STE greedy 调度策略】
+  → 算 R_model，再与求解成功的 LP Oracle R* 计算 Regret。
 所有模型过同一个"收益裁判台"，不比 MSE 比 regret——这是 decision-aware 的卖点。
 
 用法:
-  external/chronos-forecasting/.venv/bin/python scripts/decision_aware/compare_baselines.py \
+  external/chronos-forecasting/.venv/bin/python scripts/archive/decision_aware_legacy/compare_baselines.py \
       [--config ...] [--n-origins 30] [--ckpt last] [--models timesfm,chronos2,toto,toto2]
 """
 from __future__ import annotations
 import argparse, os, sys, time
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 sys.path.insert(0, os.path.join(_ROOT, "src"))
 sys.path.insert(0, os.path.join(_ROOT, "src", "data_processing"))
 sys.path.insert(0, os.path.join(_ROOT, "src", "models"))
@@ -20,7 +21,7 @@ os.chdir(_ROOT)
 import numpy as np, pandas as pd, torch
 import loader
 from decision_aware.config import PilotConfig, ALL_COVARIATES_V12 as ALL_COVARIATES
-from decision_aware.policy import BESSSimulator, STEPolicy, lp_oracle_revenue as oracle_revenue
+from decision_aware.policy import BESSSimulator, STEPolicy, lp_oracle_revenue
 from decision_aware.dataset import DecisionAwareDataset
 from decision_aware.forecaster import DecisionAwareForecaster
 import foundation as F
@@ -49,7 +50,7 @@ def revenue_from_forecast(p_hat, true_price, sim, policy):
     T = torch.from_numpy(true_price).float()
     u = policy(P)                       # [N,24] STE
     R = sim(u, T)                       # [N]
-    Rs = oracle_revenue(T, sim)         # [N]
+    Rs = lp_oracle_revenue(T, sim)      # [N]
     return R.detach().cpu().numpy(), Rs.cpu().numpy(), (Rs - R).detach().cpu().numpy()
 
 
@@ -109,7 +110,7 @@ def main():
 
     # Oracle（所有模型共用同一上界）
     _, R_star, _ = revenue_from_forecast(true_prices, true_prices, sim, pol)
-    print(f"  Oracle R* (均值, 开天眼基准): {R_star.mean():.1f}\n")
+    print(f"  LP Oracle R* (均值, 求解成功的优化上界): {R_star.mean():.1f}\n")
 
     results = []  # (name, R_mean, regret_mean, pct, mae, err)
 
@@ -122,7 +123,7 @@ def main():
     R, _, Reg = revenue_from_forecast(p_mine, true_prices, sim, pol)
     mae = np.mean(np.abs(p_mine - true_prices))
     results.append(("DA-TSFM-"+args.ckpt, R.mean(), Reg.mean(), R.mean()/R_star.mean()*100, mae, None))
-    print(f"  ✅ R={R.mean():.1f} regret={Reg.mean():.1f} 占oracle={R.mean()/R_star.mean()*100:.0f}% MAE={mae:.1f}\n")
+    print(f"  ✅ R={R.mean():.1f} regret={Reg.mean():.1f} 占LP={R.mean()/R_star.mean()*100:.0f}% MAE={mae:.1f}\n")
 
     # Foundations
     print(f"--- foundation 零样本 ---")
@@ -134,10 +135,10 @@ def main():
         R, _, Reg = revenue_from_forecast(preds, true_prices, sim, pol)
         mae = np.mean(np.abs(preds - true_prices))
         results.append((name.upper()+"-zeroshot", R.mean(), Reg.mean(), R.mean()/R_star.mean()*100, mae, None))
-        print(f"  → R={R.mean():.1f} regret={Reg.mean():.1f} 占oracle={R.mean()/R_star.mean()*100:.0f}% MAE={mae:.1f}")
+        print(f"  → R={R.mean():.1f} regret={Reg.mean():.1f} 占LP={R.mean()/R_star.mean()*100:.0f}% MAE={mae:.1f}")
 
     # 汇总表
-    print("\n" + "="*70); print(f"{'模型':24s} {'R_model':>9s} {'regret':>9s} {'占oracle':>9s} {'MAE':>7s}")
+    print("\n" + "="*70); print(f"{'模型':24s} {'R_model':>9s} {'regret':>9s} {'占LP':>9s} {'MAE':>7s}")
     print("-"*70)
     for name, R, Reg, pct, mae, err in results:
         if err:
@@ -147,7 +148,8 @@ def main():
         else:
             print(f"{name:24s} {R:9.1f} {Reg:9.1f} {pct:8.0f}% {mae:7.1f}")
     print("="*70)
-    print("注: 所有模型过同一 BESS(1MW/4MWh/η0.9)+STE策略, oracle=LP开天眼(真上界)。")
+    print("注: 所有模型过同一 BESS(1MW/4MWh/η0.9)+STE策略；"
+          "Regret 只对求解成功的 LP Oracle 计算。")
 
 
 if __name__ == "__main__":

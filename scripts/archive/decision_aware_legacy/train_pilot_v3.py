@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-"""train_pilot_v3.py — 先行版 v3 训练入口（6.5年 DA+RT 双结算）.
+"""train_pilot_v3.py — 已归档的先行版 v3 训练入口（6.5年 DA+RT 双结算）.
 
 用法:
-  external/chronos-forecasting/.venv/bin/python \\
-    scripts/decision_aware/train_pilot_v3.py \\
+  .venv/Scripts/python.exe scripts/archive/decision_aware_legacy/train_pilot_v3.py `
     --config configs/decision_aware/pilot_ercot_v3.yaml [--epochs N] [--no-early-stop]
 
 v3 改动（相对 v1/v2）:
@@ -15,7 +14,7 @@ v3 改动（相对 v1/v2）:
 """
 from __future__ import annotations
 import argparse, os, sys, time
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 sys.path.insert(0, os.path.join(_ROOT, "src"))
 sys.path.insert(0, os.path.join(_ROOT, "src", "data_processing"))
 os.chdir(_ROOT)
@@ -35,7 +34,8 @@ def get_device():
     return torch.device("cpu")
 
 
-def _run_epoch(model, loader, sim, pol, cfg, dev, opt=None, alpha=1.0, beta=0.0, amp_ok=False):
+def _run_epoch(model, loader, sim, pol, cfg, dev, opt=None, alpha=1.0, beta=0.0,
+               amp_ok=False, scaler=None):
     is_train = opt is not None
     model.train(is_train)
     ctx = torch.amp.autocast(device_type=dev.type, enabled=amp_ok)
@@ -69,9 +69,18 @@ def _run_epoch(model, loader, sim, pol, cfg, dev, opt=None, alpha=1.0, beta=0.0,
                      "regret": float(regret.detach().item()),
                      "mae": float(mae.detach().item())}
             if is_train:
-                opt.zero_grad(); loss.backward()
-                torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
-                opt.step()
+                opt.zero_grad(set_to_none=True)
+                if scaler is not None and scaler.is_enabled():
+                    scaler.scale(loss).backward()
+                    # clip_grad_norm_ 必须看到反缩放后的真实梯度。
+                    scaler.unscale_(opt)
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
+                    scaler.step(opt)
+                    scaler.update()
+                else:
+                    loss.backward()
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.grad_clip)
+                    opt.step()
             for k, v in m.items(): agg[k] = agg.get(k, 0.0) + v
             n += 1; del loss, out
     return {k: v / max(1, n) for k, v in agg.items()}
@@ -109,6 +118,7 @@ def main():
     opt = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad],
                             lr=cfg.lr, weight_decay=cfg.weight_decay)
     amp_ok = cfg.use_amp and dev.type in ("cuda", "mps")
+    scaler = torch.amp.GradScaler("cuda", enabled=amp_ok and dev.type == "cuda")
 
     tr_loader = DataLoader(train_ds, batch_size=cfg.batch_size, shuffle=True,
                            collate_fn=collate_v3, num_workers=cfg.num_workers, drop_last=True)
@@ -122,7 +132,8 @@ def main():
     for epoch in range(cfg.epochs):
         alpha, beta = anneal_alpha_beta(epoch, cfg)
         t0 = time.time()
-        tr = _run_epoch(model, tr_loader, sim, pol, cfg, dev, opt, alpha, beta, amp_ok)
+        tr = _run_epoch(model, tr_loader, sim, pol, cfg, dev, opt, alpha, beta,
+                        amp_ok, scaler=scaler)
         va = _run_epoch(model, va_loader, sim, pol, cfg, dev, None, alpha, beta, amp_ok)
         el = time.time() - t0
         print(f"  Epoch {epoch+1:2d}/{cfg.epochs} "

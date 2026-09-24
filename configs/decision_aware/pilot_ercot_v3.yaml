@@ -1,6 +1,6 @@
 # 先行版 v3 — ERCOT 6.5年 DA+RT 双结算，d=256/2层 ~5M 参数
 # 数据: ERCOT LZ_LCRA，2020-2026，统一小时表（DA+RT+load+wind+solar+holiday）
-# 运行: external/chronos-forecasting/.venv/bin/python scripts/decision_aware/train_pilot_v3.py \
+# 运行: external/chronos-forecasting/.venv/bin/python scripts/archive/decision_aware_legacy/train_pilot_v3.py \
 #         --config configs/decision_aware/pilot_ercot_v3.yaml
 
 market: ERCOT

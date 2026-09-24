@@ -9,17 +9,17 @@
 
 ## 核心成果（v7，最新有完整结果的正式版本）
 
-在 ERCOT LZ_LCRA 节点、单节点小模型（4.36M 参数）上，v7 是第一个 **w10 方案口径完全一致**的版本（价差决策、双结算 LP Oracle、零阶梯度全部对齐同一套结算公式）：
+在 ERCOT LZ_LCRA 节点、单节点小模型（4.36M 参数）上，v7 首次将价差决策、双结算、零阶梯度对齐到同一套结算公式。其启用偏差罚金后的 LP 参考限定在 **plan_track 受限策略类**，不是所有 DA/RT 动作的无限制全局上界：
 
 | 指标 | 含义 | v4 | v6 | **v7** |
 |------|------|----|----|--------|
 | MAE | 预测误差（美元）| 49.5 | 20.2 | **21.1** |
 | RMSE | 均方根误差（美元）| — | — | 53.2 |
 | R_model | 模型实际调度收益 | -81.9 | -149.0 | **-19.0**（少亏 77%）|
-| R*_LP | 双结算 LP Oracle 上界 | — | — | 276.0 |
-| PCR | 收益占 Oracle 比例 | -54% | -99% | **-6.9%**（接近盈亏平衡）|
+| R*_{LP,plan-track} | plan_track 受限策略类 LP 上界 | — | — | 276.0 |
+| 收益/受限 LP 参考 | 非无限制 PCR | -54% | -99% | **-6.9%**（接近盈亏平衡）|
 
-> regret 指标口径在 v4/v6/v7 间不一致（v7 是双结算 Oracle），不可直接横向比较，仅 MAE/R_model/PCR 可比。详细训练动态、验证标准、MSE 数值爆炸的教训见 `docs/正式版实验结果.md`。
+> v7 的 `regret/PCR` 历史字段应读作 plan_track 受限策略类下的 LP 差距/比例，不可与其他口径直接横向比较。详见 `docs/正式版实验结果.md`。
 
 **下一步 v8**（`configs/decision_aware/formal_ercot_v8.yaml`，配置已就绪，尚未训练出结果）：在 v7 基础上修复了两轮交叉代码审查发现的架构缺陷（Pre-LN 缺 final LayerNorm、融合层误开 RoPE、多流缺 modality embedding 等）和正确性 bug（L_proxy 梯度被 detach 截断、LP Oracle 缺 κ/E_cyc 等），参数量增至 9.92M，详见 `docs/todo3_2.md`。
 
@@ -27,8 +27,10 @@
 
 ## 项目结构
 
+图例：`[Git 忽略]` 表示只存在于本地，clone 仓库后需要重新生成、下载或从团队成员处取得。
+
 ```
-school/
+electricity-price-forecasting/
 ├── configs/
 │   ├── nodes.yaml                    # 节点分组配置（volatility/spikes/stable）
 │   ├── decision_aware/               # 当前方向：Decision-aware 训练配置
@@ -38,28 +40,32 @@ school/
 │
 ├── src/
 │   ├── data_processing/              # 数据加载与节点分组
-│   │   ├── loader.py                 # 从 raw 长表按需切片
-│   │   └── build_nodes_config.py
-│   ├── decision_aware/                # 当前方向核心代码
+│   ├── decision_aware/               # 当前方向核心代码
 │   │   ├── model.py                   # 多流 Encoder + CrossModalFusion + DA/RT 双 Decoder
 │   │   ├── policy.py                  # BESS 模拟器 + HardTopK 策略 + LP Oracle（单/双结算）
 │   │   ├── loss.py                    # 预测损失（Huber/MSE）+ L_proxy 决策感知损失
 │   │   ├── zero_order.py              # 零阶梯度估计（双点高斯扰动）
-│   │   ├── dataset.py / dataset_v3.py # 滑窗数据集
-│   │   └── train.py                   # 先行版训练循环
+│   │   ├── dataset.py / dataset_v3.py # 滑窗数据集及统一表加载
+│   │   ├── forecaster.py              # 训练后模型的预测器封装
+│   │   └── train.py                   # 公共训练/评估循环（CUDA AMP + GradScaler）
 │   ├── evaluation/                    # 指标 / 统计检验 / 回测
 │   ├── models/                        # 预测器层：统计/树基线 + 外部 TSFM 适配器
-│   │   └── workers/                   # TimesFM / Chronos-2 / Toto 子进程 worker
+│   │   └── workers/                   # TimesFM / Chronos-2 / Toto-1 / Toto-2 子进程 worker
 │   └── archive/                       # 旧范式代码（v1.0/v2.0 消融），已废弃不维护
 │
 ├── scripts/
-│   ├── decision_aware/
-│   │   ├── train_formal.py            # 正式版训练入口（v3+，支持 dual_split）
-│   │   ├── train_pilot.py / train_pilot_v3.py  # 先行版训练入口
-│   │   ├── compare_baselines_formal.py / compare_baselines.py  # 基线对比
-│   │   ├── eval_v3_da_oracle.py       # Oracle 评估
+│   ├── decision_aware/                # 当前可运行入口
+│   │   ├── train_formal.py            # 正式版训练入口（CUDA AMP + GradScaler）
+│   │   ├── compare_baselines_formal.py # 正式版基线对比（当前仍偏 v4 口径）
 │   │   └── covariate_screen_xgb.py    # XGBoost 协变量筛选
-│   └── covariates/                    # 协变量数据管线（下载/清洗/合并/特征构建，15 个步骤脚本）
+│   ├── covariates/                    # 协变量数据管线的分步骤脚本
+│   ├── archive/
+│   │   ├── decision_aware_legacy/     # 先行版与 v3 历史实验入口
+│   │   └── run_all.sh                 # 已归档的 Bash 数据流水线总入口
+│   └── setup_decision_aware_cuda.ps1  # Windows/RTX 一键创建环境、安装并验证
+│
+├── tests/
+│   └── test_decision_aware_policy.py  # Decision-aware 策略与结算测试
 │
 ├── docs/
 │   ├── todo3.md / todo3_2.md          # 当前决策清单（模型搭建 + v7 改动清单 + 架构/bug 审查记录）
@@ -76,17 +82,69 @@ school/
 │   └── archive/                       # 旧范式文档归档（v1.0/v2.0 消融结论，仍有复用价值）
 │
 ├── data/
-│   ├── raw/                           # 原始数据源（EIA/ERCOT/NYISO/PJM/CAISO/weather，不入库）
-│   ├── unified/                       # 统一小时数据表（4 ISO × parquet+xlsx，含市场+天气，31列）
-│   ├── covariates/                    # 协变量派生数据（gas/oil/steel/storm/news/generation_mix）
-│   ├── results/                       # 实验输出（parameter_ablation/structural_ablation 为旧范式产物）
-│   └── checkpoints/                   # 训练 checkpoint（不入库，本地产物）
+│   ├── raw/                           # [Git 忽略/当前缺失] 原始市场与天气数据
+│   ├── unified/                       # [Git 忽略/当前缺失] 统一小时 parquet；正式训练必需
+│   ├── covariates/                    # 派生数据被忽略，仅 README/experiment.md 入库
+│   ├── results/                       # 已有实验结果；新生成的顶层 CSV/PNG 默认忽略
+│   └── checkpoints/                   # [Git 忽略/当前缺失] 本地训练 checkpoint
 │
-└── external/                          # 三个基础模型，各含独立 .venv
-    ├── timesfm/                        # TimesFM-2.5（Google）
-    ├── chronos-forecasting/            # Chronos-2（Amazon）
-    └── toto/                           # Toto-1.0 & Toto-2.0（Datadog）
+├── external/                          # [Git 忽略] 三个上游仓库及彼此隔离的环境
+│   ├── timesfm/.venv/                 # TimesFM-2.5（Google）
+│   ├── chronos-forecasting/.venv/     # Chronos-2（Amazon）
+│   └── toto/
+│       ├── .venv/                     # Toto-1.0
+│       └── .venv-toto2/               # Toto-2.0
+│
+├── hf_cache/hub/                      # [Git 忽略] Hugging Face 权重缓存
+│   ├── models--google--timesfm-2.5-200m-pytorch/
+│   ├── models--amazon--chronos-2/
+│   ├── models--Datadog--Toto-Open-Base-1.0/
+│   └── models--Datadog--Toto-2.0-22m/
+│
+├── temp/                              # [Git 忽略] 项目内临时文件、pip/CUDA 缓存、Worker IPC
+├── tmp/                               # [Git 忽略] 其他临时输出
+├── requirements.txt                  # 主环境的跨平台依赖（不含 PyTorch 构建选择）
+├── requirements-windows-cuda.txt     # Windows + CUDA 12.6 完整依赖入口
+├── gen_arch.py / gen_train.py        # Draw.io 架构图与训练回路生成器
+└── README.md
 ```
+
+被忽略目录不会随 `git clone` 出现。正式训练至少需要准备
+`data/unified/ERCOT_统一小时数据_20200101_20260601.parquet`；运行四个基础模型基线时，还需要重建 `external/` 中的三个上游仓库、各自虚拟环境以及 `hf_cache/` 中的四套权重。
+
+---
+
+## 环境安装
+
+你想到的快捷依赖文件叫 `requirements.txt`。本项目把通用依赖与 CUDA 构建分开，避免云服务器或非 NVIDIA 机器误装错误版本。
+
+### Windows + NVIDIA GPU（推荐）
+
+要求 Python 3.12 和可用的 NVIDIA 驱动。在项目根目录的 PowerShell 中运行：
+
+```powershell
+& .\scripts\setup_decision_aware_cuda.ps1
+```
+
+脚本会自动创建根目录 `.venv`，读取 `requirements-windows-cuda.txt` 安装全部 Decision-aware 依赖，并执行一次真实的 CUDA autocast + GradScaler 反向传播测试。安装临时文件、pip 缓存、Torch 缓存和 CUDA 缓存均放在 `temp/decision_aware_env/`，不会写入仓库之外。
+
+也可以手动安装：
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-windows-cuda.txt
+```
+
+### Linux / 云服务器
+
+先按照服务器驱动选择 PyTorch 官方对应的 CUDA wheel，再安装通用依赖：
+
+```bash
+python -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+TimesFM、Chronos-2、Toto-1 和 Toto-2 的依赖互相冲突，因此不合并进主 `.venv`；它们继续使用 `external/` 下各自的独立环境。
 
 ---
 
@@ -109,17 +167,16 @@ school/
 
 ### 快速运行
 
-```bash
-# v7 训练（~8 小时，M3 Pro MPS）
-external/chronos-forecasting/.venv/bin/python \
-    scripts/decision_aware/train_formal.py \
-    --config configs/decision_aware/formal_ercot_v7.yaml --no-early-stop --no-oracle-train \
-    2>&1 | tee /tmp/v7_train.log
+```powershell
+# Windows / RTX：v8 正式训练，日志保存在项目 temp/ 内
+.\.venv\Scripts\python.exe scripts\decision_aware\train_formal.py `
+    --config configs\decision_aware\formal_ercot_v8.yaml `
+    --no-early-stop --no-oracle-train `
+    2>&1 | Tee-Object -FilePath temp\v8_train.log
 
 # 基线对比
-external/chronos-forecasting/.venv/bin/python \
-    scripts/decision_aware/compare_baselines_formal.py \
-    --config configs/decision_aware/formal_ercot_v7.yaml
+.\.venv\Scripts\python.exe scripts\decision_aware\compare_baselines_formal.py `
+    --config configs\decision_aware\formal_ercot_v8.yaml
 ```
 
 ---
@@ -134,9 +191,10 @@ external/chronos-forecasting/.venv/bin/python \
 | v2.0 结构消融 | 36 次组件消融 + 32 次逐层消融 | FFN 是所有模型最关键组件；精度通路与尖峰通路功能分离；TimesFM 40% 层可安全移除 | `docs/archive/结构消融汇报材料.md` |
 | ElecFM 融合模型 | v1→V6 共 9 个版本 | 冻结骨干 + spike head 在消融定位的分叉层接入，可用极少参数（334K）提升尖峰检测；已废弃 | `docs/archive/README.md`（索引） |
 
-```bash
+```powershell
 # 旧范式脚本仍保留，仅供查阅（run_experiment.py 依赖已删除的部分配置，不保证可直接运行）
-external/timesfm/.venv/bin/python src/archive/parameter_ablation/run_ablation.py configs/archive/parameter_ablation/baseline.yaml
+.\external\timesfm\.venv\Scripts\python.exe src\archive\parameter_ablation\run_ablation.py `
+    configs\archive\parameter_ablation\baseline.yaml
 ```
 
 ---
@@ -149,7 +207,7 @@ external/timesfm/.venv/bin/python src/archive/parameter_ablation/run_ablation.py
 | RandomForest / LightGBM / XGBoost | 树模型 | 进程内（每起报点重训）|
 | TimesFM-2.5（Google）| 时序基础模型 | 独立 venv 子进程 |
 | Chronos-2（Amazon）| 时序基础模型 | 独立 venv 子进程 |
-| Toto-1.0 / Toto-2.0（Datadog）| 时序基础模型 | 独立 venv 子进程（共用 venv）|
+| Toto-1.0 / Toto-2.0（Datadog）| 时序基础模型 | 独立子进程，分别使用 `.venv` / `.venv-toto2` |
 
 ---
 
@@ -170,11 +228,12 @@ external/timesfm/.venv/bin/python src/archive/parameter_ablation/run_ablation.py
 
 ## 注意事项
 
-- **基础模型 venv 独立**：TimesFM / Chronos / Toto 依赖冲突，各自使用 `external/<model>/.venv`，不要在主环境 import
-- **数据范围**：ERCOT 实时电价 2025-01-01 ~ 2026-06-02，约 17 个月
+- **环境隔离**：Decision-aware 使用根目录 `.venv`；TimesFM、Chronos、Toto-1 和 Toto-2 使用 `external/` 下各自的环境，不要把这些包混装进主环境
+- **正式版数据范围**：v3+ 统一表覆盖 ERCOT 2020-01-01 ~ 2026-06-01，包含 DA/RT 双价；旧 v1/v2 数据为约 17 个月
+- **clone 后需补齐**：`data/raw/`、`data/unified/`、`data/checkpoints/`、`external/`、`hf_cache/`、`.venv/` 均不会由 Git 下载
 - **测试隔离**：W1（稳定期）/W2（负电价）/W3（极端尖峰）测试窗口及前 168h buffer 已严格排除于训练集之外
 - **运行目录**：所有脚本从项目根目录运行
-- **checkpoint 与日志不入库**：`data/checkpoints/`、`logs/` 均已 gitignore，为本地训练产物，清理前如需保留请自行备份
+- **checkpoint、日志与临时文件不入库**：`data/checkpoints/`、`logs/`、`temp/`、`tmp/` 均已 gitignore，清理前如需保留请自行备份
 
 ---
 

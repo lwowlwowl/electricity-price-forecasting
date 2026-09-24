@@ -22,7 +22,9 @@ forecaster.py    DecisionAwareForecaster(Forecaster) 接 src/evaluation/backtest
 from .config import PilotConfig
 from .model import DecisionAwareTSFM
 from .policy import (BESSSimulator, STEPolicy, TopKPolicy, HardTopKPolicy,
-                     lp_oracle_revenue, lp_oracle_revenue_dual)
+                     greedy_hindsight_revenue, lp_oracle_revenue,
+                     lp_oracle_revenue_dual, LPSolveStatus,
+                     LPOracleSolveError)
 from .loss import total_loss, total_loss_zo, anneal_alpha_beta
 from .zero_order import (estimate_zo_gradient, estimate_zo_gradient_dual,
                          compute_l_proxy, compute_epsilon)
@@ -32,7 +34,8 @@ from .forecaster import DecisionAwareForecaster
 __all__ = [
     "PilotConfig", "DecisionAwareTSFM",
     "BESSSimulator", "STEPolicy", "TopKPolicy", "HardTopKPolicy",
-    "lp_oracle_revenue", "lp_oracle_revenue_dual",
+    "greedy_hindsight_revenue", "lp_oracle_revenue", "lp_oracle_revenue_dual",
+    "LPSolveStatus", "LPOracleSolveError",
     "total_loss", "total_loss_zo", "anneal_alpha_beta",
     "estimate_zo_gradient", "estimate_zo_gradient_dual",
     "compute_l_proxy", "compute_epsilon",

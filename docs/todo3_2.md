@@ -281,7 +281,7 @@
 | # | 状态 | 问题 | 代码位置 | 说明 | 修法 |
 |---|------|------|---------|------|------|
 | E1 | ✅已改 | **L_proxy `.mean()` 使 DA 项梯度比 w10 小 48×** | `zero_order.py:100` `compute_l_proxy` | w10 §6.2：DA/RT\|DA 项是点积 `(p̂DA)^T ĝ^DA`（不除 horizon），RT 项是 `(1/24)Σ`（除 24）。代码统一用 `.mean()` = `Σ/(B·H)`：DA 项（H=48）被多除 48 → 梯度小 48×；RT 项（H=24）恰好匹配。`proxy_scale=80` 是全局标量，无法修正 DA/RT 相对权重。验证：code/w10 梯度比 DA=0.0208（=1/48），RT=1.0000 | `compute_l_proxy` 加 `per_sample_sum` 参数：DA/RT\|DA 项用 `per_sample_sum=True`（per-sample 点积再 mean over batch），RT 项保持默认 `.mean()`（匹配 w10 的 1/24）|
-| E2 | ✅已改 | **LP Oracle 不含偏差罚金**（v7 开了罚金但 Oracle 没扣）| `policy.py:348-353` `lp_oracle_revenue_dual` | `lp_oracle_revenue_dual` 解两个独立 LP 相加，偏差罚金 `P_dev = Σ 2|pRT|·[|Δu|−0.03|uDA|]+` 耦合 uDA/uRT，独立 LP 无法表达。v7 `use_deviation_penalty=true`，模型 `forward_dual` 正确扣了罚金，但 Oracle R* 没扣 → R* 虚高、regret 虚高、PCR 虚低。实测：Oracle=280 vs 可达−125（虚高 405）。**分析**：罚金倍数 2×\|pRT\| 使偏差收益 `Δu·pRT − 2|pRT|·|Δu| ≤ −|pRT|·|Δu| < 0`（任意 Δu 符号），即偏差永远不划算 → 最优 uRT=uDA → R* 退化为单结算 LP `max Σ pDA·uDA − κ|uDA|`。这与模型 plan_track 行为一致，是公平的真上界 | `lp_oracle_revenue_dual` 加 `use_deviation_penalty` 参数：True 时走单结算 LP（DA 价），False 时走原双 LP。`loss.py` 调用处传 `use_dev_penalty` |
+| E2 | ⚠️部分修复 | **偏差罚金与 LP 参考口径** | `policy.py` `lp_oracle_revenue_dual` | 旧双 LP 完全忽略罚金，会使参考收益虚高。当前实现改为：启用罚金时，按项目的 plan_track 业务规则限定策略类，uDA≠0 时强制 uRT=uDA，并用单结算 LP 求该受限策略类上界。原证明忽略了 3% 免罚容忍带，因此不能再宣称 uRT=uDA 是所有 DA/RT 动作中的无限制全局最优 | 保留当前 plan_track 受限 LP 用于与现有策略类公平比较，但将指标明确标注为 `R*_{LP,plan-track}` / `gap_to_plan_track_LP`。若要无限制全局 Oracle，需要对 3% 分段罚金和 DA/RT 联合决策建立精确优化模型 |
 | E3 | ✅已改 | **forward_dual RT 偏差腿用未裁剪的 uRT 意图值** | `policy.py:131,139-141,155-157` | `delta_u = urt_t - uda_t` 用原始意图值，但实际执行 `d_act/c_act` 被 SOC 裁剪（§4.2）。市场按实际计量值结算偏差。实测：uRT=+1（放电）但 SOC 空→全 clip 到 0，代码仍算 `rt_leg=2400`（应为 0）。SOC 裁剪越频繁错误越大 | rt_leg 和 penalty 改用 clipped actual：`actual_rt_net = d_act - c_act`（已裁剪净放电），`delta_actual = actual_rt_net - da_net`，`rt_leg = delta_actual · prt_t`，penalty 阈值/超额也用 actual |
 
 ### 验证
@@ -289,7 +289,7 @@
 | Fix | 验证方法 | 结果 |
 |-----|---------|------|
 | E1 | DA/RT proxy 梯度比 head_da/head_rt_action | ✅ 修复前 DA/RT≈0.02（48× 偏小），修复后 155（DA 主导，符合 w10 设计） |
-| E2 | `lp_oracle_revenue_dual(pen=True) ≤ (pen=False)` | ✅ 48.7 ≤ 247.8 |
+| E2 | `lp_oracle_revenue_dual(pen=True) ≤ (pen=False)` | ✅ 48.7 ≤ 247.8；这只验证受限参考值的数值关系，不能证明无限制全局最优 |
 | E3 | SOC 空 + uRT=放电 → rt_leg 应为 0 | ✅ 修复前 2400，修复后 0.00 |
 
 ### 与第一轮（D1-D12）的关系

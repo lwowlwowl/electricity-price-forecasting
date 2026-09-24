@@ -65,7 +65,7 @@ def run_my_model(cfg, origins, norm_stats, ckpt_tag):
     ckpt_path = cfg.checkpoint_path(ckpt_tag)
     model.load_state_dict(torch.load(ckpt_path, map_location="cpu", weights_only=True))
     model.eval()
-    dev = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = model.to(dev)
 
     preds = []

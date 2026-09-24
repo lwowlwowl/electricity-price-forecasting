@@ -1,6 +1,6 @@
 """config.py — 先行版配置（dataclass + yaml 加载）.
 
-v1/v2: d=128/1层~1.1M, 17月ERCOT单RT, STE/greedy
+v1/v2: d=128/1层~1.1M, 17月ERCOT单RT, STE/Greedy hindsight baseline
 v3:    d=256/2层~5M, 6.5年ERCOT DA+RT双结算, TopK/LP, w10规范BESS参数
 """
 from __future__ import annotations
@@ -92,7 +92,7 @@ class PilotConfig:
 
     # ── 策略与 Oracle ────────────────────────────────────────────────────────
     policy_type: str = "topk"        # "ste" / "topk"(soft) / "hard_topk"(正式版)
-    oracle_type: str = "lp"          # "greedy" 或 "lp"
+    oracle_type: str = "lp"          # Regret 只使用求解成功的 LP Oracle
     topk_k_charge: int = 4
     topk_k_discharge: int = 4
     topk_spread_threshold: float = -1.0   # <0 = 自动 κ/η（w10 §4.1 价差门控）；0=关闭

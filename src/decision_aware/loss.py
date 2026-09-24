@@ -62,13 +62,13 @@ def total_loss(
     delta: float = 1.0,
     pred_scale: float = 1.0,      # 把 L_pred 归一到 O(1)，与 L_bus 同尺度，防 β→1 梯度爆炸
     bus_scale: float = 1.0,       # 把 L_bus  归一到 O(1)
-    oracle: str = "greedy",       # "greedy"(v1) 或 "lp"(v2 真上界)
+    oracle: str = "lp",           # Regret 只使用求解成功的 LP Oracle
 ):
     """返回 (total_loss, metrics_dict)。metrics_dict 全为 .detach().item() 标量，供日志。
 
     total = α·(L_pred/pred_scale) + β·(L_bus/bus_scale)，两分量均 O(1)，
     α/β 退火才是真正的权衡（否则 regret 尺度 ~10× 于 pred，β=1 直接 NaN）。
-    oracle="lp" 时 R* 用 LP 真上界（模型不可能超过，regret≥0）。
+    R* 使用求解成功的 LP Oracle；Greedy hindsight baseline 不用于 Regret。
     """
     l_pred_raw = huber_loss(p_da, price_tgt, delta=delta)
     R_model, R_star, regret = compute_regret(p_da, price_tgt, simulator, policy, oracle=oracle)
@@ -271,7 +271,7 @@ def total_loss_zo(
 
         if oracle_train:
             if use_dual_split:
-                # w10 §5.2: 双结算 LP Oracle（DA腿+RT腿），与 R_model 同口径
+                # 双结算 LP；启用罚金时是 plan_track 受限策略类口径。
                 R_star = lp_oracle_revenue_dual(da_tgt_24, rt_tgt_24, simulator,
                                                 use_deviation_penalty=use_dev_penalty)
             else:

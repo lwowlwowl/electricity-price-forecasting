@@ -223,27 +223,15 @@ def bess_revenue_lp_oracle(price: np.ndarray) -> float:
     bounds = [(0, P * dt)] * (2 * H)
     res = linprog(c, A_ub=np.array(A_ub), b_ub=np.array(b_ub),
                   bounds=bounds, method="highs")
-    if res.success:
-        x = res.x
-        dis = x[:H]
-        chg = x[H:]
-        return float(np.sum((dis - chg) * p) - kappa * np.sum(dis + chg))
-    else:
-        # 退回 greedy
-        thr = p.mean()
-        u = np.sign(p - thr)
-        # 简化 greedy 收益
-        soc = s0
-        rev = 0.0
-        for t in range(H):
-            ut = u[t]
-            dis = max(ut, 0) * P * dt
-            chg = max(-ut, 0) * P * dt
-            d_act = min(dis, max(0, (soc - s_min) * eta))
-            c_act = min(chg, max(0, (s_max - soc) / eta))
-            rev += (d_act - c_act) * p[t] - kappa * (d_act + c_act)
-            soc = soc - d_act / eta + c_act * eta
-        return rev
+    if not res.success:
+        raise RuntimeError(
+            "LP Oracle solve failed in covariate screening "
+            f"(status={res.status}): {res.message}"
+        )
+    x = res.x
+    dis = x[:H]
+    chg = x[H:]
+    return float(np.sum((dis - chg) * p) - kappa * np.sum(dis + chg))
 
 
 def bess_revenue_model(pred: np.ndarray, actual: np.ndarray) -> float:
