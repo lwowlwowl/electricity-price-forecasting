@@ -19,7 +19,6 @@ from __future__ import annotations
 import argparse, os, sys, time
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, os.path.join(_ROOT, "src"))
-sys.path.insert(0, os.path.join(_ROOT, "src", "data_processing"))
 os.chdir(_ROOT)
 
 # 强制 stdout 行缓冲（否则管道/文件输出会 block-buffer，看不到实时日志）

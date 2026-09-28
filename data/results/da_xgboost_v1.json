@@ -1,0 +1,20 @@
+{
+  "contract": "ERCOT D-1 10:00 local -> D 00:00-23:00",
+  "revenue_scope": "DA standalone physical-execution proxy; not full dual settlement",
+  "train_samples": 1809,
+  "validation_samples": 180,
+  "test_samples": 333,
+  "models": {
+    "xgboost": {
+      "mae": 40.10004425048828,
+      "rmse": 141.37649536132812,
+      "mean_revenue": 114.78993225097656,
+      "mean_oracle": 192.47132873535156,
+      "mean_regret": 77.681396484375,
+      "positive_day_rate": 0.9519519805908203,
+      "days": 333,
+      "seconds": 330.01
+    }
+  },
+  "errors": {}
+}

@@ -1,0 +1,245 @@
+{
+  "run_type": "training",
+  "contract": "hourly issue; [t-168,t) -> [t,t+4); execute first step",
+  "training_objective": "supervised Huber only",
+  "selection_metric": "validation RT-only rolling mean daily revenue",
+  "revenue_scope": "RT-only diagnostic; excludes DA position and dual settlement",
+  "device": "cuda",
+  "mixed_precision": true,
+  "batch_size": 32,
+  "wall_time_seconds": 1143.99,
+  "peak_cuda_memory_mb": 904.77,
+  "parameter_count": 2800130,
+  "config": {
+    "market": "ERCOT",
+    "node": "LZ_LCRA",
+    "freq": "1h",
+    "context_len": 168,
+    "horizon_da": 24,
+    "da_issue_hour_local": 10,
+    "horizon_rt": 4,
+    "train_stride": 1,
+    "eval_stride": 1,
+    "val_stride": 1,
+    "data_version": "v3",
+    "use_dual_settlement": false,
+    "use_dual_split": false,
+    "use_deviation_penalty": false,
+    "d_model": 128,
+    "n_heads_enc": 4,
+    "n_heads_fusion": 4,
+    "n_layers_enc": 2,
+    "n_layers_fusion": 2,
+    "dim_ff": 512,
+    "dropout": 0.1,
+    "use_rope": true,
+    "da_fusion_mode": "source_attention",
+    "rt_fusion_mode": "source_attention",
+    "bess_power_mw": 1.0,
+    "bess_energy_mwh": 4.0,
+    "bess_eta": 0.95,
+    "bess_init_soc_frac": 0.5,
+    "bess_kappa": 5.7,
+    "bess_soc_min": 0.4,
+    "bess_soc_max": 3.6,
+    "bess_e_cyc": 4.0,
+    "policy_type": "topk",
+    "oracle_type": "lp",
+    "topk_k_charge": 1,
+    "topk_k_discharge": 1,
+    "topk_spread_threshold": -1.0,
+    "ste_k": 5.0,
+    "zo_rho": 0.05,
+    "zo_K": 2,
+    "zo_sigma": 0.0,
+    "proxy_scale": 1.0,
+    "alpha0": 1.0,
+    "beta0": 0.0,
+    "alpha_end": 1.0,
+    "beta_end": 0.0,
+    "anneal_epochs": 1,
+    "pretrain_epochs": 0,
+    "use_mse_loss": false,
+    "huber_delta": 1.0,
+    "pred_scale": 25.0,
+    "bus_scale": 250.0,
+    "pred_clamp": [
+      -500.0,
+      10000.0
+    ],
+    "lr": 0.0005,
+    "weight_decay": 0.01,
+    "batch_size": 32,
+    "epochs": 10,
+    "grad_clip": 1.0,
+    "early_stop_patience": 3,
+    "use_amp": true,
+    "monitor": "val_rolling_rt_revenue",
+    "num_workers": 0,
+    "checkpoint_dir": "data/checkpoints/rt_independent_seed2",
+    "seed": 2
+  },
+  "samples": {
+    "train": 43677,
+    "validation": 4340,
+    "test": 8057
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.9430745640298823,
+      "validation": {
+        "mae_all_horizons": 18.489673614501953,
+        "rmse_all_horizons": 75.8153076171875,
+        "mae_executed_hour": 18.528141021728516,
+        "rolling_rt_only": {
+          "total_revenue": 22816.864583321723,
+          "mean_daily_revenue": 126.06002532221946,
+          "positive_day_rate": 0.6740331491712708,
+          "days": 181,
+          "hours": 4340,
+          "final_soc": 1.4947368421052631,
+          "intended_nonzero_rate": 0.2758064568042755
+        }
+      }
+    },
+    {
+      "epoch": 2,
+      "train_loss": 1.5710922555063234,
+      "validation": {
+        "mae_all_horizons": 18.513431549072266,
+        "rmse_all_horizons": 73.5381851196289,
+        "mae_executed_hour": 18.45134925842285,
+        "rolling_rt_only": {
+          "total_revenue": 24895.64036695896,
+          "mean_daily_revenue": 137.5449744030882,
+          "positive_day_rate": 0.7237569060773481,
+          "days": 181,
+          "hours": 4340,
+          "final_soc": 1.4947368421052631,
+          "intended_nonzero_rate": 0.3797234892845154
+        }
+      }
+    },
+    {
+      "epoch": 3,
+      "train_loss": 1.4851707411663873,
+      "validation": {
+        "mae_all_horizons": 16.434370040893555,
+        "rmse_all_horizons": 74.37256622314453,
+        "mae_executed_hour": 16.311498641967773,
+        "rolling_rt_only": {
+          "total_revenue": 25554.265325033935,
+          "mean_daily_revenue": 141.18378632615435,
+          "positive_day_rate": 0.7513812154696132,
+          "days": 181,
+          "hours": 4340,
+          "final_soc": 1.4947368421052631,
+          "intended_nonzero_rate": 0.41843318939208984
+        }
+      }
+    },
+    {
+      "epoch": 4,
+      "train_loss": 1.3142941936795964,
+      "validation": {
+        "mae_all_horizons": 16.04005241394043,
+        "rmse_all_horizons": 74.35668182373047,
+        "mae_executed_hour": 16.097997665405273,
+        "rolling_rt_only": {
+          "total_revenue": 26476.845044757785,
+          "mean_daily_revenue": 146.28091184949054,
+          "positive_day_rate": 0.7790055248618785,
+          "days": 181,
+          "hours": 4340,
+          "final_soc": 1.4947368421052631,
+          "intended_nonzero_rate": 0.44930875301361084
+        }
+      }
+    },
+    {
+      "epoch": 5,
+      "train_loss": 1.1225200855688298,
+      "validation": {
+        "mae_all_horizons": 16.287620544433594,
+        "rmse_all_horizons": 74.3734130859375,
+        "mae_executed_hour": 15.915814399719238,
+        "rolling_rt_only": {
+          "total_revenue": 22597.505327991577,
+          "mean_daily_revenue": 124.8480957347601,
+          "positive_day_rate": 0.7237569060773481,
+          "days": 181,
+          "hours": 4340,
+          "final_soc": 1.4947368421052631,
+          "intended_nonzero_rate": 0.4811059832572937
+        }
+      }
+    },
+    {
+      "epoch": 6,
+      "train_loss": 1.0605901065326873,
+      "validation": {
+        "mae_all_horizons": 16.135173797607422,
+        "rmse_all_horizons": 74.41665649414062,
+        "mae_executed_hour": 16.109573364257812,
+        "rolling_rt_only": {
+          "total_revenue": 24734.68952458068,
+          "mean_daily_revenue": 136.6557432297275,
+          "positive_day_rate": 0.7458563535911602,
+          "days": 181,
+          "hours": 4340,
+          "final_soc": 1.4947368421052631,
+          "intended_nonzero_rate": 0.47096773982048035
+        }
+      }
+    },
+    {
+      "epoch": 7,
+      "train_loss": 1.036471220403364,
+      "validation": {
+        "mae_all_horizons": 22.52461051940918,
+        "rmse_all_horizons": 77.05583190917969,
+        "mae_executed_hour": 22.167898178100586,
+        "rolling_rt_only": {
+          "total_revenue": 25615.672754932315,
+          "mean_daily_revenue": 141.52305389465369,
+          "positive_day_rate": 0.7237569060773481,
+          "days": 181,
+          "hours": 4340,
+          "final_soc": 1.4947368421052631,
+          "intended_nonzero_rate": 0.4228110611438751
+        }
+      }
+    }
+  ],
+  "best_epoch": 4,
+  "best_validation": {
+    "mae_all_horizons": 16.04005241394043,
+    "rmse_all_horizons": 74.35668182373047,
+    "mae_executed_hour": 16.097997665405273,
+    "rolling_rt_only": {
+      "total_revenue": 26476.845044757785,
+      "mean_daily_revenue": 146.28091184949054,
+      "positive_day_rate": 0.7790055248618785,
+      "days": 181,
+      "hours": 4340,
+      "final_soc": 1.4947368421052631,
+      "intended_nonzero_rate": 0.44930875301361084
+    }
+  },
+  "test": {
+    "mae_all_horizons": 13.928594589233398,
+    "rmse_all_horizons": 83.59327697753906,
+    "mae_executed_hour": 13.73777961730957,
+    "rolling_rt_only": {
+      "total_revenue": 26511.847613812854,
+      "mean_daily_revenue": 78.90430837444302,
+      "positive_day_rate": 0.7142857142857143,
+      "days": 336,
+      "hours": 8057,
+      "final_soc": 3.6,
+      "intended_nonzero_rate": 0.43266725540161133
+    }
+  },
+  "checkpoint": "data\\checkpoints\\rt_independent_seed2\\pilot_LZ_LCRA_best_rolling_revenue.pt"
+}

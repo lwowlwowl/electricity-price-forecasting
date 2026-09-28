@@ -1,7 +1,7 @@
-"""dataset_v3.py — v3 数据集（6.5年 ERCOT 统一表，DA+RT 双价，真节假日）.
+"""dataset_v3.py — v3 多市场统一小时数据集（DA+RT 双价，真节假日）.
 
 与 dataset.py 区别：
-- 读 data/unified/ERCOT_统一小时数据_20200101_20260601.parquet（loader_v2.py）
+- 读 data/markets/<MARKET>/<MARKET>_统一小时数据_20200101_20260601.parquet，
 - 当前实际输入为 5 流：DA price / RT price / Load / System(wind,solar) / Calendar
 - 返回 price_da + price_rt 两条目标（真双结算）
 - 真节假日 is_holiday（不再用 is_weekend 代理）
@@ -11,8 +11,6 @@
 """
 from __future__ import annotations
 
-import os
-import sys
 from typing import Dict, List, Optional
 
 import numpy as np
@@ -20,12 +18,8 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset
 
-_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, os.path.join(_ROOT, "src", "data_processing"))
-sys.path.insert(0, os.path.join(_ROOT, "src", "decision_aware"))
-
 from .config import PilotConfig
-from .loader_v2 import load_ercot_unified
+from .loader_v2 import load_market_unified
 
 
 def _ts(s: str) -> pd.Timestamp:
@@ -42,13 +36,13 @@ STREAMS_V3 = {
 
 
 class DecisionAwareDatasetV3(Dataset):
-    """v3 多流滑窗数据集（ERCOT 6.5年 DA+RT 双价）。
+    """v3 多流滑窗数据集（统一表 6.5年 DA+RT 双价）。
 
     每条样本（dict）：
       price_da_ctx  : [context_len]  归一化 DA 价历史
       price_rt_ctx  : [context_len]  归一化 RT 价历史
-      price_da_tgt  : [horizon]      真实 DA 价（结算用，不归一化）
-      price_rt_tgt  : [horizon]      真实 RT 价（结算用）
+      price_da_tgt  : [horizon_tgt]  真实 DA 价（结算用，不归一化）
+      price_rt_tgt  : [horizon_tgt]  真实 RT 价（结算用）
       price_da_mean/std, price_rt_mean/std : float（反归一化用）
       load_ctx      : [context_len, 1]
       system_ctx    : [context_len, 2]
@@ -75,6 +69,19 @@ class DecisionAwareDatasetV3(Dataset):
         self.price_da = df["price_da"].to_numpy(dtype=np.float32)
         self.price_rt = df["price_rt"].to_numpy(dtype=np.float32)
         self.index = df.index
+
+        # 不允许一个样本跨越缺失时刻。否则 168 个数组位置不一定代表
+        # 连续 168 小时，模型会把两小时（或更长）的跳跃误当作一小时。
+        expected_step = pd.to_timedelta(cfg.freq)
+        # pandas 3.0 may store DatetimeIndex values at microsecond resolution.
+        # Convert explicitly so the comparison remains in the same nanosecond
+        # unit as Timedelta.value on every supported pandas version.
+        actual_steps = np.diff(self.index.as_unit("ns").asi8)
+        bad_steps = actual_steps != expected_step.value
+        # gap_prefix[k] = 前 k 个相邻间隔中异常间隔的数量。
+        self._gap_prefix = np.concatenate(
+            [np.zeros(1, dtype=np.int64), np.cumsum(bad_steps, dtype=np.int64)]
+        )
 
         # 各流
         self.streams: Dict[str, np.ndarray] = {}
@@ -112,7 +119,9 @@ class DecisionAwareDatasetV3(Dataset):
         for i in range(0, n - self.context_len - self.horizon_tgt + 1, stride):
             tgt_start = self.index[i + self.context_len]
             tgt_end = self.index[i + self.context_len + self.horizon_tgt - 1]
-            if tgt_start >= split_lo and tgt_end <= split_hi:
+            window_last = i + self.context_len + self.horizon_tgt - 1
+            has_gap = self._gap_prefix[window_last] != self._gap_prefix[i]
+            if tgt_start >= split_lo and tgt_end <= split_hi and not has_gap:
                 self.valid_starts.append(i)
 
     def _norm(self, arr, st):
@@ -120,6 +129,19 @@ class DecisionAwareDatasetV3(Dataset):
 
     def __len__(self):
         return len(self.valid_starts)
+
+    def sample_time_bounds(self, idx: int) -> Dict[str, pd.Timestamp]:
+        """返回一个样本的原始时间边界，供审计与日志使用。"""
+        i = self.valid_starts[idx]
+        context_end = i + self.context_len - 1
+        target_start = context_end + 1
+        target_end = target_start + self.horizon_tgt - 1
+        return {
+            "context_start": self.index[i],
+            "context_end": self.index[context_end],
+            "target_start": self.index[target_start],
+            "target_end": self.index[target_end],
+        }
 
     def __getitem__(self, idx):
         i = self.valid_starts[idx]
@@ -146,7 +168,12 @@ class DecisionAwareDatasetV3(Dataset):
 
 def build_datasets_v3(cfg: PilotConfig):
     """返回 (train_ds, val_ds, test_ds, wide_df)。"""
-    wide_df = load_ercot_unified(node=cfg.node, start="2020-01-01", end="2026-06-02")
+    wide_df = load_market_unified(
+        market=cfg.market,
+        node=cfg.node,
+        start="2020-01-01",
+        end="2026-06-02",
+    )
     print(f"  [data v3] wide_df shape={wide_df.shape}  cols={wide_df.columns.tolist()}")
     print(f"  [data v3] time {wide_df.index.min()} → {wide_df.index.max()}  n={len(wide_df)}")
 

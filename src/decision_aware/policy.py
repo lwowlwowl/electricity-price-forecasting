@@ -29,6 +29,23 @@ class LPSolveStatus:
     objective: float | None
 
 
+@dataclass(frozen=True)
+class BESSActionProjection:
+    """一段动作在电池约束下的可执行结果。
+
+    ``action`` 仍使用 [-1, 1] 的归一化动作；``net_energy_mwh`` 使用市场
+    结算符号（放电为正、充电为负）。``soc_path_mwh`` 包含起点，因此长度
+    比动作多 1。这个结构既可用于 DA 计划可行性检查，也可用于小数字审计。
+    """
+
+    action: torch.Tensor
+    net_energy_mwh: torch.Tensor
+    discharge_mwh: torch.Tensor
+    charge_mwh: torch.Tensor
+    soc_path_mwh: torch.Tensor
+    clipped_energy_mwh: torch.Tensor
+
+
 class LPOracleSolveError(RuntimeError):
     """Raised when an LP Oracle solve is not certified optimal."""
 
@@ -72,6 +89,90 @@ class BESSSimulator(nn.Module):
         # w10 §4.2: 每日累计放电上限 E_cyc（默认=E，即满容量一次循环）
         self.e_cyc = float(e_cyc if e_cyc is not None else energy_mwh)
 
+    @torch.no_grad()
+    def project_actions(
+        self,
+        u: torch.Tensor,
+        initial_soc_mwh: float | torch.Tensor | None = None,
+    ) -> BESSActionProjection:
+        """把意图动作投影为满足 SOC 和单段放电量上限的动作。
+
+        该函数不修改模拟器状态。对 DA 使用时得到的是一条独立的“计划
+        SOC”，不会更新真实 SOC；真实 SOC 仍只能由 RT 实际动作更新。
+        ``u`` 的每一行被视为一个独立计划段，累计放电上限从 0 开始。
+        """
+        if u.ndim != 2:
+            raise ValueError(f"u应为[B,H]，实际为{tuple(u.shape)}")
+        batch_size, horizon = u.shape
+        if initial_soc_mwh is None:
+            soc = torch.full(
+                (batch_size,), self.E * self.init_soc_frac,
+                dtype=u.dtype, device=u.device,
+            )
+        else:
+            soc = torch.as_tensor(
+                initial_soc_mwh, dtype=u.dtype, device=u.device
+            ).reshape(-1)
+            if soc.numel() == 1:
+                soc = soc.expand(batch_size).clone()
+            elif soc.numel() != batch_size:
+                raise ValueError(
+                    "initial_soc_mwh必须是标量或长度与batch一致的向量"
+                )
+        tolerance = 1e-6
+        if torch.any(soc < self.s_min - tolerance) or torch.any(
+            soc > self.s_max + tolerance
+        ):
+            raise ValueError("initial_soc_mwh超出SOC上下限")
+        # 长序列反复乘除效率后可能出现3.6000001这类纯浮点误差。
+        soc = soc.clamp(min=self.s_min, max=self.s_max)
+
+        feasible = torch.zeros_like(u)
+        discharge_all = torch.zeros_like(u)
+        charge_all = torch.zeros_like(u)
+        soc_path = torch.empty(
+            (batch_size, horizon + 1), dtype=u.dtype, device=u.device
+        )
+        soc_path[:, 0] = soc
+        clipped = torch.zeros(batch_size, dtype=u.dtype, device=u.device)
+        discharged = torch.zeros(batch_size, dtype=u.dtype, device=u.device)
+        scale = self.P * self.dt
+
+        for step in range(horizon):
+            intended = u[:, step]
+            requested_discharge = torch.clamp(intended, min=0.0) * scale
+            requested_charge = torch.clamp(-intended, min=0.0) * scale
+            discharge = torch.minimum(
+                requested_discharge,
+                torch.clamp((soc - self.s_min) * self.eta, min=0.0),
+            )
+            discharge = torch.minimum(
+                discharge,
+                torch.clamp(self.e_cyc - discharged, min=0.0),
+            )
+            charge = torch.minimum(
+                requested_charge,
+                torch.clamp((self.s_max - soc) / self.eta, min=0.0),
+            )
+            discharge_all[:, step] = discharge
+            charge_all[:, step] = charge
+            feasible[:, step] = (discharge - charge) / scale
+            clipped = clipped + (
+                requested_discharge + requested_charge - discharge - charge
+            )
+            soc = soc - discharge / self.eta + charge * self.eta
+            discharged = discharged + discharge
+            soc_path[:, step + 1] = soc
+
+        return BESSActionProjection(
+            action=feasible,
+            net_energy_mwh=discharge_all - charge_all,
+            discharge_mwh=discharge_all,
+            charge_mwh=charge_all,
+            soc_path_mwh=soc_path,
+            clipped_energy_mwh=clipped,
+        )
+
     def forward(self, u: torch.Tensor, price: torch.Tensor,
                 price_da: torch.Tensor = None) -> torch.Tensor:
         """u: [B,H] 动作；price: [B,H] RT 价；price_da: [B,H] DA 价（可选）→ R: [B]。
@@ -114,18 +215,20 @@ class BESSSimulator(nn.Module):
     def forward_dual(self, u_da: torch.Tensor, u_rt: torch.Tensor,
                      price_da: torch.Tensor, price_rt: torch.Tensor,
                      use_deviation_penalty: bool = False,
-                     plan_track: bool = False) -> torch.Tensor:
+                     plan_track: bool = False,
+                     enforce_da_feasibility: bool = True) -> torch.Tensor:
         """DA/RT 分离决策的真双结算（w10 §4.3 + §5）。
 
-        u_da: [B, 48] 日前计划动作（48h 窗口，只前 24h 提交结算）
-        u_rt: [B, 24] 实时实际动作（24h 交易日）
-        price_da: [B, 48] 真实 DA 价
-        price_rt: [B, 48] 真实 RT 价（前 24h 用于结算）
+        u_da: [B, 24] 在截止时点锁定的交付日计划动作
+        u_rt: [B, 24] 交付日内逐小时得到的实时实际动作
+        price_da: [B, 24] 真实 DA 价
+        price_rt: [B, 24] 真实 RT 价
         use_deviation_penalty: 是否启用偏差罚金（w10 §5.1）
-        plan_track: 启用偏差罚金时 RT 先尽量执行 uDA 再套利（w10 §4.3）
+        plan_track: 预留的“RT跟踪DA再套利”策略；当前未实现，传True会报错
+        enforce_da_feasibility: 是否先用独立计划SOC把DA动作投影为可行计划
 
         两条 SOC 轨迹分离（w10 §4.3）：
-          - 计划 SOC：u_da 在 48h 连续传递，只检查日前提交可行性
+          - 计划 SOC：只用于检查/修正DA提交可行性，不改变真实SOC
           - 实际 SOC：u_rt 在 24h 独立从 s0 起跑，更新退化成本
         E_cyc 循环约束在 24h 交易日内生效（第 25h 重置，w10 §4.2）。
 
@@ -134,15 +237,24 @@ class BESSSimulator(nn.Module):
         """
         B, H_da = u_da.shape
         H_rt = u_rt.shape[1]
+        if plan_track:
+            raise NotImplementedError(
+                "plan_track尚未实现，不能静默当作False使用"
+            )
+        if any(value.ndim != 2 for value in (u_da, u_rt, price_da, price_rt)):
+            raise ValueError("u_da/u_rt/price_da/price_rt都必须是[B,H]")
+        if any(value.shape[0] != B for value in (u_rt, price_da, price_rt)):
+            raise ValueError("DA/RT动作和价格的batch维必须一致")
         P, eta, dt = self.P, self.eta, self.dt
         s0 = self.E * self.init_soc_frac
         kappa = self.kappa
         e_cyc = self.e_cyc
-        H_settle = min(H_da, H_rt, 24)   # 结算窗口 = 交易日 24h
-
-        # 注：原 plan SOC 轨迹（48h 连续）已删除——它算完即丢弃，从不参与收益
-        # 计算，是死代码（48 步 Python 循环白跑）。w10 §4.3 的"计划 SOC 检查
-        # 提交可行性"当前未实现约束/罚金，若后续需要可重新加入。
+        H_settle = min(H_da, H_rt, price_da.shape[1], price_rt.shape[1], 24)
+        if H_settle < 1:
+            raise ValueError("结算窗口不能为空")
+        u_da_settle = u_da[:, :H_settle]
+        if enforce_da_feasibility:
+            u_da_settle = self.project_actions(u_da_settle).action
 
         # ── 实际 SOC 轨迹 + 结算（24h，w10 §4.3）────────────────────────────
         soc_act = torch.full((B,), s0, dtype=u_da.dtype, device=u_da.device)
@@ -150,7 +262,7 @@ class BESSSimulator(nn.Module):
         revenue = torch.zeros(B, dtype=u_da.dtype, device=u_da.device)
         penalty = torch.zeros(B, dtype=u_da.dtype, device=u_da.device)
         for t in range(H_settle):
-            uda_t = u_da[:, t]
+            uda_t = u_da_settle[:, t]
             urt_t = u_rt[:, t]
             pda_t = price_da[:, t]
             prt_t = price_rt[:, t]

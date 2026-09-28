@@ -9,7 +9,9 @@ def configure_runtime_environment(project_root: str, worker_name: str) -> None:
     """Keep model caches and temporary files inside the project directory."""
     project_root = os.path.abspath(project_root)
     hf_home = os.path.join(project_root, "hf_cache")
-    runtime_dir = os.path.join(project_root, "temp", "foundation_workers", worker_name)
+    runtime_dir = os.path.join(
+        project_root, "runtime_cache", "foundation_workers", worker_name
+    )
     cache_dir = os.path.join(runtime_dir, "cache")
 
     for path in (hf_home, runtime_dir, cache_dir):

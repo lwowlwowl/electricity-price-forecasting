@@ -1,6 +1,6 @@
 """model.py — DecisionAwareTSFM（先行版架构，架构缺陷修复后）.
 
-架构修复（对应 docs/todo3_2.md「架构缺陷」清单 + N1 final norm）：
+架构修复（历史清单见 docs/archive/todo3_2.md；另含 N1 final norm）：
   A1 融合层关 RoPE（位置先验反事实）
   A2 每条流加可学习 modality embedding
   B1 编码器可配多层（n_layers_enc）+ 每栈出口 final LayerNorm（pre-LN 必备，N1）
@@ -131,8 +131,12 @@ class QueryDecoder(nn.Module):
           不再是全局共享、与样本无关的固定槽（pretrain 阶段更快对齐 query↔时间）。
     """
 
-    def __init__(self, d_model: int, n_heads: int, dim_ff: int, dropout: float, n_queries: int):
+    def __init__(self, d_model: int, n_heads: int, dim_ff: int, dropout: float,
+                 n_queries: int, use_memory_context: bool = True):
         super().__init__()
+        self.d_model = d_model
+        self.n_queries = n_queries
+        self.use_memory_context = use_memory_context
         self.queries = nn.Parameter(torch.randn(n_queries, d_model) * 0.02)
         # B3: 可学习 query 位置编码
         self.query_pos = nn.Parameter(torch.randn(n_queries, d_model) * 0.02)
@@ -153,11 +157,23 @@ class QueryDecoder(nn.Module):
         )
         self.final_norm = nn.LayerNorm(d_model)   # N1: pre-LN 栈出口 final norm
 
-    def forward(self, memory: torch.Tensor) -> torch.Tensor:
+    def forward(self, memory: torch.Tensor,
+                query_context: torch.Tensor | None = None) -> torch.Tensor:
         B = memory.shape[0]
-        # B3: query = 内容 query + 位置 query + 输入条件化摘要
-        ctx = self.ctx_proj(self.ctx_norm(memory.mean(dim=1, keepdim=True)))   # [B, 1, d]
-        q = (self.queries + self.query_pos).unsqueeze(0).expand(B, -1, -1) + ctx  # [B, N, d]
+        # B3: query = 内容 query + 位置 query + 可选的样本条件。
+        # 旧联合模型继续使用 memory mean，保持向后兼容；独立 DA/RT 模型可以关闭
+        # 这条尚未验证有效的工程路径，改用起报时确实已知的逐目标时点信息。
+        q = (self.queries + self.query_pos).unsqueeze(0).expand(B, -1, -1)
+        if self.use_memory_context:
+            ctx = self.ctx_proj(self.ctx_norm(memory.mean(dim=1, keepdim=True)))
+            q = q + ctx
+        if query_context is not None:
+            expected = (B, self.n_queries, self.d_model)
+            if tuple(query_context.shape) != expected:
+                raise ValueError(
+                    f"query_context形状应为{expected}，实际为{tuple(query_context.shape)}"
+                )
+            q = q + query_context
         # B2: query 间 self-attn（query 彼此感知 → 预测曲线平滑）
         q = q + self.q_self(self.q_norm1(q))
         # cross-attn：从 memory 取信息

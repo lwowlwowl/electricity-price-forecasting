@@ -1,5 +1,9 @@
 # Chronos2 单协变量扫描实验
 
+> **历史实验记录**：这里提到的 `src/data_processing/loader.py` 和旧 forecast
+> 流程已经归档。当前正式训练使用 `src/decision_aware/loader_v2.py` 读取
+> `data/markets/` 下的统一 Parquet。
+>
 > 目的：在零样本基础模型 Chronos2 上，**逐个单独**测试每个协变量对
 > 点预测（MAE / rMAE）与尖峰检测（Spike-F1）的边际影响，确定哪些
 > 协变量真正有用、哪些是噪声甚至有害。

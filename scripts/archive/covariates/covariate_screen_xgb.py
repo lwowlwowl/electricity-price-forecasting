@@ -22,6 +22,7 @@ os.chdir(_ROOT)
 
 import xgboost as xgb
 from scipy.optimize import linprog
+from decision_aware.loader_v2 import resolve_ercot_unified_path
 
 # ── BESS 参数（w10 §7 规范值，与先行版 v3 一致）──────────────────────────
 P_MAX = 1.0       # MW
@@ -38,8 +39,8 @@ CONTEXT = 168     # 7 天历史上下文（lag 特征）
 
 def load_merged_data():
     """合并统一表 + model_ready 协变量，返回 2025-2026 重叠段 DataFrame。"""
-    # 统一表（从 data/unified/ 读取 parquet）
-    df = pd.read_parquet("data/unified/ERCOT_统一小时数据_20200101_20260601.parquet")
+    # 统一表：使用当前 data/markets/ERCOT/。
+    df = pd.read_parquet(resolve_ercot_unified_path())
     df = df[df["node"] == "LZ_LCRA"].copy()
     df["ts"] = pd.to_datetime(df["timestamp_utc"], utc=True)
     df = df.set_index("ts").sort_index()

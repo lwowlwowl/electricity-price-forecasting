@@ -59,6 +59,7 @@ class PilotConfig:
     freq: str = "1h"
     context_len: int = 168
     horizon_da: int = 24
+    da_issue_hour_local: int = 10  # ERCOT正常DAM提交截止：D-1日10:00 CPT
     horizon_rt: int = 4            # w10 §2: 实时滚动预测 H=4
     train_stride: int = 1
     eval_stride: int = 24           # test 用（保持独立日窗口，DM/GW 检验 i.i.d. 前提）
@@ -79,6 +80,8 @@ class PilotConfig:
     dim_ff: int = 1024               # v3 放大（v1/v2=512）
     dropout: float = 0.1
     use_rope: bool = True
+    da_fusion_mode: str = "source_attention"
+    rt_fusion_mode: str = "source_attention"
 
     # ── BESS 模拟器（w10 第7节规范值）──────────────────────────────────────
     bess_power_mw: float = 1.0

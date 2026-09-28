@@ -20,7 +20,6 @@ from __future__ import annotations
 import argparse, os, sys, time
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, os.path.join(_ROOT, "src"))
-sys.path.insert(0, os.path.join(_ROOT, "src", "data_processing"))
 sys.path.insert(0, os.path.join(_ROOT, "src", "models"))
 os.chdir(_ROOT)
 
@@ -29,13 +28,18 @@ from decision_aware.config import PilotConfig
 from decision_aware.dataset_v3 import build_datasets_v3, collate_v3
 from decision_aware.model import DecisionAwareTSFM
 from decision_aware.policy import BESSSimulator, HardTopKPolicy, lp_oracle_revenue, lp_oracle_revenue_dual
-from decision_aware.loader_v2 import load_ercot_unified
+from decision_aware.loader_v2 import load_market_unified
 from torch.utils.data import DataLoader
 
 
 def build_origins_v3(cfg, n):
     """从 v3 test 段均匀抽 n 个起报点，返回 [(ctx_df, true_da_price), ...]。"""
-    wide_df = load_ercot_unified(node=cfg.node, start="2020-01-01", end="2026-06-02")
+    wide_df = load_market_unified(
+        market=cfg.market,
+        node=cfg.node,
+        start="2020-01-01",
+        end="2026-06-02",
+    )
     train_ds, _, test_ds, _ = build_datasets_v3(cfg)
     idxs = np.linspace(0, len(test_ds) - 1, min(n, len(test_ds))).astype(int)
 
@@ -96,15 +100,16 @@ def run_my_model(cfg, origins, norm_stats, ckpt_tag):
             arr = ctx[cols].to_numpy(dtype=np.float32)
             arr_n = (arr - st["mean"]) / st["std"]
             batch[f"{stream}_ctx"] = torch.from_numpy(arr_n).unsqueeze(0).to(dev)
-        # calendar
-        idx = ctx.index
-        cal = np.stack([
-            np.sin(2*np.pi*idx.hour/24), np.cos(2*np.pi*idx.hour/24),
-            np.sin(2*np.pi*idx.dayofweek/7), np.cos(2*np.pi*idx.dayofweek/7),
-            (idx.dayofweek >= 5).astype(float),
-            ctx["is_holiday"].astype(float).values if "is_holiday" in ctx else np.zeros(len(ctx)),
-        ], axis=-1).astype(np.float32)
-        batch["cal_ctx"] = torch.from_numpy(cal).unsqueeze(0).to(dev)
+        # Calendar 必须复用 loader 按市场本地时间生成的 8 列，并使用训练段
+        # 统计量归一化。旧实现按 UTC 重建了 6 列，既错时区也与模型输入维度不符。
+        cal_cols = [
+            "hour_sin", "hour_cos", "dow_sin", "dow_cos",
+            "month_sin", "month_cos", "is_weekend", "is_holiday",
+        ]
+        cal_st = norm_stats["cal"]
+        cal = ctx[cal_cols].to_numpy(dtype=np.float32)
+        cal_n = (cal - cal_st["mean"]) / cal_st["std"]
+        batch["cal_ctx"] = torch.from_numpy(cal_n).unsqueeze(0).to(dev)
 
         with torch.no_grad():
             out = model(batch)

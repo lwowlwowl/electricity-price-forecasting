@@ -33,7 +33,6 @@ import pandas as pd
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPT_DIR)                                   # evaluation/
 sys.path.insert(0, os.path.join(SCRIPT_DIR, "..", "models"))    # models/
-sys.path.insert(0, os.path.join(SCRIPT_DIR, "..", "data_processing"))  # loader
 
 import metrics as M                       # noqa: E402
 from base import Forecaster, Forecast     # noqa: E402

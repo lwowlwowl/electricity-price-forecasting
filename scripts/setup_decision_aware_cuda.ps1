@@ -2,9 +2,9 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $python = Join-Path $repoRoot ".venv\Scripts\python.exe"
-$runtimeRoot = Join-Path $repoRoot "temp\decision_aware_env"
+$runtimeRoot = Join-Path $repoRoot "runtime_cache\setup_cache"
 
-# 所有安装临时文件与运行缓存都限制在项目目录，避免写入系统盘。
+# Keep temporary files and caches inside the project instead of the system drive.
 $env:TEMP = Join-Path $runtimeRoot "tmp"
 $env:TMP = $env:TEMP
 $env:PIP_CACHE_DIR = Join-Path $runtimeRoot "pip-cache"
@@ -13,6 +13,8 @@ $env:CUDA_CACHE_PATH = Join-Path $runtimeRoot "cuda-cache"
 $env:TORCH_HOME = Join-Path $runtimeRoot "torch-home"
 $env:PIP_DISABLE_PIP_VERSION_CHECK = "1"
 $env:PYTHONNOUSERSITE = "1"
+$env:PYTHONUTF8 = "1"
+$env:PYTHONIOENCODING = "utf-8"
 
 @(
     $env:TEMP,
@@ -26,28 +28,28 @@ $env:PYTHONNOUSERSITE = "1"
 
 if (-not (Test-Path -LiteralPath $python)) {
     $basePython = (Get-Command python -ErrorAction Stop).Source
-    Write-Host "未找到项目 .venv，使用 $basePython 创建..."
+    Write-Host "Project .venv not found. Creating it with $basePython ..."
     & $basePython -m venv (Join-Path $repoRoot ".venv")
-    if ($LASTEXITCODE -ne 0) { throw ".venv 创建失败，退出码：$LASTEXITCODE" }
+    if ($LASTEXITCODE -ne 0) { throw ".venv creation failed (exit code $LASTEXITCODE)" }
 }
 
-Write-Host "项目目录: $repoRoot"
+Write-Host "Project:  $repoRoot"
 Write-Host "Python:   $python"
-Write-Host "临时目录: $runtimeRoot"
+Write-Host "Cache:    $runtimeRoot"
 Write-Host ""
-Write-Host "[1/2] 安装 requirements-windows-cuda.txt（PyTorch wheel 约 2.6 GB）..."
+Write-Host "[1/2] Installing requirements-windows-cuda.txt (PyTorch downloads are about 2.6 GB)..."
 & $python -m pip install `
     -r (Join-Path $repoRoot "requirements-windows-cuda.txt") `
     --progress-bar on
-if ($LASTEXITCODE -ne 0) { throw "依赖安装失败，退出码：$LASTEXITCODE" }
+if ($LASTEXITCODE -ne 0) { throw "Dependency installation failed (exit code $LASTEXITCODE)" }
 
 Write-Host ""
-Write-Host "[2/2] 验证 NVIDIA GPU、CUDA autocast 和 GradScaler 反向传播..."
+Write-Host "[2/2] Verifying NVIDIA GPU, CUDA autocast, and GradScaler backward pass..."
 $cudaSmoke = @'
 import torch
 
 if not torch.cuda.is_available():
-    raise SystemExit("CUDA 不可用；请检查 NVIDIA 驱动和 PyTorch 安装。")
+    raise SystemExit("CUDA is unavailable; check the NVIDIA driver and PyTorch installation.")
 
 device = torch.device("cuda")
 model = torch.nn.Sequential(
@@ -75,11 +77,11 @@ print(f"CUDA runtime: {torch.version.cuda}")
 print(f"GPU: {torch.cuda.get_device_name(0)}")
 print(f"GradScaler enabled: {scaler.is_enabled()}")
 print(f"Smoke loss: {loss.item():.6f}")
-print("CUDA 训练烟雾测试通过。")
+print("CUDA training smoke test passed.")
 '@
 
 & $python -c $cudaSmoke
-if ($LASTEXITCODE -ne 0) { throw "CUDA 训练烟雾测试失败，退出码：$LASTEXITCODE" }
+if ($LASTEXITCODE -ne 0) { throw "CUDA training smoke test failed (exit code $LASTEXITCODE)" }
 
 Write-Host ""
-Write-Host "decision-aware CUDA 环境安装完成。"
+Write-Host "Decision-aware CUDA environment installation completed."

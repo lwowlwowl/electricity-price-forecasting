@@ -1,5 +1,5 @@
-# Windows + NVIDIA GPU（CUDA 12.6）完整环境。
-# 一条命令安装：
+# Complete Windows + NVIDIA GPU environment (CUDA 12.6).
+# Install with:
 #   .venv\Scripts\python.exe -m pip install -r requirements-windows-cuda.txt
 --extra-index-url https://download.pytorch.org/whl/cu126
 

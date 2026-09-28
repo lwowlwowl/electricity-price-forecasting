@@ -1,0 +1,84 @@
+{
+  "contract": "ERCOT D-1 10:00 local -> D 00:00-23:00",
+  "revenue_scope": "DA standalone physical-execution proxy; not full dual settlement",
+  "train_samples": 1809,
+  "validation_samples": 180,
+  "test_samples": 333,
+  "models": {
+    "seasonal": {
+      "mae": 25.148427963256836,
+      "rmse": 103.91975402832031,
+      "mean_revenue": 112.05799865722656,
+      "mean_oracle": 192.47132873535156,
+      "mean_regret": 80.41331481933594,
+      "positive_day_rate": 0.9099099040031433,
+      "days": 333,
+      "seconds": 1.68
+    },
+    "extra_trees": {
+      "mae": 33.33475112915039,
+      "rmse": 107.89363098144531,
+      "mean_revenue": 111.74577331542969,
+      "mean_oracle": 192.47132873535156,
+      "mean_regret": 80.72553253173828,
+      "positive_day_rate": 0.9579579830169678,
+      "days": 333,
+      "seconds": 16.64
+    },
+    "rnn": {
+      "training_history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.06775671145225172,
+          "val_mae": 26.704944610595703
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.06410641406597406,
+          "val_mae": 28.892210006713867
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.0613662796932387,
+          "val_mae": 26.47595977783203
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.05743229162282915,
+          "val_mae": 27.462444305419922
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.05270120518878429,
+          "val_mae": 25.68486213684082
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.048285282478390035,
+          "val_mae": 22.33131217956543
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.039060087327175495,
+          "val_mae": 24.044057846069336
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.03299611726604206,
+          "val_mae": 23.88553810119629
+        }
+      ],
+      "mae": 27.498918533325195,
+      "rmse": 76.28520965576172,
+      "mean_revenue": 62.50410079956055,
+      "mean_oracle": 192.47132873535156,
+      "mean_regret": 129.96722412109375,
+      "positive_day_rate": 0.8468468189239502,
+      "days": 333,
+      "seconds": 41.29
+    }
+  },
+  "errors": {
+    "xgboost": "RuntimeError: 当前项目环境未安装xgboost；没有用其他模型冒充XGBoost"
+  }
+}

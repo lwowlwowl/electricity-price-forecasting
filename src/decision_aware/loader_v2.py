@@ -1,10 +1,10 @@
-"""loader_v2.py — 读 ERCOT 统一小时数据（2020-2026，DA+RT 双价，含天气）.
+"""loader_v2.py — 读四市场统一小时数据（2020-2026，DA+RT 双价，含天气）.
 
-从 data/unified/ERCOT_统一小时数据_20200101_20260601.parquet 读取，
+从 data/markets/<MARKET>/<MARKET>_统一小时数据_20200101_20260601.parquet 读取，
 返回宽表 DataFrame（每列一个变量），供 DecisionAwareDataset 使用。
 
-与 loader.py 的 load_slice_model_ready 区别：
-- 读新统一表（DA+RT+load+wind+solar+calendar+weather 全在一个文件）
+统一表特点：
+- DA+RT+load+wind+solar+calendar+weather 全在一个 Parquet 文件
 - 支持真双结算（返回 DA 价 + RT 价两列）
 - 支持真节假日（is_holiday 列）
 - 统一表已含天气实际值与+24h预测值（17列）
@@ -14,32 +14,75 @@ import os
 import pandas as pd
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-_DATA_DIR = os.path.join(_SCRIPT_DIR, "../../data")
+_DATA_ROOT = os.path.abspath(os.path.join(_SCRIPT_DIR, "../../data/markets"))
+_MARKET_TIMEZONES = {
+    "CAISO": "America/Los_Angeles",
+    "ERCOT": "America/Chicago",
+    "NYISO": "America/New_York",
+    "PJM": "America/New_York",
+}
 
-UNIFIED_PATH = os.path.join(_DATA_DIR, "unified",
-                            "ERCOT_统一小时数据_20200101_20260601.parquet")
+
+def market_timezone(market: str) -> str:
+    """返回市场本地时区；未知市场立即报错，不静默套用ERCOT。"""
+    market = market.upper()
+    if market not in _MARKET_TIMEZONES:
+        raise ValueError(
+            f"不支持的市场 {market!r}；可选：{sorted(_MARKET_TIMEZONES)}"
+        )
+    return _MARKET_TIMEZONES[market]
 
 
-def load_ercot_unified(node: str = "LZ_LCRA",
-                       start: str = "2020-01-01",
-                       end: str = "2026-06-02",
-                       dropna: bool = True,
-                       include_weather: bool = False) -> pd.DataFrame:
-    """读 ERCOT 统一小时数据，返回宽表。
+_UNIFIED_FILENAME = "ERCOT_统一小时数据_20200101_20260601.parquet"
+UNIFIED_PATH = os.path.join(_DATA_ROOT, "ERCOT", _UNIFIED_FILENAME)
+
+
+def resolve_market_unified_path(market: str) -> str:
+    """返回一个市场当前唯一的统一 Parquet 路径。"""
+    market = market.upper()
+    market_timezone(market)
+    filename = f"{market}_统一小时数据_20200101_20260601.parquet"
+    path = os.path.abspath(os.path.join(_DATA_ROOT, market, filename))
+    if not os.path.isfile(path):
+        raise FileNotFoundError(
+            f"找不到 {market} 统一小时数据。请把团队数据包解压到：\n"
+            f"  {path}"
+        )
+    return path
+
+
+def resolve_ercot_unified_path() -> str:
+    """兼容旧调用：返回 ERCOT 统一 Parquet 路径。"""
+    return resolve_market_unified_path("ERCOT")
+
+
+def load_market_unified(market: str,
+                        node: str,
+                        start: str = "2020-01-01",
+                        end: str = "2026-06-02",
+                        dropna: bool = True,
+                        include_weather: bool = False) -> pd.DataFrame:
+    """读一个市场、一个节点的统一小时数据，返回宽表。
 
     返回列：
       timestamp_utc (DatetimeIndex), price_da, price_rt, load, wind, solar,
       hour_sin, hour_cos, dow_sin, dow_cos, month_sin, month_cos,
-      is_weekend, is_holiday。日历特征以 ERCOT 原始"本地时间"派生。
+      is_weekend, is_holiday。日历特征以该市场原始"本地时间"派生。
       若 include_weather=True，额外返回 9 列 actual_* 天气实际值和
       8 列 forecast_* +24h 天气预测值。
     """
-    df = pd.read_parquet(UNIFIED_PATH)
+    market = market.upper()
+    df = pd.read_parquet(resolve_market_unified_path(market))
     # 筛节点
     df = df[df["node"] == node].copy()
+    if df.empty:
+        raise ValueError(f"{market} 数据中找不到节点 {node!r}")
     # 以 UTC 索引保证全表按绝对时间排序
     df["timestamp_utc"] = pd.to_datetime(df["timestamp_utc"], utc=True)
-    df["timestamp_local"] = pd.to_datetime(df["timestamp_local"], utc=True).dt.tz_convert("America/Chicago")
+    df["timestamp_local"] = (
+        pd.to_datetime(df["timestamp_local"], utc=True)
+        .dt.tz_convert(market_timezone(market))
+    )
     df = df.set_index("timestamp_utc").sort_index()
     # 重命名为统一列名
     out = pd.DataFrame({
@@ -88,6 +131,22 @@ def load_ercot_unified(node: str = "LZ_LCRA",
         out = out.dropna()
     out.index.name = "timestamp_utc"
     return out
+
+
+def load_ercot_unified(node: str = "LZ_LCRA",
+                       start: str = "2020-01-01",
+                       end: str = "2026-06-02",
+                       dropna: bool = True,
+                       include_weather: bool = False) -> pd.DataFrame:
+    """兼容旧调用：读取 ERCOT 的一个节点。"""
+    return load_market_unified(
+        market="ERCOT",
+        node=node,
+        start=start,
+        end=end,
+        dropna=dropna,
+        include_weather=include_weather,
+    )
 
 
 def np_sin(x, period):

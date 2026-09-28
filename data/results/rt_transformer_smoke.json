@@ -1,0 +1,81 @@
+{
+  "run_type": "smoke",
+  "contract": "hourly issue; [t-168,t) -> [t,t+4); execute first step",
+  "training_objective": "supervised Huber only",
+  "selection_metric": "validation RT-only rolling mean daily revenue",
+  "revenue_scope": "RT-only diagnostic; excludes DA position and dual settlement",
+  "device": "cpu",
+  "parameter_count": 71362,
+  "samples": {
+    "train": 32,
+    "validation": 32,
+    "test": 32
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 11.39896273612976,
+      "validation": {
+        "mae_all_horizons": 188.29147338867188,
+        "rmse_all_horizons": 222.4400634765625,
+        "mae_executed_hour": 179.6072540283203,
+        "rolling_rt_only": {
+          "total_revenue": -98.40497707376981,
+          "mean_daily_revenue": -49.20248853688491,
+          "positive_day_rate": 0.0,
+          "days": 2,
+          "hours": 32,
+          "final_soc": 3.6,
+          "intended_nonzero_rate": 0.90625
+        }
+      }
+    },
+    {
+      "epoch": 2,
+      "train_loss": 8.74016797542572,
+      "validation": {
+        "mae_all_horizons": 168.35635375976562,
+        "rmse_all_horizons": 193.2431640625,
+        "mae_executed_hour": 159.0426025390625,
+        "rolling_rt_only": {
+          "total_revenue": -98.40497707376981,
+          "mean_daily_revenue": -49.20248853688491,
+          "positive_day_rate": 0.0,
+          "days": 2,
+          "hours": 32,
+          "final_soc": 3.6,
+          "intended_nonzero_rate": 0.875
+        }
+      }
+    }
+  ],
+  "best_validation": {
+    "mae_all_horizons": 188.29147338867188,
+    "rmse_all_horizons": 222.4400634765625,
+    "mae_executed_hour": 179.6072540283203,
+    "rolling_rt_only": {
+      "total_revenue": -98.40497707376981,
+      "mean_daily_revenue": -49.20248853688491,
+      "positive_day_rate": 0.0,
+      "days": 2,
+      "hours": 32,
+      "final_soc": 3.6,
+      "intended_nonzero_rate": 0.90625
+    }
+  },
+  "test": {
+    "mae_all_horizons": 276.5129699707031,
+    "rmse_all_horizons": 331.9208679199219,
+    "mae_executed_hour": 288.1564025878906,
+    "rolling_rt_only": {
+      "total_revenue": -190.3394497174715,
+      "mean_daily_revenue": -95.16972485873575,
+      "positive_day_rate": 0.5,
+      "days": 2,
+      "hours": 32,
+      "final_soc": 3.6,
+      "intended_nonzero_rate": 0.96875
+    }
+  },
+  "checkpoint": "data\\checkpoints\\rt_independent_v1\\pilot_LZ_LCRA_best_rolling_revenue_smoke.pt"
+}

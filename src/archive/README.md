@@ -2,7 +2,7 @@
 
 > 状态：**已废弃，不再维护**。保留仅供查阅可复用片段。
 > 新方向：`src/decision_aware/`（Decision-aware 多模态 TSFM，从零训练）。
-> 范式依据：`docs/team_notes/w8/研究方案_Decision-aware_多模态TSFM.md`、`docs/team_notes/w9/模型相关.md`、`docs/todo3.md`。
+> 历史方案与实验记录已统一放在 `docs/archive/`；当前任务以根目录 `README.md` 和主线 PRD 为准。
 
 ## 为什么归档
 
@@ -17,9 +17,11 @@
 | `fusion_model/` | ElecFM 融合模型（冻结骨干 + spike head + CrossNodeAttention） | `dataset.py` 滑窗逻辑、`evaluate.py` τ\* 阈值搜索、三窗口回测口径可参考 |
 | `parameter_ablation/` | v1.0 输入配置消融执行器 | 实验代码废弃；**结论**（协变量加全 +6.7% spike-F1、720h context 最优、15min 微增）已沉淀到 `docs/archive/参数消融*.md`，指导新模型输入设计 |
 | `structural_ablation/` | v2.0 结构消融（14 种手术操作 + 逐层消融） | 方法论（Wilcoxon + Bonferroni、逐层/组件消融流程）可迁移到对新自有模型的消融 |
+| `data_raw_legacy/` | 旧 `data/raw/` 加载器、节点脚本和 v1/v2 Dataset/Forecaster | 仅供追溯旧实验；当前数据入口是 `decision_aware/loader_v2.py` |
 
 ## 保留在主线（未归档）的 src 模块
 
 - `src/models/` — 预测器层：`base.py`（抽象基类）、`forecasters.py`（7 个统计/树基线）、`foundation.py`+`workers/`（外部 TSFM 基线层，双重用途：零样本参考 + 从零训练对照 plumbing 模板）
-- `src/data_processing/loader.py` — 多模态数据对齐 `load_slice()`
+- `src/decision_aware/loader_v2.py` + `dataset_da.py` — 当前统一 Parquet 入口与固定截止时点 DA 样本
+- `src/decision_aware/dataset_v3.py` — 旧 48 小时滑窗实现，仅供回溯和后续消融
 - `src/evaluation/` — 指标 / 统计检验 / 回测（新增 business 指标后复用）

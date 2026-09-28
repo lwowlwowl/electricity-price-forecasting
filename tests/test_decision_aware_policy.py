@@ -22,6 +22,115 @@ from decision_aware.policy import (  # noqa: E402
 )
 
 
+class BESSSimulatorAccountingTests(unittest.TestCase):
+    """用能手算的小数字固定动作符号、单位、SOC裁剪和结算口径。"""
+
+    @staticmethod
+    def _simulator(kappa: float = 0.0) -> BESSSimulator:
+        return BESSSimulator(
+            power_mw=1.0,
+            energy_mwh=2.0,
+            eta=1.0,
+            init_soc_frac=0.5,
+            dt=1.0,
+            kappa=kappa,
+            soc_min=0.0,
+            soc_max=2.0,
+            e_cyc=2.0,
+        )
+
+    def test_charge_at_10_discharge_at_30_earns_20(self):
+        simulator = self._simulator()
+        action = torch.tensor([[-1.0, 1.0]])
+        price = torch.tensor([[10.0, 30.0]])
+
+        revenue = simulator(action, price)
+
+        torch.testing.assert_close(revenue, torch.tensor([20.0]))
+
+    def test_do_nothing_earns_zero(self):
+        simulator = self._simulator()
+        action = torch.zeros((1, 2))
+        price = torch.tensor([[10.0, 30.0]])
+
+        revenue = simulator(action, price)
+
+        torch.testing.assert_close(revenue, torch.tensor([0.0]))
+
+    def test_soc_clip_prevents_discharge_beyond_available_energy(self):
+        simulator = self._simulator()
+        # 初始只有 1 MWh；连续要求放 2 MWh 时，第二小时必须被裁掉。
+        action = torch.tensor([[1.0, 1.0]])
+        price = torch.tensor([[10.0, 10.0]])
+
+        revenue = simulator(action, price)
+
+        torch.testing.assert_close(revenue, torch.tensor([10.0]))
+
+    def test_dual_settlement_matches_da_when_actual_follows_plan(self):
+        simulator = self._simulator()
+        plan = torch.tensor([[-1.0, 1.0]])
+        actual = plan.clone()
+        price_da = torch.tensor([[10.0, 30.0]])
+        price_rt = torch.tensor([[100.0, -50.0]])
+
+        revenue = simulator.forward_dual(plan, actual, price_da, price_rt)
+
+        # 实际动作等于计划时，RT偏差为0，只剩DA低买高卖的20。
+        torch.testing.assert_close(revenue, torch.tensor([20.0]))
+
+    def test_cancelled_da_plan_is_offset_in_real_time(self):
+        simulator = self._simulator()
+        plan = torch.tensor([[-1.0, 1.0]])
+        actual = torch.zeros_like(plan)
+        price_da = torch.tensor([[10.0, 30.0]])
+        price_rt = price_da.clone()
+
+        revenue = simulator.forward_dual(plan, actual, price_da, price_rt)
+
+        # DA腿赚20，但同价RT偏差腿正好抵消，最终为0。
+        torch.testing.assert_close(revenue, torch.tensor([0.0]))
+
+    def test_throughput_cost_is_charged_once_per_actual_mwh(self):
+        simulator = self._simulator(kappa=2.0)
+        action = torch.tensor([[-1.0, 1.0]])
+        price = torch.tensor([[10.0, 30.0]])
+
+        revenue = simulator(action, price)
+
+        # 毛收益20，充1 MWh和放1 MWh各扣2，共扣4。
+        torch.testing.assert_close(revenue, torch.tensor([16.0]))
+
+    def test_plan_projection_has_separate_soc_and_clips_infeasible_action(self):
+        simulator = self._simulator()
+        # 初始SOC只有1 MWh；第二次连续放电必须被裁为0。
+        projection = simulator.project_actions(torch.tensor([[1.0, 1.0]]))
+
+        torch.testing.assert_close(projection.action, torch.tensor([[1.0, 0.0]]))
+        torch.testing.assert_close(
+            projection.soc_path_mwh, torch.tensor([[1.0, 0.0, 0.0]])
+        )
+        torch.testing.assert_close(projection.clipped_energy_mwh, torch.tensor([1.0]))
+
+    def test_unimplemented_plan_track_cannot_fail_silently(self):
+        simulator = self._simulator()
+        zeros = torch.zeros((1, 2))
+        with self.assertRaisesRegex(NotImplementedError, "plan_track"):
+            simulator.forward_dual(zeros, zeros, zeros, zeros, plan_track=True)
+
+    def test_plan_projection_tolerates_only_tiny_boundary_roundoff(self):
+        simulator = self._simulator()
+        projection = simulator.project_actions(
+            torch.zeros((1, 1)), initial_soc_mwh=2.0 + 1e-7
+        )
+        torch.testing.assert_close(projection.soc_path_mwh[0, 0], torch.tensor(2.0))
+
+        with self.assertRaisesRegex(ValueError, "SOC"):
+            simulator.project_actions(
+                torch.zeros((1, 1)), initial_soc_mwh=2.01
+            )
+
+
 class LPOracleTests(unittest.TestCase):
     def setUp(self):
         self.simulator = BESSSimulator(

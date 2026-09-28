@@ -1,0 +1,40 @@
+# F0/F1/F2融合消融前冻结的RT协调合同。
+# 这不是新的可训练模型，而是验证集选出的固定执行方式。
+version: rt_coordination_v1
+status: frozen_before_fusion_ablation
+
+selected:
+  coordination_mode: rt_only
+  adjust_margin_usd: 0.0
+  rt_seed: 2
+  rt_checkpoint: data/checkpoints/rt_independent_seed2/pilot_LZ_LCRA_best_rolling_revenue.pt
+
+selection:
+  split: validation
+  objective: mean_full_dual_daily_revenue
+  aggregation: mean_across_da_references
+  da_references:
+    - transformer_da_seed2
+    - xgboost_da_seed0
+  validation_selection_score_usd_per_day: 147.38101612103247
+  candidate_modes:
+    - rt_only
+    - follow_da
+    - track_adjust
+  rt_seeds: [0, 1, 2]
+
+test_report_only:
+  transformer_da_seed2_usd_per_day: 83.13277917353876
+  xgboost_da_seed0_usd_per_day: 94.35484185296666
+
+evidence:
+  report: data/results/rt_coordination_validation_selection.json
+  selection_script: scripts/decision_aware/select_rt_coordination.py
+  note: test集只评估事先定义的旧基线和验证集胜者，不用来改选方案。
+
+scope:
+  rt_price_model_reads_da_action: false
+  coordination_is_trainable: false
+  use_deviation_penalty: false
+  terminal_inventory_value: none
+  warning: 若结算规则、期末库存口径或BESS参数改变，必须重新验证。

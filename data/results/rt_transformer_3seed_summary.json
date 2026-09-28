@@ -1,0 +1,41 @@
+{
+  "selection_rule": "maximum validation RT-only rolling mean daily revenue; test never selects seed",
+  "selected_seed": 2,
+  "selected_checkpoint": "data\\checkpoints\\rt_independent_seed2\\pilot_LZ_LCRA_best_rolling_revenue.pt",
+  "runs": [
+    {
+      "report": "data\\results\\rt_transformer_seed0.json",
+      "seed": 0,
+      "checkpoint": "data\\checkpoints\\rt_independent_v1\\pilot_LZ_LCRA_best_rolling_revenue.pt",
+      "epochs_ran": 9,
+      "validation_mean_daily_revenue": 140.67920658425314,
+      "test_mean_daily_revenue": 69.43321178154626,
+      "test_executed_hour_mae": 15.811155319213867
+    },
+    {
+      "report": "data\\results\\rt_transformer_seed1.json",
+      "seed": 1,
+      "checkpoint": "data\\checkpoints\\rt_independent_seed1\\pilot_LZ_LCRA_best_rolling_revenue.pt",
+      "epochs_ran": 4,
+      "validation_mean_daily_revenue": 118.93075385956563,
+      "test_mean_daily_revenue": 65.42167219980361,
+      "test_executed_hour_mae": 18.470924377441406
+    },
+    {
+      "report": "data\\results\\rt_transformer_seed2.json",
+      "seed": 2,
+      "checkpoint": "data\\checkpoints\\rt_independent_seed2\\pilot_LZ_LCRA_best_rolling_revenue.pt",
+      "epochs_ran": 7,
+      "validation_mean_daily_revenue": 146.28091184949054,
+      "test_mean_daily_revenue": 78.90430837444302,
+      "test_executed_hour_mae": 13.73777961730957
+    }
+  ],
+  "test_across_seeds": {
+    "mean_daily_revenue_mean": 71.25306411859764,
+    "mean_daily_revenue_sample_std": 6.923096594077487,
+    "executed_hour_mae_mean": 16.006619771321613,
+    "executed_hour_mae_sample_std": 2.3726187207638736
+  },
+  "scope_warning": "This selects an RT forecasting checkpoint with an RT-only diagnostic. It is not a final full dual-settlement model-selection claim."
+}

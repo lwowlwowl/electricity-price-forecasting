@@ -1,0 +1,173 @@
+{
+  "run_type": "smoke",
+  "contract": "ERCOT D-1 10:00 local -> delivery day 00:00-23:00",
+  "selection_metric": "validation.mean_revenue",
+  "revenue_scope": "DA standalone physical-execution proxy; not full dual settlement",
+  "device": "cpu",
+  "parameter_count": 72610,
+  "samples": {
+    "train": 32,
+    "validation": 16,
+    "test": 16
+  },
+  "epsilon": 20.910667419933596,
+  "history": [
+    {
+      "epoch": 1,
+      "alpha": 1.0,
+      "beta": 0.0,
+      "train": {
+        "loss_total": 6.981643557548523,
+        "loss_pred": 174.54108428955078,
+        "loss_proxy": 0.0,
+        "revenue": -117.6961612701416,
+        "mae": 175.0409812927246,
+        "rmse": 212.87104415893555,
+        "zo_gradient_norm": 0.0,
+        "alpha": 1.0,
+        "beta": 0.0
+      },
+      "validation": {
+        "mae": 142.94239807128906,
+        "rmse": 181.51458740234375,
+        "mean_revenue": -102.09528350830078,
+        "positive_day_rate": 0.125,
+        "days": 16
+      }
+    },
+    {
+      "epoch": 2,
+      "alpha": 1.0,
+      "beta": 0.0,
+      "train": {
+        "loss_total": 5.54350221157074,
+        "loss_pred": 138.58755683898926,
+        "loss_proxy": 0.0,
+        "revenue": -115.99425888061523,
+        "mae": 139.08667945861816,
+        "rmse": 172.56588172912598,
+        "zo_gradient_norm": 0.0,
+        "alpha": 1.0,
+        "beta": 0.0
+      },
+      "validation": {
+        "mae": 110.87076568603516,
+        "rmse": 146.69491577148438,
+        "mean_revenue": -88.52613830566406,
+        "positive_day_rate": 0.125,
+        "days": 16
+      }
+    },
+    {
+      "epoch": 3,
+      "alpha": 1.0,
+      "beta": 0.0,
+      "train": {
+        "loss_total": 4.186368882656097,
+        "loss_pred": 104.65922164916992,
+        "loss_proxy": 0.0,
+        "revenue": -112.36947059631348,
+        "mae": 105.15705680847168,
+        "rmse": 134.05895042419434,
+        "zo_gradient_norm": 0.0,
+        "alpha": 1.0,
+        "beta": 0.0
+      },
+      "validation": {
+        "mae": 83.94795989990234,
+        "rmse": 109.52511596679688,
+        "mean_revenue": -38.50688934326172,
+        "positive_day_rate": 0.125,
+        "days": 16
+      }
+    },
+    {
+      "epoch": 4,
+      "alpha": 1.0,
+      "beta": 0.0,
+      "train": {
+        "loss_total": 3.1668663024902344,
+        "loss_pred": 79.17165851593018,
+        "loss_proxy": 0.0,
+        "revenue": -97.74633693695068,
+        "mae": 79.67102527618408,
+        "rmse": 101.58647537231445,
+        "zo_gradient_norm": 0.0,
+        "alpha": 1.0,
+        "beta": 0.0
+      },
+      "validation": {
+        "mae": 65.60388946533203,
+        "rmse": 90.0887451171875,
+        "mean_revenue": 0.8028793334960938,
+        "positive_day_rate": 0.3125,
+        "days": 16
+      }
+    },
+    {
+      "epoch": 5,
+      "alpha": 1.0,
+      "beta": 0.0,
+      "train": {
+        "loss_total": 2.383241683244705,
+        "loss_pred": 59.58104228973389,
+        "loss_proxy": 0.0,
+        "revenue": -69.6649158000946,
+        "mae": 60.07886600494385,
+        "rmse": 79.2235860824585,
+        "zo_gradient_norm": 0.0,
+        "alpha": 1.0,
+        "beta": 0.0
+      },
+      "validation": {
+        "mae": 52.73737716674805,
+        "rmse": 76.25929260253906,
+        "mean_revenue": 50.21706771850586,
+        "positive_day_rate": 0.625,
+        "days": 16
+      }
+    },
+    {
+      "epoch": 6,
+      "alpha": 0.9166666666666666,
+      "beta": 0.08333333333333333,
+      "train": {
+        "loss_total": 1.8538925051689148,
+        "loss_pred": 50.78684902191162,
+        "loss_proxy": -0.09950372716411948,
+        "revenue": -18.636849403381348,
+        "mae": 51.284424781799316,
+        "rmse": 71.0671854019165,
+        "zo_gradient_norm": 19.782508850097656,
+        "alpha": 0.9166666666666666,
+        "beta": 0.08333333333333333
+      },
+      "validation": {
+        "mae": 49.72495651245117,
+        "rmse": 64.93006896972656,
+        "mean_revenue": 77.92744445800781,
+        "positive_day_rate": 0.75,
+        "days": 16
+      }
+    }
+  ],
+  "best_validation": {
+    "mae": 49.72495651245117,
+    "rmse": 64.93006896972656,
+    "mean_revenue": 77.92744445800781,
+    "positive_day_rate": 0.75,
+    "days": 16,
+    "mean_oracle": 183.5260009765625,
+    "mean_regret": 105.59856414794922
+  },
+  "test": {
+    "mae": 44.95413589477539,
+    "rmse": 53.496795654296875,
+    "mean_revenue": -44.40288162231445,
+    "positive_day_rate": 0.5625,
+    "days": 16,
+    "mean_oracle": 128.36790466308594,
+    "mean_regret": 172.77081298828125
+  },
+  "checkpoint": "data\\checkpoints\\da_independent_v1\\pilot_LZ_LCRA_best_revenue_smoke.pt"
+}

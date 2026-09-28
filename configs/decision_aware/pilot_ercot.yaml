@@ -1,5 +1,5 @@
 # 先行版 (Pilot) — Decision-aware 多模态 TSFM 配置
-# 架构对应 docs/model_architecture_v2.drawio「先行版」两页。
+# 旧先行版配置；当前结构图见 docs/model_architecture.drawio。
 # 数据: ERCOT LZ_LCRA（高波动节点，decision-aware 优势明显），小时级，model_ready forecast 版（无泄漏）。
 # 运行: external/chronos-forecasting/.venv/bin/python scripts/archive/decision_aware_legacy/train_pilot.py \
 #         --config configs/decision_aware/pilot_ercot.yaml

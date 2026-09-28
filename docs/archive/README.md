@@ -1,23 +1,20 @@
-# docs/archive — 旧范式文档归档
+# 历史文档归档
 
-> 状态：**已废弃**。新方向文档见 `docs/todo3.md` 与 `docs/team_notes/w8`、`w9`。
-> 保留这些文档是因为其中包含已沉淀的实验结论与方法论，写新模型时仍需回查。
+这里保存已经退出当前主流程的实验手册、旧TODO、协变量研究、历史结果和汇报材料。
+它们只用于追溯，不代表当前待办，也不应作为当前路径或数据合同。
 
-## 归档内容
+当前请优先看：
 
-| 文件/目录 | 内容 | 复用价值 |
-|-----------|------|----------|
-| `fusion/` | ElecFM 融合模型设计/实验/实现文档 | 架构思路（spike head 分叉点选择）可参考 |
-| `elecfm/` | 更早的 ElecFM 历史文档 | 仅存档 |
-| `参数消融汇报材料.md` + `参数消融实验结果与问答.md` | v1.0 输入配置消融完整分析 | **结论可直接指导新模型输入设计**：喂哪些协变量、context 长度、频率 |
-| `结构消融汇报材料.md` + `结构消融实验结果与问答.md` | v2.0 结构消融 + ElecFM 完整研究记录 | 方法论（Wilcoxon、逐层消融）可迁移；FFN 是最关键组件等结论 |
-| `融合模型汇报.md` | ElecFM 汇总汇报 | 仅存档 |
-| `todo.md` + `todo2.md` | 旧阶段待办 | 仅存档 |
+- 根目录 `README.md`：当前项目入口与最小结构；
+- 根目录 `TODO-WIN.md`：仍需处理的代码问题；
+- `docs/PRD_DA_RT独立建模与跨模态融合.md`：当前实施要求；
+- `docs/transformer_3day_learning_plan.md`：学习顺序。
 
-## 保留在主线的 docs 内容
+2026-09-28归档内容包括：
 
-- `docs/todo3.md` — 当前决策清单（Decision-aware 模型搭建）
-- `docs/covariate_conclusions.md` — 协变量结论（多模态输入设计依据）
-- `docs/新闻特征初步汇报材料.md` — LLM 新闻特征（Event Encoder 可选输入）
-- `docs/model_architecture*.drawio` + `gen_drawio_v4.py` — **新方向架构图**（基于 w9 材料，含 Head_DA/Head_RT、双结算、代理梯度）
-- `docs/specs/`、`docs/concepts/`、`docs/reference/`、`docs/team_notes/` — 方法论/参考/团队纪要
+- v1/v2实验手册及参数/结构消融材料；
+- 协变量结论与新闻特征汇报；
+- 原 `data/covariates/` 中的两份旧流程说明；
+- todo3、todo3_2、todo4和w10提取文本；
+- 先行版、正式版与v8阶段历史结果；
+- 项目整理前的完整README快照。

@@ -54,18 +54,8 @@ external/
 # --------------------------------------------
 # 4. 数据文件（选择性忽略）
 # --------------------------------------------
-data/raw/
-
-# 协变量（派生数据，与 raw 同性质，可由 scripts/covariates 重新生成）
-# 注：忽略"目录下内容"而非目录本身，否则 ! 例外无法生效（git 不进入被忽略目录）
-data/covariates/**
-# 例外：保留实验文档（体积小，需入库）
-!data/covariates/experiment.md
-!data/covariates/README.md
-
-# 统一小时数据表（ERCOT/PJM/CAISO/NYISO，xlsx 40~121MB 超出 GitHub 限制，
-# parquet 10~41MB 也不适合入库；loader_v2.py 本地读取 data/unified/）
-data/unified/
+# 团队提供的统一市场数据包。目录内含 Excel/Parquet 大文件，不提交 Git。
+data/markets/
 
 # 处理后的数据（可重新生成）
 data/processed/*.csv
@@ -75,7 +65,6 @@ data/results/*.csv
 data/results/*.png
 
 # 但保留目录结构（使用 .gitkeep）
-# data/raw/.gitkeep
 # data/processed/.gitkeep
 # data/results/.gitkeep
 
@@ -133,8 +122,7 @@ log/
 # --------------------------------------------
 # 10. 临时文件
 # --------------------------------------------
-tmp/
-temp/
+runtime_cache/
 *.tmp
 *.bak
 *.backup

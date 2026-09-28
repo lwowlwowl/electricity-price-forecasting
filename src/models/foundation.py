@@ -124,7 +124,7 @@ def _run_worker(kind: str, tasks: List[Task], horizon: int,
             payload[f"future_cov__{i}"] = t.future_cov.astype(np.float32)
 
     hf_home = os.path.join(ROOT, "hf_cache")
-    runtime_dir = os.path.join(ROOT, "temp", "foundation_workers", kind)
+    runtime_dir = os.path.join(ROOT, "runtime_cache", "foundation_workers", kind)
     cache_dir = os.path.join(runtime_dir, "cache")
     ipc_dir = os.path.join(runtime_dir, "ipc")
     os.makedirs(cache_dir, exist_ok=True)
