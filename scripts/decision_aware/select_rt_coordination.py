@@ -1,5 +1,8 @@
 #!/usr/bin/env python
-"""用完整双结算验证收益选择固定RT协调方式和RT checkpoint。"""
+"""历史DA-only信号下选择固定RT协调方式和RT checkpoint。
+
+补齐RT-at-DA后的正式选择入口是``select_spread_coordination.py``。
+"""
 from __future__ import annotations
 
 import argparse
@@ -35,7 +38,7 @@ from decision_aware.model_da import DecisionAwareDAForecaster  # noqa: E402
 from decision_aware.model_rt import DecisionAwareRTForecaster  # noqa: E402
 
 
-MODES = ("rt_only", "follow_da", "track_adjust")
+MODES = ("rt_only", "follow_da")
 
 
 def _xgboost_predictions(train_ds, val_ds, test_ds, cache_path: Path):
@@ -106,7 +109,6 @@ def _run(
         rt_k_charge=1,
         rt_k_discharge=1,
         coordination_mode=mode,
-        adjust_margin_usd=0.0,
     )
 
 
@@ -259,7 +261,6 @@ def main() -> None:
         "da_checkpoint": str(args.da_checkpoint),
         "xgboost_prediction_source": xgb_source,
         "candidate_modes": list(MODES),
-        "adjust_margin_usd": 0.0,
         "validation_grid": validation_grid,
         "selected": {
             "rt_seed": selected["rt_seed"],

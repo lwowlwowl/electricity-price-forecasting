@@ -28,7 +28,7 @@ from .config import PilotConfig
 from .model import DecisionAwareTSFM
 from .model_da import DecisionAwareDAForecaster
 from .model_rt import DecisionAwareRTForecaster
-from .policy import (BESSSimulator, STEPolicy, TopKPolicy, HardTopKPolicy,
+from .policy import (BESSSimulator, LookaheadMPCPolicy, STEPolicy, TopKPolicy, HardTopKPolicy,
                      greedy_hindsight_revenue, lp_oracle_revenue,
                      lp_oracle_revenue_dual, LPSolveStatus,
                      LPOracleSolveError)
@@ -40,7 +40,7 @@ from .zero_order import (estimate_zo_gradient, estimate_zo_gradient_dual,
 __all__ = [
     "PilotConfig", "DecisionAwareTSFM", "DecisionAwareDAForecaster",
     "DecisionAwareRTForecaster",
-    "BESSSimulator", "STEPolicy", "TopKPolicy", "HardTopKPolicy",
+    "BESSSimulator", "LookaheadMPCPolicy", "STEPolicy", "TopKPolicy", "HardTopKPolicy",
     "greedy_hindsight_revenue", "lp_oracle_revenue", "lp_oracle_revenue_dual",
     "LPSolveStatus", "LPOracleSolveError",
     "total_loss", "total_loss_zo", "anneal_alpha_beta", "da_decision_aware_loss",

@@ -1,0 +1,34 @@
+{
+  "run_type": "smoke",
+  "contract": "ERCOT D-1 10:00 local -> delivery-day 24 hourly RT prices",
+  "training_objective": "supervised Huber only",
+  "epoch_selection_metric": "validation MAE (lower is better)",
+  "system_selection_note": "seed/checkpoint enters a later validation-only full dual-settlement grid; test is not read by this script",
+  "device": "cuda",
+  "mixed_precision": true,
+  "parameter_count": 72610,
+  "samples": {
+    "train": 32,
+    "validation": 16
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 9.540554881095886,
+      "validation": {
+        "mae": 244.6226043701172,
+        "rmse": 292.5457458496094,
+        "days": 16
+      }
+    }
+  ],
+  "best_epoch": 1,
+  "best_validation": {
+    "mae": 244.6226043701172,
+    "rmse": 292.5457458496094,
+    "days": 16
+  },
+  "checkpoint": "data\\checkpoints\\rt_at_da_independent_v1\\pilot_LZ_LCRA_best_mae_smoke.pt",
+  "wall_time_seconds": 8.98,
+  "peak_cuda_memory_mb": 115.93
+}

@@ -1,0 +1,53 @@
+# 补齐RT-at-DA后、F0/F1/F2融合消融前冻结的完整系统合同。
+version: rt_coordination_spread_v2
+status: frozen_before_fusion_ablation
+
+da_decision:
+  signal: predicted_da_minus_predicted_rt_at_da
+  issue_time: D-1 10:00 America/Chicago
+  delivery_horizon_hours: 24
+  da_checkpoint: data/checkpoints/da_independent_seed2/pilot_LZ_LCRA_best_revenue.pt
+
+selected:
+  rt_at_da_seed: 2
+  rt_at_da_checkpoint: data/checkpoints/rt_at_da_independent_seed2/pilot_LZ_LCRA_best_mae.pt
+  rolling_rt_seed: 2
+  rolling_rt_checkpoint: data/checkpoints/rt_independent_seed2/pilot_LZ_LCRA_best_rolling_revenue.pt
+  coordination_mode: rt_only
+
+selection:
+  split: validation
+  objective: mean_full_dual_daily_revenue
+  aggregation: mean_across_da_references
+  da_references:
+    - transformer_da_seed2
+    - xgboost_da_seed0
+  candidate_grid: 3_rt_at_da_seeds_x_3_rolling_rt_seeds_x_3_current_modes
+  candidate_modes: [rt_only, follow_da, lookahead_mpc]
+  candidates: 27
+  validation_selection_score_usd_per_day: 148.51155194876807
+  legacy_da_only_score_usd_per_day: 147.38101612103247
+  score_change_usd_per_day: 1.13053582773560
+
+test_report_only:
+  transformer_da_seed2:
+    legacy_usd_per_day: 83.13277917353876
+    corrected_usd_per_day: 82.97846877387771
+    change_usd_per_day: -0.15431039966106
+  xgboost_da_seed0:
+    legacy_usd_per_day: 94.35484185296666
+    corrected_usd_per_day: 95.89271471387697
+    change_usd_per_day: 1.53787286091031
+
+evidence:
+  report: data/results/spread_coordination_validation_selection.json
+  selection_script: scripts/decision_aware/select_spread_coordination.py
+  note: 测试集只在验证选择结束后评价旧诊断基线和验证胜者。
+
+scope:
+  model_weights_shared: false
+  rolling_rt_reads_da_action: false
+  coordination_is_trainable: false
+  use_deviation_penalty: false
+  terminal_inventory_value: none
+  warning: 若结算规则、期末库存口径或BESS参数改变，必须重新验证。

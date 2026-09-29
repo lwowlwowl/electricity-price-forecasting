@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from .policy import BESSSimulator, HardTopKPolicy
+from .policy import BESSSimulator, HardTopKPolicy, LookaheadMPCPolicy
 
 
 def _as_2d_float(value, name: str) -> torch.Tensor:
@@ -40,8 +40,9 @@ def _digest(values: Sequence[float]) -> str:
     return hashlib.sha256(data.tobytes()).hexdigest()
 
 
-def _normalise_plan_mapping(
+def _normalise_daily_mapping(
     forecasts: Mapping[date | str, Sequence[float] | torch.Tensor],
+    label: str,
 ) -> dict[date, torch.Tensor]:
     result: dict[date, torch.Tensor] = {}
     for key, value in forecasts.items():
@@ -49,7 +50,7 @@ def _normalise_plan_mapping(
         prediction = torch.as_tensor(value, dtype=torch.float32).detach().cpu().reshape(-1)
         if prediction.numel() != 24:
             raise ValueError(
-                f"{delivery_date}的DA预测应有24个小时，实际为{prediction.numel()}"
+                f"{delivery_date}的{label}应有24个小时，实际为{prediction.numel()}"
             )
         result[delivery_date] = prediction
     return result
@@ -69,54 +70,6 @@ def _make_simulator(cfg) -> BESSSimulator:
     )
 
 
-def coordinated_rt_intent(
-    da_action: float,
-    rt_candidate: float,
-    predicted_rt_price: float,
-    cfg,
-    mode: str,
-    adjust_margin_usd: float = 0.0,
-    use_deviation_penalty: bool = False,
-) -> tuple[float, bool, float]:
-    """在不改变价格模型的前提下，决定本小时是否偏离已锁定DA计划。
-
-    返回 ``(动作, 是否采用RT候选, 候选相对跟随DA的预计增益)``。预计增益
-    只比较本小时会随实际动作变化的RT结算与吞吐成本；DA腿已经锁定，是常数。
-    ``track_adjust`` 只有在候选增益严格超过预设门槛时才采用RT候选。
-    """
-    supported = {"rt_only", "follow_da", "track_adjust"}
-    if mode not in supported:
-        raise ValueError(f"未知RT协调方式: {mode}；应为{sorted(supported)}之一")
-    if mode == "rt_only":
-        return float(rt_candidate), True, float("nan")
-    if mode == "follow_da":
-        return float(da_action), False, float("nan")
-
-    power_energy = float(cfg.bess_power_mw)  # 当前合同dt=1小时
-    da_net = float(da_action) * power_energy
-    candidate_net = float(rt_candidate) * power_energy
-    follow_net = da_net
-    price = float(predicted_rt_price)
-    candidate_value = (candidate_net - da_net) * price
-    follow_value = (follow_net - da_net) * price
-    candidate_cost = float(cfg.bess_kappa) * abs(candidate_net)
-    follow_cost = float(cfg.bess_kappa) * abs(follow_net)
-    gain = (candidate_value - candidate_cost) - (follow_value - follow_cost)
-
-    if use_deviation_penalty:
-        tolerance = 0.03 * abs(da_net)
-        candidate_excess = max(0.0, abs(candidate_net - da_net) - tolerance)
-        follow_excess = max(0.0, abs(follow_net - da_net) - tolerance)
-        gain -= 2.0 * abs(price) * (candidate_excess - follow_excess)
-
-    use_candidate = gain > float(adjust_margin_usd)
-    return (
-        float(rt_candidate) if use_candidate else float(da_action),
-        use_candidate,
-        gain,
-    )
-
-
 @torch.no_grad()
 def locked_dual_backtest(
     da_price_forecasts: Mapping[date | str, Sequence[float] | torch.Tensor],
@@ -132,7 +85,9 @@ def locked_dual_backtest(
     rt_k_discharge: int = 1,
     use_deviation_penalty: bool | None = None,
     coordination_mode: str = "rt_only",
-    adjust_margin_usd: float = 0.0,
+    rt_at_da_price_forecasts: (
+        Mapping[date | str, Sequence[float] | torch.Tensor] | None
+    ) = None,
 ) -> dict:
     """回测锁定的日计划和逐小时 RT 动作，返回可审计的收益分解。
 
@@ -140,7 +95,11 @@ def locked_dual_backtest(
     小时、这些小时在 UTC 上连续。夏令时的 23/25 小时日不伪装成 24 小时
     日。若中间出现缺日，则在下一连续段开始时重置两条 SOC，并明确报告。
     """
-    plans = _normalise_plan_mapping(da_price_forecasts)
+    da_forecasts = _normalise_daily_mapping(da_price_forecasts, "DA预测")
+    rt_at_da_forecasts = (
+        _normalise_daily_mapping(rt_at_da_price_forecasts, "RT-at-DA预测")
+        if rt_at_da_price_forecasts is not None else None
+    )
     rt_forecasts = _as_2d_float(rt_price_forecasts, "rt_price_forecasts")
     price_da = _as_1d_float(realized_da_price, "realized_da_price")
     price_rt = _as_1d_float(realized_rt_price, "realized_rt_price")
@@ -178,7 +137,13 @@ def locked_dual_backtest(
         ):
             excluded_incomplete.append(str(delivery_date))
             continue
-        if delivery_date not in plans:
+        if delivery_date not in da_forecasts:
+            excluded_without_plan.append(str(delivery_date))
+            continue
+        if (
+            rt_at_da_forecasts is not None
+            and delivery_date not in rt_at_da_forecasts
+        ):
             excluded_without_plan.append(str(delivery_date))
             continue
         eligible[delivery_date] = positions
@@ -193,6 +158,18 @@ def locked_dual_backtest(
         rt_k_charge, rt_k_discharge, spread_threshold=threshold
     )
     simulator = _make_simulator(cfg)
+    mpc_policy = LookaheadMPCPolicy(
+        cfg.bess_power_mw,
+        cfg.bess_energy_mwh,
+        cfg.bess_eta,
+        cfg.bess_init_soc_frac,
+        kappa=cfg.bess_kappa,
+        soc_min=cfg.bess_soc_min,
+        soc_max=cfg.bess_soc_max,
+        e_cyc=cfg.bess_e_cyc,
+    )
+    if coordination_mode not in {"rt_only", "follow_da", "lookahead_mpc"}:
+        raise ValueError(f"未知RT协调方式: {coordination_mode}")
     rt_candidates_all = rt_policy(rt_forecasts)[:, 0]
 
     ordered_dates = sorted(eligible)
@@ -221,7 +198,10 @@ def locked_dual_backtest(
             segment_count += 1
             segment_start_dates.append(str(delivery_date))
             plan_soc = float(initial_soc)
-        intended_plan = da_policy(plans[delivery_date].reshape(1, 24))
+        da_signal = da_forecasts[delivery_date]
+        if rt_at_da_forecasts is not None:
+            da_signal = da_signal - rt_at_da_forecasts[delivery_date]
+        intended_plan = da_policy(da_signal.reshape(1, 24))
         projection = simulator.project_actions(intended_plan, plan_soc)
         feasible_plan = projection.action[0]
         da_actions[delivery_date] = feasible_plan
@@ -239,9 +219,7 @@ def locked_dual_backtest(
     daily = {}
     all_actual_actions = []
     all_da_actions = []
-    used_rt_candidate_hours = 0
     changed_from_da_hours = 0
-    finite_expected_gains = []
     previous_last_utc = None
     actual_segment_index = 0
 
@@ -267,19 +245,38 @@ def locked_dual_backtest(
         for hour, position in enumerate(positions):
             da_action = float(plan[hour])
             rt_candidate = float(rt_candidates_all[position])
-            rt_intended, used_candidate, expected_gain = coordinated_rt_intent(
-                da_action,
-                rt_candidate,
-                float(rt_forecasts[position, 0]),
-                cfg,
-                coordination_mode,
-                adjust_margin_usd,
-                penalty_enabled,
-            )
-            used_rt_candidate_hours += int(used_candidate)
+            if coordination_mode == "lookahead_mpc":
+                horizon = int(rt_forecasts.shape[1])
+                future_da = torch.zeros((1, horizon), dtype=torch.float32)
+                cycle_reset = torch.zeros((1, horizon), dtype=torch.bool)
+                for step in range(horizon):
+                    future_position = position + step
+                    if future_position >= len(timestamps):
+                        break
+                    if step > 0:
+                        expected_utc = utc_timestamps[position] + step * one_hour
+                        if utc_timestamps[future_position] != expected_utc:
+                            break
+                        if timestamps[future_position].date() != timestamps[future_position - 1].date():
+                            cycle_reset[0, step] = True
+                    future_date = timestamps[future_position].date()
+                    if future_date in da_actions:
+                        future_da[0, step] = da_actions[future_date][
+                            timestamps[future_position].hour
+                        ]
+                rt_intended = float(mpc_policy(
+                    rt_forecasts[position].reshape(1, -1),
+                    initial_soc_mwh=actual_soc,
+                    initial_discharged_mwh=discharged_today,
+                    da_plan=future_da,
+                    use_deviation_penalty=penalty_enabled,
+                    cycle_reset_mask=cycle_reset,
+                )[0, 0])
+            elif coordination_mode == "follow_da":
+                rt_intended = da_action
+            else:
+                rt_intended = rt_candidate
             changed_from_da_hours += int(abs(rt_intended - da_action) > 1e-8)
-            if np.isfinite(expected_gain):
-                finite_expected_gains.append(expected_gain)
             requested_discharge = max(rt_intended, 0.0) * cfg.bess_power_mw
             requested_charge = max(-rt_intended, 0.0) * cfg.bess_power_mw
             actual_discharge = min(
@@ -341,15 +338,14 @@ def locked_dual_backtest(
     total_revenue = total_da + total_rt - total_cost - total_penalty
     return {
         "contract": "locked 24h DA plan + hourly rolling RT first action + dual settlement",
+        "da_decision_signal": (
+            "predicted_DA_minus_predicted_RT_at_DA"
+            if rt_at_da_forecasts is not None else "legacy_predicted_DA_only"
+        ),
         "coordination": {
             "mode": coordination_mode,
-            "adjust_margin_usd": float(adjust_margin_usd),
-            "used_rt_candidate_hours": used_rt_candidate_hours,
             "changed_from_da_hours": changed_from_da_hours,
             "changed_from_da_rate": changed_from_da_hours / (24 * len(daily_values)),
-            "mean_candidate_gain_usd": (
-                float(np.mean(finite_expected_gains)) if finite_expected_gains else None
-            ),
         },
         "days": len(daily_values),
         "hours": 24 * len(daily_values),

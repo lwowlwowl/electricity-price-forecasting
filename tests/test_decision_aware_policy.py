@@ -15,11 +15,49 @@ sys.path.insert(0, str(ROOT / "src"))
 from decision_aware.policy import (  # noqa: E402
     BESSSimulator,
     LPOracleSolveError,
+    LookaheadMPCPolicy,
     STEPolicy,
     compute_regret,
     greedy_hindsight_revenue,
     lp_oracle_revenue,
 )
+
+
+class LookaheadMPCPolicyTests(unittest.TestCase):
+    def _policy(self, kappa: float = 0.0):
+        return LookaheadMPCPolicy(
+            power_mw=1.0,
+            energy_mwh=2.0,
+            eta=1.0,
+            init_soc_frac=0.5,
+            kappa=kappa,
+            soc_min=0.0,
+            soc_max=2.0,
+            e_cyc=2.0,
+        )
+
+    def test_joint_path_charges_low_then_discharges_high(self):
+        action = self._policy()(torch.tensor([[10.0, 30.0]]))
+        self.assertEqual(float(action[0, 0]), -1.0)
+
+    def test_da_plan_does_not_change_rt_optimum_without_penalty(self):
+        policy = self._policy(kappa=1.0)
+        price = torch.tensor([[10.0, 30.0]])
+        without_da = policy(price)
+        with_da = policy(price, da_plan=torch.tensor([[1.0, -1.0]]))
+        torch.testing.assert_close(with_da, without_da)
+
+    def test_da_plan_can_change_rt_optimum_when_penalty_is_enabled(self):
+        policy = self._policy()
+        price = torch.tensor([[1.0]])
+        independent = policy(price)
+        tracked = policy(
+            price,
+            da_plan=torch.tensor([[-1.0]]),
+            use_deviation_penalty=True,
+        )
+        self.assertEqual(float(independent[0, 0]), 0.0)
+        self.assertEqual(float(tracked[0, 0]), -1.0)
 
 
 class BESSSimulatorAccountingTests(unittest.TestCase):

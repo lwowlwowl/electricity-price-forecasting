@@ -310,6 +310,170 @@ class BESSSimulator(nn.Module):
 # ════════════════════════════════════════════════════════════════════════════
 # 策略 1：STE（v1，保留向后兼容）
 # ════════════════════════════════════════════════════════════════════════════
+class LookaheadMPCPolicy(nn.Module):
+    """在短时域内联合选择充/停/放路径，而不做单小时贪心判断。
+
+    动作集默认为 ``{-1, 0, +1}``，对 H=4 只需比较 3^4=81 条路径。
+    每条路径都按相同的功率、SOC、效率、每日放电上限和吞吐成本
+    执行。回测时每小时重新规划并只执行第一步。
+
+    在无偏差罚金的价格接受者双结算中，已锁定的 DA 头寸对
+    所有 RT 候选路径是同一个常数项，不会改变最优 RT 动作。
+    只有启用偏差罚金时，``da_plan`` 才会影响路径选择。
+    """
+
+    def __init__(
+        self,
+        power_mw: float,
+        energy_mwh: float,
+        eta: float,
+        init_soc_frac: float = 0.5,
+        kappa: float = 0.0,
+        soc_min: float = 0.0,
+        soc_max: float | None = None,
+        e_cyc: float | None = None,
+        action_levels: tuple[float, ...] = (-1.0, 0.0, 1.0),
+        terminal_value_weight: float = 1.0,
+    ):
+        super().__init__()
+        if not action_levels or any(abs(value) > 1.0 for value in action_levels):
+            raise ValueError("action_levels必须是[-1,1]内的非空动作集")
+        self.P = float(power_mw)
+        self.E = float(energy_mwh)
+        self.eta = float(eta)
+        self.init_soc_frac = float(init_soc_frac)
+        self.kappa = float(kappa)
+        self.s_min = float(soc_min)
+        self.s_max = float(soc_max if soc_max is not None else energy_mwh)
+        self.e_cyc = float(e_cyc if e_cyc is not None else energy_mwh)
+        self.action_levels = tuple(float(value) for value in action_levels)
+        self.terminal_value_weight = float(terminal_value_weight)
+
+    def _sequences(self, horizon: int, reference: torch.Tensor) -> torch.Tensor:
+        levels = torch.tensor(
+            self.action_levels, dtype=reference.dtype, device=reference.device
+        )
+        if horizon == 1:
+            return levels.reshape(-1, 1)
+        return torch.cartesian_prod(*([levels] * horizon)).reshape(-1, horizon)
+
+    @torch.no_grad()
+    def forward(
+        self,
+        predicted_price: torch.Tensor,
+        initial_soc_mwh: float | torch.Tensor | None = None,
+        initial_discharged_mwh: float | torch.Tensor = 0.0,
+        da_plan: torch.Tensor | None = None,
+        use_deviation_penalty: bool = False,
+        cycle_reset_mask: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        """返回每个样本在预测价格下的最优离散动作路径。"""
+        if predicted_price.ndim != 2:
+            raise ValueError("predicted_price必须是[B,H]")
+        batch_size, horizon = predicted_price.shape
+        if horizon < 1:
+            raise ValueError("前瞻时域不能为空")
+        sequences = self._sequences(horizon, predicted_price)
+        sequence_count = sequences.shape[0]
+        actions = sequences.unsqueeze(0).expand(batch_size, -1, -1)
+
+        def _state(value, default: float, name: str) -> torch.Tensor:
+            if value is None:
+                value = default
+            tensor = torch.as_tensor(
+                value, dtype=predicted_price.dtype, device=predicted_price.device
+            ).reshape(-1)
+            if tensor.numel() == 1:
+                tensor = tensor.expand(batch_size)
+            if tensor.numel() != batch_size:
+                raise ValueError(f"{name}必须是标量或长度为B的向量")
+            return tensor
+
+        soc0 = _state(
+            initial_soc_mwh, self.E * self.init_soc_frac, "initial_soc_mwh"
+        )
+        q0 = _state(initial_discharged_mwh, 0.0, "initial_discharged_mwh")
+        tolerance = 1e-6
+        if torch.any(soc0 < self.s_min - tolerance) or torch.any(
+            soc0 > self.s_max + tolerance
+        ):
+            raise ValueError("initial_soc_mwh超出SOC上下限")
+        soc = soc0.clamp(self.s_min, self.s_max).unsqueeze(1).expand(
+            -1, sequence_count
+        ).clone()
+        discharged = q0.clamp(min=0.0, max=self.e_cyc).unsqueeze(1).expand(
+            -1, sequence_count
+        ).clone()
+        value = torch.zeros_like(soc)
+        throughput = torch.zeros_like(soc)
+
+        if da_plan is None:
+            da_plan = torch.zeros_like(predicted_price)
+        else:
+            da_plan = torch.as_tensor(
+                da_plan,
+                dtype=predicted_price.dtype,
+                device=predicted_price.device,
+            )
+            if da_plan.shape != predicted_price.shape:
+                raise ValueError("da_plan必须与predicted_price同形状")
+        if cycle_reset_mask is None:
+            cycle_reset_mask = torch.zeros_like(predicted_price, dtype=torch.bool)
+        else:
+            cycle_reset_mask = torch.as_tensor(
+                cycle_reset_mask, dtype=torch.bool, device=predicted_price.device
+            )
+            if cycle_reset_mask.shape != predicted_price.shape:
+                raise ValueError("cycle_reset_mask必须与predicted_price同形状")
+
+        for step in range(horizon):
+            reset = cycle_reset_mask[:, step].unsqueeze(1)
+            discharged = torch.where(reset, torch.zeros_like(discharged), discharged)
+            intended = actions[:, :, step]
+            requested_discharge = torch.clamp(intended, min=0.0) * self.P
+            requested_charge = torch.clamp(-intended, min=0.0) * self.P
+            actual_discharge = torch.minimum(
+                requested_discharge,
+                torch.clamp((soc - self.s_min) * self.eta, min=0.0),
+            )
+            actual_discharge = torch.minimum(
+                actual_discharge,
+                torch.clamp(self.e_cyc - discharged, min=0.0),
+            )
+            actual_charge = torch.minimum(
+                requested_charge,
+                torch.clamp((self.s_max - soc) / self.eta, min=0.0),
+            )
+            actual_net = actual_discharge - actual_charge
+            da_net = da_plan[:, step].unsqueeze(1) * self.P
+            price = predicted_price[:, step].unsqueeze(1)
+            step_throughput = actual_discharge + actual_charge
+            value = value + (actual_net - da_net) * price
+            value = value - self.kappa * step_throughput
+            if use_deviation_penalty:
+                tolerance_band = 0.03 * torch.abs(da_net)
+                excess = torch.clamp(
+                    torch.abs(actual_net - da_net) - tolerance_band, min=0.0
+                )
+                value = value - 2.0 * torch.abs(price) * excess
+            throughput = throughput + step_throughput
+            soc = soc - actual_discharge / self.eta + actual_charge * self.eta
+            discharged = discharged + actual_discharge
+
+        # 有限时域末端的存电不能被当成“没有价值”。用最后一个
+        # 可见预测价格估计剩余能量的机会价值，避免四小时窗口在末端
+        # 无条件把电池放空。负价时持有库存不会被赋予负价值。
+        terminal_price = torch.clamp(predicted_price[:, -1], min=0.0).unsqueeze(1)
+        terminal_value = (
+            self.terminal_value_weight * soc * self.eta * terminal_price
+        )
+        # 同收益时轻微偏好更少吞吐，避免选到无效充放。
+        intended_effort = torch.abs(actions).sum(dim=2)
+        score = value + terminal_value - throughput * 1e-6 - intended_effort * 1e-7
+        best = torch.argmax(score, dim=1)
+        return sequences[best]
+
+
 class STEPolicy(nn.Module):
     """可微 greedy：前向 sign(p̂-mean)，反向 tanh 软阈值。最轻量。"""
     def __init__(self, k: float = 5.0):

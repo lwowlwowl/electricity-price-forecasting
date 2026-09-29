@@ -1,5 +1,9 @@
 #!/usr/bin/env python
-"""在同一独立RT模型下比较Transformer DA与XGBoost DA的双结算收益。"""
+"""历史DA-only信号诊断：在同一RT模型下比较两种DA预测器。
+
+当前正式系统已改用``p_DA - p_RT_at_DA``，选择入口是
+``select_spread_coordination.py``。本脚本保留用于复现旧基线。
+"""
 from __future__ import annotations
 
 import argparse

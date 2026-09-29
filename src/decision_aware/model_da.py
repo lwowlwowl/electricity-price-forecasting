@@ -155,7 +155,8 @@ class DecisionAwareDAForecaster(nn.Module):
             raise ValueError(f"{name}必须是[B,T]或[B,T,C]，实际为{tuple(value.shape)}")
         return value
 
-    def forward(self, batch: dict) -> dict:
+    def _encode_and_decode(self, batch: dict):
+        """共享日级骨干；DA与RT-at-DA实例只共享代码，不共享权重。"""
         inputs = {
             "price_da": self._three_dimensional(batch["price_da_ctx"], "price_da_ctx"),
             "price_rt": self._three_dimensional(batch["price_rt_ctx"], "price_rt_ctx"),
@@ -169,6 +170,10 @@ class DecisionAwareDAForecaster(nn.Module):
         memory, source_weights = self.fusion(encoded)
         calendar_context = self.target_calendar(batch["cal_tgt"])
         representation = self.decoder(memory, query_context=calendar_context)
+        return representation, memory, source_weights
+
+    def forward(self, batch: dict) -> dict:
+        representation, memory, source_weights = self._encode_and_decode(batch)
         normalized_price = self.price_head(representation).squeeze(-1)
 
         mean = batch["price_da_mean"].reshape(-1, 1)

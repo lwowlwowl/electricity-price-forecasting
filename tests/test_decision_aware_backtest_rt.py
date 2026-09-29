@@ -7,7 +7,7 @@ import torch
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 
-from decision_aware.backtest_rt import rolling_rt_backtest
+from decision_aware.backtest_rt import rolling_rt_backtest, rolling_rt_mpc_backtest
 from decision_aware.config import PilotConfig
 
 
@@ -46,3 +46,24 @@ def test_daily_cycle_counter_resets_but_soc_does_not():
     assert report["days"] == 2
     assert report["actual_actions"][0] > 0
     assert report["actual_actions"][1] > 0
+
+
+def test_rolling_mpc_uses_joint_future_path_and_executes_first_step():
+    cfg = PilotConfig(
+        horizon_rt=2,
+        bess_power_mw=1.0,
+        bess_energy_mwh=2.0,
+        bess_eta=1.0,
+        bess_init_soc_frac=0.5,
+        bess_kappa=0.0,
+        bess_soc_min=0.0,
+        bess_soc_max=2.0,
+        bess_e_cyc=2.0,
+    )
+    forecasts = torch.tensor([[10.0, 30.0], [30.0, 10.0]])
+    prices = torch.tensor([10.0, 30.0])
+    report = rolling_rt_mpc_backtest(
+        forecasts, prices, [date(2025, 1, 1), date(2025, 1, 1)], cfg
+    )
+    assert report["actual_actions"] == [-1.0, 1.0]
+    assert report["total_revenue"] == 20.0

@@ -1,0 +1,65 @@
+version: rt_coordination_mpc_candidate_v3
+status: candidate_not_promoted_due_to_test_generalization
+
+purpose: >-
+  Record the validation-selected lookahead MPC RT coordination candidate without
+  replacing the currently frozen production comparison configuration.
+
+selected_on_validation:
+  rt_at_da:
+    seed: 2
+    checkpoint: data/checkpoints/rt_at_da_independent_seed2/pilot_LZ_LCRA_best_mae.pt
+  rolling_rt:
+    seed: 2
+    checkpoint: data/checkpoints/rt_mpc_independent_seed2/pilot_LZ_LCRA_best_mpc_revenue.pt
+  coordination:
+    mode: lookahead_mpc
+    horizon_hours: 4
+    action_levels: [-1.0, 0.0, 1.0]
+    terminal_value: last_visible_predicted_rt_price
+    terminal_value_weight: 1.0
+    da_deviation_penalty_per_mwh: 0.0
+
+training:
+  initialization_checkpoint: data/checkpoints/rt_independent_seed2/pilot_LZ_LCRA_best_rolling_revenue.pt
+  objective: huber_prediction_plus_zero_order_mpc_proxy
+  seeds_evaluated: [0, 1, 2]
+  selected_seed: 2
+  selected_epoch: 2
+  selected_beta: 0.0025
+  checkpoint_selection_metric: validation_rolling_lookahead_mpc_mean_daily_revenue
+
+comparison:
+  validation_mean_daily_revenue:
+    frozen_v2_rt_only: 148.51155194876807
+    mpc_candidate_v3: 151.17718877795977
+    difference: 2.66563682919170
+    relative_difference_percent: 1.795
+  test_mean_daily_revenue_across_da_references:
+    frozen_v2_rt_only: 89.43559174387734
+    mpc_candidate_v3: 87.18262739304896
+    difference: -2.25296435082838
+    relative_difference_percent: -2.519
+  test_by_da_reference:
+    transformer_da:
+      frozen_v2_rt_only: 82.97846877387771
+      mpc_candidate_v3: 80.72550442304933
+    xgboost_da:
+      frozen_v2_rt_only: 95.89271471387697
+      mpc_candidate_v3: 93.63975036304859
+
+decision:
+  promote: false
+  keep_frozen_configuration: configs/decision_aware/rt_coordination_spread_v2.yaml
+  reason: >-
+    The candidate won on validation but lost on the untouched test period and
+    showed substantial seed sensitivity. It remains an experimental candidate,
+    not the new official comparison system.
+
+evidence:
+  strategy_only_comparison: data/results/mpc_strategy_existing_rt_comparison.json
+  seed0_training: data/results/rt_mpc_transformer_seed0.json
+  seed1_training: data/results/rt_mpc_transformer_seed1.json
+  seed2_training: data/results/rt_mpc_transformer_seed2.json
+  final_selection: data/results/mpc_decision_aware_validation_selection.json
+  frozen_v2_selection: data/results/spread_coordination_validation_selection.json

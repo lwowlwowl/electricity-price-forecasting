@@ -1,11 +1,11 @@
 # F0/F1/F2融合消融前冻结的RT协调合同。
 # 这不是新的可训练模型，而是验证集选出的固定执行方式。
 version: rt_coordination_v1
-status: frozen_before_fusion_ablation
+status: historical_superseded
+superseded_by: configs/decision_aware/rt_coordination_spread_v2.yaml
 
 selected:
   coordination_mode: rt_only
-  adjust_margin_usd: 0.0
   rt_seed: 2
   rt_checkpoint: data/checkpoints/rt_independent_seed2/pilot_LZ_LCRA_best_rolling_revenue.pt
 
@@ -20,7 +20,6 @@ selection:
   candidate_modes:
     - rt_only
     - follow_da
-    - track_adjust
   rt_seeds: [0, 1, 2]
 
 test_report_only:

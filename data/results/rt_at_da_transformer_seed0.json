@@ -1,0 +1,88 @@
+{
+  "run_type": "training",
+  "contract": "ERCOT D-1 10:00 local -> delivery-day 24 hourly RT prices",
+  "training_objective": "supervised Huber only",
+  "epoch_selection_metric": "validation MAE (lower is better)",
+  "system_selection_note": "seed/checkpoint enters a later validation-only full dual-settlement grid; test is not read by this script",
+  "device": "cuda",
+  "mixed_precision": true,
+  "parameter_count": 2805122,
+  "samples": {
+    "train": 1809,
+    "validation": 180
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 5.329656088561342,
+      "validation": {
+        "mae": 33.39711380004883,
+        "rmse": 81.16748046875,
+        "days": 180
+      }
+    },
+    {
+      "epoch": 2,
+      "train_loss": 2.46141191846446,
+      "validation": {
+        "mae": 25.836273193359375,
+        "rmse": 82.00199127197266,
+        "days": 180
+      }
+    },
+    {
+      "epoch": 3,
+      "train_loss": 2.3494346392782113,
+      "validation": {
+        "mae": 25.414926528930664,
+        "rmse": 80.24531555175781,
+        "days": 180
+      }
+    },
+    {
+      "epoch": 4,
+      "train_loss": 2.149869229709893,
+      "validation": {
+        "mae": 20.605871200561523,
+        "rmse": 79.53213500976562,
+        "days": 180
+      }
+    },
+    {
+      "epoch": 5,
+      "train_loss": 2.092304868656292,
+      "validation": {
+        "mae": 24.821979522705078,
+        "rmse": 82.60957336425781,
+        "days": 180
+      }
+    },
+    {
+      "epoch": 6,
+      "train_loss": 2.0220349776117423,
+      "validation": {
+        "mae": 21.57114028930664,
+        "rmse": 79.85948181152344,
+        "days": 180
+      }
+    },
+    {
+      "epoch": 7,
+      "train_loss": 2.0525148918754175,
+      "validation": {
+        "mae": 24.053659439086914,
+        "rmse": 79.16487121582031,
+        "days": 180
+      }
+    }
+  ],
+  "best_epoch": 4,
+  "best_validation": {
+    "mae": 20.605871200561523,
+    "rmse": 79.53213500976562,
+    "days": 180
+  },
+  "checkpoint": "data\\checkpoints\\rt_at_da_independent_v1\\pilot_LZ_LCRA_best_mae.pt",
+  "wall_time_seconds": 51.41,
+  "peak_cuda_memory_mb": 903.19
+}

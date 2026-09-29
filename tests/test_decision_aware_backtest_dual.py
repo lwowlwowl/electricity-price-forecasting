@@ -11,10 +11,7 @@ import torch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from decision_aware.backtest_dual import (  # noqa: E402
-    coordinated_rt_intent,
-    locked_dual_backtest,
-)
+from decision_aware.backtest_dual import locked_dual_backtest  # noqa: E402
 from decision_aware.config import PilotConfig  # noqa: E402
 
 
@@ -90,40 +87,67 @@ def test_dst_day_is_not_forced_into_fake_24_hour_plan():
         )
 
 
-def test_fixed_rt_coordination_modes_are_explicit_and_auditable():
+def test_unknown_rt_coordination_mode_is_rejected():
     cfg = _tiny_config()
-
-    action, used_candidate, _ = coordinated_rt_intent(
-        da_action=-1.0,
-        rt_candidate=1.0,
-        predicted_rt_price=50.0,
-        cfg=cfg,
-        mode="follow_da",
+    timestamps = pd.date_range(
+        "2025-01-02 00:00", periods=24, freq="h", tz="America/Chicago"
     )
-    assert action == -1.0
-    assert not used_candidate
-
-    action, used_candidate, gain = coordinated_rt_intent(
-        da_action=-1.0,
-        rt_candidate=1.0,
-        predicted_rt_price=50.0,
-        cfg=cfg,
-        mode="track_adjust",
-    )
-    assert action == 1.0
-    assert used_candidate
-    assert gain == pytest.approx(100.0)
-
-    action, used_candidate, gain = coordinated_rt_intent(
-        da_action=-1.0,
-        rt_candidate=1.0,
-        predicted_rt_price=-50.0,
-        cfg=cfg,
-        mode="track_adjust",
-    )
-    assert action == -1.0
-    assert not used_candidate
-    assert gain == pytest.approx(-100.0)
-
     with pytest.raises(ValueError, match="未知RT协调方式"):
-        coordinated_rt_intent(0.0, 0.0, 0.0, cfg, mode="unknown")
+        locked_dual_backtest(
+            {timestamps[0].date(): torch.zeros(24)},
+            torch.zeros((24, 4)),
+            torch.zeros(24),
+            torch.zeros(24),
+            timestamps,
+            cfg,
+            coordination_mode="unknown",
+        )
+
+
+def test_rt_at_da_forecast_changes_da_plan_to_use_predicted_spread():
+    cfg = _tiny_config()
+    timestamps = pd.date_range(
+        "2025-01-02 00:00", periods=24, freq="h", tz="America/Chicago"
+    )
+    # DA预测本身没有高低差。RT-at-DA在第0小时高、在第1小时低，
+    # 所以DA-RT价差会让第0小时充电、第1小时放电。
+    da_forecast = torch.full((24,), 50.0)
+    rt_at_da_forecast = torch.full((24,), 50.0)
+    rt_at_da_forecast[0] = 80.0
+    rt_at_da_forecast[1] = 20.0
+    rt_forecasts = torch.full((24, 4), 50.0)
+    realized_da = torch.zeros(24)
+    realized_da[0], realized_da[1] = 10.0, 30.0
+    realized_rt = torch.zeros(24)
+
+    result = locked_dual_backtest(
+        {timestamps[0].date(): da_forecast},
+        rt_forecasts,
+        realized_da,
+        realized_rt,
+        timestamps,
+        cfg,
+        da_k_charge=1,
+        da_k_discharge=1,
+        coordination_mode="follow_da",
+        rt_at_da_price_forecasts={timestamps[0].date(): rt_at_da_forecast},
+    )
+
+    assert result["da_decision_signal"] == "predicted_DA_minus_predicted_RT_at_DA"
+    assert result["revenue_components"]["da_leg"] == pytest.approx(20.0)
+
+
+def test_legacy_da_only_signal_remains_explicit_for_old_reports():
+    cfg = _tiny_config()
+    timestamps = pd.date_range(
+        "2025-01-02 00:00", periods=24, freq="h", tz="America/Chicago"
+    )
+    result = locked_dual_backtest(
+        {timestamps[0].date(): torch.arange(24, dtype=torch.float32)},
+        torch.zeros((24, 4)),
+        torch.zeros(24),
+        torch.zeros(24),
+        timestamps,
+        cfg,
+    )
+    assert result["da_decision_signal"] == "legacy_predicted_DA_only"

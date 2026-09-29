@@ -81,6 +81,7 @@ class PilotConfig:
     dropout: float = 0.1
     use_rope: bool = True
     da_fusion_mode: str = "source_attention"
+    rt_at_da_fusion_mode: str = "source_attention"
     rt_fusion_mode: str = "source_attention"
 
     # ── BESS 模拟器（w10 第7节规范值）──────────────────────────────────────

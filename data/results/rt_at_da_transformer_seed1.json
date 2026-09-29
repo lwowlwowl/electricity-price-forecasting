@@ -1,0 +1,115 @@
+{
+  "run_type": "training",
+  "contract": "ERCOT D-1 10:00 local -> delivery-day 24 hourly RT prices",
+  "training_objective": "supervised Huber only",
+  "epoch_selection_metric": "validation MAE (lower is better)",
+  "system_selection_note": "seed/checkpoint enters a later validation-only full dual-settlement grid; test is not read by this script",
+  "device": "cuda",
+  "mixed_precision": true,
+  "parameter_count": 2805122,
+  "samples": {
+    "train": 1809,
+    "validation": 180
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 5.28752548129935,
+      "validation": {
+        "mae": 26.247182846069336,
+        "rmse": 81.11312103271484,
+        "days": 180
+      }
+    },
+    {
+      "epoch": 2,
+      "train_loss": 2.222788695703473,
+      "validation": {
+        "mae": 30.245561599731445,
+        "rmse": 83.34903717041016,
+        "days": 180
+      }
+    },
+    {
+      "epoch": 3,
+      "train_loss": 2.5631197962844583,
+      "validation": {
+        "mae": 34.27500534057617,
+        "rmse": 81.01004028320312,
+        "days": 180
+      }
+    },
+    {
+      "epoch": 4,
+      "train_loss": 2.58649995766188,
+      "validation": {
+        "mae": 24.44765853881836,
+        "rmse": 78.9475326538086,
+        "days": 180
+      }
+    },
+    {
+      "epoch": 5,
+      "train_loss": 2.385883565534625,
+      "validation": {
+        "mae": 24.287296295166016,
+        "rmse": 81.99051666259766,
+        "days": 180
+      }
+    },
+    {
+      "epoch": 6,
+      "train_loss": 2.2096264644673,
+      "validation": {
+        "mae": 29.91387176513672,
+        "rmse": 79.79957580566406,
+        "days": 180
+      }
+    },
+    {
+      "epoch": 7,
+      "train_loss": 2.143923096489488,
+      "validation": {
+        "mae": 25.37540054321289,
+        "rmse": 79.23026275634766,
+        "days": 180
+      }
+    },
+    {
+      "epoch": 8,
+      "train_loss": 2.101669021865778,
+      "validation": {
+        "mae": 20.703601837158203,
+        "rmse": 79.66764831542969,
+        "days": 180
+      }
+    },
+    {
+      "epoch": 9,
+      "train_loss": 2.2416148792233384,
+      "validation": {
+        "mae": 27.221208572387695,
+        "rmse": 82.85514831542969,
+        "days": 180
+      }
+    },
+    {
+      "epoch": 10,
+      "train_loss": 2.4166222413380942,
+      "validation": {
+        "mae": 26.92040252685547,
+        "rmse": 79.36901092529297,
+        "days": 180
+      }
+    }
+  ],
+  "best_epoch": 8,
+  "best_validation": {
+    "mae": 20.703601837158203,
+    "rmse": 79.66764831542969,
+    "days": 180
+  },
+  "checkpoint": "data\\checkpoints\\rt_at_da_independent_seed1\\pilot_LZ_LCRA_best_mae.pt",
+  "wall_time_seconds": 66.1,
+  "peak_cuda_memory_mb": 903.19
+}

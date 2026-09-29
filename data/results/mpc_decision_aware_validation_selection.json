@@ -1,0 +1,962 @@
+{
+  "purpose": "select RT-at-DA + rolling RT + fixed coordination before fusion ablation",
+  "da_decision_signal": "predicted_DA_minus_predicted_RT_at_DA",
+  "selection_split": "validation only",
+  "selection_rule": "maximize mean full-dual validation daily revenue across fixed Transformer DA seed2 and XGBoost DA seed0 references",
+  "test_usage": "test evaluated only for legacy diagnostic and validation winner",
+  "device": "cuda",
+  "candidate_counts": {
+    "rt_at_da_seeds": 1,
+    "rolling_rt_seeds": 3,
+    "coordination_modes": 4,
+    "total_system_candidates": 12
+  },
+  "da_checkpoint": "data/checkpoints/da_independent_seed2/pilot_LZ_LCRA_best_revenue.pt",
+  "xgboost_prediction_source": "cache",
+  "validation_grid": [
+    {
+      "rt_at_da_seed": 2,
+      "rt_at_da_checkpoint": "data\\checkpoints\\rt_at_da_independent_seed2\\pilot_LZ_LCRA_best_mae.pt",
+      "rt_at_da_validation_mae": 20.052730560302734,
+      "rolling_rt_seed": 0,
+      "rolling_rt_checkpoint": "data\\checkpoints\\rt_mpc_independent_v1\\pilot_LZ_LCRA_best_mpc_revenue.pt",
+      "coordination_mode": "rt_only",
+      "selection_score": 120.96112847627501,
+      "systems": {
+        "transformer_da_seed2": {
+          "mean_daily_revenue": 134.3907259805463,
+          "positive_day_rate": 0.7821229050279329,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "rt_only",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 4296,
+            "changed_from_da_hours": 1945,
+            "changed_from_da_rate": 0.45274674115456237,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 87.75548390927622,
+            "rt_deviation_leg": 69.15374464404279,
+            "degradation_cost": 22.518502572772714,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 290.8460669517517,
+          "actual_segment_final_soc_mwh": [
+            0.4,
+            0.4
+          ],
+          "actual_action_digest": "8c7af206ad72fcffaa1ead7efa90dde67a73accd060c7dae3e0233e30060a015"
+        },
+        "xgboost_da_seed0": {
+          "mean_daily_revenue": 107.5315309720037,
+          "positive_day_rate": 0.7821229050279329,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "rt_only",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 4296,
+            "changed_from_da_hours": 1690,
+            "changed_from_da_rate": 0.39338919925512106,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 107.90908528168922,
+            "rt_deviation_leg": 22.140948263087193,
+            "degradation_cost": 22.518502572772714,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 322.94876009225845,
+          "actual_segment_final_soc_mwh": [
+            0.4,
+            0.4
+          ],
+          "actual_action_digest": "8c7af206ad72fcffaa1ead7efa90dde67a73accd060c7dae3e0233e30060a015"
+        }
+      }
+    },
+    {
+      "rt_at_da_seed": 2,
+      "rt_at_da_checkpoint": "data\\checkpoints\\rt_at_da_independent_seed2\\pilot_LZ_LCRA_best_mae.pt",
+      "rt_at_da_validation_mae": 20.052730560302734,
+      "rolling_rt_seed": 0,
+      "rolling_rt_checkpoint": "data\\checkpoints\\rt_mpc_independent_v1\\pilot_LZ_LCRA_best_mpc_revenue.pt",
+      "coordination_mode": "follow_da",
+      "selection_score": 62.132373156420016,
+      "systems": {
+        "transformer_da_seed2": {
+          "mean_daily_revenue": 51.417066415447145,
+          "positive_day_rate": 0.5307262569832403,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "follow_da",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 0,
+            "changed_from_da_hours": 0,
+            "changed_from_da_rate": 0.0,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 87.75548390927622,
+            "rt_deviation_leg": 3.0190568679712024e-06,
+            "degradation_cost": 36.33842051288596,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 290.8460669517517,
+          "actual_segment_final_soc_mwh": [
+            2.300000319512267,
+            0.4000002166158275
+          ],
+          "actual_action_digest": "ce0a70d80059fc332d42e22d0b7e3a550933a0f578dd70893d259cf8a7db63bd"
+        },
+        "xgboost_da_seed0": {
+          "mean_daily_revenue": 72.84767989739288,
+          "positive_day_rate": 0.7430167597765364,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "follow_da",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 0,
+            "changed_from_da_hours": 0,
+            "changed_from_da_rate": 0.0,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 107.90908528168922,
+            "rt_deviation_leg": 2.0492964992028933e-06,
+            "degradation_cost": 35.06140743359284,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 322.94876009225845,
+          "actual_segment_final_soc_mwh": [
+            0.4000001850096805,
+            0.4000002166158275
+          ],
+          "actual_action_digest": "899893b75f3f6148bc31213fd48034e7871a7425ec6ff080f09fc0abbe634bc5"
+        }
+      }
+    },
+    {
+      "rt_at_da_seed": 2,
+      "rt_at_da_checkpoint": "data\\checkpoints\\rt_at_da_independent_seed2\\pilot_LZ_LCRA_best_mae.pt",
+      "rt_at_da_validation_mae": 20.052730560302734,
+      "rolling_rt_seed": 0,
+      "rolling_rt_checkpoint": "data\\checkpoints\\rt_mpc_independent_v1\\pilot_LZ_LCRA_best_mpc_revenue.pt",
+      "coordination_mode": "track_adjust",
+      "selection_score": 25.600187213166933,
+      "systems": {
+        "transformer_da_seed2": {
+          "mean_daily_revenue": 39.74863297670678,
+          "positive_day_rate": 0.664804469273743,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "track_adjust",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 1121,
+            "changed_from_da_hours": 1121,
+            "changed_from_da_rate": 0.26094040968342647,
+            "mean_candidate_gain_usd": 1.5795631244283694
+          },
+          "mean_daily_components": {
+            "da_leg": 87.75548390927622,
+            "rt_deviation_leg": -46.162722572085386,
+            "degradation_cost": 1.844128360484066,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 290.8460669517517,
+          "actual_segment_final_soc_mwh": [
+            0.4,
+            0.4
+          ],
+          "actual_action_digest": "70eded558fc1aa920b92637222a147bf8af8338eb2b5745ac7a2ab9b2442fcb5"
+        },
+        "xgboost_da_seed0": {
+          "mean_daily_revenue": 11.451741449627082,
+          "positive_day_rate": 0.5921787709497207,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "track_adjust",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 987,
+            "changed_from_da_hours": 987,
+            "changed_from_da_rate": 0.2297486033519553,
+            "mean_candidate_gain_usd": 1.265646364043429
+          },
+          "mean_daily_components": {
+            "da_leg": 107.90908528168922,
+            "rt_deviation_leg": -93.33779643155212,
+            "degradation_cost": 3.1195474005100117,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 322.94876009225845,
+          "actual_segment_final_soc_mwh": [
+            0.4,
+            0.4
+          ],
+          "actual_action_digest": "af5172b0af7fbba5812db08d21e7d4391675a80351381d77eeede340b2f4523d"
+        }
+      }
+    },
+    {
+      "rt_at_da_seed": 2,
+      "rt_at_da_checkpoint": "data\\checkpoints\\rt_at_da_independent_seed2\\pilot_LZ_LCRA_best_mae.pt",
+      "rt_at_da_validation_mae": 20.052730560302734,
+      "rolling_rt_seed": 0,
+      "rolling_rt_checkpoint": "data\\checkpoints\\rt_mpc_independent_v1\\pilot_LZ_LCRA_best_mpc_revenue.pt",
+      "coordination_mode": "lookahead_mpc",
+      "selection_score": 120.01712197172267,
+      "systems": {
+        "transformer_da_seed2": {
+          "mean_daily_revenue": 133.44671947599397,
+          "positive_day_rate": 0.8044692737430168,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "lookahead_mpc",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 4296,
+            "changed_from_da_hours": 1681,
+            "changed_from_da_rate": 0.39129422718808193,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 87.75548390927622,
+            "rt_deviation_leg": 62.642534228875924,
+            "degradation_cost": 16.951298662158187,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 290.8460669517517,
+          "actual_segment_final_soc_mwh": [
+            0.4,
+            0.4
+          ],
+          "actual_action_digest": "a47eca0e0c87cb5572d897d883ea89e1d56545ef8dc95fbeaa652c615c0c2733"
+        },
+        "xgboost_da_seed0": {
+          "mean_daily_revenue": 106.58752446745136,
+          "positive_day_rate": 0.7821229050279329,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "lookahead_mpc",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 4296,
+            "changed_from_da_hours": 1532,
+            "changed_from_da_rate": 0.35661080074487894,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 107.90908528168922,
+            "rt_deviation_leg": 15.629737847920326,
+            "degradation_cost": 16.951298662158187,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 322.94876009225845,
+          "actual_segment_final_soc_mwh": [
+            0.4,
+            0.4
+          ],
+          "actual_action_digest": "a47eca0e0c87cb5572d897d883ea89e1d56545ef8dc95fbeaa652c615c0c2733"
+        }
+      }
+    },
+    {
+      "rt_at_da_seed": 2,
+      "rt_at_da_checkpoint": "data\\checkpoints\\rt_at_da_independent_seed2\\pilot_LZ_LCRA_best_mae.pt",
+      "rt_at_da_validation_mae": 20.052730560302734,
+      "rolling_rt_seed": 1,
+      "rolling_rt_checkpoint": "data\\checkpoints\\rt_mpc_independent_seed1\\pilot_LZ_LCRA_best_mpc_revenue.pt",
+      "coordination_mode": "rt_only",
+      "selection_score": 122.6527643394714,
+      "systems": {
+        "transformer_da_seed2": {
+          "mean_daily_revenue": 136.08236184374272,
+          "positive_day_rate": 0.7821229050279329,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "rt_only",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 4296,
+            "changed_from_da_hours": 2221,
+            "changed_from_da_rate": 0.5169925512104283,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 87.75548390927622,
+            "rt_deviation_leg": 78.8018821979184,
+            "degradation_cost": 30.47500426345193,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 290.8460669517517,
+          "actual_segment_final_soc_mwh": [
+            0.4,
+            0.4421052631578948
+          ],
+          "actual_action_digest": "bb996b003965e9f08672e7efef00c8ddfc3822b8bd3eac813a500139f4d8a5f1"
+        },
+        "xgboost_da_seed0": {
+          "mean_daily_revenue": 109.22316683520009,
+          "positive_day_rate": 0.7318435754189944,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "rt_only",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 4296,
+            "changed_from_da_hours": 2030,
+            "changed_from_da_rate": 0.4725325884543762,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 107.90908528168922,
+            "rt_deviation_leg": 31.789085816962807,
+            "degradation_cost": 30.47500426345193,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 322.94876009225845,
+          "actual_segment_final_soc_mwh": [
+            0.4,
+            0.4421052631578948
+          ],
+          "actual_action_digest": "bb996b003965e9f08672e7efef00c8ddfc3822b8bd3eac813a500139f4d8a5f1"
+        }
+      }
+    },
+    {
+      "rt_at_da_seed": 2,
+      "rt_at_da_checkpoint": "data\\checkpoints\\rt_at_da_independent_seed2\\pilot_LZ_LCRA_best_mae.pt",
+      "rt_at_da_validation_mae": 20.052730560302734,
+      "rolling_rt_seed": 1,
+      "rolling_rt_checkpoint": "data\\checkpoints\\rt_mpc_independent_seed1\\pilot_LZ_LCRA_best_mpc_revenue.pt",
+      "coordination_mode": "follow_da",
+      "selection_score": 62.132373156420016,
+      "systems": {
+        "transformer_da_seed2": {
+          "mean_daily_revenue": 51.417066415447145,
+          "positive_day_rate": 0.5307262569832403,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "follow_da",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 0,
+            "changed_from_da_hours": 0,
+            "changed_from_da_rate": 0.0,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 87.75548390927622,
+            "rt_deviation_leg": 3.0190568679712024e-06,
+            "degradation_cost": 36.33842051288596,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 290.8460669517517,
+          "actual_segment_final_soc_mwh": [
+            2.300000319512267,
+            0.4000002166158275
+          ],
+          "actual_action_digest": "ce0a70d80059fc332d42e22d0b7e3a550933a0f578dd70893d259cf8a7db63bd"
+        },
+        "xgboost_da_seed0": {
+          "mean_daily_revenue": 72.84767989739288,
+          "positive_day_rate": 0.7430167597765364,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "follow_da",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 0,
+            "changed_from_da_hours": 0,
+            "changed_from_da_rate": 0.0,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 107.90908528168922,
+            "rt_deviation_leg": 2.0492964992028933e-06,
+            "degradation_cost": 35.06140743359284,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 322.94876009225845,
+          "actual_segment_final_soc_mwh": [
+            0.4000001850096805,
+            0.4000002166158275
+          ],
+          "actual_action_digest": "899893b75f3f6148bc31213fd48034e7871a7425ec6ff080f09fc0abbe634bc5"
+        }
+      }
+    },
+    {
+      "rt_at_da_seed": 2,
+      "rt_at_da_checkpoint": "data\\checkpoints\\rt_at_da_independent_seed2\\pilot_LZ_LCRA_best_mae.pt",
+      "rt_at_da_validation_mae": 20.052730560302734,
+      "rolling_rt_seed": 1,
+      "rolling_rt_checkpoint": "data\\checkpoints\\rt_mpc_independent_seed1\\pilot_LZ_LCRA_best_mpc_revenue.pt",
+      "coordination_mode": "track_adjust",
+      "selection_score": 27.2168688109632,
+      "systems": {
+        "transformer_da_seed2": {
+          "mean_daily_revenue": 38.796222124893895,
+          "positive_day_rate": 0.664804469273743,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "track_adjust",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 1093,
+            "changed_from_da_hours": 1093,
+            "changed_from_da_rate": 0.25442271880819367,
+            "mean_candidate_gain_usd": -1.695717314399223
+          },
+          "mean_daily_components": {
+            "da_leg": 87.75548390927622,
+            "rt_deviation_leg": -45.02915231932409,
+            "degradation_cost": 3.9301094650582478,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 290.8460669517517,
+          "actual_segment_final_soc_mwh": [
+            0.4,
+            0.4
+          ],
+          "actual_action_digest": "0e27ef1b3b60977c3d5e1d9457f1dcd36d4852b5ea37246360f437cdda013174"
+        },
+        "xgboost_da_seed0": {
+          "mean_daily_revenue": 15.637515497032501,
+          "positive_day_rate": 0.6033519553072626,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "track_adjust",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 984,
+            "changed_from_da_hours": 984,
+            "changed_from_da_rate": 0.22905027932960895,
+            "mean_candidate_gain_usd": -1.9283256806706823
+          },
+          "mean_daily_components": {
+            "da_leg": 107.90908528168922,
+            "rt_deviation_leg": -86.61930892099377,
+            "degradation_cost": 5.652260863662942,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 322.94876009225845,
+          "actual_segment_final_soc_mwh": [
+            0.4,
+            0.4
+          ],
+          "actual_action_digest": "7c488d0d892baba0fe79b1e727ab883431a13e2e53a54bba4e1d77330474f42f"
+        }
+      }
+    },
+    {
+      "rt_at_da_seed": 2,
+      "rt_at_da_checkpoint": "data\\checkpoints\\rt_at_da_independent_seed2\\pilot_LZ_LCRA_best_mae.pt",
+      "rt_at_da_validation_mae": 20.052730560302734,
+      "rolling_rt_seed": 1,
+      "rolling_rt_checkpoint": "data\\checkpoints\\rt_mpc_independent_seed1\\pilot_LZ_LCRA_best_mpc_revenue.pt",
+      "coordination_mode": "lookahead_mpc",
+      "selection_score": 141.80908983251877,
+      "systems": {
+        "transformer_da_seed2": {
+          "mean_daily_revenue": 155.23868733679006,
+          "positive_day_rate": 0.7988826815642458,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "lookahead_mpc",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 4296,
+            "changed_from_da_hours": 1903,
+            "changed_from_da_rate": 0.44297020484171323,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 87.75548390927622,
+            "rt_deviation_leg": 92.27463690296223,
+            "degradation_cost": 24.7914334754484,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 290.8460669517517,
+          "actual_segment_final_soc_mwh": [
+            0.4,
+            0.4
+          ],
+          "actual_action_digest": "df9c14eae1d8b2f1df78a117556ac4719a99db0fbd3fd34e4fe54ba9eff3faf9"
+        },
+        "xgboost_da_seed0": {
+          "mean_daily_revenue": 128.37949232824747,
+          "positive_day_rate": 0.776536312849162,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "lookahead_mpc",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 4296,
+            "changed_from_da_hours": 1742,
+            "changed_from_da_rate": 0.40549348230912474,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 107.90908528168922,
+            "rt_deviation_leg": 45.26184052200662,
+            "degradation_cost": 24.7914334754484,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 322.94876009225845,
+          "actual_segment_final_soc_mwh": [
+            0.4,
+            0.4
+          ],
+          "actual_action_digest": "df9c14eae1d8b2f1df78a117556ac4719a99db0fbd3fd34e4fe54ba9eff3faf9"
+        }
+      }
+    },
+    {
+      "rt_at_da_seed": 2,
+      "rt_at_da_checkpoint": "data\\checkpoints\\rt_at_da_independent_seed2\\pilot_LZ_LCRA_best_mae.pt",
+      "rt_at_da_validation_mae": 20.052730560302734,
+      "rolling_rt_seed": 2,
+      "rolling_rt_checkpoint": "data\\checkpoints\\rt_mpc_independent_seed2\\pilot_LZ_LCRA_best_mpc_revenue.pt",
+      "coordination_mode": "rt_only",
+      "selection_score": 135.62104475203734,
+      "systems": {
+        "transformer_da_seed2": {
+          "mean_daily_revenue": 149.05064225630863,
+          "positive_day_rate": 0.7597765363128491,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "rt_only",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 4296,
+            "changed_from_da_hours": 2424,
+            "changed_from_da_rate": 0.5642458100558659,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 87.75548390927622,
+            "rt_deviation_leg": 96.30759138143404,
+            "degradation_cost": 35.012433034401646,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 290.8460669517517,
+          "actual_segment_final_soc_mwh": [
+            3.6,
+            0.4
+          ],
+          "actual_action_digest": "c9ef16f804e119d1a23741734c57eca2df17d64ba952ca27e923a8aa93959573"
+        },
+        "xgboost_da_seed0": {
+          "mean_daily_revenue": 122.19144724776602,
+          "positive_day_rate": 0.7597765363128491,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "rt_only",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 4296,
+            "changed_from_da_hours": 2188,
+            "changed_from_da_rate": 0.5093109869646183,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 107.90908528168922,
+            "rt_deviation_leg": 49.294795000478445,
+            "degradation_cost": 35.012433034401646,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 322.94876009225845,
+          "actual_segment_final_soc_mwh": [
+            3.6,
+            0.4
+          ],
+          "actual_action_digest": "c9ef16f804e119d1a23741734c57eca2df17d64ba952ca27e923a8aa93959573"
+        }
+      }
+    },
+    {
+      "rt_at_da_seed": 2,
+      "rt_at_da_checkpoint": "data\\checkpoints\\rt_at_da_independent_seed2\\pilot_LZ_LCRA_best_mae.pt",
+      "rt_at_da_validation_mae": 20.052730560302734,
+      "rolling_rt_seed": 2,
+      "rolling_rt_checkpoint": "data\\checkpoints\\rt_mpc_independent_seed2\\pilot_LZ_LCRA_best_mpc_revenue.pt",
+      "coordination_mode": "follow_da",
+      "selection_score": 62.132373156420016,
+      "systems": {
+        "transformer_da_seed2": {
+          "mean_daily_revenue": 51.417066415447145,
+          "positive_day_rate": 0.5307262569832403,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "follow_da",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 0,
+            "changed_from_da_hours": 0,
+            "changed_from_da_rate": 0.0,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 87.75548390927622,
+            "rt_deviation_leg": 3.0190568679712024e-06,
+            "degradation_cost": 36.33842051288596,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 290.8460669517517,
+          "actual_segment_final_soc_mwh": [
+            2.300000319512267,
+            0.4000002166158275
+          ],
+          "actual_action_digest": "ce0a70d80059fc332d42e22d0b7e3a550933a0f578dd70893d259cf8a7db63bd"
+        },
+        "xgboost_da_seed0": {
+          "mean_daily_revenue": 72.84767989739288,
+          "positive_day_rate": 0.7430167597765364,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "follow_da",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 0,
+            "changed_from_da_hours": 0,
+            "changed_from_da_rate": 0.0,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 107.90908528168922,
+            "rt_deviation_leg": 2.0492964992028933e-06,
+            "degradation_cost": 35.06140743359284,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 322.94876009225845,
+          "actual_segment_final_soc_mwh": [
+            0.4000001850096805,
+            0.4000002166158275
+          ],
+          "actual_action_digest": "899893b75f3f6148bc31213fd48034e7871a7425ec6ff080f09fc0abbe634bc5"
+        }
+      }
+    },
+    {
+      "rt_at_da_seed": 2,
+      "rt_at_da_checkpoint": "data\\checkpoints\\rt_at_da_independent_seed2\\pilot_LZ_LCRA_best_mae.pt",
+      "rt_at_da_validation_mae": 20.052730560302734,
+      "rolling_rt_seed": 2,
+      "rolling_rt_checkpoint": "data\\checkpoints\\rt_mpc_independent_seed2\\pilot_LZ_LCRA_best_mpc_revenue.pt",
+      "coordination_mode": "track_adjust",
+      "selection_score": 36.88850777916889,
+      "systems": {
+        "transformer_da_seed2": {
+          "mean_daily_revenue": 42.47437266749498,
+          "positive_day_rate": 0.6871508379888268,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "track_adjust",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 1260,
+            "changed_from_da_hours": 1260,
+            "changed_from_da_rate": 0.29329608938547486,
+            "mean_candidate_gain_usd": -0.0461584339939985
+          },
+          "mean_daily_components": {
+            "da_leg": 87.75548390927622,
+            "rt_deviation_leg": -38.94415180912953,
+            "degradation_cost": 6.336959432651719,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 290.8460669517517,
+          "actual_segment_final_soc_mwh": [
+            0.4,
+            0.4
+          ],
+          "actual_action_digest": "db2e33841767d6db59265dd02b80b5ce8e47c2d3860e8d1c1046499f4a243da4"
+        },
+        "xgboost_da_seed0": {
+          "mean_daily_revenue": 31.302642890842797,
+          "positive_day_rate": 0.6871508379888268,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "track_adjust",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 1058,
+            "changed_from_da_hours": 1058,
+            "changed_from_da_rate": 0.2462756052141527,
+            "mean_candidate_gain_usd": -1.2348840863343373
+          },
+          "mean_daily_components": {
+            "da_leg": 107.90908528168922,
+            "rt_deviation_leg": -65.04865599778603,
+            "degradation_cost": 11.557786393060393,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 322.94876009225845,
+          "actual_segment_final_soc_mwh": [
+            0.4,
+            0.4
+          ],
+          "actual_action_digest": "2a8edf31d85c378fb81c8d3dfbf3b06af95778fa4af59261f3271df9784ce4e2"
+        }
+      }
+    },
+    {
+      "rt_at_da_seed": 2,
+      "rt_at_da_checkpoint": "data\\checkpoints\\rt_at_da_independent_seed2\\pilot_LZ_LCRA_best_mae.pt",
+      "rt_at_da_validation_mae": 20.052730560302734,
+      "rolling_rt_seed": 2,
+      "rolling_rt_checkpoint": "data\\checkpoints\\rt_mpc_independent_seed2\\pilot_LZ_LCRA_best_mpc_revenue.pt",
+      "coordination_mode": "lookahead_mpc",
+      "selection_score": 151.17718877795977,
+      "systems": {
+        "transformer_da_seed2": {
+          "mean_daily_revenue": 164.6067862822311,
+          "positive_day_rate": 0.7541899441340782,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "lookahead_mpc",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 4296,
+            "changed_from_da_hours": 2383,
+            "changed_from_da_rate": 0.5547020484171322,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 87.75548390927622,
+            "rt_deviation_leg": 109.70122893867082,
+            "degradation_cost": 32.84992656571597,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 290.8460669517517,
+          "actual_segment_final_soc_mwh": [
+            3.6,
+            0.4
+          ],
+          "actual_action_digest": "9ac03c52502b93a8449dd67869acf06ff16f77fe4ac3985b7a9bd94fe2fbe797"
+        },
+        "xgboost_da_seed0": {
+          "mean_daily_revenue": 137.74759127368847,
+          "positive_day_rate": 0.7541899441340782,
+          "days": 179,
+          "hours": 4296,
+          "coordination": {
+            "mode": "lookahead_mpc",
+            "adjust_margin_usd": 0.0,
+            "used_rt_candidate_hours": 4296,
+            "changed_from_da_hours": 2055,
+            "changed_from_da_rate": 0.47835195530726254,
+            "mean_candidate_gain_usd": null
+          },
+          "mean_daily_components": {
+            "da_leg": 107.90908528168922,
+            "rt_deviation_leg": 62.688432557715224,
+            "degradation_cost": 32.84992656571597,
+            "deviation_penalty": 0.0
+          },
+          "plan_total_clipped_mwh": 322.94876009225845,
+          "actual_segment_final_soc_mwh": [
+            3.6,
+            0.4
+          ],
+          "actual_action_digest": "9ac03c52502b93a8449dd67869acf06ff16f77fe4ac3985b7a9bd94fe2fbe797"
+        }
+      }
+    }
+  ],
+  "validation_comparison": {
+    "legacy_da_only_signal_rt_seed2_rt_only_score": 134.49050892430174,
+    "legacy_systems": {
+      "transformer_da_seed2": {
+        "mean_daily_revenue": 144.4822509929174,
+        "positive_day_rate": 0.776536312849162,
+        "days": 179,
+        "hours": 4296,
+        "coordination": {
+          "mode": "rt_only",
+          "adjust_margin_usd": 0.0,
+          "used_rt_candidate_hours": 4296,
+          "changed_from_da_hours": 2369,
+          "changed_from_da_rate": 0.5514432029795159,
+          "mean_candidate_gain_usd": null
+        },
+        "mean_daily_components": {
+          "da_leg": 106.45230798331922,
+          "rt_deviation_leg": 73.04237604399978,
+          "degradation_cost": 35.012433034401646,
+          "deviation_penalty": 0.0
+        },
+        "plan_total_clipped_mwh": 264.4403150677681,
+        "actual_segment_final_soc_mwh": [
+          3.6,
+          0.4
+        ],
+        "actual_action_digest": "c9ef16f804e119d1a23741734c57eca2df17d64ba952ca27e923a8aa93959573"
+      },
+      "xgboost_da_seed0": {
+        "mean_daily_revenue": 124.4987668556861,
+        "positive_day_rate": 0.7597765363128491,
+        "days": 179,
+        "hours": 4296,
+        "coordination": {
+          "mode": "rt_only",
+          "adjust_margin_usd": 0.0,
+          "used_rt_candidate_hours": 4296,
+          "changed_from_da_hours": 2271,
+          "changed_from_da_rate": 0.5286312849162011,
+          "mean_candidate_gain_usd": null
+        },
+        "mean_daily_components": {
+          "da_leg": 108.12877068834766,
+          "rt_deviation_leg": 51.38242920174008,
+          "degradation_cost": 35.012433034401646,
+          "deviation_penalty": 0.0
+        },
+        "plan_total_clipped_mwh": 302.4270718097687,
+        "actual_segment_final_soc_mwh": [
+          3.6,
+          0.4
+        ],
+        "actual_action_digest": "c9ef16f804e119d1a23741734c57eca2df17d64ba952ca27e923a8aa93959573"
+      }
+    },
+    "selected_spread_system_score": 151.17718877795977,
+    "score_change": 16.686679853658035
+  },
+  "selected": {
+    "rt_at_da_seed": 2,
+    "rt_at_da_checkpoint": "data\\checkpoints\\rt_at_da_independent_seed2\\pilot_LZ_LCRA_best_mae.pt",
+    "rolling_rt_seed": 2,
+    "rolling_rt_checkpoint": "data\\checkpoints\\rt_mpc_independent_seed2\\pilot_LZ_LCRA_best_mpc_revenue.pt",
+    "coordination_mode": "lookahead_mpc",
+    "validation_selection_score": 151.17718877795977
+  },
+  "test_comparison": {
+    "legacy_da_only_signal_rt_seed2_rt_only": {
+      "transformer_da_seed2": {
+        "mean_daily_revenue": 74.5732224719198,
+        "positive_day_rate": 0.7027027027027027,
+        "days": 333,
+        "hours": 7992,
+        "coordination": {
+          "mode": "rt_only",
+          "adjust_margin_usd": 0.0,
+          "used_rt_candidate_hours": 7992,
+          "changed_from_da_hours": 4402,
+          "changed_from_da_rate": 0.5508008008008008,
+          "mean_candidate_gain_usd": null
+        },
+        "mean_daily_components": {
+          "da_leg": 87.84473428444596,
+          "rt_deviation_leg": 19.143785603310747,
+          "degradation_cost": 32.41529741583689,
+          "deviation_penalty": 0.0
+        },
+        "plan_total_clipped_mwh": 518.43718957901,
+        "actual_segment_final_soc_mwh": [
+          2.5473684210526315,
+          3.6,
+          1.4947368421052631
+        ],
+        "actual_action_digest": "2e66a4e7f5c00f9e060185579aa8494c43b3d1cc5eb1b5ec7a0058871a90f8f5"
+      },
+      "xgboost_da_seed0": {
+        "mean_daily_revenue": 85.79528515134771,
+        "positive_day_rate": 0.7147147147147147,
+        "days": 333,
+        "hours": 7992,
+        "coordination": {
+          "mode": "rt_only",
+          "adjust_margin_usd": 0.0,
+          "used_rt_candidate_hours": 7992,
+          "changed_from_da_hours": 4235,
+          "changed_from_da_rate": 0.5299049049049049,
+          "mean_candidate_gain_usd": null
+        },
+        "mean_daily_components": {
+          "da_leg": 117.68626154506727,
+          "rt_deviation_leg": 0.5243210221173418,
+          "degradation_cost": 32.41529741583689,
+          "deviation_penalty": 0.0
+        },
+        "plan_total_clipped_mwh": 562.7933215498924,
+        "actual_segment_final_soc_mwh": [
+          2.5473684210526315,
+          3.6,
+          1.4947368421052631
+        ],
+        "actual_action_digest": "2e66a4e7f5c00f9e060185579aa8494c43b3d1cc5eb1b5ec7a0058871a90f8f5"
+      }
+    },
+    "selected_spread_system": {
+      "transformer_da_seed2": {
+        "mean_daily_revenue": 80.72550442304933,
+        "positive_day_rate": 0.7177177177177178,
+        "days": 333,
+        "hours": 7992,
+        "coordination": {
+          "mode": "lookahead_mpc",
+          "adjust_margin_usd": 0.0,
+          "used_rt_candidate_hours": 7992,
+          "changed_from_da_hours": 4358,
+          "changed_from_da_rate": 0.5452952952952953,
+          "mean_candidate_gain_usd": null
+        },
+        "mean_daily_components": {
+          "da_leg": 68.92823709191276,
+          "rt_deviation_leg": 41.861065932369364,
+          "degradation_cost": 30.06379860123281,
+          "deviation_penalty": 0.0
+        },
+        "plan_total_clipped_mwh": 539.9167284369469,
+        "actual_segment_final_soc_mwh": [
+          1.5789473684210527,
+          3.6,
+          1.1447368421052635
+        ],
+        "actual_action_digest": "23b3c7f6e1aa0b39207d25a2e94469dc8e37c480fcfdc2a21bab3b36a04b78d8"
+      },
+      "xgboost_da_seed0": {
+        "mean_daily_revenue": 93.63975036304859,
+        "positive_day_rate": 0.7027027027027027,
+        "days": 333,
+        "hours": 7992,
+        "coordination": {
+          "mode": "lookahead_mpc",
+          "adjust_margin_usd": 0.0,
+          "used_rt_candidate_hours": 7992,
+          "changed_from_da_hours": 3916,
+          "changed_from_da_rate": 0.48998998998999,
+          "mean_candidate_gain_usd": null
+        },
+        "mean_daily_components": {
+          "da_leg": 113.43681473571652,
+          "rt_deviation_leg": 10.266734228564864,
+          "degradation_cost": 30.06379860123281,
+          "deviation_penalty": 0.0
+        },
+        "plan_total_clipped_mwh": 580.6254782676697,
+        "actual_segment_final_soc_mwh": [
+          1.5789473684210527,
+          3.6,
+          1.1447368421052635
+        ],
+        "actual_action_digest": "23b3c7f6e1aa0b39207d25a2e94469dc8e37c480fcfdc2a21bab3b36a04b78d8"
+      }
+    }
+  },
+  "selected_rt_at_da_test_forecast": {
+    "mae": 18.16322898864746,
+    "rmse": 48.199249267578125,
+    "days": 333,
+    "note": "reported only after validation selection; not used to choose the model"
+  },
+  "seconds": 145.69
+}
