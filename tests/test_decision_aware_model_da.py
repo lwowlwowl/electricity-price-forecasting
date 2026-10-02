@@ -2,6 +2,7 @@ import os
 import sys
 
 import torch
+import pytest
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(ROOT, "src"))
@@ -76,3 +77,55 @@ def test_two_da_models_do_not_share_parameters():
     first_parameter = next(first.parameters())
     second_parameter = next(second.parameters())
     assert first_parameter.data_ptr() != second_parameter.data_ptr()
+
+
+@pytest.mark.parametrize(
+    ("mode", "expected_memory_steps"),
+    [("F0", 16), ("F1", 16), ("F2", 80)],
+)
+def test_all_fusion_modes_have_valid_shapes_and_gradients(
+    mode, expected_memory_steps
+):
+    cfg = _config()
+    cfg.da_fusion_mode = mode
+    model = DecisionAwareDAForecaster(cfg)
+    output = model(_batch())
+    assert output["p_da"].shape == (2, 24)
+    assert output["memory"].shape == (2, expected_memory_steps, 32)
+    output["p_da"].mean().backward()
+    for name, encoder in model.encoders.items():
+        gradient = encoder.proj.weight.grad
+        assert gradient is not None, (mode, name)
+        assert torch.isfinite(gradient).all(), (mode, name)
+
+
+def test_f2_uses_separate_source_and_time_identity_without_global_rope():
+    cfg = _config()
+    cfg.da_fusion_mode = "F2"
+    model = DecisionAwareDAForecaster(cfg)
+    fusion = model.fusion
+    assert fusion.modality_embedding.shape == (5, 32)
+    assert fusion.time_embedding.shape == (cfg.context_len, 32)
+    assert len(fusion.global_blocks) == 2 * cfg.n_layers_fusion
+    assert all(block.attn.rope is None for block in fusion.global_blocks)
+
+
+def test_fusion_parameter_budgets_are_close():
+    counts = {}
+    for mode in ("F0", "F1", "F2"):
+        cfg = _config()
+        cfg.da_fusion_mode = mode
+        counts[mode] = sum(
+            parameter.numel() for parameter in DecisionAwareDAForecaster(cfg).parameters()
+        )
+    assert max(counts.values()) / min(counts.values()) < 1.10, counts
+
+
+def test_fusion_models_do_not_share_parameters():
+    models = []
+    for mode in ("F0", "F1", "F2"):
+        cfg = _config()
+        cfg.da_fusion_mode = mode
+        models.append(DecisionAwareDAForecaster(cfg))
+    pointers = [next(model.parameters()).data_ptr() for model in models]
+    assert len(set(pointers)) == len(pointers)

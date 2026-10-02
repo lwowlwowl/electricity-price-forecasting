@@ -128,3 +128,24 @@ def test_validation_reuses_training_statistics() -> None:
     val = DecisionAwareDADataset(frame, cfg, "val", norm_stats=train.norm_stats)
 
     assert val.norm_stats is train.norm_stats
+
+
+def test_experiment_can_freeze_explicit_time_split() -> None:
+    cfg = PilotConfig(
+        data_version="v3",
+        split_train_start="2020-02-01 00:00",
+        split_train_end="2023-12-31 23:00",
+        split_val_start="2024-01-01 00:00",
+        split_val_end="2024-06-30 23:00",
+        split_test_start="2024-07-01 00:00",
+        split_test_end="2024-12-31 23:00",
+    )
+    assert cfg.split_bounds("train") == (
+        "2020-02-01 00:00", "2023-12-31 23:00"
+    )
+    assert cfg.split_bounds("val") == (
+        "2024-01-01 00:00", "2024-06-30 23:00"
+    )
+    assert cfg.split_bounds("test") == (
+        "2024-07-01 00:00", "2024-12-31 23:00"
+    )

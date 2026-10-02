@@ -1,0 +1,81 @@
+# RT-at-DA五来源融合确认实验：只比较F0/F1，其他合同全部冻结。
+market: ERCOT
+node: LZ_LCRA
+data_version: v3
+freq: 1h
+context_len: 168
+horizon_da: 24
+da_issue_hour_local: 10
+train_stride: 1
+val_stride: 1
+eval_stride: 1
+
+# 与DA融合消融完全相同。2026H1只作report-only，不参与选模。
+split_train_start: "2020-01-01 00:00"
+split_train_end: "2024-12-31 23:00"
+split_val_start: "2025-07-01 00:00"
+split_val_end: "2025-12-31 23:00"
+split_test_start: "2026-01-01 00:00"
+split_test_end: "2026-06-01 23:00"
+
+use_dual_split: false
+use_dual_settlement: false
+use_deviation_penalty: false
+da_fusion_mode: source_attention
+rt_at_da_fusion_mode: source_attention
+
+d_model: 128
+n_heads_enc: 4
+n_heads_fusion: 4
+n_layers_enc: 2
+n_layers_fusion: 2
+dim_ff: 512
+dropout: 0.1
+use_rope: true
+
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_init_soc_frac: 0.5
+bess_kappa: 5.7
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+bess_e_cyc: 4.0
+topk_k_charge: 4
+topk_k_discharge: 4
+topk_spread_threshold: -1.0
+
+# 固定纯Huber，只检验融合结构，不混入收益代理训练。
+alpha0: 1.0
+beta0: 0.0
+alpha_end: 1.0
+beta_end: 0.0
+pretrain_epochs: 0
+anneal_epochs: 1
+use_mse_loss: false
+huber_delta: 1.0
+pred_scale: 25.0
+pred_clamp: [-500.0, 10000.0]
+
+lr: 0.0005
+weight_decay: 0.01
+batch_size: 32
+grad_accum_steps: 1
+epochs: 10
+grad_clip: 1.0
+early_stop_patience: 3
+use_amp: true
+monitor: frozen_da_panel_full_dual_validation_revenue
+num_workers: 0
+checkpoint_dir: data/checkpoints/rt_at_da_fusion_ablation
+seed: 0
+
+# DA结构已冻结为F1。三个seed共同作为固定参考面板，避免RT-at-DA结论
+# 偶然依赖某一个DA初始化；滚动RT和协调策略仍完全冻结。
+frozen_da_checkpoints:
+  - data/checkpoints/da_fusion_ablation/f1_seed0/pilot_LZ_LCRA_best_full_dual.pt
+  - data/checkpoints/da_fusion_ablation/f1_seed1/pilot_LZ_LCRA_best_full_dual.pt
+  - data/checkpoints/da_fusion_ablation/f1_seed2/pilot_LZ_LCRA_best_full_dual.pt
+frozen_rt_checkpoint: data/checkpoints/rt_independent_seed2/pilot_LZ_LCRA_best_rolling_revenue.pt
+frozen_coordination_mode: rt_only
+bootstrap_samples: 2000

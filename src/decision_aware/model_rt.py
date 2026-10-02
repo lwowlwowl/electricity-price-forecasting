@@ -6,7 +6,14 @@ import torch.nn as nn
 
 from .config import PilotConfig
 from .model import QueryDecoder, StreamEncoder
-from .model_da import DA_STREAM_DIMS, SourceInteractionFusion
+from .model_da import (
+    DA_STREAM_DIMS,
+    GlobalTokenFusion,
+    SimpleResidualFusion,
+    SourceAttentionConcatFusion,
+    SourceInteractionFusion,
+    canonical_da_fusion_mode,
+)
 
 
 class DecisionAwareRTForecaster(nn.Module):
@@ -18,11 +25,12 @@ class DecisionAwareRTForecaster(nn.Module):
         super().__init__()
         if cfg.horizon_rt < 1:
             raise ValueError("horizon_rt必须至少为1")
-        if getattr(cfg, "rt_fusion_mode", "source_attention") != "source_attention":
-            raise ValueError("独立RT模型当前只支持source_attention融合")
         d = cfg.d_model
         n_layers = max(1, cfg.n_layers_enc)
         self.cfg = cfg
+        self.fusion_mode = canonical_da_fusion_mode(
+            getattr(cfg, "rt_fusion_mode", "source_attention")
+        )
         self.encoders = nn.ModuleDict({
             "price_da": StreamEncoder(1, d, "transformer", cfg.n_heads_enc,
                                       cfg.dim_ff, cfg.dropout, cfg.use_rope, n_layers),
@@ -35,10 +43,24 @@ class DecisionAwareRTForecaster(nn.Module):
             "cal": StreamEncoder(8, d, "mlp", cfg.n_heads_enc,
                                  cfg.dim_ff, cfg.dropout, cfg.use_rope, n_layers),
         })
-        self.fusion = SourceInteractionFusion(
-            d, cfg.n_heads_fusion, cfg.dim_ff, cfg.dropout,
-            cfg.n_layers_fusion, len(self.stream_names),
-        )
+        fusion_kwargs = {
+            "d_model": d,
+            "n_heads": cfg.n_heads_fusion,
+            "dim_ff": cfg.dim_ff,
+            "dropout": cfg.dropout,
+            "n_layers": cfg.n_layers_fusion,
+            "n_sources": len(self.stream_names),
+        }
+        if self.fusion_mode == "f0_residual_mlp":
+            self.fusion = SimpleResidualFusion(**fusion_kwargs)
+        elif self.fusion_mode == "source_attention":
+            self.fusion = SourceInteractionFusion(**fusion_kwargs)
+        elif self.fusion_mode == "source_attention_concat":
+            self.fusion = SourceAttentionConcatFusion(**fusion_kwargs)
+        else:
+            self.fusion = GlobalTokenFusion(
+                **fusion_kwargs, max_steps=cfg.context_len
+            )
         # RT起报时可合法使用目标小时的已公布DA价和确定的日历。
         self.target_context = nn.Sequential(
             nn.Linear(9, d), nn.GELU(), nn.LayerNorm(d)

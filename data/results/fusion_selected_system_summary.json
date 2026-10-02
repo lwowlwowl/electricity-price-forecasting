@@ -1,0 +1,29 @@
+{
+  "experiment": "selected fusion structures and deployment checkpoints",
+  "selection_rule": "select structure by three-seed mean validation revenue, then select one checkpoint by validation revenue within that structure; no joint grid",
+  "models": {
+    "da": {
+      "fusion_mode": "F1",
+      "seed": 1,
+      "checkpoint": "data\\checkpoints\\da_fusion_ablation\\f1_seed1\\pilot_LZ_LCRA_best_full_dual.pt",
+      "selection_basis": "highest stage validation revenue among upstream checkpoints actually frozen in the rolling-RT experiment"
+    },
+    "rt_at_da": {
+      "fusion_mode": "F0",
+      "seed": 1,
+      "checkpoint": "data\\checkpoints\\rt_at_da_fusion_ablation\\f0_seed1\\pilot_LZ_LCRA_best_full_dual.pt",
+      "selection_basis": "highest stage validation revenue among upstream checkpoints actually frozen in the rolling-RT experiment"
+    },
+    "rt": {
+      "fusion_mode": "F0",
+      "seed": 0,
+      "checkpoint": "data\\checkpoints\\rt_fusion_ablation\\f0_seed0\\pilot_LZ_LCRA_best_full_dual.pt",
+      "selection_basis": "highest stage validation revenue within selected mode"
+    }
+  },
+  "coordination_mode": "rt_only",
+  "validation_full_dual_mean_daily_revenue": 123.06264446344426,
+  "report_only_full_dual_mean_daily_revenue": 66.30674296259909,
+  "report_only_warning": "2026-01 through 2026-06 was exposed by earlier experiments and is not a fresh final test",
+  "reference_key": "DA=data/checkpoints/da_fusion_ablation/f1_seed1/pilot_LZ_LCRA_best_full_dual.pt|RT-at-DA=data/checkpoints/rt_at_da_fusion_ablation/f0_seed1/pilot_LZ_LCRA_best_full_dual.pt"
+}

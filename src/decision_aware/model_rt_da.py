@@ -13,9 +13,12 @@ class DecisionAwareRTAtDAForecaster(DecisionAwareDAForecaster):
     """
 
     def __init__(self, cfg: PilotConfig):
-        if getattr(cfg, "rt_at_da_fusion_mode", "source_attention") != "source_attention":
-            raise ValueError("RT-at-DA模型当前只支持source_attention融合")
-        super().__init__(cfg)
+        super().__init__(
+            cfg,
+            fusion_mode=getattr(
+                cfg, "rt_at_da_fusion_mode", "source_attention"
+            ),
+        )
 
     def forward(self, batch: dict) -> dict:
         representation, memory, source_weights = self._encode_and_decode(batch)

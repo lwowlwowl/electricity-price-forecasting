@@ -1,0 +1,248 @@
+{
+  "experiment": "DA F0/F1/F2 fusion ablation; three seeds",
+  "task": "da",
+  "selection_rule": "highest mean frozen full-dual validation revenue across seeds",
+  "test_role": "report-only and never used to choose the winner",
+  "fairness": {
+    "loss": "pure Huber for every run",
+    "effective_batch_size": 32,
+    "parameter_counts": {
+      "F0": 2755713,
+      "F1": 2805122,
+      "F2": 2826241
+    },
+    "max_to_min_parameter_ratio": 1.0255933763784546,
+    "same_split": true,
+    "same_frozen_rt_system": true
+  },
+  "modes": {
+    "F0": {
+      "validation_full_dual_revenue": {
+        "mean": 105.83586236306284,
+        "std": 0.9949942956454128,
+        "values": [
+          106.45909255060948,
+          104.68836345657101,
+          106.36013108200805
+        ]
+      },
+      "validation_mae": {
+        "mean": 18.033135732014973,
+        "std": 1.5694569138931929,
+        "values": [
+          16.57762336730957,
+          19.69593620300293,
+          17.825847625732422
+        ]
+      },
+      "validation_lower_tail_10pct": {
+        "mean": -94.78477040967859,
+        "std": 9.735906745153319,
+        "values": [
+          -105.97619037102159,
+          -90.11208241518187,
+          -88.26603844283231
+        ]
+      },
+      "validation_max_drawdown": {
+        "mean": 276.00071557780166,
+        "std": 39.44672678420001,
+        "values": [
+          302.0720215281625,
+          295.31099756390086,
+          230.6191276413416
+        ]
+      },
+      "test_report_only_revenue": {
+        "mean": 46.368284223783554,
+        "std": 5.06326167134559,
+        "values": [
+          47.4560248135497,
+          40.84955372387474,
+          50.79927413392622
+        ]
+      },
+      "parameter_count": 2755713,
+      "training_seconds": {
+        "mean": 67.36333333333333,
+        "std": 3.2474656785458627,
+        "values": [
+          71.06,
+          66.06,
+          64.97
+        ]
+      },
+      "peak_cuda_memory_mb": {
+        "mean": 489.32958984375,
+        "std": 0.0,
+        "values": [
+          489.32958984375,
+          489.32958984375,
+          489.32958984375
+        ]
+      }
+    },
+    "F1": {
+      "validation_full_dual_revenue": {
+        "mean": 107.56786896678341,
+        "std": 2.8007435882782286,
+        "values": [
+          106.43187489706081,
+          110.75813653544704,
+          105.51359546784239
+        ]
+      },
+      "validation_mae": {
+        "mean": 21.026564915974934,
+        "std": 2.152505524047925,
+        "values": [
+          23.391193389892578,
+          20.507333755493164,
+          19.181167602539062
+        ]
+      },
+      "validation_lower_tail_10pct": {
+        "mean": -108.34060729962778,
+        "std": 16.80141271593701,
+        "values": [
+          -96.06319038140597,
+          -101.47023260067674,
+          -127.4883989168006
+        ]
+      },
+      "validation_max_drawdown": {
+        "mean": 619.8451891255271,
+        "std": 248.90198729238907,
+        "values": [
+          340.89909066333746,
+          819.2682583119349,
+          699.3682184013087
+        ]
+      },
+      "test_report_only_revenue": {
+        "mean": 65.25751206965892,
+        "std": 23.36251934033525,
+        "values": [
+          40.137985961068324,
+          69.29880307860388,
+          86.33574716930455
+        ]
+      },
+      "parameter_count": 2805122,
+      "training_seconds": {
+        "mean": 56.52333333333333,
+        "std": 4.642858315018166,
+        "values": [
+          61.83,
+          54.53,
+          53.21
+        ]
+      },
+      "peak_cuda_memory_mb": {
+        "mean": 903.1884765625,
+        "std": 0.0,
+        "values": [
+          903.1884765625,
+          903.1884765625,
+          903.1884765625
+        ]
+      }
+    },
+    "F2": {
+      "validation_full_dual_revenue": {
+        "mean": 107.01956875304175,
+        "std": 3.489074868926557,
+        "values": [
+          104.2783837962153,
+          110.94712666245441,
+          105.83319580045553
+        ]
+      },
+      "validation_mae": {
+        "mean": 24.390220006306965,
+        "std": 7.159231555386279,
+        "values": [
+          22.110952377319336,
+          18.648117065429688,
+          32.411590576171875
+        ]
+      },
+      "validation_lower_tail_10pct": {
+        "mean": -105.97511970110348,
+        "std": 12.305220177783772,
+        "values": [
+          -95.5108750913626,
+          -119.53149165290118,
+          -102.88299235904664
+        ]
+      },
+      "validation_max_drawdown": {
+        "mean": 609.3943809673201,
+        "std": 322.16320757039233,
+        "values": [
+          336.114001525546,
+          964.6152376538921,
+          527.4539037225222
+        ]
+      },
+      "test_report_only_revenue": {
+        "mean": 58.30464221419473,
+        "std": 5.83589328695882,
+        "values": [
+          64.05765797520166,
+          52.38925992085756,
+          58.467008746524954
+        ]
+      },
+      "parameter_count": 2826241,
+      "training_seconds": {
+        "mean": 115.14,
+        "std": 31.440407122045993,
+        "values": [
+          151.3,
+          99.86,
+          94.26
+        ]
+      },
+      "peak_cuda_memory_mb": {
+        "mean": 303.06298828125,
+        "std": 0.0,
+        "values": [
+          303.06298828125,
+          303.06298828125,
+          303.06298828125
+        ]
+      }
+    }
+  },
+  "selected_by_validation": "F1",
+  "paired_validation_differences": {
+    "F1_minus_F0": {
+      "mean_daily_difference": 1.7320066037205637,
+      "weekly_block_bootstrap_95ci": [
+        -5.483064958317958,
+        8.350757327031666
+      ],
+      "paired_days": 182
+    },
+    "F1_minus_F2": {
+      "mean_daily_difference": 0.5483002137416622,
+      "weekly_block_bootstrap_95ci": [
+        -7.305112332186825,
+        11.483953260551292
+      ],
+      "paired_days": 182
+    }
+  },
+  "run_files": {
+    "F0_seed0": "data/results/da_fusion_f0_seed0.json",
+    "F0_seed1": "data/results/da_fusion_f0_seed1.json",
+    "F0_seed2": "data/results/da_fusion_f0_seed2.json",
+    "F1_seed0": "data/results/da_fusion_f1_seed0.json",
+    "F1_seed1": "data/results/da_fusion_f1_seed1.json",
+    "F1_seed2": "data/results/da_fusion_f1_seed2.json",
+    "F2_seed0": "data/results/da_fusion_f2_seed0.json",
+    "F2_seed1": "data/results/da_fusion_f2_seed1.json",
+    "F2_seed2": "data/results/da_fusion_f2_seed2.json"
+  }
+}

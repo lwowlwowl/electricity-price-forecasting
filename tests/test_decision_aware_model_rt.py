@@ -1,6 +1,7 @@
 import os
 import sys
 
+import pytest
 import torch
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -76,3 +77,33 @@ def test_known_da_target_changes_rt_forecast():
         changed["price_da_tgt_known"] = batch["price_da_tgt_known"] + 3.0
         second = model(changed)["p_rt"]
     assert not torch.allclose(first, second)
+
+
+@pytest.mark.parametrize(
+    ("mode", "expected_memory_steps"),
+    [("F0", 16), ("F1", 16), ("F1b", 16), ("F2", 80)],
+)
+def test_rt_supports_all_fusion_modes(mode, expected_memory_steps):
+    cfg = _config()
+    cfg.rt_fusion_mode = mode
+    model = DecisionAwareRTForecaster(cfg)
+    output = model(_batch())
+    assert output["p_rt"].shape == (2, 4)
+    assert output["memory"].shape == (2, expected_memory_steps, 32)
+    output["p_rt"].mean().backward()
+    for name, encoder in model.encoders.items():
+        gradient = encoder.proj.weight.grad
+        assert gradient is not None, (mode, name)
+        assert torch.isfinite(gradient).all(), (mode, name)
+
+
+def test_rt_fusion_parameter_budgets_are_close():
+    counts = {}
+    for mode in ("F0", "F1", "F1b", "F2"):
+        cfg = _config()
+        cfg.rt_fusion_mode = mode
+        counts[mode] = sum(
+            parameter.numel()
+            for parameter in DecisionAwareRTForecaster(cfg).parameters()
+        )
+    assert max(counts.values()) / min(counts.values()) < 1.10, counts

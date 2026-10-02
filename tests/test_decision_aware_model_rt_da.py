@@ -1,6 +1,7 @@
 import os
 import sys
 
+import pytest
 import torch
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -58,3 +59,56 @@ def test_rt_at_da_backpropagates_to_every_source_encoder():
     for name, encoder in model.encoders.items():
         assert encoder.proj.weight.grad is not None, name
         assert torch.isfinite(encoder.proj.weight.grad).all(), name
+
+
+@pytest.mark.parametrize(
+    ("mode", "expected_memory_steps"),
+    [("F0", 16), ("F1", 16), ("F1b", 16), ("F2", 80)],
+)
+def test_rt_at_da_supports_all_fusion_modes(mode, expected_memory_steps):
+    cfg = _config()
+    cfg.rt_at_da_fusion_mode = mode
+    model = DecisionAwareRTAtDAForecaster(cfg)
+    output = model(_batch())
+    assert model.fusion_mode in {
+        "f0_residual_mlp", "source_attention", "source_attention_concat",
+        "f2_global_attention"
+    }
+    assert output["p_rt_at_da"].shape == (2, 24)
+    assert output["memory"].shape == (2, expected_memory_steps, 32)
+    output["p_rt_at_da"].mean().backward()
+    for name, encoder in model.encoders.items():
+        gradient = encoder.proj.weight.grad
+        assert gradient is not None, (mode, name)
+        assert torch.isfinite(gradient).all(), (mode, name)
+
+
+def test_rt_at_da_uses_its_own_fusion_setting():
+    cfg = _config()
+    cfg.da_fusion_mode = "F1"
+    cfg.rt_at_da_fusion_mode = "F0"
+    model = DecisionAwareRTAtDAForecaster(cfg)
+    assert model.fusion_mode == "f0_residual_mlp"
+
+
+def test_rt_at_da_f1b_removes_scalar_source_pooling():
+    cfg = _config()
+    cfg.rt_at_da_fusion_mode = "F1b"
+    model = DecisionAwareRTAtDAForecaster(cfg)
+    output = model(_batch())
+    assert hasattr(model.fusion, "source_blocks")
+    assert hasattr(model.fusion, "concat_projection")
+    assert not hasattr(model.fusion, "source_score")
+    assert output["source_weights"] is None
+
+
+def test_rt_at_da_fusion_parameter_budgets_are_close():
+    counts = {}
+    for mode in ("F0", "F1", "F1b", "F2"):
+        cfg = _config()
+        cfg.rt_at_da_fusion_mode = mode
+        counts[mode] = sum(
+            parameter.numel()
+            for parameter in DecisionAwareRTAtDAForecaster(cfg).parameters()
+        )
+    assert max(counts.values()) / min(counts.values()) < 1.10, counts

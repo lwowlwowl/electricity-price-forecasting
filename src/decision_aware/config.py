@@ -65,6 +65,15 @@ class PilotConfig:
     eval_stride: int = 24           # test 用（保持独立日窗口，DM/GW 检验 i.i.d. 前提）
     val_stride: int = 24            # val 用（v8 设 6 加密止住 regret 摇号；默认 24 向后兼容）
 
+    # 可选的实验级时间切分。留空时沿用上面的版本默认值；正式消融用配置文件
+    # 显式冻结，避免为了某个结果在代码里反复改全局常量。
+    split_train_start: str | None = None
+    split_train_end: str | None = None
+    split_val_start: str | None = None
+    split_val_end: str | None = None
+    split_test_start: str | None = None
+    split_test_end: str | None = None
+
     # ── 数据版本（v12=旧17月单RT，v3=新6.5年DA+RT）─────────────────────────
     data_version: str = "v3"
     use_dual_settlement: bool = True  # v3: 真双结算（DA+RT）
@@ -131,6 +140,16 @@ class PilotConfig:
     use_amp: bool = True
     monitor: str = "regret"
     num_workers: int = 0
+    grad_accum_steps: int = 1
+
+    # 融合消融使用的冻结完整系统。普通训练入口不会读取这些字段。
+    # RT-at-DA消融同时对三个冻结DA-F1 seed计分，避免结论依赖单个DA seed。
+    frozen_da_checkpoints: list[str] = field(default_factory=list)
+    frozen_rt_at_da_checkpoints: list[str] = field(default_factory=list)
+    frozen_rt_at_da_checkpoint: str = ""
+    frozen_rt_checkpoint: str = ""
+    frozen_coordination_mode: str = "rt_only"
+    bootstrap_samples: int = 2000
 
     # ── 路径 ─────────────────────────────────────────────────────────────────
     checkpoint_dir: str = "data/checkpoints/da_tsfm_pilot_v3"
@@ -154,13 +173,23 @@ class PilotConfig:
 
     def split_bounds(self, split: str) -> Tuple[str, str]:
         if self.data_version == "v3":
-            return {"train": (TRAIN_START_V3, TRAIN_END_V3),
-                    "val":   (VAL_START_V3,   VAL_END_V3),
-                    "test":  (TEST_START_V3,  TEST_END_V3)}[split]
+            defaults = {
+                "train": (TRAIN_START_V3, TRAIN_END_V3),
+                "val":   (VAL_START_V3,   VAL_END_V3),
+                "test":  (TEST_START_V3,  TEST_END_V3),
+            }
         else:
-            return {"train": (TRAIN_START_V12, TRAIN_END_V12),
-                    "val":   (VAL_START_V12,   VAL_END_V12),
-                    "test":  (TEST_START_V12,  TEST_END_V12)}[split]
+            defaults = {
+                "train": (TRAIN_START_V12, TRAIN_END_V12),
+                "val":   (VAL_START_V12,   VAL_END_V12),
+                "test":  (TEST_START_V12,  TEST_END_V12),
+            }
+        if split not in defaults:
+            raise ValueError(f"未知split: {split}")
+        default_start, default_end = defaults[split]
+        override_start = getattr(self, f"split_{split}_start")
+        override_end = getattr(self, f"split_{split}_end")
+        return override_start or default_start, override_end or default_end
 
     def to_dict(self) -> dict:
         return asdict(self)
