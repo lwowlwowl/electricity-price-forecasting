@@ -40,6 +40,29 @@ def _digest(values: Sequence[float]) -> str:
     return hashlib.sha256(data.tobytes()).hexdigest()
 
 
+def _soc_inventory_summary(
+    initial_soc_mwh: float,
+    segment_final_soc_mwh: Sequence[float],
+) -> dict:
+    """把每个连续数据段的SOC起点、终点和变化量统一列成MWh。"""
+    final_values = [float(value) for value in segment_final_soc_mwh]
+    if not final_values:
+        raise ValueError("SOC汇总至少需要一个连续数据段")
+    initial_value = float(initial_soc_mwh)
+    changes = [value - initial_value for value in final_values]
+    return {
+        "initial_soc_mwh": initial_value,
+        "segment_initial_soc_mwh": [initial_value] * len(final_values),
+        "segment_final_soc_mwh": final_values,
+        "segment_soc_change_mwh": changes,
+        # 数据缺口会让下一段重新从initial_soc_mwh开始，因此另列每段变化之和，
+        # 不把它误写成一条连续SOC轨迹的首尾差。
+        "total_segment_soc_change_mwh": float(sum(changes)),
+        "final_soc_mwh": final_values[-1],
+        "final_minus_initial_soc_mwh": final_values[-1] - initial_value,
+    }
+
+
 def _normalise_daily_mapping(
     forecasts: Mapping[date | str, Sequence[float] | torch.Tensor],
     label: str,
@@ -367,16 +390,22 @@ def locked_dual_backtest(
         "plan_feasibility": {
             "total_clipped_mwh": sum(plan_clipped_by_date.values()),
             "clipped_days": sum(value > 1e-8 for value in plan_clipped_by_date.values()),
-            "segment_final_soc_mwh": segment_final_plan_soc,
+            **_soc_inventory_summary(initial_soc, segment_final_plan_soc),
         },
         "actual_state": {
-            "segment_final_soc_mwh": segment_final_actual_soc,
+            **_soc_inventory_summary(initial_soc, segment_final_actual_soc),
             "action_digest": _digest(all_actual_actions),
         },
         "da_plan_action_digest": _digest(all_da_actions),
+        "terminal_inventory_accounting": {
+            "unit": "MWh",
+            "monetized": False,
+            "included_in_revenue": False,
+            "reporting_rule": "cash revenue and terminal SOC are reported separately",
+        },
         "terminal_inventory_note": (
-            "未做人为期末估值；跨DA模型比较时固定同一RT动作，因此实际SOC与期末库存完全相同，"
-            "该项会相互抵消。比较不同RT模型前必须另行统一期末库存规则。"
+            "未做人为期末估值，期末SOC只按MWh列示，不计入现金收益。"
+            "每个连续数据段都单列起点、终点和变化量；数据缺口后的SOC重置不被当作交易。"
         ),
         "daily": daily,
     }

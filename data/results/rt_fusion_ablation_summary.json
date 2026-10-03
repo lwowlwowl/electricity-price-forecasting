@@ -3,6 +3,7 @@
   "task": "rt",
   "selection_rule": "highest mean frozen full-dual validation revenue across seeds",
   "test_role": "report-only and never used to choose the winner",
+  "terminal_soc_rule": "report actual SOC in MWh only; do not monetize it or include it in revenue",
   "fairness": {
     "loss": "pure Huber for every run",
     "effective_batch_size": 32,
@@ -80,6 +81,164 @@
           480.0322265625,
           480.0322265625
         ]
+      },
+      "validation_actual_soc": {
+        "unit": "MWh",
+        "monetized": false,
+        "included_in_revenue": false,
+        "per_seed": {
+          "0": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              1.4947368421052631,
+              3.25
+            ],
+            "segment_soc_change_mwh": [
+              -0.5052631578947369,
+              1.25
+            ],
+            "total_segment_soc_change_mwh": 0.7447368421052631,
+            "final_soc_mwh": 3.25,
+            "final_minus_initial_soc_mwh": 1.25
+          },
+          "1": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              0.4421052631578948,
+              2.5473684210526315
+            ],
+            "segment_soc_change_mwh": [
+              -1.5578947368421052,
+              0.5473684210526315
+            ],
+            "total_segment_soc_change_mwh": -1.0105263157894737,
+            "final_soc_mwh": 2.5473684210526315,
+            "final_minus_initial_soc_mwh": 0.5473684210526315
+          },
+          "2": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              2.5473684210526315,
+              3.25
+            ],
+            "segment_soc_change_mwh": [
+              0.5473684210526315,
+              1.25
+            ],
+            "total_segment_soc_change_mwh": 1.7973684210526315,
+            "final_soc_mwh": 3.25,
+            "final_minus_initial_soc_mwh": 1.25
+          }
+        },
+        "final_soc_mwh": {
+          "mean": 3.0157894736842104,
+          "std": 0.405664531246395,
+          "values": [
+            3.25,
+            2.5473684210526315,
+            3.25
+          ]
+        },
+        "total_segment_soc_change_mwh": {
+          "mean": 0.5105263157894736,
+          "std": 1.4185235779761427,
+          "values": [
+            0.7447368421052631,
+            -1.0105263157894737,
+            1.7973684210526315
+          ]
+        }
+      },
+      "report_only_actual_soc": {
+        "unit": "MWh",
+        "monetized": false,
+        "included_in_revenue": false,
+        "per_seed": {
+          "0": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              3.6,
+              0.4
+            ],
+            "segment_soc_change_mwh": [
+              1.6,
+              -1.6
+            ],
+            "total_segment_soc_change_mwh": 0.0,
+            "final_soc_mwh": 0.4,
+            "final_minus_initial_soc_mwh": -1.6
+          },
+          "1": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              0.9394736842105265,
+              0.4
+            ],
+            "segment_soc_change_mwh": [
+              -1.0605263157894735,
+              -1.6
+            ],
+            "total_segment_soc_change_mwh": -2.6605263157894736,
+            "final_soc_mwh": 0.4,
+            "final_minus_initial_soc_mwh": -1.6
+          },
+          "2": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              3.6,
+              2.5473684210526315
+            ],
+            "segment_soc_change_mwh": [
+              1.6,
+              0.5473684210526315
+            ],
+            "total_segment_soc_change_mwh": 2.1473684210526316,
+            "final_soc_mwh": 2.5473684210526315,
+            "final_minus_initial_soc_mwh": 0.5473684210526315
+          }
+        },
+        "final_soc_mwh": {
+          "mean": 1.1157894736842104,
+          "std": 1.2397837359440385,
+          "values": [
+            0.4,
+            0.4,
+            2.5473684210526315
+          ]
+        },
+        "total_segment_soc_change_mwh": {
+          "mean": -0.17105263157894735,
+          "std": 2.40850725600237,
+          "values": [
+            0.0,
+            -2.6605263157894736,
+            2.1473684210526316
+          ]
+        }
       }
     },
     "F1": {
@@ -146,6 +305,164 @@
           903.0859375,
           903.0859375
         ]
+      },
+      "validation_actual_soc": {
+        "unit": "MWh",
+        "monetized": false,
+        "included_in_revenue": false,
+        "per_seed": {
+          "0": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              0.4421052631578948,
+              0.9394736842105263
+            ],
+            "segment_soc_change_mwh": [
+              -1.5578947368421052,
+              -1.0605263157894735
+            ],
+            "total_segment_soc_change_mwh": -2.6184210526315788,
+            "final_soc_mwh": 0.9394736842105263,
+            "final_minus_initial_soc_mwh": -1.0605263157894735
+          },
+          "1": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              1.5368421052631578,
+              0.9394736842105263
+            ],
+            "segment_soc_change_mwh": [
+              -0.4631578947368422,
+              -1.0605263157894735
+            ],
+            "total_segment_soc_change_mwh": -1.5236842105263158,
+            "final_soc_mwh": 0.9394736842105263,
+            "final_minus_initial_soc_mwh": -1.0605263157894735
+          },
+          "2": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              1.4947368421052631,
+              3.6
+            ],
+            "segment_soc_change_mwh": [
+              -0.5052631578947369,
+              1.6
+            ],
+            "total_segment_soc_change_mwh": 1.0947368421052632,
+            "final_soc_mwh": 3.6,
+            "final_minus_initial_soc_mwh": 1.6
+          }
+        },
+        "final_soc_mwh": {
+          "mean": 1.8263157894736841,
+          "std": 1.536055584607136,
+          "values": [
+            0.9394736842105263,
+            0.9394736842105263,
+            3.6
+          ]
+        },
+        "total_segment_soc_change_mwh": {
+          "mean": -1.0157894736842106,
+          "std": 1.90797096036485,
+          "values": [
+            -2.6184210526315788,
+            -1.5236842105263158,
+            1.0947368421052632
+          ]
+        }
+      },
+      "report_only_actual_soc": {
+        "unit": "MWh",
+        "monetized": false,
+        "included_in_revenue": false,
+        "per_seed": {
+          "0": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              1.35,
+              0.4
+            ],
+            "segment_soc_change_mwh": [
+              -0.6499999999999999,
+              -1.6
+            ],
+            "total_segment_soc_change_mwh": -2.25,
+            "final_soc_mwh": 0.4,
+            "final_minus_initial_soc_mwh": -1.6
+          },
+          "1": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              1.1447368421052635,
+              0.4421052631578948
+            ],
+            "segment_soc_change_mwh": [
+              -0.8552631578947365,
+              -1.5578947368421052
+            ],
+            "total_segment_soc_change_mwh": -2.413157894736842,
+            "final_soc_mwh": 0.4421052631578948,
+            "final_minus_initial_soc_mwh": -1.5578947368421052
+          },
+          "2": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              2.3421052631578947,
+              0.4
+            ],
+            "segment_soc_change_mwh": [
+              0.3421052631578947,
+              -1.6
+            ],
+            "total_segment_soc_change_mwh": -1.2578947368421054,
+            "final_soc_mwh": 0.4,
+            "final_minus_initial_soc_mwh": -1.6
+          }
+        },
+        "final_soc_mwh": {
+          "mean": 0.41403508771929826,
+          "std": 0.02430948501851057,
+          "values": [
+            0.4,
+            0.4421052631578948,
+            0.4
+          ]
+        },
+        "total_segment_soc_change_mwh": {
+          "mean": -1.9736842105263157,
+          "std": 0.6252367972469141,
+          "values": [
+            -2.25,
+            -2.413157894736842,
+            -1.2578947368421054
+          ]
+        }
       }
     },
     "F1b": {
@@ -212,6 +529,164 @@
           903.427734375,
           903.427734375
         ]
+      },
+      "validation_actual_soc": {
+        "unit": "MWh",
+        "monetized": false,
+        "included_in_revenue": false,
+        "per_seed": {
+          "0": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              0.4421052631578948,
+              0.9394736842105263
+            ],
+            "segment_soc_change_mwh": [
+              -1.5578947368421052,
+              -1.0605263157894735
+            ],
+            "total_segment_soc_change_mwh": -2.6184210526315788,
+            "final_soc_mwh": 0.9394736842105263,
+            "final_minus_initial_soc_mwh": -1.0605263157894735
+          },
+          "1": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              2.5473684210526315,
+              3.25
+            ],
+            "segment_soc_change_mwh": [
+              0.5473684210526315,
+              1.25
+            ],
+            "total_segment_soc_change_mwh": 1.7973684210526315,
+            "final_soc_mwh": 3.25,
+            "final_minus_initial_soc_mwh": 1.25
+          },
+          "2": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              1.5368421052631578,
+              2.5473684210526315
+            ],
+            "segment_soc_change_mwh": [
+              -0.4631578947368422,
+              0.5473684210526315
+            ],
+            "total_segment_soc_change_mwh": 0.08421052631578929,
+            "final_soc_mwh": 2.5473684210526315,
+            "final_minus_initial_soc_mwh": 0.5473684210526315
+          }
+        },
+        "final_soc_mwh": {
+          "mean": 2.245614035087719,
+          "std": 1.1844512425911482,
+          "values": [
+            0.9394736842105263,
+            3.25,
+            2.5473684210526315
+          ]
+        },
+        "total_segment_soc_change_mwh": {
+          "mean": -0.2456140350877193,
+          "std": 2.22629453351389,
+          "values": [
+            -2.6184210526315788,
+            1.7973684210526315,
+            0.08421052631578929
+          ]
+        }
+      },
+      "report_only_actual_soc": {
+        "unit": "MWh",
+        "monetized": false,
+        "included_in_revenue": false,
+        "per_seed": {
+          "0": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              1.4947368421052631,
+              1.4947368421052631
+            ],
+            "segment_soc_change_mwh": [
+              -0.5052631578947369,
+              -0.5052631578947369
+            ],
+            "total_segment_soc_change_mwh": -1.0105263157894737,
+            "final_soc_mwh": 1.4947368421052631,
+            "final_minus_initial_soc_mwh": -0.5052631578947369
+          },
+          "1": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              3.6,
+              1.4947368421052631
+            ],
+            "segment_soc_change_mwh": [
+              1.6,
+              -0.5052631578947369
+            ],
+            "total_segment_soc_change_mwh": 1.0947368421052632,
+            "final_soc_mwh": 1.4947368421052631,
+            "final_minus_initial_soc_mwh": -0.5052631578947369
+          },
+          "2": {
+            "initial_soc_mwh": 2.0,
+            "segment_initial_soc_mwh": [
+              2.0,
+              2.0
+            ],
+            "segment_final_soc_mwh": [
+              0.4421052631578948,
+              0.4
+            ],
+            "segment_soc_change_mwh": [
+              -1.5578947368421052,
+              -1.6
+            ],
+            "total_segment_soc_change_mwh": -3.1578947368421053,
+            "final_soc_mwh": 0.4,
+            "final_minus_initial_soc_mwh": -1.6
+          }
+        },
+        "final_soc_mwh": {
+          "mean": 1.1298245614035087,
+          "std": 0.6320466104812745,
+          "values": [
+            1.4947368421052631,
+            1.4947368421052631,
+            0.4
+          ]
+        },
+        "total_segment_soc_change_mwh": {
+          "mean": -1.0245614035087718,
+          "std": 2.1263505295060274,
+          "values": [
+            -1.0105263157894737,
+            1.0947368421052632,
+            -3.1578947368421053
+          ]
+        }
       }
     }
   },

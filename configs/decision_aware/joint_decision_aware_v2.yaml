@@ -1,0 +1,105 @@
+# E06-ZO-Joint-v2：三个独立Transformer在同一完整双结算目标下联合微调。
+# 本配置不合并模型、不共享参数，不使用2026 report-only选模。
+market: ERCOT
+node: LZ_LCRA
+data_version: v3
+freq: 1h
+context_len: 168
+horizon_da: 24
+horizon_rt: 4
+da_issue_hour_local: 10
+train_stride: 1
+val_stride: 1
+eval_stride: 1
+
+split_train_start: "2020-01-01 00:00"
+split_train_end: "2024-12-31 23:00"
+split_val_start: "2025-07-01 00:00"
+split_val_end: "2025-12-31 23:00"
+split_test_start: "2026-01-01 00:00"
+split_test_end: "2026-06-01 23:00"
+
+use_deviation_penalty: false
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_init_soc_frac: 0.5
+bess_kappa: 5.7
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+bess_e_cyc: 4.0
+topk_k_charge: 4
+topk_k_discharge: 4
+topk_spread_threshold: -1.0
+
+joint_da_checkpoint: data/checkpoints/da_fusion_ablation/f1_seed1/pilot_LZ_LCRA_best_full_dual.pt
+joint_rt_at_da_checkpoint: data/checkpoints/rt_at_da_fusion_ablation/f0_seed1/pilot_LZ_LCRA_best_full_dual.pt
+joint_rt_checkpoint: data/checkpoints/rt_fusion_ablation/f0_seed0/pilot_LZ_LCRA_best_full_dual.pt
+
+# 仍按连续16天传递SOC；只有真实数据缺口才重置。
+joint_episode_days: 16
+joint_validation_batch_days: 8
+
+# 不再继续用真值Huber推动三模型离开强基线。改为锚定原
+# checkpoint的输出；价差锚定权重更高，保护DA排序。
+joint_prediction_loss_mode: source_anchor
+joint_pred_weight_da: 0.5
+joint_pred_weight_rt_at_da: 0.5
+joint_pred_weight_rt: 1.0
+joint_pred_weight_spread: 1.0
+joint_alpha: 1.0
+
+# DA和RT-at-DA共同决定变量是spread=p_DA-p_RT|DA，只估计一条
+# coupled spread信号，再通过可微减法同时回传到两个独立模型。
+joint_da_proxy_mode: coupled_spread
+joint_proxy_weight_spread: 1.0
+joint_proxy_weight_rt: 1.0
+joint_proxy_reduction: sample_sum_mean
+
+# 稳定性审计后的零阶合同：DA价差用逐日反馈+8个正交方向；
+# 滚动RT用逐小时反馈，在每个4维窗口内用4个正交方向完整覆盖。
+joint_zo_direction_mode: orthogonal
+joint_zo_feedback_mode: per_day
+joint_zo_rt_feedback_mode: per_group
+joint_zo_epsilon_spread: 5.0
+joint_zo_epsilon_rt: 10.0
+joint_zo_directions_spread: 8
+joint_zo_directions_rt: 4
+zo_rho: 0.05
+zo_K: 2
+pred_clamp: [-500.0, 10000.0]
+
+# sample_sum_mean修正了v1额外除24/96的缩小，因此用更大scale和
+# 更小beta使代理参数梯度保持在clip附近，而不是每步都爆满。
+joint_proxy_scale: 1000.0
+joint_beta_start: 0.001
+joint_beta_end: 0.003
+joint_beta_warmup_epochs: 4
+
+# 少数尖峰日造成了v1大部分亏损；训练效用给最差10%日额外10%权重，
+# 把它作为收益代理的风险正则。正式checkpoint按照文献中更常见、也与
+# 本项目“最大化电池净收益”目标直接一致的完整双结算日均净收益选择；
+# 尾部10%、最大回撤和正收益日比例只并列报告，不再混入主score。
+joint_tail_weight: 0.10
+joint_tail_fraction: 0.10
+joint_selection_tail_weight: 0.0
+
+# 三个模型的price head在每一步同时更新；骨干保护不动。
+# 三个AdamW只是分开状态和梯度裁剪，并非分阶段或单路训练。
+joint_trainable_scope: price_head
+joint_separate_optimizers: true
+joint_include_baseline_candidate: true
+joint_disable_dropout: true
+
+huber_delta: 1.0
+pred_scale: 25.0
+lr: 0.000005
+weight_decay: 0.0
+epochs: 8
+grad_clip: 1.0
+early_stop_patience: 3
+use_amp: true
+num_workers: 0
+seed: 0
+checkpoint_dir: data/checkpoints/joint_decision_aware_v2_mean_seed0
+bootstrap_samples: 2000

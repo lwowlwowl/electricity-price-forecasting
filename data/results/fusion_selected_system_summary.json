@@ -24,6 +24,47 @@
   "coordination_mode": "rt_only",
   "validation_full_dual_mean_daily_revenue": 123.06264446344426,
   "report_only_full_dual_mean_daily_revenue": 66.30674296259909,
+  "terminal_soc_accounting": {
+    "unit": "MWh",
+    "monetized": false,
+    "included_in_revenue": false,
+    "validation_actual_soc": {
+      "initial_soc_mwh": 2.0,
+      "segment_initial_soc_mwh": [
+        2.0,
+        2.0
+      ],
+      "segment_final_soc_mwh": [
+        1.4947368421052631,
+        3.25
+      ],
+      "segment_soc_change_mwh": [
+        -0.5052631578947369,
+        1.25
+      ],
+      "total_segment_soc_change_mwh": 0.7447368421052631,
+      "final_soc_mwh": 3.25,
+      "final_minus_initial_soc_mwh": 1.25
+    },
+    "report_only_actual_soc": {
+      "initial_soc_mwh": 2.0,
+      "segment_initial_soc_mwh": [
+        2.0,
+        2.0
+      ],
+      "segment_final_soc_mwh": [
+        3.6,
+        0.4
+      ],
+      "segment_soc_change_mwh": [
+        1.6,
+        -1.6
+      ],
+      "total_segment_soc_change_mwh": 0.0,
+      "final_soc_mwh": 0.4,
+      "final_minus_initial_soc_mwh": -1.6
+    }
+  },
   "report_only_warning": "2026-01 through 2026-06 was exposed by earlier experiments and is not a fresh final test",
   "reference_key": "DA=data/checkpoints/da_fusion_ablation/f1_seed1/pilot_LZ_LCRA_best_full_dual.pt|RT-at-DA=data/checkpoints/rt_at_da_fusion_ablation/f0_seed1/pilot_LZ_LCRA_best_full_dual.pt"
 }

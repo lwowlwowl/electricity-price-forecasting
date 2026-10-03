@@ -1,0 +1,168 @@
+{
+  "device": "cuda",
+  "config": "configs\\decision_aware\\joint_decision_aware_v1.yaml",
+  "episode": {
+    "spike_index": 401,
+    "spike_abs_price": 9770.1474609375,
+    "start_index": 393,
+    "end_index": 408,
+    "delivery_dates": [
+      "2021-02-07",
+      "2021-02-08",
+      "2021-02-09",
+      "2021-02-10",
+      "2021-02-11",
+      "2021-02-12",
+      "2021-02-13",
+      "2021-02-14",
+      "2021-02-15",
+      "2021-02-16",
+      "2021-02-17",
+      "2021-02-18",
+      "2021-02-19",
+      "2021-02-20",
+      "2021-02-21",
+      "2021-02-22"
+    ]
+  },
+  "episode_days": 16,
+  "repeats": 4,
+  "raw_epsilon": {
+    "da": 20.91066589355469,
+    "rt": 22.991928100585938
+  },
+  "settings": [
+    {
+      "name": "per_group_orthogonal_k4_eps2.5",
+      "feedback_mode": "per_group",
+      "direction_mode": "orthogonal",
+      "directions": 4,
+      "epsilon_spread": 2.5,
+      "epsilon_rt": 2.5,
+      "branches": {
+        "spread": {
+          "repeat_cosine": {
+            "pair_count": 6,
+            "finite_pair_count": 6,
+            "mean": 0.11315918629255382,
+            "minimum": -0.1059245530117701,
+            "maximum": 0.19650544480151777
+          },
+          "gradient_norm_mean": 5689.385009765625,
+          "gradient_norm_cv": 0.22240587918201724,
+          "changed_direction_fraction_mean": 1.0,
+          "changed_day_fraction_mean": 0.99609375
+        },
+        "rt": {
+          "repeat_cosine": {
+            "pair_count": 6,
+            "finite_pair_count": 6,
+            "mean": 0.17002318287656948,
+            "minimum": -0.045201374836936675,
+            "maximum": 0.5091569177166108
+          },
+          "gradient_norm_mean": 2519.1192626953125,
+          "gradient_norm_cv": 0.02086722408224867,
+          "changed_direction_fraction_mean": 1.0,
+          "changed_day_fraction_mean": 0.796875
+        }
+      }
+    },
+    {
+      "name": "per_group_orthogonal_k4_eps5",
+      "feedback_mode": "per_group",
+      "direction_mode": "orthogonal",
+      "directions": 4,
+      "epsilon_spread": 5.0,
+      "epsilon_rt": 5.0,
+      "branches": {
+        "spread": {
+          "repeat_cosine": {
+            "pair_count": 6,
+            "finite_pair_count": 6,
+            "mean": 0.06231281021429547,
+            "minimum": -0.1352357308547124,
+            "maximum": 0.1981231158519649
+          },
+          "gradient_norm_mean": 4511.783752441406,
+          "gradient_norm_cv": 0.18067672567797646,
+          "changed_direction_fraction_mean": 1.0,
+          "changed_day_fraction_mean": 1.0
+        },
+        "rt": {
+          "repeat_cosine": {
+            "pair_count": 6,
+            "finite_pair_count": 6,
+            "mean": 0.43622768076140117,
+            "minimum": 0.2751268913632295,
+            "maximum": 0.6746831515247276
+          },
+          "gradient_norm_mean": 1832.5264282226562,
+          "gradient_norm_cv": 0.05856683859129512,
+          "changed_direction_fraction_mean": 1.0,
+          "changed_day_fraction_mean": 0.84765625
+        }
+      }
+    },
+    {
+      "name": "per_group_orthogonal_k4_eps10",
+      "feedback_mode": "per_group",
+      "direction_mode": "orthogonal",
+      "directions": 4,
+      "epsilon_spread": 10.0,
+      "epsilon_rt": 10.0,
+      "branches": {
+        "spread": {
+          "repeat_cosine": {
+            "pair_count": 6,
+            "finite_pair_count": 6,
+            "mean": 0.054165577951619526,
+            "minimum": -0.01627681774356192,
+            "maximum": 0.17616012476781392
+          },
+          "gradient_norm_mean": 2291.7958068847656,
+          "gradient_norm_cv": 0.19915230537390802,
+          "changed_direction_fraction_mean": 1.0,
+          "changed_day_fraction_mean": 1.0
+        },
+        "rt": {
+          "repeat_cosine": {
+            "pair_count": 6,
+            "finite_pair_count": 6,
+            "mean": 0.5239055479932041,
+            "minimum": 0.45701055481635977,
+            "maximum": 0.58604402762696
+          },
+          "gradient_norm_mean": 1108.6647644042969,
+          "gradient_norm_cv": 0.05275787790944943,
+          "changed_direction_fraction_mean": 1.0,
+          "changed_day_fraction_mean": 0.875
+        }
+      }
+    }
+  ],
+  "gradient_scale": {
+    "trainable_scope": "price_head",
+    "trainable_parameter_counts": {
+      "da": 129,
+      "rt_at_da": 129,
+      "rt": 129
+    },
+    "truth_huber_parameter_gradient_norm": {
+      "da": 41.606766855776044,
+      "rt_at_da": 9.938103462524484,
+      "rt": 15.757870540193466
+    },
+    "v2_proxy_beta1_parameter_gradient_norm": {
+      "da": 42129.28904505043,
+      "rt_at_da": 39302.77038363965,
+      "rt": 6659.794648027144
+    },
+    "note": "source_anchor在初始checkpoint处梯度为0；训练后只在偏离原输出时产生回拉信号。"
+  },
+  "interpretation_contract": {
+    "purpose": "gradient stability and scale audit only",
+    "not_model_selection": true,
+    "not_evidence_of_revenue_improvement": true
+  }
+}

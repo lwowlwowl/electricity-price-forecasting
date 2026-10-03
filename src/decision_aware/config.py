@@ -151,6 +151,68 @@ class PilotConfig:
     frozen_coordination_mode: str = "rt_only"
     bootstrap_samples: int = 2000
 
+    # ── 三模型联合 decision-aware 微调 ────────────────────────────────────
+    # 这三个路径是联合训练的唯一初始化清单。结构由各checkpoint自己的config
+    # 恢复；这里的实验配置只冻结数据、物理结算和联合优化合同。
+    joint_da_checkpoint: str = ""
+    joint_rt_at_da_checkpoint: str = ""
+    joint_rt_checkpoint: str = ""
+    joint_episode_days: int = 16
+    joint_validation_batch_days: int = 8
+    joint_pred_weight_da: float = 1.0
+    joint_pred_weight_rt_at_da: float = 1.0
+    joint_pred_weight_rt: float = 1.0
+    # DA动作只读取p_DA-p_RT|DA；单独约束两条价格曲线并不能保证价差排序稳定。
+    # 0保持v1复现；v2可显式加入真实DA-RT价差的Huber辅助损失。
+    joint_pred_weight_spread: float = 0.0
+    # truth_huber保留v1；source_anchor约束联合微调不偏离三个已按
+    # 验证收益选出的强checkpoint输出。
+    joint_prediction_loss_mode: str = "truth_huber"
+    # 三路零阶代理都先按各自输出元素求mean，再除以同一尺度；这样滚动RT的
+    # 24×4个输出不会仅因元素更多而压过两个24点日模型。
+    joint_proxy_scale: float = 10.0
+    joint_alpha: float = 1.0
+    joint_beta_start: float = 0.05
+    joint_beta_end: float = 0.30
+    joint_beta_warmup_epochs: int = 4
+    # v1分别扰动p_DA和p_RT|DA；v2直接扰动共同决策变量spread，避免两路
+    # 独立高方差估计把同一个价差信号向相反方向推移。
+    joint_da_proxy_mode: str = "independent_prices"
+    # gaussian保持v1；orthogonal使用等范数正交高斯方向降低同一batch内方差。
+    joint_zo_direction_mode: str = "gaussian"
+    # episode_scalar保留v1的单标量反馈；per_day利用系统已有的逐日
+    # 收益，为每个交付日单独分配零阶信号，降低高维交叉噪声。
+    joint_zo_feedback_mode: str = "episode_scalar"
+    # 滚动RT每小时有一个H维窗口，v2可用per_group将该小时
+    # 结算反馈直接分配给对应窗口，避免24个窗口共用一个日标量。
+    joint_zo_rt_feedback_mode: str = "episode_scalar"
+    # >0时覆盖rho*全局价格std。ERCOT全局std受尖峰支配，v2使用显式、较小扰动。
+    joint_zo_epsilon_spread: float = 0.0
+    joint_zo_epsilon_rt: float = 0.0
+    # 0时共用历史zo_K；v2允许DA价差和4维RT窗口用不同K。
+    joint_zo_directions_spread: int = 0
+    joint_zo_directions_rt: int = 0
+    joint_proxy_weight_spread: float = 1.0
+    joint_proxy_weight_rt: float = 1.0
+    # element_mean保留v1；sample_sum_mean先对每日的决策维求和，
+    # 再对天数取均值，不会把已估计的输出梯度再除24/96。
+    joint_proxy_reduction: str = "element_mean"
+    # 风险效用=(1-w)*mean_revenue+w*lower_tail_mean；0保持只优化均值。
+    joint_tail_weight: float = 0.0
+    joint_tail_fraction: float = 0.10
+    # checkpoint选择使用同形式的验证效用；0保持v1按日均收益选择。
+    joint_selection_tail_weight: float = 0.0
+    # all保持v1；decoder_head只更新各自decoder和price_head，保护已选骨干。
+    joint_trainable_scope: str = "all"
+    # v1单AdamW+全局clip；v2为三个独立模型分别建optimizer和clip。
+    joint_separate_optimizers: bool = False
+    # v2把未微调的强基线作为epoch 0候选；训练若没有真正
+    # 提高验证效用，最终bundle至少不会被更差的epoch覆盖。
+    joint_include_baseline_candidate: bool = False
+    # source_anchor必须和确定性基线输出比较；v2在微调时保持eval
+    # 以关闭dropout，但不使用no_grad，因此price head仍正常反传。
+    joint_disable_dropout: bool = False
+
     # ── 路径 ─────────────────────────────────────────────────────────────────
     checkpoint_dir: str = "data/checkpoints/da_tsfm_pilot_v3"
     seed: int = 0

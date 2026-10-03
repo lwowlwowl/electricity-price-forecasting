@@ -1,0 +1,72 @@
+# 三个独立Transformer的系统级decision-aware联合微调。
+# 结构已经由融合消融冻结；本实验只比较训练目标，不重新选择F0/F1/F1b/F2。
+market: ERCOT
+node: LZ_LCRA
+data_version: v3
+freq: 1h
+context_len: 168
+horizon_da: 24
+horizon_rt: 4
+da_issue_hour_local: 10
+train_stride: 1
+val_stride: 1
+eval_stride: 1
+
+split_train_start: "2020-01-01 00:00"
+split_train_end: "2024-12-31 23:00"
+split_val_start: "2025-07-01 00:00"
+split_val_end: "2025-12-31 23:00"
+# 这个时期已经被历史实验查看，只能在训练结束后作report-only披露。
+split_test_start: "2026-01-01 00:00"
+split_test_end: "2026-06-01 23:00"
+
+use_deviation_penalty: false
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_init_soc_frac: 0.5
+bess_kappa: 5.7
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+bess_e_cyc: 4.0
+topk_k_charge: 4
+topk_k_discharge: 4
+topk_spread_threshold: -1.0
+
+joint_da_checkpoint: data/checkpoints/da_fusion_ablation/f1_seed1/pilot_LZ_LCRA_best_full_dual.pt
+joint_rt_at_da_checkpoint: data/checkpoints/rt_at_da_fusion_ablation/f0_seed1/pilot_LZ_LCRA_best_full_dual.pt
+joint_rt_checkpoint: data/checkpoints/rt_fusion_ablation/f0_seed0/pilot_LZ_LCRA_best_full_dual.pt
+
+# 按连续16天截断系统级零阶目标；batch之间继续继承基础轨迹SOC，只有真实
+# 数据缺口才按合同重置。三项Huber各自mean后等权平均。
+joint_episode_days: 16
+joint_validation_batch_days: 8
+joint_pred_weight_da: 1.0
+joint_pred_weight_rt_at_da: 1.0
+joint_pred_weight_rt: 1.0
+joint_proxy_scale: 10.0
+joint_alpha: 1.0
+joint_beta_start: 0.05
+joint_beta_end: 0.30
+joint_beta_warmup_epochs: 4
+
+# 两点高斯零阶：每路每batch用2对方向；ε_m=ρ×训练价格标准差。
+zo_rho: 0.05
+zo_K: 2
+pred_clamp: [-500.0, 10000.0]
+huber_delta: 1.0
+pred_scale: 25.0
+
+# 从三个纯Huber checkpoint小学习率联合微调，不从随机参数训练。
+lr: 0.00001
+weight_decay: 0.01
+epochs: 6
+grad_clip: 1.0
+early_stop_patience: 2
+# 使用AMP降低16天episode显存；训练器把GradScaler固定在保守的64量级，
+# 不使用默认65536（smoke已证明默认值会溢出）。
+use_amp: true
+num_workers: 0
+seed: 0
+checkpoint_dir: data/checkpoints/joint_decision_aware_seed0
+bootstrap_samples: 2000

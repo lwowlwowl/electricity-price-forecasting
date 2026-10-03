@@ -63,7 +63,62 @@ def test_locked_plan_and_identical_actual_action_reduce_to_da_revenue():
     assert result["revenue_components"]["da_leg"] == pytest.approx(20.0)
     assert result["revenue_components"]["rt_deviation_leg"] == pytest.approx(0.0)
     assert result["plan_feasibility"]["total_clipped_mwh"] == pytest.approx(0.0)
+    assert result["actual_state"]["initial_soc_mwh"] == pytest.approx(1.0)
+    assert result["actual_state"]["segment_initial_soc_mwh"] == pytest.approx([1.0])
     assert result["actual_state"]["segment_final_soc_mwh"] == pytest.approx([1.0])
+    assert result["actual_state"]["segment_soc_change_mwh"] == pytest.approx([0.0])
+    assert result["actual_state"]["total_segment_soc_change_mwh"] == pytest.approx(0.0)
+    assert result["actual_state"]["final_soc_mwh"] == pytest.approx(1.0)
+    assert result["actual_state"]["final_minus_initial_soc_mwh"] == pytest.approx(0.0)
+    assert result["terminal_inventory_accounting"] == {
+        "unit": "MWh",
+        "monetized": False,
+        "included_in_revenue": False,
+        "reporting_rule": "cash revenue and terminal SOC are reported separately",
+    }
+
+
+def test_soc_change_is_reported_per_segment_without_monetization():
+    cfg = _tiny_config()
+    # 两个完整交付日之间空一天，所以回测会形成两个连续数据段，并在第二段重置SOC。
+    timestamps = pd.date_range(
+        "2025-01-02 00:00", periods=24, freq="h", tz="America/Chicago"
+    ).append(
+        pd.date_range(
+            "2025-01-04 00:00", periods=24, freq="h", tz="America/Chicago"
+        )
+    )
+    delivery_dates = sorted(set(timestamps.date))
+    da_forecasts = {day: torch.zeros(24) for day in delivery_dates}
+    # 每个滚动窗口的第一步都是高价，因此RT动作持续尝试放电；每段都会从1 MWh降到0。
+    rt_forecasts = torch.tensor([[10.0, 0.0, 0.0, 0.0]]).repeat(48, 1)
+
+    result = locked_dual_backtest(
+        da_forecasts,
+        rt_forecasts,
+        torch.zeros(48),
+        torch.zeros(48),
+        timestamps,
+        cfg,
+    )
+
+    assert result["segments"] == 2
+    assert result["state_resets_due_to_gaps"] == 1
+    assert result["total_revenue"] == pytest.approx(0.0)
+    assert result["actual_state"]["segment_initial_soc_mwh"] == pytest.approx(
+        [1.0, 1.0]
+    )
+    assert result["actual_state"]["segment_final_soc_mwh"] == pytest.approx(
+        [0.0, 0.0]
+    )
+    assert result["actual_state"]["segment_soc_change_mwh"] == pytest.approx(
+        [-1.0, -1.0]
+    )
+    assert result["actual_state"]["total_segment_soc_change_mwh"] == pytest.approx(-2.0)
+    assert result["actual_state"]["final_soc_mwh"] == pytest.approx(0.0)
+    assert result["actual_state"]["final_minus_initial_soc_mwh"] == pytest.approx(-1.0)
+    assert result["terminal_inventory_accounting"]["monetized"] is False
+    assert result["terminal_inventory_accounting"]["included_in_revenue"] is False
 
 
 def test_dst_day_is_not_forced_into_fake_24_hour_plan():

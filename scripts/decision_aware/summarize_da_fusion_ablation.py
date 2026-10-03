@@ -6,11 +6,23 @@ import argparse
 import json
 import math
 from pathlib import Path
+import sys
 
 import numpy as np
 
 
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "src"))
+
+from decision_aware.config import PilotConfig  # noqa: E402
+
+
 SEEDS = (0, 1, 2)
+DEFAULT_CONFIGS = {
+    "da": "configs/decision_aware/da_fusion_ablation_v1.yaml",
+    "rt_at_da": "configs/decision_aware/rt_at_da_fusion_ablation_v1.yaml",
+    "rt": "configs/decision_aware/rt_fusion_ablation_v1.yaml",
+}
 
 
 def _bootstrap_difference(values: np.ndarray, samples: int = 5000,
@@ -33,6 +45,49 @@ def _stats(values) -> dict:
         "mean": float(array.mean()),
         "std": float(array.std(ddof=1)) if len(array) > 1 else 0.0,
         "values": [float(value) for value in array],
+    }
+
+
+def _soc_inventory_summary(actual_state: dict, initial_soc_mwh: float) -> dict:
+    """兼容旧run，只用已保存的每段期末SOC补出非货币化库存指标。"""
+    final_values = [
+        float(value) for value in actual_state["segment_final_soc_mwh"]
+    ]
+    if not final_values:
+        raise ValueError("actual_state缺少连续数据段的期末SOC")
+    initial_value = float(initial_soc_mwh)
+    changes = [value - initial_value for value in final_values]
+    return {
+        "initial_soc_mwh": initial_value,
+        "segment_initial_soc_mwh": [initial_value] * len(final_values),
+        "segment_final_soc_mwh": final_values,
+        "segment_soc_change_mwh": changes,
+        "total_segment_soc_change_mwh": float(sum(changes)),
+        "final_soc_mwh": final_values[-1],
+        "final_minus_initial_soc_mwh": final_values[-1] - initial_value,
+    }
+
+
+def _soc_across_seeds(reports: list[dict], split: str,
+                      initial_soc_mwh: float) -> dict:
+    per_seed = {
+        str(seed): _soc_inventory_summary(
+            report[split]["full_dual"]["actual_state"], initial_soc_mwh
+        )
+        for seed, report in zip(SEEDS, reports)
+    }
+    return {
+        "unit": "MWh",
+        "monetized": False,
+        "included_in_revenue": False,
+        "per_seed": per_seed,
+        "final_soc_mwh": _stats([
+            per_seed[str(seed)]["final_soc_mwh"] for seed in SEEDS
+        ]),
+        "total_segment_soc_change_mwh": _stats([
+            per_seed[str(seed)]["total_segment_soc_change_mwh"]
+            for seed in SEEDS
+        ]),
     }
 
 
@@ -88,7 +143,7 @@ def _select_frozen_upstream(result_dir: Path, task: str, prefix: str,
 
 
 def _write_selected_system(result_dir: Path, rt_runs: dict,
-                           rt_winner: str) -> Path:
+                           rt_winner: str, initial_soc_mwh: float) -> Path:
     """记录不做笛卡尔积回选的单checkpoint组合及其已暴露期结果。"""
     rt_seed = _best_seed(rt_runs, rt_winner)
     rt_report = rt_runs[(rt_winner, rt_seed)]
@@ -143,6 +198,19 @@ def _write_selected_system(result_dir: Path, rt_runs: dict,
         "report_only_full_dual_mean_daily_revenue": float(
             report_refs[reference_key]
         ),
+        "terminal_soc_accounting": {
+            "unit": "MWh",
+            "monetized": False,
+            "included_in_revenue": False,
+            "validation_actual_soc": _soc_inventory_summary(
+                rt_report["validation"]["full_dual"]["actual_state"],
+                initial_soc_mwh,
+            ),
+            "report_only_actual_soc": _soc_inventory_summary(
+                rt_report["test_report_only"]["full_dual"]["actual_state"],
+                initial_soc_mwh,
+            ),
+        },
         "report_only_warning": (
             "2026-01 through 2026-06 was exposed by earlier experiments and is not "
             "a fresh final test"
@@ -163,7 +231,15 @@ def main() -> None:
     )
     parser.add_argument("--results-dir", default="data/results")
     parser.add_argument("--output", default=None)
+    parser.add_argument(
+        "--config",
+        default=None,
+        help="用于读取BESS初始SOC；默认使用对应任务的融合消融配置",
+    )
     args = parser.parse_args()
+
+    cfg = PilotConfig.from_yaml(args.config or DEFAULT_CONFIGS[args.task])
+    initial_soc_mwh = cfg.bess_energy_mwh * cfg.bess_init_soc_frac
 
     modes = {
         "da": ("F0", "F1", "F2"),
@@ -259,6 +335,13 @@ def main() -> None:
                 report["compute"]["peak_cuda_memory_mb"] for report in reports
             ]),
         }
+        if args.task == "rt":
+            mode_summaries[mode]["validation_actual_soc"] = _soc_across_seeds(
+                reports, "validation", initial_soc_mwh
+            )
+            mode_summaries[mode]["report_only_actual_soc"] = _soc_across_seeds(
+                reports, "test_report_only", initial_soc_mwh
+            )
 
     winner = max(
         modes,
@@ -298,6 +381,10 @@ def main() -> None:
         "task": args.task,
         "selection_rule": "highest mean frozen full-dual validation revenue across seeds",
         "test_role": "report-only and never used to choose the winner",
+        "terminal_soc_rule": (
+            "report actual SOC in MWh only; do not monetize it or include it in revenue"
+            if args.task == "rt" else "not added for this upstream-only summary"
+        ),
         "fairness": {
             "loss": "pure Huber for every run",
             "effective_batch_size": 32,
@@ -324,7 +411,9 @@ def main() -> None:
     output.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     selected_output = None
     if args.task == "rt":
-        selected_output = _write_selected_system(result_dir, runs, winner)
+        selected_output = _write_selected_system(
+            result_dir, runs, winner, initial_soc_mwh
+        )
     print(json.dumps({
         "selected_by_validation": winner,
         "validation_revenues": {
