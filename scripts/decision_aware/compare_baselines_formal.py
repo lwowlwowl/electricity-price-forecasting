@@ -4,12 +4,12 @@
 与先行版 compare_baselines.py 的区别：
 - 用 HardTopKPolicy（非 STE）
 - 用 DA 价（非 RT 价）
-- κ=27 + SOC 0.4-3.6 + η=0.95（w10 规范，非简化版）
+- 从配置读取κ、SOC边界和效率（非简化版）
 - 用 v3 数据集（6.5年统一表，非 17 月 model_ready）
 - 加"不充不放"基线（R=0），看模型是否至少比不操作好
 
 每个模型在相同 test 起报点上：
-  预测 24h DA 价 → 喂进同一套 BESS(HardTopK+κ=27) → 算 R_model、regret。
+  预测 24h DA 价 → 喂进同一套配置冻结的BESS与HardTopK → 算 R_model、regret。
 不比 MAE 比 R——这是 decision-aware 的核心卖点。
 
 用法:
@@ -160,7 +160,7 @@ def main():
         cfg.checkpoint_dir = args.ckpt_dir
     print("=" * 70)
     print(f"B 对比（正式版）: foundation 零样本 vs DA-TSFM v4({args.ckpt})")
-    print(f"  {args.n_origins} 个 test 起报点 | HardTopK + κ=27 + DA 价")
+    print(f"  {args.n_origins} 个 test 起报点 | HardTopK + κ={cfg.bess_kappa:g} + DA 价")
     print("=" * 70)
 
     origins, norm_stats = build_origins_v3(cfg, args.n_origins)

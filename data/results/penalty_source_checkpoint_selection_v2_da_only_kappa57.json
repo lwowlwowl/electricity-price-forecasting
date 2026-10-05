@@ -1,0 +1,245 @@
+{
+  "contract": {
+    "validation_days": 182,
+    "selection_metric_da_pair": "validation mean daily net revenue",
+    "selection_metric_rt_at_da_tiebreak": "validation daily-horizon MAE when DA signal is DA-only",
+    "selection_metric_rt_tiebreak": "validation all-horizon MAE",
+    "coordination_mode": "follow_da",
+    "da_signal_mode": "da_only",
+    "da_k": [
+      3,
+      3
+    ],
+    "rt_k": [
+      0,
+      0
+    ],
+    "spread_threshold": 6.000000000000001,
+    "deviation_penalty_enabled": true,
+    "report_only_used": false,
+    "warning": "现有checkpoint各自仍是无罚金收益选出的epoch；本步只是对已保存checkpoint的低成本预筛选。"
+  },
+  "candidate_counts": {
+    "da": 9,
+    "rt_at_da": 12,
+    "rt": 9
+  },
+  "selected": {
+    "da_rt_at_da_pair": {
+      "da": "f2_seed1",
+      "rt_at_da": null,
+      "mean_daily_revenue": 87.74840577094109,
+      "positive_day_rate": 0.8351648351648352,
+      "lower_tail_10pct_mean": -60.88251164084986,
+      "max_drawdown": 200.47340488433838,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    "rt_at_da_forecast_tiebreak": {
+      "rt_at_da": "f1b_seed0",
+      "validation_mae": 18.521637938221602,
+      "validation_rmse": 40.88042713677241
+    },
+    "rt_forecast_tiebreak": {
+      "rt": "f0_seed0",
+      "validation_mae": 12.965221508123806,
+      "validation_rmse": 33.25169900204339
+    },
+    "paths": {
+      "da": "data\\checkpoints\\da_fusion_ablation\\f2_seed1\\pilot_LZ_LCRA_best_full_dual.pt",
+      "rt_at_da": "data\\checkpoints\\rt_at_da_fusion_ablation\\f1b_seed0\\pilot_LZ_LCRA_best_full_dual.pt",
+      "rt": "data\\checkpoints\\rt_fusion_ablation\\f0_seed0\\pilot_LZ_LCRA_best_full_dual.pt"
+    }
+  },
+  "pair_ranking": [
+    {
+      "da": "f2_seed1",
+      "rt_at_da": null,
+      "mean_daily_revenue": 87.74840577094109,
+      "positive_day_rate": 0.8351648351648352,
+      "lower_tail_10pct_mean": -60.88251164084986,
+      "max_drawdown": 200.47340488433838,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed2",
+      "rt_at_da": null,
+      "mean_daily_revenue": 77.3531156529437,
+      "positive_day_rate": 0.8131868131868132,
+      "lower_tail_10pct_mean": -78.94400526347913,
+      "max_drawdown": 140.62001037597656,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed0",
+      "rt_at_da": null,
+      "mean_daily_revenue": 66.83377110303103,
+      "positive_day_rate": 0.8131868131868132,
+      "lower_tail_10pct_mean": -65.06356982180947,
+      "max_drawdown": 195.05433654785156,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed0",
+      "rt_at_da": null,
+      "mean_daily_revenue": 66.11474452699933,
+      "positive_day_rate": 0.7802197802197802,
+      "lower_tail_10pct_mean": -64.3533602262798,
+      "max_drawdown": 195.66778945922852,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed1",
+      "rt_at_da": null,
+      "mean_daily_revenue": 64.27500531437633,
+      "positive_day_rate": 0.7472527472527473,
+      "lower_tail_10pct_mean": -100.94247456600792,
+      "max_drawdown": 304.30732440948486,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed1",
+      "rt_at_da": null,
+      "mean_daily_revenue": 63.73892925597809,
+      "positive_day_rate": 0.7692307692307693,
+      "lower_tail_10pct_mean": -55.778099863152754,
+      "max_drawdown": 203.40313720703125,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed2",
+      "rt_at_da": null,
+      "mean_daily_revenue": 62.99003157772861,
+      "positive_day_rate": 0.7527472527472527,
+      "lower_tail_10pct_mean": -76.93944228322883,
+      "max_drawdown": 218.13306045532227,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed2",
+      "rt_at_da": null,
+      "mean_daily_revenue": 59.29858173380841,
+      "positive_day_rate": 0.7692307692307693,
+      "lower_tail_10pct_mean": -99.433710800974,
+      "max_drawdown": 486.1882095336914,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed0",
+      "rt_at_da": null,
+      "mean_daily_revenue": 54.90758562088013,
+      "positive_day_rate": 0.7362637362637363,
+      "lower_tail_10pct_mean": -97.35073129754318,
+      "max_drawdown": 315.62865829467773,
+      "mean_daily_deviation_penalty": 0.0
+    }
+  ],
+  "rt_at_da_forecast_ranking": [
+    {
+      "rt_at_da": "f1b_seed0",
+      "validation_mae": 18.521637938221602,
+      "validation_rmse": 40.88042713677241
+    },
+    {
+      "rt_at_da": "f1_seed2",
+      "validation_mae": 19.28018389324378,
+      "validation_rmse": 39.686028141425616
+    },
+    {
+      "rt_at_da": "f0_seed1",
+      "validation_mae": 19.37539029453076,
+      "validation_rmse": 39.18113847602737
+    },
+    {
+      "rt_at_da": "f1_seed1",
+      "validation_mae": 19.995228642332556,
+      "validation_rmse": 39.242802520895836
+    },
+    {
+      "rt_at_da": "f1_seed0",
+      "validation_mae": 20.45317023385388,
+      "validation_rmse": 38.9113353971992
+    },
+    {
+      "rt_at_da": "f2_seed2",
+      "validation_mae": 21.102396950140193,
+      "validation_rmse": 42.4319615755098
+    },
+    {
+      "rt_at_da": "f0_seed0",
+      "validation_mae": 22.380834722517044,
+      "validation_rmse": 39.673293028060826
+    },
+    {
+      "rt_at_da": "f1b_seed1",
+      "validation_mae": 24.127680658680923,
+      "validation_rmse": 41.853926877674866
+    },
+    {
+      "rt_at_da": "f0_seed2",
+      "validation_mae": 25.92858401020808,
+      "validation_rmse": 43.57518288871492
+    },
+    {
+      "rt_at_da": "f2_seed1",
+      "validation_mae": 26.844908256545125,
+      "validation_rmse": 46.32204349744903
+    },
+    {
+      "rt_at_da": "f1b_seed2",
+      "validation_mae": 27.122538983188193,
+      "validation_rmse": 48.1035437927101
+    },
+    {
+      "rt_at_da": "f2_seed0",
+      "validation_mae": 37.2217450472006,
+      "validation_rmse": 48.51801916891397
+    }
+  ],
+  "rt_forecast_ranking": [
+    {
+      "rt": "f0_seed0",
+      "validation_mae": 12.965221508123806,
+      "validation_rmse": 33.25169900204339
+    },
+    {
+      "rt": "f1_seed0",
+      "validation_mae": 13.12683166949771,
+      "validation_rmse": 32.553807220077935
+    },
+    {
+      "rt": "f1b_seed0",
+      "validation_mae": 13.224831801918489,
+      "validation_rmse": 32.38002578280958
+    },
+    {
+      "rt": "f0_seed1",
+      "validation_mae": 13.442309476231351,
+      "validation_rmse": 33.34617845872106
+    },
+    {
+      "rt": "f1_seed2",
+      "validation_mae": 15.64674385840452,
+      "validation_rmse": 36.5574738970523
+    },
+    {
+      "rt": "f1b_seed2",
+      "validation_mae": 15.999288864898574,
+      "validation_rmse": 33.43319810031479
+    },
+    {
+      "rt": "f1_seed1",
+      "validation_mae": 16.663586903664527,
+      "validation_rmse": 32.77938091284455
+    },
+    {
+      "rt": "f1b_seed1",
+      "validation_mae": 16.95575460140771,
+      "validation_rmse": 32.80338498449041
+    },
+    {
+      "rt": "f0_seed2",
+      "validation_mae": 30.97999214221239,
+      "validation_rmse": 44.58641654231658
+    }
+  ]
+}

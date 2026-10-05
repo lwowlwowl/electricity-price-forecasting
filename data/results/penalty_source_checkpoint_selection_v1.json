@@ -1,0 +1,1067 @@
+{
+  "contract": {
+    "validation_days": 182,
+    "selection_metric_da_pair": "validation mean daily net revenue",
+    "selection_metric_rt_tiebreak": "validation all-horizon MAE",
+    "coordination_mode": "plan_track_topk",
+    "da_k": [
+      4,
+      4
+    ],
+    "rt_k": [
+      0,
+      0
+    ],
+    "spread_threshold": 10.0,
+    "deviation_penalty_enabled": true,
+    "report_only_used": false,
+    "warning": "现有checkpoint各自仍是无罚金收益选出的epoch；本步只是对已保存checkpoint的低成本预筛选。"
+  },
+  "candidate_counts": {
+    "da": 9,
+    "rt_at_da": 12,
+    "rt": 9
+  },
+  "selected": {
+    "da_rt_at_da_pair": {
+      "da": "f2_seed1",
+      "rt_at_da": "f1b_seed0",
+      "mean_daily_revenue": 85.28545623624717,
+      "positive_day_rate": 0.7802197802197802,
+      "lower_tail_10pct_mean": -107.37734262566818,
+      "max_drawdown": 648.9175024032593,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    "rt_forecast_tiebreak": {
+      "rt": "f0_seed0",
+      "validation_mae": 12.965221508123806,
+      "validation_rmse": 33.25169900204339
+    },
+    "paths": {
+      "da": "data\\checkpoints\\da_fusion_ablation\\f2_seed1\\pilot_LZ_LCRA_best_full_dual.pt",
+      "rt_at_da": "data\\checkpoints\\rt_at_da_fusion_ablation\\f1b_seed0\\pilot_LZ_LCRA_best_full_dual.pt",
+      "rt": "data\\checkpoints\\rt_fusion_ablation\\f0_seed0\\pilot_LZ_LCRA_best_full_dual.pt"
+    }
+  },
+  "pair_ranking": [
+    {
+      "da": "f2_seed1",
+      "rt_at_da": "f1b_seed0",
+      "mean_daily_revenue": 85.28545623624717,
+      "positive_day_rate": 0.7802197802197802,
+      "lower_tail_10pct_mean": -107.37734262566818,
+      "max_drawdown": 648.9175024032593,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed1",
+      "rt_at_da": "f1_seed0",
+      "mean_daily_revenue": 84.0339527975072,
+      "positive_day_rate": 0.8186813186813187,
+      "lower_tail_10pct_mean": -124.50638580322266,
+      "max_drawdown": 642.397120475769,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed1",
+      "rt_at_da": "f1b_seed2",
+      "mean_daily_revenue": 83.69277338274233,
+      "positive_day_rate": 0.7472527472527473,
+      "lower_tail_10pct_mean": -96.07223631206311,
+      "max_drawdown": 614.8176901340485,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed1",
+      "rt_at_da": "f2_seed0",
+      "mean_daily_revenue": 83.16230571466488,
+      "positive_day_rate": 0.7362637362637363,
+      "lower_tail_10pct_mean": -98.08047927053352,
+      "max_drawdown": 506.7610321044922,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed1",
+      "rt_at_da": "f1b_seed1",
+      "mean_daily_revenue": 82.72262680727047,
+      "positive_day_rate": 0.7967032967032966,
+      "lower_tail_10pct_mean": -83.19909828587582,
+      "max_drawdown": 457.8242897987366,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed1",
+      "rt_at_da": "f1_seed1",
+      "mean_daily_revenue": 82.49422360776545,
+      "positive_day_rate": 0.7857142857142857,
+      "lower_tail_10pct_mean": -124.85388625295539,
+      "max_drawdown": 692.3991055488586,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed1",
+      "rt_at_da": "f1_seed2",
+      "mean_daily_revenue": 81.47122632933187,
+      "positive_day_rate": 0.7747252747252747,
+      "lower_tail_10pct_mean": -142.0478146201686,
+      "max_drawdown": 861.2240786552429,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed1",
+      "rt_at_da": "f0_seed0",
+      "mean_daily_revenue": 80.52198169061116,
+      "positive_day_rate": 0.7582417582417582,
+      "lower_tail_10pct_mean": -129.99341402555766,
+      "max_drawdown": 1176.884462237358,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed1",
+      "rt_at_da": "f0_seed2",
+      "mean_daily_revenue": 79.70682911558465,
+      "positive_day_rate": 0.7362637362637363,
+      "lower_tail_10pct_mean": -113.24037531802529,
+      "max_drawdown": 1255.4838485717773,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed1",
+      "rt_at_da": "f0_seed1",
+      "mean_daily_revenue": 79.10786889411591,
+      "positive_day_rate": 0.7417582417582418,
+      "lower_tail_10pct_mean": -136.7606100785105,
+      "max_drawdown": 1281.6122722625732,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed1",
+      "rt_at_da": "f2_seed1",
+      "mean_daily_revenue": 74.82176717362562,
+      "positive_day_rate": 0.7472527472527473,
+      "lower_tail_10pct_mean": -113.34830635472348,
+      "max_drawdown": 976.0811004638672,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed1",
+      "rt_at_da": "f2_seed2",
+      "mean_daily_revenue": 70.8665260037223,
+      "positive_day_rate": 0.7307692307692307,
+      "lower_tail_10pct_mean": -126.60090998599404,
+      "max_drawdown": 1113.3682765960693,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed0",
+      "rt_at_da": "f1_seed0",
+      "mean_daily_revenue": 70.51885222864675,
+      "positive_day_rate": 0.7747252747252747,
+      "lower_tail_10pct_mean": -68.13091659545898,
+      "max_drawdown": 264.8657817840576,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed0",
+      "rt_at_da": "f1b_seed0",
+      "mean_daily_revenue": 69.72590685938741,
+      "positive_day_rate": 0.7692307692307693,
+      "lower_tail_10pct_mean": -90.81912974307411,
+      "max_drawdown": 482.8351345062256,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed0",
+      "rt_at_da": "f0_seed0",
+      "mean_daily_revenue": 63.120975719048424,
+      "positive_day_rate": 0.7637362637362637,
+      "lower_tail_10pct_mean": -93.80982690108449,
+      "max_drawdown": 642.1565504074097,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed0",
+      "rt_at_da": "f1_seed1",
+      "mean_daily_revenue": 62.55107469873114,
+      "positive_day_rate": 0.7472527472527473,
+      "lower_tail_10pct_mean": -96.5467798333419,
+      "max_drawdown": 459.90792655944824,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed0",
+      "rt_at_da": "f2_seed1",
+      "mean_daily_revenue": 59.22297148652129,
+      "positive_day_rate": 0.7087912087912088,
+      "lower_tail_10pct_mean": -97.37229718660053,
+      "max_drawdown": 733.4478235244751,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed0",
+      "rt_at_da": "f1b_seed2",
+      "mean_daily_revenue": 57.43586823180482,
+      "positive_day_rate": 0.7362637362637363,
+      "lower_tail_10pct_mean": -105.49778044851203,
+      "max_drawdown": 681.4459791183472,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed0",
+      "rt_at_da": "f1b_seed2",
+      "mean_daily_revenue": 56.17591454432561,
+      "positive_day_rate": 0.7417582417582418,
+      "lower_tail_10pct_mean": -135.05650992142526,
+      "max_drawdown": 963.5506229400635,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed0",
+      "rt_at_da": "f2_seed0",
+      "mean_daily_revenue": 55.44075625283377,
+      "positive_day_rate": 0.6813186813186813,
+      "lower_tail_10pct_mean": -146.33568131296258,
+      "max_drawdown": 1075.0554389953613,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed2",
+      "rt_at_da": "f1b_seed2",
+      "mean_daily_revenue": 55.351305041994365,
+      "positive_day_rate": 0.7582417582417582,
+      "lower_tail_10pct_mean": -108.94321963661595,
+      "max_drawdown": 330.35894775390625,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed0",
+      "rt_at_da": "f1b_seed0",
+      "mean_daily_revenue": 54.8354660652496,
+      "positive_day_rate": 0.7142857142857143,
+      "lower_tail_10pct_mean": -111.8163379869963,
+      "max_drawdown": 919.7748260498047,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed0",
+      "rt_at_da": "f0_seed0",
+      "mean_daily_revenue": 54.0395892897805,
+      "positive_day_rate": 0.7142857142857143,
+      "lower_tail_10pct_mean": -115.9412851835552,
+      "max_drawdown": 993.9831562042236,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed0",
+      "rt_at_da": "f0_seed1",
+      "mean_daily_revenue": 52.58628450383197,
+      "positive_day_rate": 0.6978021978021978,
+      "lower_tail_10pct_mean": -129.21783788580643,
+      "max_drawdown": 1374.8479261398315,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed1",
+      "rt_at_da": "f1b_seed0",
+      "mean_daily_revenue": 52.44073319697118,
+      "positive_day_rate": 0.6868131868131868,
+      "lower_tail_10pct_mean": -106.56601333618164,
+      "max_drawdown": 493.75574684143066,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed0",
+      "rt_at_da": "f1b_seed1",
+      "mean_daily_revenue": 52.292244979313445,
+      "positive_day_rate": 0.6923076923076923,
+      "lower_tail_10pct_mean": -107.88598050569233,
+      "max_drawdown": 987.477373123169,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed0",
+      "rt_at_da": "f1b_seed1",
+      "mean_daily_revenue": 51.679203541724235,
+      "positive_day_rate": 0.6923076923076923,
+      "lower_tail_10pct_mean": -92.74542417024311,
+      "max_drawdown": 359.78754329681396,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed0",
+      "rt_at_da": "f1_seed0",
+      "mean_daily_revenue": 51.45694731094025,
+      "positive_day_rate": 0.7142857142857143,
+      "lower_tail_10pct_mean": -123.1242531224301,
+      "max_drawdown": 874.963526725769,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed0",
+      "rt_at_da": "f2_seed2",
+      "mean_daily_revenue": 50.85064448236109,
+      "positive_day_rate": 0.6978021978021978,
+      "lower_tail_10pct_mean": -130.58501956337378,
+      "max_drawdown": 829.3594658374786,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed0",
+      "rt_at_da": "f1_seed1",
+      "mean_daily_revenue": 50.53107803994482,
+      "positive_day_rate": 0.6813186813186813,
+      "lower_tail_10pct_mean": -122.54041932758533,
+      "max_drawdown": 1083.1104345321655,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed0",
+      "rt_at_da": "f0_seed1",
+      "mean_daily_revenue": 49.8238597544995,
+      "positive_day_rate": 0.6813186813186813,
+      "lower_tail_10pct_mean": -121.97608445820056,
+      "max_drawdown": 1014.8993988037109,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed1",
+      "rt_at_da": "f0_seed0",
+      "mean_daily_revenue": 49.60005522298289,
+      "positive_day_rate": 0.6483516483516484,
+      "lower_tail_10pct_mean": -90.00709071912263,
+      "max_drawdown": 478.0465965270996,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed0",
+      "rt_at_da": "f2_seed0",
+      "mean_daily_revenue": 48.354696685141256,
+      "positive_day_rate": 0.7087912087912088,
+      "lower_tail_10pct_mean": -122.92657711631374,
+      "max_drawdown": 1239.2413835525513,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed1",
+      "rt_at_da": "f1b_seed2",
+      "mean_daily_revenue": 48.038908435748176,
+      "positive_day_rate": 0.6758241758241759,
+      "lower_tail_10pct_mean": -112.95116023013466,
+      "max_drawdown": 685.8617217540741,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed0",
+      "rt_at_da": "f2_seed1",
+      "mean_daily_revenue": 48.00481154630472,
+      "positive_day_rate": 0.6923076923076923,
+      "lower_tail_10pct_mean": -124.37590970491108,
+      "max_drawdown": 1006.9640870094299,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed0",
+      "rt_at_da": "f1_seed2",
+      "mean_daily_revenue": 47.67577956273006,
+      "positive_day_rate": 0.6813186813186813,
+      "lower_tail_10pct_mean": -114.59533209549754,
+      "max_drawdown": 1029.5109615325928,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed2",
+      "rt_at_da": "f1b_seed0",
+      "mean_daily_revenue": 47.49222495267679,
+      "positive_day_rate": 0.6648351648351648,
+      "lower_tail_10pct_mean": -155.84885928505346,
+      "max_drawdown": 844.1777091026306,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed1",
+      "rt_at_da": "f1b_seed1",
+      "mean_daily_revenue": 47.3376853125436,
+      "positive_day_rate": 0.6428571428571429,
+      "lower_tail_10pct_mean": -84.28036238017835,
+      "max_drawdown": 368.60902404785156,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed1",
+      "rt_at_da": "f1b_seed0",
+      "mean_daily_revenue": 46.556621428374406,
+      "positive_day_rate": 0.6098901098901099,
+      "lower_tail_10pct_mean": -136.0781025133635,
+      "max_drawdown": 1267.8083810806274,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed2",
+      "rt_at_da": "f1b_seed0",
+      "mean_daily_revenue": 46.19084719773177,
+      "positive_day_rate": 0.6703296703296703,
+      "lower_tail_10pct_mean": -158.25366853412828,
+      "max_drawdown": 480.36413192749023,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed0",
+      "rt_at_da": "f0_seed2",
+      "mean_daily_revenue": 46.108676171564795,
+      "positive_day_rate": 0.6648351648351648,
+      "lower_tail_10pct_mean": -140.2993947079307,
+      "max_drawdown": 1846.1550941467285,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed2",
+      "rt_at_da": "f0_seed1",
+      "mean_daily_revenue": 45.97943029822884,
+      "positive_day_rate": 0.6483516483516484,
+      "lower_tail_10pct_mean": -161.57149706388773,
+      "max_drawdown": 344.6625289916992,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed0",
+      "rt_at_da": "f1_seed2",
+      "mean_daily_revenue": 44.45045992502799,
+      "positive_day_rate": 0.6483516483516484,
+      "lower_tail_10pct_mean": -100.72732102243523,
+      "max_drawdown": 488.3947229385376,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed2",
+      "rt_at_da": "f0_seed0",
+      "mean_daily_revenue": 43.04415019527897,
+      "positive_day_rate": 0.6318681318681318,
+      "lower_tail_10pct_mean": -101.9788155806692,
+      "max_drawdown": 850.5612735748291,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed2",
+      "rt_at_da": "f1b_seed0",
+      "mean_daily_revenue": 42.82063844701746,
+      "positive_day_rate": 0.6428571428571429,
+      "lower_tail_10pct_mean": -137.52874274002878,
+      "max_drawdown": 730.7610054016113,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed0",
+      "rt_at_da": "f2_seed2",
+      "mean_daily_revenue": 41.51813912129664,
+      "positive_day_rate": 0.6703296703296703,
+      "lower_tail_10pct_mean": -147.26492711117393,
+      "max_drawdown": 1655.689519405365,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed2",
+      "rt_at_da": "f0_seed0",
+      "mean_daily_revenue": 41.10734673908779,
+      "positive_day_rate": 0.6263736263736264,
+      "lower_tail_10pct_mean": -149.92857722232216,
+      "max_drawdown": 471.54829025268555,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed1",
+      "rt_at_da": "f1_seed1",
+      "mean_daily_revenue": 40.96514543072208,
+      "positive_day_rate": 0.5879120879120879,
+      "lower_tail_10pct_mean": -92.75917916548879,
+      "max_drawdown": 789.758376121521,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed1",
+      "rt_at_da": "f1_seed0",
+      "mean_daily_revenue": 39.27343558217143,
+      "positive_day_rate": 0.5989010989010989,
+      "lower_tail_10pct_mean": -109.415796380294,
+      "max_drawdown": 525.6120944023132,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed0",
+      "rt_at_da": "f0_seed2",
+      "mean_daily_revenue": 38.601299684126296,
+      "positive_day_rate": 0.6758241758241759,
+      "lower_tail_10pct_mean": -162.02371215820312,
+      "max_drawdown": 2088.0348691940308,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed2",
+      "rt_at_da": "f0_seed0",
+      "mean_daily_revenue": 38.53564471988888,
+      "positive_day_rate": 0.6648351648351648,
+      "lower_tail_10pct_mean": -172.4085026791221,
+      "max_drawdown": 898.9406433105469,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed1",
+      "rt_at_da": "f0_seed1",
+      "mean_daily_revenue": 37.623693146548426,
+      "positive_day_rate": 0.6538461538461539,
+      "lower_tail_10pct_mean": -145.18012358012953,
+      "max_drawdown": 1404.1097497940063,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed2",
+      "rt_at_da": "f1b_seed2",
+      "mean_daily_revenue": 37.016962926466384,
+      "positive_day_rate": 0.6098901098901099,
+      "lower_tail_10pct_mean": -174.99399285567435,
+      "max_drawdown": 923.6164569854736,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed2",
+      "rt_at_da": "f2_seed1",
+      "mean_daily_revenue": 36.8468137206612,
+      "positive_day_rate": 0.6098901098901099,
+      "lower_tail_10pct_mean": -141.2827313071803,
+      "max_drawdown": 602.92600440979,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed1",
+      "rt_at_da": "f2_seed1",
+      "mean_daily_revenue": 35.64081837580754,
+      "positive_day_rate": 0.5989010989010989,
+      "lower_tail_10pct_mean": -130.566466080515,
+      "max_drawdown": 848.2435441017151,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed2",
+      "rt_at_da": "f1b_seed1",
+      "mean_daily_revenue": 35.414260607499344,
+      "positive_day_rate": 0.5824175824175825,
+      "lower_tail_10pct_mean": -130.88835585744758,
+      "max_drawdown": 414.50707244873047,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed2",
+      "rt_at_da": "f0_seed1",
+      "mean_daily_revenue": 35.385969848423215,
+      "positive_day_rate": 0.6153846153846154,
+      "lower_tail_10pct_mean": -187.11589371530633,
+      "max_drawdown": 1110.810468196869,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed1",
+      "rt_at_da": "f1_seed2",
+      "mean_daily_revenue": 35.38461696446597,
+      "positive_day_rate": 0.5384615384615384,
+      "lower_tail_10pct_mean": -101.23747936048005,
+      "max_drawdown": 718.6854209899902,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed1",
+      "rt_at_da": "f0_seed0",
+      "mean_daily_revenue": 33.89237207108801,
+      "positive_day_rate": 0.5494505494505495,
+      "lower_tail_10pct_mean": -142.5346057289525,
+      "max_drawdown": 1438.3301692008972,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed1",
+      "rt_at_da": "f2_seed0",
+      "mean_daily_revenue": 33.07979852550633,
+      "positive_day_rate": 0.5989010989010989,
+      "lower_tail_10pct_mean": -144.258201197574,
+      "max_drawdown": 1456.0939683914185,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed2",
+      "rt_at_da": "f1_seed2",
+      "mean_daily_revenue": 32.19998529455164,
+      "positive_day_rate": 0.5989010989010989,
+      "lower_tail_10pct_mean": -140.20824673301294,
+      "max_drawdown": 608.9178733825684,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed2",
+      "rt_at_da": "f0_seed1",
+      "mean_daily_revenue": 32.07309721852397,
+      "positive_day_rate": 0.5989010989010989,
+      "lower_tail_10pct_mean": -144.8004278885691,
+      "max_drawdown": 1405.0368785858154,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed2",
+      "rt_at_da": "f0_seed2",
+      "mean_daily_revenue": 30.765385331688346,
+      "positive_day_rate": 0.6483516483516484,
+      "lower_tail_10pct_mean": -158.6588074533563,
+      "max_drawdown": 1481.0136761665344,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed1",
+      "rt_at_da": "f0_seed2",
+      "mean_daily_revenue": 30.435795285544554,
+      "positive_day_rate": 0.5494505494505495,
+      "lower_tail_10pct_mean": -168.0052590621145,
+      "max_drawdown": 2076.047874569893,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed1",
+      "rt_at_da": "f2_seed2",
+      "mean_daily_revenue": 30.256750850887087,
+      "positive_day_rate": 0.5769230769230769,
+      "lower_tail_10pct_mean": -135.20597678736635,
+      "max_drawdown": 1168.7918376922607,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed2",
+      "rt_at_da": "f1b_seed1",
+      "mean_daily_revenue": 28.674247959157924,
+      "positive_day_rate": 0.5769230769230769,
+      "lower_tail_10pct_mean": -181.45121202970805,
+      "max_drawdown": 609.3422222137451,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed2",
+      "rt_at_da": "f0_seed2",
+      "mean_daily_revenue": 27.32779841370635,
+      "positive_day_rate": 0.5769230769230769,
+      "lower_tail_10pct_mean": -166.37538588674445,
+      "max_drawdown": 1803.2638931274414,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed2",
+      "rt_at_da": "f2_seed0",
+      "mean_daily_revenue": 27.301983796633206,
+      "positive_day_rate": 0.5714285714285714,
+      "lower_tail_10pct_mean": -163.98783713892885,
+      "max_drawdown": 1691.9199390411377,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed0",
+      "rt_at_da": "f1b_seed0",
+      "mean_daily_revenue": 27.268411741151915,
+      "positive_day_rate": 0.5164835164835165,
+      "lower_tail_10pct_mean": -137.66242699874076,
+      "max_drawdown": 1004.1513195037842,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed1",
+      "rt_at_da": "f0_seed2",
+      "mean_daily_revenue": 26.740071105433035,
+      "positive_day_rate": 0.5659340659340659,
+      "lower_tail_10pct_mean": -141.52899210076583,
+      "max_drawdown": 1586.1154718399048,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed2",
+      "rt_at_da": "f1b_seed1",
+      "mean_daily_revenue": 26.733314508920188,
+      "positive_day_rate": 0.5934065934065934,
+      "lower_tail_10pct_mean": -163.50260403281763,
+      "max_drawdown": 1350.9265394210815,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed2",
+      "rt_at_da": "f2_seed1",
+      "mean_daily_revenue": 26.516448293413436,
+      "positive_day_rate": 0.6098901098901099,
+      "lower_tail_10pct_mean": -189.0394696687397,
+      "max_drawdown": 978.6086750030518,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed2",
+      "rt_at_da": "f0_seed2",
+      "mean_daily_revenue": 26.382626344869426,
+      "positive_day_rate": 0.5769230769230769,
+      "lower_tail_10pct_mean": -179.99711930124383,
+      "max_drawdown": 1896.747639656067,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed2",
+      "rt_at_da": "f1_seed2",
+      "mean_daily_revenue": 25.940971455731233,
+      "positive_day_rate": 0.5934065934065934,
+      "lower_tail_10pct_mean": -236.8526217811986,
+      "max_drawdown": 831.3116550445557,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed2",
+      "rt_at_da": "f2_seed0",
+      "mean_daily_revenue": 25.677501316908952,
+      "positive_day_rate": 0.5934065934065934,
+      "lower_tail_10pct_mean": -205.2525674920333,
+      "max_drawdown": 1409.7329597473145,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed2",
+      "rt_at_da": "f2_seed1",
+      "mean_daily_revenue": 24.913323706322974,
+      "positive_day_rate": 0.5824175824175825,
+      "lower_tail_10pct_mean": -145.97398095381888,
+      "max_drawdown": 1084.8526706695557,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed2",
+      "rt_at_da": "f1_seed0",
+      "mean_daily_revenue": 24.69439946295141,
+      "positive_day_rate": 0.5439560439560439,
+      "lower_tail_10pct_mean": -116.97487760844983,
+      "max_drawdown": 837.5401411056519,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed2",
+      "rt_at_da": "f1_seed0",
+      "mean_daily_revenue": 24.446121742437175,
+      "positive_day_rate": 0.5714285714285714,
+      "lower_tail_10pct_mean": -199.88974882427016,
+      "max_drawdown": 920.9398970603943,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed2",
+      "rt_at_da": "f1_seed1",
+      "mean_daily_revenue": 23.9278046639411,
+      "positive_day_rate": 0.5439560439560439,
+      "lower_tail_10pct_mean": -156.1127704821135,
+      "max_drawdown": 1667.2393522262573,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed1",
+      "rt_at_da": "f2_seed1",
+      "mean_daily_revenue": 23.056133063939903,
+      "positive_day_rate": 0.5164835164835165,
+      "lower_tail_10pct_mean": -145.90054000051398,
+      "max_drawdown": 1547.6178350448608,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed2",
+      "rt_at_da": "f1_seed0",
+      "mean_daily_revenue": 22.596454295483266,
+      "positive_day_rate": 0.5714285714285714,
+      "lower_tail_10pct_mean": -163.7253357736688,
+      "max_drawdown": 1486.6332960128784,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed2",
+      "rt_at_da": "f1_seed1",
+      "mean_daily_revenue": 22.471286920400765,
+      "positive_day_rate": 0.5879120879120879,
+      "lower_tail_10pct_mean": -203.39736938476562,
+      "max_drawdown": 998.960280418396,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed2",
+      "rt_at_da": "f1_seed2",
+      "mean_daily_revenue": 21.68641770017016,
+      "positive_day_rate": 0.5659340659340659,
+      "lower_tail_10pct_mean": -178.25803335089432,
+      "max_drawdown": 1546.14368724823,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed2",
+      "rt_at_da": "f2_seed2",
+      "mean_daily_revenue": 21.43189553638081,
+      "positive_day_rate": 0.5714285714285714,
+      "lower_tail_10pct_mean": -160.7581767032021,
+      "max_drawdown": 2164.2862458229065,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed1",
+      "rt_at_da": "f0_seed1",
+      "mean_daily_revenue": 21.352272528868454,
+      "positive_day_rate": 0.5274725274725275,
+      "lower_tail_10pct_mean": -148.0059320550216,
+      "max_drawdown": 2267.6323671340942,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed2",
+      "rt_at_da": "f1_seed1",
+      "mean_daily_revenue": 19.45156977726863,
+      "positive_day_rate": 0.5164835164835165,
+      "lower_tail_10pct_mean": -130.48175048828125,
+      "max_drawdown": 1282.4083805084229,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed2",
+      "rt_at_da": "f2_seed2",
+      "mean_daily_revenue": 19.322831169589534,
+      "positive_day_rate": 0.5164835164835165,
+      "lower_tail_10pct_mean": -159.44090592233758,
+      "max_drawdown": 2032.4896821975708,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed1",
+      "rt_at_da": "f1b_seed2",
+      "mean_daily_revenue": 19.303650591399645,
+      "positive_day_rate": 0.46703296703296704,
+      "lower_tail_10pct_mean": -144.4700016222502,
+      "max_drawdown": 874.2840776443481,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f0_seed2",
+      "rt_at_da": "f2_seed0",
+      "mean_daily_revenue": 19.289897462823888,
+      "positive_day_rate": 0.5054945054945055,
+      "lower_tail_10pct_mean": -148.7916131270559,
+      "max_drawdown": 1588.4724702835083,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed2",
+      "rt_at_da": "f1b_seed2",
+      "mean_daily_revenue": 17.71453235568581,
+      "positive_day_rate": 0.5439560439560439,
+      "lower_tail_10pct_mean": -172.4631970054225,
+      "max_drawdown": 804.8705263137817,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed0",
+      "rt_at_da": "f1b_seed2",
+      "mean_daily_revenue": 17.6331800366496,
+      "positive_day_rate": 0.532967032967033,
+      "lower_tail_10pct_mean": -206.9035291169819,
+      "max_drawdown": 779.3704261779785,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed0",
+      "rt_at_da": "f0_seed0",
+      "mean_daily_revenue": 15.94228590451754,
+      "positive_day_rate": 0.5054945054945055,
+      "lower_tail_10pct_mean": -181.1920993202611,
+      "max_drawdown": 949.9503211975098,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed2",
+      "rt_at_da": "f2_seed2",
+      "mean_daily_revenue": 13.485185264231085,
+      "positive_day_rate": 0.46153846153846156,
+      "lower_tail_10pct_mean": -145.23121040745787,
+      "max_drawdown": 3180.5660190582275,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed1",
+      "rt_at_da": "f1_seed2",
+      "mean_daily_revenue": 12.071102646680979,
+      "positive_day_rate": 0.47802197802197804,
+      "lower_tail_10pct_mean": -165.3505690725226,
+      "max_drawdown": 2104.0656774044037,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed1",
+      "rt_at_da": "f1b_seed1",
+      "mean_daily_revenue": 7.034702682233119,
+      "positive_day_rate": 0.46153846153846156,
+      "lower_tail_10pct_mean": -167.04824186626234,
+      "max_drawdown": 1768.0156487226486,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed0",
+      "rt_at_da": "f0_seed1",
+      "mean_daily_revenue": 5.350995393899771,
+      "positive_day_rate": 0.3791208791208791,
+      "lower_tail_10pct_mean": -151.83081857781661,
+      "max_drawdown": 1369.036485671997,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed1",
+      "rt_at_da": "f1_seed1",
+      "mean_daily_revenue": 3.530285671517089,
+      "positive_day_rate": 0.41208791208791207,
+      "lower_tail_10pct_mean": -168.6084169086657,
+      "max_drawdown": 2411.909995317459,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed0",
+      "rt_at_da": "f1b_seed1",
+      "mean_daily_revenue": 1.4994063429780058,
+      "positive_day_rate": 0.45054945054945056,
+      "lower_tail_10pct_mean": -182.8650729530736,
+      "max_drawdown": 1191.3418312072754,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed0",
+      "rt_at_da": "f0_seed2",
+      "mean_daily_revenue": 0.13669807308322782,
+      "positive_day_rate": 0.46153846153846156,
+      "lower_tail_10pct_mean": -202.85908749229029,
+      "max_drawdown": 2453.209159851074,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed1",
+      "rt_at_da": "f1_seed0",
+      "mean_daily_revenue": -2.353828204857124,
+      "positive_day_rate": 0.41208791208791207,
+      "lower_tail_10pct_mean": -162.46402700323807,
+      "max_drawdown": 2856.3499159812927,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed1",
+      "rt_at_da": "f2_seed0",
+      "mean_daily_revenue": -2.405703394622593,
+      "positive_day_rate": 0.45054945054945056,
+      "lower_tail_10pct_mean": -175.71248666863693,
+      "max_drawdown": 2098.1177291870117,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed0",
+      "rt_at_da": "f2_seed1",
+      "mean_daily_revenue": -4.041211358793489,
+      "positive_day_rate": 0.4010989010989011,
+      "lower_tail_10pct_mean": -190.6442581979852,
+      "max_drawdown": 1647.3450050354004,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f1_seed1",
+      "rt_at_da": "f2_seed2",
+      "mean_daily_revenue": -7.011887731132926,
+      "positive_day_rate": 0.42857142857142855,
+      "lower_tail_10pct_mean": -196.19105128238076,
+      "max_drawdown": 5158.189286231995,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed0",
+      "rt_at_da": "f1_seed1",
+      "mean_daily_revenue": -10.321532024132026,
+      "positive_day_rate": 0.4065934065934066,
+      "lower_tail_10pct_mean": -218.47739129317435,
+      "max_drawdown": 2602.1438694000244,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed0",
+      "rt_at_da": "f2_seed0",
+      "mean_daily_revenue": -11.826470474620441,
+      "positive_day_rate": 0.4230769230769231,
+      "lower_tail_10pct_mean": -181.15479720266242,
+      "max_drawdown": 2912.8894691467285,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed0",
+      "rt_at_da": "f1_seed0",
+      "mean_daily_revenue": -15.002637538281116,
+      "positive_day_rate": 0.38461538461538464,
+      "lower_tail_10pct_mean": -211.69940426475122,
+      "max_drawdown": 2897.5642194747925,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed0",
+      "rt_at_da": "f1_seed2",
+      "mean_daily_revenue": -16.695305499401723,
+      "positive_day_rate": 0.38461538461538464,
+      "lower_tail_10pct_mean": -212.25878424393503,
+      "max_drawdown": 3137.5384826660156,
+      "mean_daily_deviation_penalty": 0.0
+    },
+    {
+      "da": "f2_seed0",
+      "rt_at_da": "f2_seed2",
+      "mean_daily_revenue": -19.775143177954707,
+      "positive_day_rate": 0.3791208791208791,
+      "lower_tail_10pct_mean": -203.52808821828742,
+      "max_drawdown": 5068.761587142944,
+      "mean_daily_deviation_penalty": 0.0
+    }
+  ],
+  "rt_forecast_ranking": [
+    {
+      "rt": "f0_seed0",
+      "validation_mae": 12.965221508123806,
+      "validation_rmse": 33.25169900204339
+    },
+    {
+      "rt": "f1_seed0",
+      "validation_mae": 13.12683166949771,
+      "validation_rmse": 32.553807220077935
+    },
+    {
+      "rt": "f1b_seed0",
+      "validation_mae": 13.224831801918489,
+      "validation_rmse": 32.38002578280958
+    },
+    {
+      "rt": "f0_seed1",
+      "validation_mae": 13.442309476231351,
+      "validation_rmse": 33.34617845872106
+    },
+    {
+      "rt": "f1_seed2",
+      "validation_mae": 15.64674385840452,
+      "validation_rmse": 36.5574738970523
+    },
+    {
+      "rt": "f1b_seed2",
+      "validation_mae": 15.999288864898574,
+      "validation_rmse": 33.43319810031479
+    },
+    {
+      "rt": "f1_seed1",
+      "validation_mae": 16.663586903664527,
+      "validation_rmse": 32.77938091284455
+    },
+    {
+      "rt": "f1b_seed1",
+      "validation_mae": 16.95575460140771,
+      "validation_rmse": 32.80338498449041
+    },
+    {
+      "rt": "f0_seed2",
+      "validation_mae": 30.97999214221239,
+      "validation_rmse": 44.58641654231658
+    }
+  ]
+}

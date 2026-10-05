@@ -6,6 +6,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
 
+import numpy as np
 import torch
 
 
@@ -15,12 +16,39 @@ sys.path.insert(0, str(ROOT / "src"))
 from decision_aware.policy import (  # noqa: E402
     BESSSimulator,
     LPOracleSolveError,
+    MILPOracleSolveError,
+    MILPSolveStatus,
     LookaheadMPCPolicy,
     STEPolicy,
     compute_regret,
     greedy_hindsight_revenue,
     lp_oracle_revenue,
+    lp_oracle_revenue_dual,
+    lp_oracle_revenue_dual_plan_tracking_restricted,
+    milp_oracle_revenue_dual,
+    plan_track_override,
+    solve_dual_penalty_milp_day,
 )
+
+
+class PlanTrackPriorityTests(unittest.TestCase):
+    def test_uses_rt_topk_when_da_plan_is_zero(self):
+        actual = plan_track_override(
+            torch.tensor([[0.0, 0.0]]), torch.tensor([[-1.0, 1.0]])
+        )
+        torch.testing.assert_close(actual, torch.tensor([[-1.0, 1.0]]))
+
+    def test_keeps_da_when_rt_candidate_is_opposite(self):
+        actual = plan_track_override(
+            torch.tensor([[0.5, -0.5]]), torch.tensor([[-1.0, 1.0]])
+        )
+        torch.testing.assert_close(actual, torch.tensor([[0.5, -0.5]]))
+
+    def test_same_direction_rt_uses_remaining_power(self):
+        actual = plan_track_override(
+            torch.tensor([[0.4, -0.25]]), torch.tensor([[1.0, -1.0]])
+        )
+        torch.testing.assert_close(actual, torch.tensor([[1.0, -1.0]]))
 
 
 class LookaheadMPCPolicyTests(unittest.TestCase):
@@ -220,6 +248,123 @@ class LPOracleTests(unittest.TestCase):
                 STEPolicy(),
                 oracle="greedy",
             )
+
+
+class DualPenaltyMILPOracleTests(unittest.TestCase):
+    @staticmethod
+    def _simulator(kappa: float = 0.0, e_cyc: float = 2.0):
+        return BESSSimulator(
+            power_mw=1.0,
+            energy_mwh=2.0,
+            eta=1.0,
+            init_soc_frac=0.5,
+            kappa=kappa,
+            soc_min=0.0,
+            soc_max=2.0,
+            e_cyc=e_cyc,
+        )
+
+    def test_three_percent_band_is_strictly_better_than_old_restricted_lp(self):
+        simulator = self._simulator()
+        exact = solve_dual_penalty_milp_day([10.0], [100.0], simulator)
+        with self.assertWarns(DeprecationWarning):
+            restricted = lp_oracle_revenue_dual_plan_tracking_restricted(
+                torch.tensor([[10.0]]), torch.tensor([[100.0]]), simulator
+            )
+
+        # Commit 100/103 MWh DA and deliver 1 MWh RT.  The 3/103 MWh
+        # deviation is exactly the 3% tolerance, so the global optimum earns
+        # 1300/103 > the historical uRT=uDA restricted value of 10.
+        self.assertAlmostEqual(exact.revenue, 1300.0 / 103.0, places=7)
+        self.assertAlmostEqual(float(restricted[0]), 10.0, places=6)
+        self.assertGreater(exact.revenue, float(restricted[0]))
+        np.testing.assert_allclose(exact.dispatch.excess_mwh, 0.0, atol=1e-9)
+        np.testing.assert_allclose(
+            exact.dispatch.deviation_mwh,
+            exact.dispatch.tolerance_mwh,
+            atol=1e-9,
+        )
+
+    def test_dispatch_obeys_mode_power_soc_and_both_cycle_constraints(self):
+        simulator = self._simulator(e_cyc=0.4)
+        solved = solve_dual_penalty_milp_day(
+            [-50.0, 80.0, 20.0],
+            [-40.0, 100.0, 10.0],
+            simulator,
+        )
+        dispatch = solved.dispatch
+
+        for discharge, charge, soc in (
+            (
+                dispatch.da_discharge_mwh,
+                dispatch.da_charge_mwh,
+                dispatch.da_soc_path_mwh,
+            ),
+            (
+                dispatch.rt_discharge_mwh,
+                dispatch.rt_charge_mwh,
+                dispatch.rt_soc_path_mwh,
+            ),
+        ):
+            self.assertTrue(np.all(discharge <= 1.0 + 1e-8))
+            self.assertTrue(np.all(charge <= 1.0 + 1e-8))
+            self.assertTrue(np.all(discharge * charge <= 1e-10))
+            self.assertLessEqual(float(discharge.sum()), 0.4 + 1e-8)
+            self.assertTrue(np.all(soc >= -1e-8))
+            self.assertTrue(np.all(soc <= 2.0 + 1e-8))
+
+    def test_degradation_cost_can_make_the_optimal_dispatch_idle(self):
+        solved = solve_dual_penalty_milp_day(
+            [10.0], [100.0], self._simulator(kappa=20.0)
+        )
+
+        self.assertAlmostEqual(solved.revenue, 0.0, places=8)
+        np.testing.assert_allclose(solved.dispatch.da_discharge_mwh, 0.0)
+        np.testing.assert_allclose(solved.dispatch.rt_discharge_mwh, 0.0)
+        self.assertAlmostEqual(solved.dispatch.degradation_cost, 0.0, places=8)
+
+    def test_batch_and_legacy_entrypoint_return_certified_milp_statuses(self):
+        simulator = self._simulator()
+        price_da = torch.tensor([[10.0], [20.0]], dtype=torch.float64)
+        price_rt = torch.tensor([[100.0], [80.0]], dtype=torch.float64)
+
+        direct, statuses = milp_oracle_revenue_dual(
+            price_da, price_rt, simulator, return_status=True
+        )
+        compatible = lp_oracle_revenue_dual(
+            price_da,
+            price_rt,
+            simulator,
+            use_deviation_penalty=True,
+        )
+
+        self.assertEqual(direct.shape, (2,))
+        self.assertEqual(direct.dtype, torch.float64)
+        torch.testing.assert_close(compatible, direct)
+        self.assertEqual([status.sample_index for status in statuses], [0, 1])
+        self.assertTrue(all(isinstance(status, MILPSolveStatus) for status in statuses))
+        self.assertTrue(all(status.success for status in statuses))
+        self.assertTrue(all(status.status_code == 0 for status in statuses))
+
+    def test_nonoptimal_milp_status_raises_instead_of_returning_an_incumbent(self):
+        failed = SimpleNamespace(
+            success=False,
+            status=1,
+            message="time limit reached in test",
+            fun=-99.0,
+            mip_gap=0.2,
+            mip_node_count=3,
+            x=np.zeros(7),
+        )
+        with mock.patch("scipy.optimize.milp", return_value=failed):
+            with self.assertRaises(MILPOracleSolveError) as ctx:
+                solve_dual_penalty_milp_day(
+                    [10.0], [100.0], self._simulator()
+                )
+
+        self.assertFalse(ctx.exception.solve_status.success)
+        self.assertEqual(ctx.exception.solve_status.status_code, 1)
+        self.assertIn("time limit reached", str(ctx.exception))
 
 
 if __name__ == "__main__":

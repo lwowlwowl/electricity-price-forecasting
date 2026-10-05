@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""从三个冻结结构的纯Huber checkpoint开始做完整双结算联合微调。"""
+"""从三个独立预训练checkpoint开始，按显式业务信号范围做双结算微调。"""
 from __future__ import annotations
 
 import argparse
@@ -42,6 +42,7 @@ PHYSICAL_FIELDS = (
     "bess_power_mw", "bess_energy_mwh", "bess_eta", "bess_init_soc_frac",
     "bess_kappa", "bess_soc_min", "bess_soc_max", "bess_e_cyc",
 )
+MODEL_NAMES = ("da", "rt_at_da", "rt")
 
 
 def _load_checkpoint(path: str | Path) -> dict:
@@ -67,12 +68,20 @@ def _sha256(path: str | Path) -> str:
     return digest.hexdigest()
 
 
-def _check_contract(experiment: PilotConfig, model_cfg: PilotConfig, label: str):
+def _check_contract(
+    experiment: PilotConfig,
+    model_cfg: PilotConfig,
+    label: str,
+    *,
+    allow_kappa_mismatch: bool = False,
+):
     mismatches = {
         name: [getattr(experiment, name), getattr(model_cfg, name)]
         for name in PHYSICAL_FIELDS
         if getattr(experiment, name) != getattr(model_cfg, name)
     }
+    if allow_kappa_mismatch:
+        mismatches.pop("bess_kappa", None)
     if mismatches:
         raise ValueError(f"{label}物理参数不一致: {mismatches}")
 
@@ -122,7 +131,69 @@ def _assert_independent(models: dict):
                 raise ValueError(f"{left}和{right}意外共享参数")
 
 
-def _configure_trainable_scope(models: dict, scope: str) -> dict[str, int]:
+def _resolve_trainable_models(configured) -> tuple[str, ...]:
+    """验证并规范化显式的模型训练范围。"""
+    if isinstance(configured, str):
+        raise ValueError("joint_trainable_models必须是模型名列表，不能是字符串")
+    names = tuple(configured)
+    if not names:
+        raise ValueError("joint_trainable_models不能为空")
+    if len(set(names)) != len(names):
+        raise ValueError("joint_trainable_models不能包含重复模型名")
+    unknown = sorted(set(names) - set(MODEL_NAMES))
+    if unknown:
+        raise ValueError(
+            f"joint_trainable_models包含未知模型{unknown}；可选值为{list(MODEL_NAMES)}"
+        )
+    return tuple(name for name in MODEL_NAMES if name in names)
+
+
+def _rt_business_signal_active(cfg: PilotConfig) -> bool:
+    """RT预测是否可能通过当前执行合同改变实际结算动作。"""
+    if cfg.joint_coordination_mode == "follow_da":
+        return False
+    if cfg.joint_coordination_mode not in {"rt_only", "plan_track_topk"}:
+        raise ValueError(
+            f"未知joint_coordination_mode: {cfg.joint_coordination_mode}"
+        )
+    return bool(cfg.rt_topk_k_charge > 0 or cfg.rt_topk_k_discharge > 0)
+
+
+def _effective_proxy_names(
+    cfg: PilotConfig, trainable_models: tuple[str, ...]
+) -> tuple[str, ...]:
+    """返回本次真正会构造的收益代理；用于训练、日志和checkpoint合同。"""
+    trainable = set(trainable_models)
+    names: list[str] = []
+    if cfg.joint_da_signal_mode == "da_only":
+        if cfg.joint_da_proxy_mode != "da_only":
+            raise ValueError(
+                "joint_da_signal_mode=da_only时，joint_da_proxy_mode也必须为da_only"
+            )
+        if "da" in trainable:
+            names.append("da")
+    elif cfg.joint_da_signal_mode == "spread":
+        if cfg.joint_da_proxy_mode == "coupled_spread":
+            if trainable & {"da", "rt_at_da"}:
+                names.append("spread")
+        elif cfg.joint_da_proxy_mode == "independent_prices":
+            names.extend(
+                name for name in ("da", "rt_at_da") if name in trainable
+            )
+        else:
+            raise ValueError(
+                "joint_da_proxy_mode必须是independent_prices或coupled_spread"
+            )
+    else:
+        raise ValueError("joint_da_signal_mode必须是spread或da_only")
+    if "rt" in trainable and _rt_business_signal_active(cfg):
+        names.append("rt")
+    return tuple(names)
+
+
+def _configure_trainable_scope(
+    models: dict, scope: str, trainable_models: tuple[str, ...]
+) -> dict[str, int]:
     """冻结或开放每个独立模型的参数；不改变三个模型之间的独立性。"""
     allowed = {"all", "decoder_head", "price_head"}
     if scope not in allowed:
@@ -130,7 +201,9 @@ def _configure_trainable_scope(models: dict, scope: str) -> dict[str, int]:
     counts = {}
     for model_name, model in models.items():
         for name, parameter in model.named_parameters():
-            if scope == "all":
+            if model_name not in trainable_models:
+                trainable = False
+            elif scope == "all":
                 trainable = True
             elif scope == "decoder_head":
                 trainable = name.startswith("decoder.") or name.startswith(
@@ -143,7 +216,7 @@ def _configure_trainable_scope(models: dict, scope: str) -> dict[str, int]:
             parameter.numel() for parameter in model.parameters()
             if parameter.requires_grad
         )
-        if counts[model_name] == 0:
+        if model_name in trainable_models and counts[model_name] == 0:
             raise ValueError(f"{model_name}在scope={scope}下没有可训练参数")
     return counts
 
@@ -405,12 +478,12 @@ def evaluate(models: dict, dataset, cfg: PilotConfig, device: torch.device,
         cfg,
         da_k_charge=cfg.topk_k_charge,
         da_k_discharge=cfg.topk_k_discharge,
-        rt_k_charge=1,
-        rt_k_discharge=1,
-        coordination_mode="rt_only",
+        rt_k_charge=cfg.rt_topk_k_charge,
+        rt_k_discharge=cfg.rt_topk_k_discharge,
+        coordination_mode=cfg.joint_coordination_mode,
         rt_at_da_price_forecasts={
             day: p_rt_at_da[index] for index, day in enumerate(dates)
-        },
+        } if cfg.joint_da_signal_mode == "spread" else None,
     )
     return {
         "full_dual": _compact_report(report, cfg, cfg.seed),
@@ -469,6 +542,14 @@ def _bundle(path: Path, models: dict, optimizers: dict, cfg: PilotConfig,
         "best_validation_revenue": validation["full_dual"]["mean_daily_revenue"],
         "validation": validation,
         "trainable_parameter_counts": trainable_counts,
+        "trainable_models": [
+            name for name, count in trainable_counts.items() if count > 0
+        ],
+        "effective_revenue_proxy_names": list(_effective_proxy_names(
+            cfg,
+            tuple(name for name, count in trainable_counts.items() if count > 0),
+        )),
+        "rt_business_signal_active": _rt_business_signal_active(cfg),
     }, path)
 
 
@@ -539,6 +620,14 @@ def _save_training_state(
         "history": history,
         "source_best_checkpoint": str(best_checkpoint),
         "trainable_parameter_counts": trainable_counts,
+        "trainable_models": [
+            name for name, count in trainable_counts.items() if count > 0
+        ],
+        "effective_revenue_proxy_names": list(_effective_proxy_names(
+            cfg,
+            tuple(name for name, count in trainable_counts.items() if count > 0),
+        )),
+        "rt_business_signal_active": _rt_business_signal_active(cfg),
     }, path)
 
 
@@ -575,6 +664,13 @@ def _arguments():
     parser.add_argument("--max-train-days", type=int, default=None)
     parser.add_argument("--max-val-days", type=int, default=None)
     parser.add_argument("--smoke", action="store_true")
+    parser.add_argument(
+        "--skip-report-only",
+        action="store_true",
+        help=(
+            "训练候选时不评估report-only；所有seed与选模规则冻结后再单独披露"
+        ),
+    )
     parser.add_argument(
         "--audit-only", action="store_true",
         help="只加载三模型并复现完整验证基线，不更新参数",
@@ -637,7 +733,12 @@ def main():
         for name, checkpoint in checkpoints.items()
     }
     for name, model_cfg in model_cfgs.items():
-        _check_contract(cfg, model_cfg, name)
+        _check_contract(
+            cfg,
+            model_cfg,
+            name,
+            allow_kappa_mismatch=cfg.joint_allow_source_kappa_mismatch,
+        )
     reference_stats = checkpoints["da"]["norm_stats"]
     train_ds, val_ds, report_ds, _ = build_joint_datasets(
         cfg, norm_stats=reference_stats
@@ -654,9 +755,17 @@ def main():
         model.load_state_dict(checkpoints[name]["model_state"])
         model.to(device)
     _assert_independent(models)
+    trainable_models = _resolve_trainable_models(cfg.joint_trainable_models)
     trainable_counts = _configure_trainable_scope(
-        models, cfg.joint_trainable_scope
+        models, cfg.joint_trainable_scope, trainable_models
     )
+    rt_business_signal_active = _rt_business_signal_active(cfg)
+    effective_proxy_names = _effective_proxy_names(cfg, trainable_models)
+    if args.mode == "decision_aware" and not effective_proxy_names:
+        raise ValueError(
+            "当前joint_trainable_models与执行合同之间没有任何可训练的收益代理；"
+            "请开放DA决策模型，或启用可改变结算动作的RT策略"
+        )
 
     source_contract = {
         name: {
@@ -664,6 +773,12 @@ def main():
             "sha256": _sha256(path),
             "fusion_mode": checkpoints[name].get("fusion_mode"),
             "seed": checkpoints[name]["config"].get("seed"),
+            "source_bess_kappa": checkpoints[name]["config"].get("bess_kappa"),
+            "source_kappa_mismatch_allowed": bool(
+                cfg.joint_allow_source_kappa_mismatch
+                and checkpoints[name]["config"].get("bess_kappa")
+                != cfg.bess_kappa
+            ),
         }
         for name, path in source_paths.items()
     }
@@ -695,6 +810,13 @@ def main():
         "validation_days": len(val_ds),
         "report_only_days": len(report_ds),
         "episode_days": cfg.joint_episode_days,
+        "coordination_mode": cfg.joint_coordination_mode,
+        "da_signal_mode": cfg.joint_da_signal_mode,
+        "deviation_penalty_enabled": bool(cfg.use_deviation_penalty),
+        "bess_kappa": float(cfg.bess_kappa),
+        "allow_source_kappa_mismatch": bool(
+            cfg.joint_allow_source_kappa_mismatch
+        ),
         "epsilon_da": epsilon_da,
         "epsilon_rt": epsilon_rt,
         "epsilon_spread_used": epsilon_spread,
@@ -708,7 +830,10 @@ def main():
         "proxy_reduction": cfg.joint_proxy_reduction,
         "prediction_loss_mode": cfg.joint_prediction_loss_mode,
         "trainable_scope": cfg.joint_trainable_scope,
+        "trainable_models": list(trainable_models),
         "trainable_parameter_counts": trainable_counts,
+        "effective_revenue_proxy_names": list(effective_proxy_names),
+        "rt_business_signal_active": rt_business_signal_active,
         "separate_optimizers": cfg.joint_separate_optimizers,
         "dropout_disabled_during_finetune": cfg.joint_disable_dropout,
         "sources": source_contract,
@@ -750,7 +875,7 @@ def main():
             parameter for parameter in model.parameters()
             if parameter.requires_grad
         ]
-        for name, model in models.items()
+        for name, model in models.items() if name in trainable_models
     }
     parameters = [
         parameter for values in parameters_by_model.values()
@@ -899,8 +1024,8 @@ def main():
             "mean_daily_revenue": best_revenue,
         }, ensure_ascii=False), flush=True)
     for epoch in range(start_epoch, cfg.epochs):
-        for model in models.values():
-            if cfg.joint_disable_dropout:
+        for name, model in models.items():
+            if cfg.joint_disable_dropout or name not in trainable_models:
                 model.eval()
             else:
                 model.train()
@@ -937,6 +1062,7 @@ def main():
                     true_da, true_rt, reset, cfg,
                     initial_plan_soc_mwh=plan_soc,
                     initial_actual_soc_mwh=actual_soc,
+                    coordination_mode=cfg.joint_coordination_mode,
                 )
 
             base = settle(p_da.detach(), p_rt_at_da.detach(), p_rt.detach())
@@ -947,7 +1073,31 @@ def main():
                     "tail_weight": cfg.joint_tail_weight,
                     "tail_fraction": cfg.joint_tail_fraction,
                 }
-                if cfg.joint_da_proxy_mode == "coupled_spread":
+                proxy_parts = {}
+                diagnostics = {}
+                if cfg.joint_da_signal_mode == "da_only" and "da" in trainable_models:
+                    # DA计划只读取p_DA；p_RT|DA不在决策路径上，不能给它伪造
+                    # “收益梯度”。因此这里无条件只扰动p_DA。
+                    grad_da, diag_da = estimate_system_zo_gradient(
+                        p_da,
+                        lambda value: settle(
+                            value, p_rt_at_da.detach(), p_rt.detach()
+                        )["daily_revenue"],
+                        epsilon=epsilon_da,
+                        directions=directions_spread,
+                        feedback_mode=cfg.joint_zo_feedback_mode,
+                        **zo_kwargs,
+                    )
+                    proxy_parts["da"] = joint_proxy_loss(
+                        p_da, grad_da, cfg.joint_proxy_scale,
+                        reduction=cfg.joint_proxy_reduction,
+                    )
+                    diagnostics["da"] = diag_da
+                elif (
+                    cfg.joint_da_signal_mode == "spread"
+                    and cfg.joint_da_proxy_mode == "coupled_spread"
+                    and set(trainable_models) & {"da", "rt_at_da"}
+                ):
                     spread = p_da - p_rt_at_da
                     grad_spread, diag_spread = estimate_system_zo_gradient(
                         spread,
@@ -961,91 +1111,89 @@ def main():
                         feedback_mode=cfg.joint_zo_feedback_mode,
                         **zo_kwargs,
                     )
-                    proxy_parts = {
-                        "spread": joint_proxy_loss(
-                            spread, grad_spread, cfg.joint_proxy_scale,
-                            reduction=cfg.joint_proxy_reduction,
+                    proxy_parts["spread"] = joint_proxy_loss(
+                        spread, grad_spread, cfg.joint_proxy_scale,
+                        reduction=cfg.joint_proxy_reduction,
+                    )
+                    diagnostics["spread"] = diag_spread
+                elif (
+                    cfg.joint_da_signal_mode == "spread"
+                    and cfg.joint_da_proxy_mode == "independent_prices"
+                ):
+                    if "da" in trainable_models:
+                        grad_da, diag_da = estimate_system_zo_gradient(
+                            p_da,
+                            lambda value: settle(
+                                value, p_rt_at_da.detach(), p_rt.detach()
+                            )["daily_revenue"],
+                            epsilon=epsilon_da,
+                            directions=directions_spread,
+                            feedback_mode=cfg.joint_zo_feedback_mode,
+                            **zo_kwargs,
                         )
-                    }
-                    diagnostics = {"spread": diag_spread}
-                elif cfg.joint_da_proxy_mode == "independent_prices":
-                    grad_da, diag_da = estimate_system_zo_gradient(
-                        p_da,
-                        lambda value: settle(
-                            value, p_rt_at_da.detach(), p_rt.detach()
-                        )["daily_revenue"],
-                        epsilon=epsilon_da,
-                        directions=directions_spread,
-                        feedback_mode=cfg.joint_zo_feedback_mode,
-                        **zo_kwargs,
-                    )
-                    grad_rt_da, diag_rt_da = estimate_system_zo_gradient(
-                        p_rt_at_da,
-                        lambda value: settle(
-                            p_da.detach(), value, p_rt.detach()
-                        )["daily_revenue"],
-                        epsilon=epsilon_rt,
-                        directions=directions_spread,
-                        feedback_mode=cfg.joint_zo_feedback_mode,
-                        **zo_kwargs,
-                    )
-                    proxy_parts = {
-                        "da": joint_proxy_loss(
+                        proxy_parts["da"] = joint_proxy_loss(
                             p_da, grad_da, cfg.joint_proxy_scale,
                             reduction=cfg.joint_proxy_reduction,
-                        ),
-                        "rt_at_da": joint_proxy_loss(
+                        )
+                        diagnostics["da"] = diag_da
+                    if "rt_at_da" in trainable_models:
+                        grad_rt_da, diag_rt_da = estimate_system_zo_gradient(
+                            p_rt_at_da,
+                            lambda value: settle(
+                                p_da.detach(), value, p_rt.detach()
+                            )["daily_revenue"],
+                            epsilon=epsilon_rt,
+                            directions=directions_spread,
+                            feedback_mode=cfg.joint_zo_feedback_mode,
+                            **zo_kwargs,
+                        )
+                        proxy_parts["rt_at_da"] = joint_proxy_loss(
                             p_rt_at_da, grad_rt_da, cfg.joint_proxy_scale,
                             reduction=cfg.joint_proxy_reduction,
-                        ),
-                    }
-                    diagnostics = {"da": diag_da, "rt_at_da": diag_rt_da}
-                else:
-                    raise ValueError(
-                        "joint_da_proxy_mode必须是independent_prices或"
-                        "coupled_spread"
+                        )
+                        diagnostics["rt_at_da"] = diag_rt_da
+
+                # follow_da或RT TopK=0时，p_RT不可能改变实际结算动作。
+                # 此时跳过昂贵且必为零的RT零阶估计，并在合同中明确记录。
+                if rt_business_signal_active and "rt" in trainable_models:
+                    grad_rt, diag_rt = estimate_system_zo_gradient(
+                        p_rt,
+                        lambda value: settle(
+                            p_da.detach(), p_rt_at_da.detach(), value
+                        )[
+                            "hourly_revenue"
+                            if cfg.joint_zo_rt_feedback_mode == "per_group"
+                            else "daily_revenue"
+                        ],
+                        epsilon=epsilon_rt_joint,
+                        directions=directions_rt,
+                        feedback_mode=cfg.joint_zo_rt_feedback_mode,
+                        **zo_kwargs,
                     )
-                grad_rt, diag_rt = estimate_system_zo_gradient(
-                    p_rt,
-                    lambda value: settle(
-                        p_da.detach(), p_rt_at_da.detach(), value
-                    )[
-                        "hourly_revenue"
-                        if cfg.joint_zo_rt_feedback_mode == "per_group"
-                        else "daily_revenue"
-                    ],
-                    epsilon=epsilon_rt_joint,
-                    directions=directions_rt,
-                    feedback_mode=cfg.joint_zo_rt_feedback_mode,
-                    **zo_kwargs,
-                )
-                proxy_parts["rt"] = joint_proxy_loss(
-                    p_rt, grad_rt, cfg.joint_proxy_scale,
-                    reduction=cfg.joint_proxy_reduction,
-                )
-                diagnostics["rt"] = diag_rt
-                if cfg.joint_da_proxy_mode == "coupled_spread":
-                    proxy_weights = {
-                        "spread": cfg.joint_proxy_weight_spread,
-                        "rt": cfg.joint_proxy_weight_rt,
-                    }
+                    proxy_parts["rt"] = joint_proxy_loss(
+                        p_rt, grad_rt, cfg.joint_proxy_scale,
+                        reduction=cfg.joint_proxy_reduction,
+                    )
+                    diagnostics["rt"] = diag_rt
+
+                if not proxy_parts:
+                    proxy_loss = pred_loss.new_zeros(())
                 else:
                     proxy_weights = {name: 1.0 for name in proxy_parts}
-                proxy_denominator = sum(proxy_weights.values())
-                if proxy_denominator <= 0:
-                    raise ValueError("联合收益代理权重之和必须为正")
-                proxy_loss = sum(
-                    proxy_weights[name] * proxy_parts[name]
-                    for name in proxy_parts
-                ) / proxy_denominator
+                    if "spread" in proxy_weights:
+                        proxy_weights["spread"] = cfg.joint_proxy_weight_spread
+                    if "rt" in proxy_weights:
+                        proxy_weights["rt"] = cfg.joint_proxy_weight_rt
+                    proxy_denominator = sum(proxy_weights.values())
+                    if proxy_denominator <= 0:
+                        raise ValueError("联合收益代理权重之和必须为正")
+                    proxy_loss = sum(
+                        proxy_weights[name] * proxy_parts[name]
+                        for name in proxy_parts
+                    ) / proxy_denominator
             else:
-                diagnostic_names = (
-                    ("spread", "rt")
-                    if cfg.joint_da_proxy_mode == "coupled_spread"
-                    else tuple(models)
-                )
                 proxy_parts = {
-                    name: pred_loss.new_zeros(()) for name in diagnostic_names
+                    name: pred_loss.new_zeros(()) for name in effective_proxy_names
                 }
                 proxy_loss = pred_loss.new_zeros(())
                 diagnostics = {
@@ -1056,7 +1204,7 @@ def main():
                         "changed_direction_fraction": 0.0,
                         "finite": True,
                     }
-                    for name in diagnostic_names
+                    for name in effective_proxy_names
                 }
             loss = cfg.joint_alpha * pred_loss + beta * proxy_loss
             for optimizer in optimizers.values():
@@ -1189,7 +1337,7 @@ def main():
     paired = _paired_delta(best_validation, baseline_validation, cfg)
     report_only = None
     baseline_report_only = None
-    if not args.smoke:
+    if not args.smoke and not args.skip_report_only:
         # 仅在训练和验证选择全部结束后披露；绝不参与epoch选择或超参数回选。
         report_only = evaluate(
             models, report_ds, cfg, device, evaluation_amp_enabled
@@ -1213,6 +1361,11 @@ def main():
         "contract": (
             "three independent pretrained Transformers; locked DA plan; hourly "
             "rolling RT first action; continuous SOC within observed segments; "
+            f"coordination={cfg.joint_coordination_mode}; "
+            f"trainable_models={list(trainable_models)}; "
+            f"revenue_proxies={list(effective_proxy_names)}; "
+            f"rt_business_signal_active={rt_business_signal_active}; "
+            f"deviation_penalty={bool(cfg.use_deviation_penalty)}; "
             "terminal SOC reported in MWh and not monetized"
         ),
         "selection_metric": (
@@ -1221,7 +1374,11 @@ def main():
             else "validation full-dual mean daily revenue"
         ),
         "selection_tail_weight": cfg.joint_selection_tail_weight,
-        "report_only_role": "disclosed after selection; never used for model selection",
+        "report_only_role": (
+            "withheld until all candidates and selection rules are frozen"
+            if args.skip_report_only
+            else "disclosed after selection; never used for model selection"
+        ),
         "device": str(device),
         "mixed_precision_training": amp_enabled,
         "mixed_precision_evaluation": evaluation_amp_enabled,
@@ -1233,10 +1390,16 @@ def main():
             for name, model in models.items()
         },
         "trainable_parameter_counts": trainable_counts,
+        "trainable_models": list(trainable_models),
+        "effective_revenue_proxy_names": list(effective_proxy_names),
+        "rt_business_signal_active": rt_business_signal_active,
         "samples": {
             "train": len(train_indices),
             "validation": min(len(val_ds), args.max_val_days or len(val_ds)),
-            "report_only": len(report_ds) if not args.smoke else 0,
+            "report_only": (
+                len(report_ds)
+                if not args.smoke and not args.skip_report_only else 0
+            ),
         },
         "epsilon": {
             "da_raw": epsilon_da,

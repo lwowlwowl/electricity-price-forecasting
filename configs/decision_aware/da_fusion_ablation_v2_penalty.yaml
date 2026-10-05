@@ -1,0 +1,86 @@
+# DA纯Huber结构消融：在已冻结的偏差罚金合同下重新选epoch。
+# 本配置只训练DA预测器；验证选模使用统一182个交付日的
+# 完整双结算日均净收益。候选未全部冻结前，运行时应加 --skip-report-only。
+market: ERCOT
+node: LZ_LCRA
+data_version: v3
+freq: 1h
+context_len: 168
+horizon_da: 24
+da_issue_hour_local: 10
+train_stride: 1
+val_stride: 1
+eval_stride: 1
+
+split_train_start: "2020-01-01 00:00"
+split_train_end: "2024-12-31 23:00"
+split_val_start: "2025-07-01 00:00"
+split_val_end: "2025-12-31 23:00"
+split_test_start: "2026-01-01 00:00"
+split_test_end: "2026-06-01 23:00"
+
+use_dual_split: true
+use_dual_settlement: true
+use_deviation_penalty: true
+da_fusion_mode: source_attention
+
+d_model: 128
+n_heads_enc: 4
+n_heads_fusion: 4
+n_layers_enc: 2
+n_layers_fusion: 2
+dim_ff: 512
+dropout: 0.1
+use_rope: true
+
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_init_soc_frac: 0.5
+bess_kappa: 5.7
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+bess_e_cyc: 4.0
+
+# 已在182日验证集上冻结的政策合同。
+topk_k_charge: 3
+topk_k_discharge: 3
+rt_topk_k_charge: 0
+rt_topk_k_discharge: 0
+topk_spread_threshold: -1.0
+joint_coordination_mode: follow_da
+joint_da_signal_mode: da_only
+# 同步写入旧字段，使审计报告不会出现两种协调口径。
+frozen_coordination_mode: follow_da
+frozen_expected_validation_days: 182
+
+# da_only + follow_da不使用RT-at-DA预测；滚动RT checkpoint只提供
+# 同一数据时间轴和实现DA/RT价格，其预测不改变动作。
+frozen_rt_at_da_checkpoint: ""
+frozen_rt_checkpoint: data/checkpoints/rt_fusion_ablation/f0_seed0/pilot_LZ_LCRA_best_full_dual.pt
+
+# 三种结构、三个seed均使用相同纯Huber训练合同。
+alpha0: 1.0
+beta0: 0.0
+alpha_end: 1.0
+beta_end: 0.0
+pretrain_epochs: 0
+anneal_epochs: 1
+use_mse_loss: false
+huber_delta: 1.0
+pred_scale: 25.0
+pred_clamp: [-500.0, 10000.0]
+
+lr: 0.0005
+weight_decay: 0.01
+batch_size: 32
+grad_accum_steps: 1
+epochs: 10
+grad_clip: 1.0
+early_stop_patience: 3
+use_amp: true
+monitor: frozen_full_dual_validation_mean_daily_revenue
+num_workers: 0
+checkpoint_dir: data/checkpoints/da_fusion_ablation_v2_penalty
+seed: 0
+bootstrap_samples: 2000

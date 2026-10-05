@@ -1,16 +1,17 @@
-"""policy.py — 可微 BESS 策略 + 模拟器 + LP Oracle（先行版）.
+"""policy.py — 可微 BESS 策略 + 模拟器 + LP/MILP Oracle（先行版）.
 
 三层策略，按 w10 规范逐步升级：
   1. STEPolicy      — 先行版 v1：sign 阈值 + STE，最轻量（保留向后兼容）
   2. TopKPolicy     — 先行版 v2：TopK/BotK 候选 + SOC 约束，对应 w10 第 4 节
-  3. LP Oracle      — 真上界：scipy.linprog 解线性规划，对应 w10 第 5.2 节
+  3. LP/MILP Oracle — 无罚金用 LP；含偏差罚金时用联合 MILP
 
 BESS 模拟器保持不变（SOC 守恒 + 效率 + 可行性 clip）。
-LP Oracle 用 scipy（无需 cvxpy/Gurobi），逐样本求解。
+Oracle 用 scipy（无需 cvxpy/Gurobi），逐样本求解。
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
+import warnings
 
 import numpy as np
 import torch
@@ -27,6 +28,50 @@ class LPSolveStatus:
     status_code: int
     message: str
     objective: float | None
+
+
+@dataclass(frozen=True)
+class MILPSolveStatus:
+    """One HiGHS MILP solve record exposed for audit/debugging."""
+
+    sample_index: int
+    leg: str
+    success: bool
+    status_code: int
+    message: str
+    objective: float | None
+    mip_gap: float | None
+    mip_node_count: int | None
+
+
+@dataclass(frozen=True)
+class DualMILPDispatch:
+    """Auditable one-day dispatch returned by the exact dual-settlement MILP.
+
+    Energy quantities are MWh.  Both SOC paths include their initial value,
+    hence each has ``horizon + 1`` entries.
+    """
+
+    da_discharge_mwh: np.ndarray
+    da_charge_mwh: np.ndarray
+    rt_discharge_mwh: np.ndarray
+    rt_charge_mwh: np.ndarray
+    da_soc_path_mwh: np.ndarray
+    rt_soc_path_mwh: np.ndarray
+    deviation_mwh: np.ndarray
+    tolerance_mwh: np.ndarray
+    excess_mwh: np.ndarray
+    degradation_cost: float
+    deviation_penalty: float
+
+
+@dataclass(frozen=True)
+class DualMILPOracleResult:
+    """Optimal value, solver certificate, and dispatch for one price day."""
+
+    revenue: float
+    status: MILPSolveStatus
+    dispatch: DualMILPDispatch
 
 
 @dataclass(frozen=True)
@@ -58,6 +103,18 @@ class LPOracleSolveError(RuntimeError):
         )
 
 
+class MILPOracleSolveError(RuntimeError):
+    """Raised when a joint DA/RT MILP solve is not certified optimal."""
+
+    def __init__(self, solve_status: MILPSolveStatus):
+        self.solve_status = solve_status
+        super().__init__(
+            "MILP Oracle solve failed "
+            f"(sample={solve_status.sample_index}, leg={solve_status.leg}, "
+            f"status={solve_status.status_code}): {solve_status.message}"
+        )
+
+
 # ════════════════════════════════════════════════════════════════════════════
 # BESS 模拟器（不变）
 # ════════════════════════════════════════════════════════════════════════════
@@ -66,7 +123,7 @@ class BESSSimulator(nn.Module):
 
     v3 支持：
     - 真双结算：日前腿按 DA 价、实时偏差腿按 RT 价（w10 第5节）
-    - 退化成本 κ（w10 第7节：27 USD/MWh）
+    - 由实验配置给定的单位运行与退化成本 κ
     - SOC 上下限 [s_min, s_max]（w10：0.4-3.6 MWh）
     - 效率 η=0.95（w10，v1/v2=0.9）
 
@@ -631,26 +688,341 @@ def _lp_revenue_one(price_np, P, E, eta, s0, s_min, s_max, kappa, dt, e_cyc,
     return revenue, status
 
 
+def _price_vector(value, name: str) -> np.ndarray:
+    """Convert one price day to a finite float64 vector."""
+    if isinstance(value, torch.Tensor):
+        array = value.detach().cpu().numpy()
+    else:
+        array = np.asarray(value)
+    array = np.asarray(array, dtype=np.float64)
+    if array.ndim != 1 or array.size == 0:
+        raise ValueError(f"{name}必须是一维非空价格序列")
+    if not np.isfinite(array).all():
+        raise ValueError(f"{name}包含NaN或无穷值")
+    return array
+
+
+def solve_dual_penalty_milp_day(
+    price_da,
+    price_rt,
+    simulator: BESSSimulator,
+    *,
+    sample_index: int = -1,
+) -> DualMILPOracleResult:
+    """Solve the exact joint DA/RT Oracle for one settlement day.
+
+    The MILP maximises
+
+    ``pDA*uDA + pRT*(uRT-uDA) - kappa*|uRT| - penalty``
+
+    with a 3% ``|uDA|`` deviation tolerance and a penalty rate of
+    ``2*|pRT|`` beyond the tolerance.  DA plan and RT actual dispatch use
+    independent SOC trajectories and independent daily discharge limits.
+    Binary mode variables prohibit charging and discharging in the same hour
+    on either trajectory.  The default HiGHS solve has no time/node limit and
+    requests a zero relative MIP gap; a non-optimal termination raises
+    :class:`MILPOracleSolveError` with its auditable status.
+    """
+    from scipy.optimize import Bounds, LinearConstraint, milp
+
+    da = _price_vector(price_da, "price_da")
+    rt = _price_vector(price_rt, "price_rt")
+    if da.shape != rt.shape:
+        raise ValueError("price_da和price_rt必须同形")
+
+    horizon = int(da.size)
+    power_energy = float(simulator.P * simulator.dt)
+    initial_soc = float(simulator.E * simulator.init_soc_frac)
+    eta = float(simulator.eta)
+    soc_min = float(simulator.s_min)
+    soc_max = float(simulator.s_max)
+    cycle_limit = float(simulator.e_cyc)
+    kappa = float(simulator.kappa)
+    if power_energy <= 0.0 or eta <= 0.0:
+        raise ValueError("MILP Oracle要求正的功率、步长和效率")
+    if cycle_limit < 0.0 or soc_min > soc_max:
+        raise ValueError("MILP Oracle收到无效的循环或SOC边界")
+    if not soc_min - 1e-9 <= initial_soc <= soc_max + 1e-9:
+        raise ValueError("初始SOC超出SOC上下限")
+
+    # Variable order per H-vector:
+    #   DA discharge, DA charge, RT discharge, RT charge,
+    #   deviation excess, DA discharge-mode binary, RT discharge-mode binary.
+    dd = slice(0, horizon)
+    dc = slice(horizon, 2 * horizon)
+    rd = slice(2 * horizon, 3 * horizon)
+    rc = slice(3 * horizon, 4 * horizon)
+    excess_var = slice(4 * horizon, 5 * horizon)
+    da_mode = slice(5 * horizon, 6 * horizon)
+    rt_mode = slice(6 * horizon, 7 * horizon)
+    variable_count = 7 * horizon
+
+    # scipy.milp minimises.  The first four blocks are the negative of the
+    # dual-settlement cash revenue; excess has its positive penalty cost.
+    spread = da - rt
+    objective = np.zeros(variable_count, dtype=np.float64)
+    objective[dd] = -spread
+    objective[dc] = spread
+    objective[rd] = -rt + kappa
+    objective[rc] = rt + kappa
+    objective[excess_var] = 2.0 * np.abs(rt)
+
+    lower_bounds = np.zeros(variable_count, dtype=np.float64)
+    upper_bounds = np.empty(variable_count, dtype=np.float64)
+    upper_bounds[dd] = power_energy
+    upper_bounds[dc] = power_energy
+    upper_bounds[rd] = power_energy
+    upper_bounds[rc] = power_energy
+    # |uRT-uDA| cannot exceed 2*P*dt.  A finite upper bound also removes an
+    # irrelevant unbounded auxiliary direction when pRT is exactly zero.
+    upper_bounds[excess_var] = 2.0 * power_energy
+    upper_bounds[da_mode] = 1.0
+    upper_bounds[rt_mode] = 1.0
+    integrality = np.zeros(variable_count, dtype=np.int8)
+    integrality[da_mode] = 1
+    integrality[rt_mode] = 1
+
+    rows: list[np.ndarray] = []
+    row_lower: list[float] = []
+    row_upper: list[float] = []
+
+    def add_constraint(row, lower=-np.inf, upper=np.inf):
+        rows.append(row)
+        row_lower.append(float(lower))
+        row_upper.append(float(upper))
+
+    # Separate planned and actual SOC trajectories.
+    for discharge_slice, charge_slice in ((dd, dc), (rd, rc)):
+        for step in range(horizon):
+            row = np.zeros(variable_count, dtype=np.float64)
+            row[discharge_slice.start:discharge_slice.start + step + 1] = -1.0 / eta
+            row[charge_slice.start:charge_slice.start + step + 1] = eta
+            add_constraint(
+                row,
+                lower=soc_min - initial_soc,
+                upper=soc_max - initial_soc,
+            )
+        row = np.zeros(variable_count, dtype=np.float64)
+        row[discharge_slice] = 1.0
+        add_constraint(row, upper=cycle_limit)
+
+    # One binary mode per hour and trajectory: dis <= M*z, chg <= M*(1-z).
+    for step in range(horizon):
+        for discharge_slice, charge_slice, mode_slice in (
+            (dd, dc, da_mode),
+            (rd, rc, rt_mode),
+        ):
+            row = np.zeros(variable_count, dtype=np.float64)
+            row[discharge_slice.start + step] = 1.0
+            row[mode_slice.start + step] = -power_energy
+            add_constraint(row, upper=0.0)
+
+            row = np.zeros(variable_count, dtype=np.float64)
+            row[charge_slice.start + step] = 1.0
+            row[mode_slice.start + step] = power_energy
+            add_constraint(row, upper=power_energy)
+
+        # delta = (rt_dis-rt_chg) - (da_dis-da_chg)
+        # excess >= +/- delta - 0.03*(da_dis+da_chg).  Because DA charge and
+        # discharge are mutually exclusive, their sum is exactly |uDA|.
+        row = np.zeros(variable_count, dtype=np.float64)
+        row[dd.start + step] = 1.03
+        row[dc.start + step] = -0.97
+        row[rd.start + step] = -1.0
+        row[rc.start + step] = 1.0
+        row[excess_var.start + step] = 1.0
+        add_constraint(row, lower=0.0)
+
+        row = np.zeros(variable_count, dtype=np.float64)
+        row[dd.start + step] = -0.97
+        row[dc.start + step] = 1.03
+        row[rd.start + step] = 1.0
+        row[rc.start + step] = -1.0
+        row[excess_var.start + step] = 1.0
+        add_constraint(row, lower=0.0)
+
+    constraints = LinearConstraint(
+        np.asarray(rows, dtype=np.float64),
+        np.asarray(row_lower, dtype=np.float64),
+        np.asarray(row_upper, dtype=np.float64),
+    )
+    result = milp(
+        objective,
+        integrality=integrality,
+        bounds=Bounds(lower_bounds, upper_bounds),
+        constraints=constraints,
+        options={"mip_rel_gap": 0.0},
+    )
+    status_code = int(getattr(result, "status", 4))
+    certified_optimal = bool(getattr(result, "success", False)) and status_code == 0
+    result_fun = getattr(result, "fun", None)
+    result_gap = getattr(result, "mip_gap", None)
+    result_nodes = getattr(result, "mip_node_count", None)
+    status = MILPSolveStatus(
+        sample_index=int(sample_index),
+        leg="joint_da_rt_with_deviation_penalty",
+        success=certified_optimal,
+        status_code=status_code,
+        message=str(getattr(result, "message", "MILP solver returned no message")),
+        objective=(
+            float(result_fun) if certified_optimal and result_fun is not None else None
+        ),
+        mip_gap=(float(result_gap) if result_gap is not None else None),
+        mip_node_count=(int(result_nodes) if result_nodes is not None else None),
+    )
+    if not certified_optimal:
+        raise MILPOracleSolveError(status)
+
+    solution = np.asarray(result.x, dtype=np.float64)
+
+    def clean(values):
+        values = np.clip(np.asarray(values, dtype=np.float64), 0.0, power_energy)
+        values[np.abs(values) < 1e-9] = 0.0
+        return values.copy()
+
+    da_discharge = clean(solution[dd])
+    da_charge = clean(solution[dc])
+    rt_discharge = clean(solution[rd])
+    rt_charge = clean(solution[rc])
+    da_net = da_discharge - da_charge
+    rt_net = rt_discharge - rt_charge
+    deviation = rt_net - da_net
+    tolerance = 0.03 * (da_discharge + da_charge)
+    excess = np.maximum(np.abs(deviation) - tolerance, 0.0)
+    degradation_cost = kappa * float(np.sum(rt_discharge + rt_charge))
+    deviation_penalty = float(np.sum(2.0 * np.abs(rt) * excess))
+    revenue = float(
+        np.sum(da * da_net + rt * deviation)
+        - degradation_cost
+        - deviation_penalty
+    )
+
+    def soc_path(discharge, charge):
+        changes = -discharge / eta + charge * eta
+        return np.concatenate(([initial_soc], initial_soc + np.cumsum(changes)))
+
+    dispatch = DualMILPDispatch(
+        da_discharge_mwh=da_discharge,
+        da_charge_mwh=da_charge,
+        rt_discharge_mwh=rt_discharge,
+        rt_charge_mwh=rt_charge,
+        da_soc_path_mwh=soc_path(da_discharge, da_charge),
+        rt_soc_path_mwh=soc_path(rt_discharge, rt_charge),
+        deviation_mwh=deviation,
+        tolerance_mwh=tolerance,
+        excess_mwh=excess,
+        degradation_cost=degradation_cost,
+        deviation_penalty=deviation_penalty,
+    )
+    return DualMILPOracleResult(revenue=revenue, status=status, dispatch=dispatch)
+
+
+def milp_oracle_revenue_dual(
+    price_da: torch.Tensor,
+    price_rt: torch.Tensor,
+    simulator: BESSSimulator,
+    *,
+    return_status: bool = False,
+):
+    """Small-batch exact Oracle for dual settlement with deviation penalty.
+
+    Inputs must be matching ``[B, H]`` tensors.  Each row is solved as an
+    independent MILP; this deliberately favours auditable day-sized solves
+    over a monolithic multi-day benchmark.
+    """
+    if price_da.ndim != 2 or price_rt.ndim != 2:
+        raise ValueError("price_da和price_rt必须是[B,H]二维张量")
+    if price_da.shape != price_rt.shape:
+        raise ValueError("price_da和price_rt必须同形")
+    if price_da.shape[0] < 1 or price_da.shape[1] < 1:
+        raise ValueError("Oracle价格batch不能为空")
+    device, dtype = price_da.device, price_da.dtype
+    results = np.empty(price_da.shape[0], dtype=np.float64)
+    statuses = []
+    for sample_index in range(price_da.shape[0]):
+        solved = solve_dual_penalty_milp_day(
+            price_da[sample_index],
+            price_rt[sample_index],
+            simulator,
+            sample_index=sample_index,
+        )
+        results[sample_index] = solved.revenue
+        statuses.append(solved.status)
+    values = torch.from_numpy(results).to(device=device, dtype=dtype).detach()
+    return (values, tuple(statuses)) if return_status else values
+
+
+def lp_oracle_revenue_dual_plan_tracking_restricted(
+    price_da: torch.Tensor,
+    price_rt: torch.Tensor,
+    simulator: BESSSimulator,
+    *,
+    return_status: bool = False,
+):
+    """Deprecated upper bound for the restricted policy class ``uRT=uDA``.
+
+    This preserves the historical comparison only.  It is *not* the global
+    Oracle under a 3% deviation tolerance; use
+    :func:`milp_oracle_revenue_dual` for that metric.
+    """
+    warnings.warn(
+        "lp_oracle_revenue_dual_plan_tracking_restricted is deprecated: it "
+        "bounds only the uRT=uDA policy class, not the unrestricted 3%-band "
+        "problem. Use milp_oracle_revenue_dual instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    if price_da.ndim != 2 or price_rt.ndim != 2:
+        raise ValueError("price_da和price_rt必须是[B,H]二维张量")
+    if price_da.shape != price_rt.shape:
+        raise ValueError("price_da和price_rt必须同形")
+    da_np = price_da.detach().cpu().numpy().astype(np.float64)
+    results = np.empty(da_np.shape[0], dtype=np.float64)
+    statuses = []
+    initial_soc = simulator.E * simulator.init_soc_frac
+    for sample_index in range(da_np.shape[0]):
+        results[sample_index], status = _lp_revenue_one(
+            da_np[sample_index],
+            simulator.P,
+            simulator.E,
+            simulator.eta,
+            initial_soc,
+            simulator.s_min,
+            simulator.s_max,
+            simulator.kappa,
+            simulator.dt,
+            simulator.e_cyc,
+            sample_index=sample_index,
+            leg="deprecated_penalty_plan_tracking_restricted",
+        )
+        statuses.append(status)
+    values = torch.from_numpy(results).to(
+        device=price_da.device, dtype=price_da.dtype
+    ).detach()
+    return (values, tuple(statuses)) if return_status else values
+
+
 def lp_oracle_revenue_dual(price_da: torch.Tensor, price_rt: torch.Tensor,
                            simulator: BESSSimulator,
                            use_deviation_penalty: bool = False,
                            *, return_status: bool = False):
-    """双结算 LP Oracle（w10 §5.2）。
+    """Backward-compatible dual-settlement Oracle entry point.
 
-    无偏差罚金（use_deviation_penalty=False）:
-      R* = LP_DA(spread) + LP_RT(pRT)，两条 SOC 轨迹独立（§4.3 计划/实际分离）：
-        DA 腿: max Σ(pDA−pRT)·uDA   s.t. 计划 SOC + 功率，无 κ（退化只对 uRT）
-        RT 腿: max Σ(pRT·uRT − κ|uRT|)  s.t. 实际 SOC + 功率
-      两个 LP 结构相同、独立求解相加。返回 [B] 张量，无梯度。
-      return_status=True 时同时返回 DA/RT 各腿的 LPSolveStatus。
-
-    有偏差罚金（use_deviation_penalty=True）:
-      当前评估的是 plan_track 受限策略类：uDA≠0 时业务规则强制 uRT=uDA；
-      uDA=0 时，2×|pRT| 罚金使任意偏差都不划算。因此该受限策略类下退化为
-      单结算 LP: max Σ pDA·uDA − κ|uDA|  s.t. SOC+E_cyc+功率。
-      注意：由于罚金含 3% 免罚容忍带，这不是“所有可行 DA/RT 动作”的无限制全局上界；
-      R* 及 Regret 必须明确标注为 plan_track 策略类口径。
+    Without deviation penalty the separable DA/RT problem remains two LPs.
+    With deviation penalty this entry point now dispatches to the exact joint
+    MILP.  The former ``uRT=uDA`` restricted LP remains available under the
+    explicitly named, deprecated
+    :func:`lp_oracle_revenue_dual_plan_tracking_restricted` function.
     """
+    if price_da.ndim != 2 or price_rt.ndim != 2:
+        raise ValueError("price_da和price_rt必须是[B,H]二维张量")
+    if price_da.shape != price_rt.shape:
+        raise ValueError("price_da和price_rt必须同形")
+    if use_deviation_penalty:
+        return milp_oracle_revenue_dual(
+            price_da, price_rt, simulator, return_status=return_status
+        )
+
     P, E, eta = simulator.P, simulator.E, simulator.eta
     s0 = E * simulator.init_soc_frac
     s_min, s_max = simulator.s_min, simulator.s_max
@@ -658,36 +1030,23 @@ def lp_oracle_revenue_dual(price_da: torch.Tensor, price_rt: torch.Tensor,
     e_cyc = simulator.e_cyc
     dt = simulator.dt
     device, dtype = price_da.device, price_da.dtype
-
     da_np = price_da.detach().cpu().numpy().astype(np.float64)
     rt_np = price_rt.detach().cpu().numpy().astype(np.float64)
-    B = da_np.shape[0]
-    results = np.empty(B, dtype=np.float64)
+    results = np.empty(da_np.shape[0], dtype=np.float64)
     statuses = []
 
-    if use_deviation_penalty:
-        # plan_track 受限策略类下 uRT=uDA → 单结算 LP（DA 价）。
-        # 这是受限策略类上界，非含 3% 容忍带的无限制 DA/RT 全局上界。
-        for b in range(B):
-            results[b], status = _lp_revenue_one(
-                da_np[b], P, E, eta, s0, s_min, s_max, kappa, dt, e_cyc,
-                sample_index=b, leg="penalty_plan_tracking_restricted",
-            )
-            statuses.append(status)
-    else:
-        # 无罚金：双 LP 独立求解（DA腿 spread + RT腿 pRT）
-        for b in range(B):
-            spread = da_np[b] - rt_np[b]                   # DA 腿价格 = 价差
-            r_da, status_da = _lp_revenue_one(
-                spread, P, E, eta, s0, s_min, s_max, 0.0, dt, e_cyc,
-                sample_index=b, leg="day_ahead",
-            )
-            r_rt, status_rt = _lp_revenue_one(
-                rt_np[b], P, E, eta, s0, s_min, s_max, kappa, dt, e_cyc,
-                sample_index=b, leg="real_time",
-            )
-            results[b] = r_da + r_rt
-            statuses.extend((status_da, status_rt))
+    for sample_index in range(da_np.shape[0]):
+        spread = da_np[sample_index] - rt_np[sample_index]
+        r_da, status_da = _lp_revenue_one(
+            spread, P, E, eta, s0, s_min, s_max, 0.0, dt, e_cyc,
+            sample_index=sample_index, leg="day_ahead",
+        )
+        r_rt, status_rt = _lp_revenue_one(
+            rt_np[sample_index], P, E, eta, s0, s_min, s_max, kappa, dt, e_cyc,
+            sample_index=sample_index, leg="real_time",
+        )
+        results[sample_index] = r_da + r_rt
+        statuses.extend((status_da, status_rt))
     values = torch.from_numpy(results).to(device=device, dtype=dtype).detach()
     return (values, tuple(statuses)) if return_status else values
 
@@ -699,18 +1058,34 @@ def lp_oracle_revenue_dual(price_da: torch.Tensor, price_rt: torch.Tensor,
 def plan_track_override(u_da: torch.Tensor, u_rt_topk: torch.Tensor) -> torch.Tensor:
     """w10 §4.3：启用偏差罚金时，RT 策略先尽量执行日前动作 uDA，再套利。
 
-    规则：在每个时段，若 uDA≠0，RT 动作优先取 uDA（消除偏差罚金）；
-    若 uDA=0，保留 TopK 套利动作。若 uDA 与 TopK 同号冲突，取 uDA（计划优先）。
+    规则：先保留 uDA，再仅当 RT TopK 与 uDA 同向时使用剩余功率；
+    若 uDA=0，保留全部 TopK 套利动作。反向 RT 候选不得抵消已优先
+    执行的 DA 计划，从而避免同一时段充放电对冲。SOC 和循环约束
+    由后续 BESSSimulator.project_actions 统一投影。
     这是预先确定的业务规则，不参与学习。
 
     u_da:     [B, 24] 日前计划动作 ∈ {-1,0,+1}
     u_rt_topk:[B, 24] RT TopK 套利动作 ∈ {-1,0,+1}
     返回:     [B, 24] 合成后的 uRT
     """
-    # uDA≠0 的时段：强制 uRT=uDA（避免偏差罚金）
-    mask_da = (u_da != 0).float()
-    u_rt = mask_da * u_da + (1.0 - mask_da) * u_rt_topk
-    return u_rt
+    if u_da.shape != u_rt_topk.shape:
+        raise ValueError("u_da和u_rt_topk必须同形")
+    if torch.any(torch.abs(u_da) > 1.0 + 1e-6) or torch.any(
+        torch.abs(u_rt_topk) > 1.0 + 1e-6
+    ):
+        raise ValueError("计划和RT候选动作必须位于[-1,1]")
+
+    base = u_da.clamp(-1.0, 1.0)
+    candidate = u_rt_topk.clamp(-1.0, 1.0)
+    remaining = torch.clamp(1.0 - torch.abs(base), min=0.0)
+    same_direction = (base * candidate) > 0.0
+    no_plan = torch.abs(base) <= 1e-8
+    residual = torch.where(
+        no_plan,
+        candidate,
+        torch.where(same_direction, remaining * candidate, torch.zeros_like(candidate)),
+    )
+    return (base + residual).clamp(-1.0, 1.0)
 
 
 # ════════════════════════════════════════════════════════════════════════════

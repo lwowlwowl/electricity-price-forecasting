@@ -16,9 +16,9 @@
 
 ERCOT正常情况下在交付日前一天10:00 Central Prevailing Time开始DAM清算，结果最迟13:30发布。当前DA样本已按D-1日10:00截断输入，并预测D日完整24小时交付日；旧v8相邻滑窗只保留作历史对照。
 
-实现记录请按顺序阅读 `docs/progress/00_执行索引.md` 到
-`docs/progress/07_最终状态与下一步.md`。`train_formal.py`仍是旧联合模型入口，
-新实验应使用`train_da.py`或`train_rt.py`。
+实施记录从`docs/progress/00_执行索引.md`进入；当前阶段总结和统一比较见文档23、24。
+文档07只保留第一轮独立DA/RT流水线的历史验收。`train_formal.py`仍是旧联合模型入口，
+新实验应使用当前三个独立模型或联合V2入口。
 
 ## 只看这些活跃目录
 

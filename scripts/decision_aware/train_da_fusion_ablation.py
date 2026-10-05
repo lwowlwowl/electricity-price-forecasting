@@ -45,6 +45,48 @@ PHYSICAL_FIELDS = (
     "bess_kappa", "bess_soc_min", "bess_soc_max", "bess_e_cyc",
 )
 
+_COORDINATION_MODES = {"rt_only", "follow_da", "lookahead_mpc", "plan_track_topk"}
+_DA_SIGNAL_MODES = {"spread", "da_only"}
+
+
+def _resolve_evaluation_contract(cfg: PilotConfig) -> dict:
+    """解析新联合口径，同时保留旧frozen_coordination_mode配置。
+
+    旧配置只写frozen_coordination_mode；新配置优先写
+    joint_coordination_mode/joint_da_signal_mode。若两个非默认协调字段冲突，
+    立即报错，不默默选其一。
+    """
+    legacy_mode = cfg.frozen_coordination_mode
+    joint_mode = cfg.joint_coordination_mode
+    if legacy_mode not in _COORDINATION_MODES:
+        raise ValueError(f"未知frozen_coordination_mode: {legacy_mode}")
+    if joint_mode not in _COORDINATION_MODES:
+        raise ValueError(f"未知joint_coordination_mode: {joint_mode}")
+    if legacy_mode != "rt_only" and joint_mode != "rt_only" and legacy_mode != joint_mode:
+        raise ValueError(
+            "frozen_coordination_mode与joint_coordination_mode冲突: "
+            f"{legacy_mode} != {joint_mode}"
+        )
+    coordination_mode = joint_mode if joint_mode != "rt_only" else legacy_mode
+    da_signal_mode = cfg.joint_da_signal_mode
+    if da_signal_mode not in _DA_SIGNAL_MODES:
+        raise ValueError(f"未知joint_da_signal_mode: {da_signal_mode}")
+    return {
+        "coordination_mode": coordination_mode,
+        "da_signal_mode": da_signal_mode,
+        "rt_k_charge": int(cfg.rt_topk_k_charge),
+        "rt_k_discharge": int(cfg.rt_topk_k_discharge),
+        "deviation_penalty_enabled": bool(cfg.use_deviation_penalty),
+    }
+
+
+def _check_validation_day_contract(cfg: PilotConfig, report: dict) -> None:
+    expected = int(cfg.frozen_expected_validation_days)
+    if expected > 0 and int(report["days"]) != expected:
+        raise ValueError(
+            f"验证口径要求{expected}个交付日，实际为{report['days']}天"
+        )
+
 
 def _load_checkpoint(path: str | Path) -> dict:
     checkpoint = torch.load(path, map_location="cpu", weights_only=False)
@@ -207,27 +249,40 @@ class FrozenDualEvaluator:
 
     def __init__(self, cfg: PilotConfig, da_datasets: dict,
                  device: torch.device):
-        if not cfg.frozen_rt_at_da_checkpoint or not cfg.frozen_rt_checkpoint:
-            raise ValueError("DA消融必须配置冻结RT-at-DA和滚动RT checkpoint")
+        self.contract = _resolve_evaluation_contract(cfg)
+        if not cfg.frozen_rt_checkpoint:
+            raise ValueError("DA消融必须配置冻结滚动RT checkpoint")
+        if (
+            self.contract["da_signal_mode"] == "spread"
+            and not cfg.frozen_rt_at_da_checkpoint
+        ):
+            raise ValueError("spread口径必须配置冻结RT-at-DA checkpoint")
         self.cfg = cfg
         self.da_datasets = da_datasets
         self.device = device
         self.fixed = {}
 
-        rt_da_checkpoint = _load_checkpoint(cfg.frozen_rt_at_da_checkpoint)
-        rt_da_model_cfg = _config_from_checkpoint(rt_da_checkpoint)
-        _check_physical(cfg, rt_da_model_cfg, "RT-at-DA")
-        rt_da_data_cfg = _eval_config(rt_da_model_cfg, cfg)
-        rt_da_train, rt_da_val, rt_da_test, _ = build_rt_at_da_datasets(rt_da_data_cfg)
-        _check_norm_stats(rt_da_train, rt_da_checkpoint, "RT-at-DA")
-        rt_da_model = DecisionAwareRTAtDAForecaster(rt_da_model_cfg).to(device)
-        rt_da_model.load_state_dict(rt_da_checkpoint["model_state"])
-        self.rt_da_datasets = {"validation": rt_da_val, "test": rt_da_test}
-        for split, dataset in self.rt_da_datasets.items():
-            self.fixed.setdefault(split, {})["rt_at_da"] = _predict(
-                rt_da_model, dataset, "p_rt_at_da", device, batch_size=64
+        self.rt_da_datasets = {}
+        if self.contract["da_signal_mode"] == "spread":
+            rt_da_checkpoint = _load_checkpoint(cfg.frozen_rt_at_da_checkpoint)
+            rt_da_model_cfg = _config_from_checkpoint(rt_da_checkpoint)
+            _check_physical(cfg, rt_da_model_cfg, "RT-at-DA")
+            rt_da_data_cfg = _eval_config(rt_da_model_cfg, cfg)
+            rt_da_train, rt_da_val, rt_da_test, _ = build_rt_at_da_datasets(
+                rt_da_data_cfg
             )
-        del rt_da_model
+            _check_norm_stats(rt_da_train, rt_da_checkpoint, "RT-at-DA")
+            rt_da_model = DecisionAwareRTAtDAForecaster(rt_da_model_cfg).to(device)
+            rt_da_model.load_state_dict(rt_da_checkpoint["model_state"])
+            all_rt_da_datasets = {"validation": rt_da_val, "test": rt_da_test}
+            self.rt_da_datasets = {
+                split: all_rt_da_datasets[split] for split in da_datasets
+            }
+            for split, dataset in self.rt_da_datasets.items():
+                self.fixed.setdefault(split, {})["rt_at_da"] = _predict(
+                    rt_da_model, dataset, "p_rt_at_da", device, batch_size=64
+                )
+            del rt_da_model
 
         rt_checkpoint = _load_checkpoint(cfg.frozen_rt_checkpoint)
         rt_model_cfg = _config_from_checkpoint(rt_checkpoint)
@@ -237,7 +292,8 @@ class FrozenDualEvaluator:
         _check_norm_stats(rt_train, rt_checkpoint, "滚动RT")
         rt_model = DecisionAwareRTForecaster(rt_model_cfg).to(device)
         rt_model.load_state_dict(rt_checkpoint["model_state"])
-        self.rt_datasets = {"validation": rt_val, "test": rt_test}
+        all_rt_datasets = {"validation": rt_val, "test": rt_test}
+        self.rt_datasets = {split: all_rt_datasets[split] for split in da_datasets}
         for split, dataset in self.rt_datasets.items():
             self.fixed.setdefault(split, {})["rt"] = _predict(
                 rt_model, dataset, "p_rt", device, batch_size=128
@@ -250,7 +306,9 @@ class FrozenDualEvaluator:
         if device.type == "cuda":
             torch.cuda.empty_cache()
 
-        for split in ("validation", "test"):
+        for split in da_datasets:
+            if self.contract["da_signal_mode"] != "spread":
+                continue
             da_dates = [window.delivery_date for window in da_datasets[split].windows]
             rt_da_dates = [
                 window.delivery_date for window in self.rt_da_datasets[split].windows
@@ -260,6 +318,11 @@ class FrozenDualEvaluator:
 
     def evaluate(self, split: str, da_prediction: np.ndarray) -> dict:
         fixed = self.fixed[split]
+        rt_at_da_mapping = None
+        if self.contract["da_signal_mode"] == "spread":
+            rt_at_da_mapping = _da_mapping(
+                self.rt_da_datasets[split], fixed["rt_at_da"]
+            )
         return locked_dual_backtest(
             _da_mapping(self.da_datasets[split], da_prediction),
             fixed["rt"],
@@ -269,12 +332,10 @@ class FrozenDualEvaluator:
             self.cfg,
             da_k_charge=self.cfg.topk_k_charge,
             da_k_discharge=self.cfg.topk_k_discharge,
-            rt_k_charge=1,
-            rt_k_discharge=1,
-            coordination_mode=self.cfg.frozen_coordination_mode,
-            rt_at_da_price_forecasts=_da_mapping(
-                self.rt_da_datasets[split], fixed["rt_at_da"]
-            ),
+            rt_k_charge=self.contract["rt_k_charge"],
+            rt_k_discharge=self.contract["rt_k_discharge"],
+            coordination_mode=self.contract["coordination_mode"],
+            rt_at_da_price_forecasts=rt_at_da_mapping,
         )
 
 
@@ -343,9 +404,12 @@ class FrozenRTAtDADualEvaluator:
 
     def __init__(self, cfg: PilotConfig, rt_da_datasets: dict,
                  device: torch.device):
+        self.contract = _resolve_evaluation_contract(cfg)
         if not cfg.frozen_da_checkpoints or not cfg.frozen_rt_checkpoint:
             raise ValueError("RT-at-DA消融必须配置冻结DA面板和滚动RT checkpoint")
-        if cfg.frozen_coordination_mode != "rt_only":
+        if self.contract["da_signal_mode"] != "spread":
+            raise ValueError("RT-at-DA候选只能在joint_da_signal_mode=spread时按收益选模")
+        if self.contract["coordination_mode"] != "rt_only":
             raise ValueError("多DA参考面板当前只允许冻结rt_only实际动作")
         self.cfg = cfg
         self.rt_da_datasets = rt_da_datasets
@@ -361,7 +425,10 @@ class FrozenRTAtDADualEvaluator:
             _check_norm_stats(train_ds, checkpoint, f"冻结DA {path}")
             model = DecisionAwareDAForecaster(model_cfg).to(device)
             model.load_state_dict(checkpoint["model_state"])
-            datasets = {"validation": val_ds, "test": test_ds}
+            all_datasets = {"validation": val_ds, "test": test_ds}
+            datasets = {
+                split: all_datasets[split] for split in rt_da_datasets
+            }
             predictions = {
                 split: _predict(model, dataset, "p_da", device, batch_size=64)
                 for split, dataset in datasets.items()
@@ -381,7 +448,10 @@ class FrozenRTAtDADualEvaluator:
         _check_norm_stats(rt_train, rt_checkpoint, "滚动RT")
         rt_model = DecisionAwareRTForecaster(rt_model_cfg).to(device)
         rt_model.load_state_dict(rt_checkpoint["model_state"])
-        self.rt_datasets = {"validation": rt_val, "test": rt_test}
+        all_rt_datasets = {"validation": rt_val, "test": rt_test}
+        self.rt_datasets = {
+            split: all_rt_datasets[split] for split in rt_da_datasets
+        }
         for split, dataset in self.rt_datasets.items():
             self.fixed[split]["rt"] = _predict(
                 rt_model, dataset, "p_rt", device, batch_size=128
@@ -394,7 +464,7 @@ class FrozenRTAtDADualEvaluator:
         if device.type == "cuda":
             torch.cuda.empty_cache()
 
-        for split in ("validation", "test"):
+        for split in rt_da_datasets:
             candidate_dates = [
                 window.delivery_date for window in rt_da_datasets[split].windows
             ]
@@ -427,9 +497,9 @@ class FrozenRTAtDADualEvaluator:
                 self.cfg,
                 da_k_charge=self.cfg.topk_k_charge,
                 da_k_discharge=self.cfg.topk_k_discharge,
-                rt_k_charge=1,
-                rt_k_discharge=1,
-                coordination_mode=self.cfg.frozen_coordination_mode,
+                rt_k_charge=self.contract["rt_k_charge"],
+                rt_k_discharge=self.contract["rt_k_discharge"],
+                coordination_mode=self.contract["coordination_mode"],
                 rt_at_da_price_forecasts=rt_da_mapping,
             )
             labeled_reports.append((reference["checkpoint"], report))
@@ -441,12 +511,15 @@ class FrozenRollingRTDualEvaluator:
 
     def __init__(self, cfg: PilotConfig, rt_datasets: dict,
                  device: torch.device):
+        self.contract = _resolve_evaluation_contract(cfg)
+        if not cfg.frozen_da_checkpoints:
+            raise ValueError("滚动RT消融必须配置冻结DA参考面板")
         if (
-            not cfg.frozen_da_checkpoints
-            or not cfg.frozen_rt_at_da_checkpoints
+            self.contract["da_signal_mode"] == "spread"
+            and not cfg.frozen_rt_at_da_checkpoints
         ):
-            raise ValueError("滚动RT消融必须配置冻结DA和RT-at-DA参考面板")
-        if cfg.frozen_coordination_mode != "rt_only":
+            raise ValueError("spread口径的滚动RT消融必须配置RT-at-DA参考面板")
+        if self.contract["coordination_mode"] != "rt_only":
             raise ValueError("多参考面板当前只允许冻结rt_only协调方式")
         self.cfg = cfg
         self.rt_datasets = rt_datasets
@@ -463,7 +536,8 @@ class FrozenRollingRTDualEvaluator:
             _check_norm_stats(train_ds, checkpoint, f"冻结DA {path}")
             model = DecisionAwareDAForecaster(model_cfg).to(device)
             model.load_state_dict(checkpoint["model_state"])
-            datasets = {"validation": val_ds, "test": test_ds}
+            all_datasets = {"validation": val_ds, "test": test_ds}
+            datasets = {split: all_datasets[split] for split in rt_datasets}
             self.da_references.append({
                 "checkpoint": str(path),
                 "datasets": datasets,
@@ -474,7 +548,11 @@ class FrozenRollingRTDualEvaluator:
             })
             del model
 
-        for path in cfg.frozen_rt_at_da_checkpoints:
+        rt_at_da_paths = (
+            cfg.frozen_rt_at_da_checkpoints
+            if self.contract["da_signal_mode"] == "spread" else []
+        )
+        for path in rt_at_da_paths:
             checkpoint = _load_checkpoint(path)
             model_cfg = _config_from_checkpoint(checkpoint)
             _check_physical(cfg, model_cfg, f"冻结RT-at-DA {path}")
@@ -483,7 +561,8 @@ class FrozenRollingRTDualEvaluator:
             _check_norm_stats(train_ds, checkpoint, f"冻结RT-at-DA {path}")
             model = DecisionAwareRTAtDAForecaster(model_cfg).to(device)
             model.load_state_dict(checkpoint["model_state"])
-            datasets = {"validation": val_ds, "test": test_ds}
+            all_datasets = {"validation": val_ds, "test": test_ds}
+            datasets = {split: all_datasets[split] for split in rt_datasets}
             self.rt_da_references.append({
                 "checkpoint": str(path),
                 "datasets": datasets,
@@ -534,11 +613,14 @@ class FrozenRollingRTDualEvaluator:
                 da_reference["datasets"][split],
                 da_reference["predictions"][split],
             )
-            for rt_da_reference in self.rt_da_references:
-                rt_da_mapping = _da_mapping(
-                    rt_da_reference["datasets"][split],
-                    rt_da_reference["predictions"][split],
-                )
+            rt_da_references = self.rt_da_references or [None]
+            for rt_da_reference in rt_da_references:
+                rt_da_mapping = None
+                if rt_da_reference is not None:
+                    rt_da_mapping = _da_mapping(
+                        rt_da_reference["datasets"][split],
+                        rt_da_reference["predictions"][split],
+                    )
                 report = locked_dual_backtest(
                     da_mapping,
                     rt_prediction,
@@ -548,15 +630,14 @@ class FrozenRollingRTDualEvaluator:
                     self.cfg,
                     da_k_charge=self.cfg.topk_k_charge,
                     da_k_discharge=self.cfg.topk_k_discharge,
-                    rt_k_charge=1,
-                    rt_k_discharge=1,
-                    coordination_mode=self.cfg.frozen_coordination_mode,
+                    rt_k_charge=self.contract["rt_k_charge"],
+                    rt_k_discharge=self.contract["rt_k_discharge"],
+                    coordination_mode=self.contract["coordination_mode"],
                     rt_at_da_price_forecasts=rt_da_mapping,
                 )
-                label = (
-                    f"DA={da_reference['checkpoint']}|"
-                    f"RT-at-DA={rt_da_reference['checkpoint']}"
-                )
+                label = f"DA={da_reference['checkpoint']}"
+                if rt_da_reference is not None:
+                    label += f"|RT-at-DA={rt_da_reference['checkpoint']}"
                 labeled_reports.append((label, report))
         return _mean_dual_reports(labeled_reports)
 
@@ -568,6 +649,45 @@ def _evaluate_forecaster(model, dataset, output_key: str, target_key: str,
         dataset[index][target_key].numpy() for index in range(len(dataset))
     ])
     return prediction, target, _forecast_diagnostics(prediction, target)
+
+
+def _training_checkpoint_payload(
+    *,
+    model_state: dict,
+    cfg: PilotConfig,
+    norm_stats: dict,
+    args: argparse.Namespace,
+    epoch: int,
+    history: list[dict],
+    best_epoch: int | None,
+    best_revenue: float,
+    optimizer=None,
+    scaler=None,
+) -> dict:
+    """构造可审计的latest/best载荷。
+
+    best仍保留旧脚本所需的model_state/config/norm_stats键；latest另带
+    优化器和AMP状态，避免训练中断时只剩一个不完整权重文件。
+    """
+    payload = {
+        "model_state": model_state,
+        "config": cfg.to_dict(),
+        "norm_stats": norm_stats,
+        "selection_metric": "frozen_full_dual_validation_mean_daily_revenue",
+        "best_validation_revenue": float(best_revenue),
+        "best_epoch": best_epoch,
+        "epoch": int(epoch),
+        "history": list(history),
+        "fusion_mode": args.fusion_mode,
+        "task": args.task,
+        "evaluation_contract": _resolve_evaluation_contract(cfg),
+        "report_only_evaluated": not bool(args.skip_report_only),
+    }
+    if optimizer is not None:
+        payload["optimizer_state"] = optimizer.state_dict()
+    if scaler is not None:
+        payload["scaler_state"] = scaler.state_dict()
+    return payload
 
 
 def _parse_args() -> argparse.Namespace:
@@ -592,6 +712,17 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--lr", type=float, default=None)
     parser.add_argument("--max-train", type=int, default=None)
     parser.add_argument("--output", default=None)
+    parser.add_argument(
+        "--skip-report-only",
+        action="store_true",
+        help="不生成test预测、不评估report-only；用于所有候选选模冻结前",
+    )
+    parser.add_argument(
+        "--expected-validation-days",
+        type=int,
+        default=None,
+        help="覆盖配置中的验证交付日天数断言；0表示不断言",
+    )
     return parser.parse_args()
 
 
@@ -616,6 +747,8 @@ def main() -> None:
         cfg.early_stop_patience = args.early_stop_patience
     if args.checkpoint_dir is not None:
         cfg.checkpoint_dir = args.checkpoint_dir
+    if args.expected_validation_days is not None:
+        cfg.frozen_expected_validation_days = args.expected_validation_days
     if args.lr is not None:
         cfg.lr = args.lr
     if args.batch_size is not None:
@@ -642,6 +775,9 @@ def main() -> None:
         torch.cuda.manual_seed_all(cfg.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     started = time.time()
+    evaluation_splits = ("validation",) if args.skip_report_only else (
+        "validation", "test"
+    )
 
     if args.task == "da":
         train_ds, val_ds, test_ds, _ = build_da_datasets(cfg)
@@ -649,7 +785,12 @@ def main() -> None:
         output_key = "p_da"
         target_key = "price_da_tgt"
         frozen = FrozenDualEvaluator(
-            cfg, {"validation": val_ds, "test": test_ds}, device
+            cfg,
+            {
+                split: {"validation": val_ds, "test": test_ds}[split]
+                for split in evaluation_splits
+            },
+            device,
         )
         experiment_name = "DA F0/F1/F2 fusion ablation"
         result_prefix = "da_fusion"
@@ -659,7 +800,12 @@ def main() -> None:
         output_key = "p_rt_at_da"
         target_key = "price_rt_at_da_tgt"
         frozen = FrozenRTAtDADualEvaluator(
-            cfg, {"validation": val_ds, "test": test_ds}, device
+            cfg,
+            {
+                split: {"validation": val_ds, "test": test_ds}[split]
+                for split in evaluation_splits
+            },
+            device,
         )
         experiment_name = "RT-at-DA F0/F1 confirmation ablation"
         result_prefix = "rt_at_da_fusion"
@@ -669,11 +815,17 @@ def main() -> None:
         output_key = "p_rt"
         target_key = "price_rt_tgt"
         frozen = FrozenRollingRTDualEvaluator(
-            cfg, {"validation": val_ds, "test": test_ds}, device
+            cfg,
+            {
+                split: {"validation": val_ds, "test": test_ds}[split]
+                for split in evaluation_splits
+            },
+            device,
         )
         experiment_name = "Rolling RT F0/F1 confirmation ablation"
         result_prefix = "rt_fusion"
-    datasets = {"validation": val_ds, "test": test_ds}
+    all_datasets = {"validation": val_ds, "test": test_ds}
+    datasets = {split: all_datasets[split] for split in evaluation_splits}
 
     generator = torch.Generator()
     generator.manual_seed(cfg.seed)
@@ -704,6 +856,12 @@ def main() -> None:
     best_epoch = None
     stale_epochs = 0
     history = []
+    checkpoint_directory = (
+        Path(cfg.checkpoint_dir) / f"{args.fusion_mode.lower()}_seed{cfg.seed}"
+    )
+    checkpoint_directory.mkdir(parents=True, exist_ok=True)
+    best_checkpoint = checkpoint_directory / f"pilot_{cfg.node}_best_full_dual.pt"
+    latest_checkpoint = checkpoint_directory / f"pilot_{cfg.node}_latest.pt"
 
     for epoch in range(cfg.epochs):
         model.train()
@@ -737,6 +895,7 @@ def main() -> None:
             model, val_ds, output_key, target_key, device, eval_batch_size
         )
         val_dual = frozen.evaluate("validation", val_prediction)
+        _check_validation_day_contract(cfg, val_dual)
         val_revenue = float(val_dual["mean_daily_revenue"])
         row = {
             "epoch": epoch + 1,
@@ -746,7 +905,8 @@ def main() -> None:
         }
         history.append(row)
         print(json.dumps(row, ensure_ascii=False), flush=True)
-        if val_revenue > best_revenue:
+        improved = val_revenue > best_revenue
+        if improved:
             best_revenue = val_revenue
             best_epoch = epoch + 1
             best_state = {
@@ -756,8 +916,40 @@ def main() -> None:
             stale_epochs = 0
         else:
             stale_epochs += 1
-            if stale_epochs >= cfg.early_stop_patience:
-                break
+        torch.save(
+            _training_checkpoint_payload(
+                model_state={
+                    key: value.detach().cpu()
+                    for key, value in model.state_dict().items()
+                },
+                cfg=cfg,
+                norm_stats=train_ds.norm_stats,
+                args=args,
+                epoch=epoch + 1,
+                history=history,
+                best_epoch=best_epoch,
+                best_revenue=best_revenue,
+                optimizer=optimizer,
+                scaler=scaler,
+            ),
+            latest_checkpoint,
+        )
+        if improved:
+            torch.save(
+                _training_checkpoint_payload(
+                    model_state=best_state,
+                    cfg=cfg,
+                    norm_stats=train_ds.norm_stats,
+                    args=args,
+                    epoch=epoch + 1,
+                    history=history,
+                    best_epoch=best_epoch,
+                    best_revenue=best_revenue,
+                ),
+                best_checkpoint,
+            )
+        if stale_epochs >= cfg.early_stop_patience:
+            break
 
     if best_state is None:
         raise RuntimeError("训练没有产生可保存的状态")
@@ -777,22 +969,19 @@ def main() -> None:
             ),
         }
 
-    checkpoint = (
-        Path(cfg.checkpoint_dir)
-        / f"{args.fusion_mode.lower()}_seed{cfg.seed}"
-        / "pilot_LZ_LCRA_best_full_dual.pt"
+    torch.save(
+        _training_checkpoint_payload(
+            model_state=best_state,
+            cfg=cfg,
+            norm_stats=train_ds.norm_stats,
+            args=args,
+            epoch=int(best_epoch),
+            history=history,
+            best_epoch=best_epoch,
+            best_revenue=best_revenue,
+        ),
+        best_checkpoint,
     )
-    checkpoint.parent.mkdir(parents=True, exist_ok=True)
-    torch.save({
-        "model_state": best_state,
-        "config": cfg.to_dict(),
-        "norm_stats": train_ds.norm_stats,
-        "selection_metric": "frozen_full_dual_validation_mean_daily_revenue",
-        "best_validation_revenue": best_revenue,
-        "best_epoch": best_epoch,
-        "fusion_mode": args.fusion_mode,
-        "task": args.task,
-    }, checkpoint)
 
     peak_memory_mb = (
         float(torch.cuda.max_memory_allocated(device) / (1024 ** 2))
@@ -807,6 +996,13 @@ def main() -> None:
         "device": str(device),
         "loss": "pure Huber only; alpha=1 beta=0",
         "selection_metric": "frozen full-dual validation mean daily revenue",
+        "selection_contract": {
+            **_resolve_evaluation_contract(cfg),
+            "expected_validation_days": int(cfg.frozen_expected_validation_days),
+            "observed_validation_days": int(
+                final["validation"]["full_dual"]["days"]
+            ),
+        },
         "frozen_system": {
             "da_checkpoints": (
                 cfg.frozen_da_checkpoints
@@ -823,12 +1019,23 @@ def main() -> None:
             "rolling_rt_checkpoint": (
                 "candidate" if args.task == "rt" else cfg.frozen_rt_checkpoint
             ),
-            "coordination_mode": cfg.frozen_coordination_mode,
+            "coordination_mode": _resolve_evaluation_contract(cfg)[
+                "coordination_mode"
+            ],
+            "da_signal_mode": _resolve_evaluation_contract(cfg)[
+                "da_signal_mode"
+            ],
+            "rt_topk": [cfg.rt_topk_k_charge, cfg.rt_topk_k_discharge],
+            "deviation_penalty_enabled": bool(cfg.use_deviation_penalty),
         },
         "split": {
             name: list(cfg.split_bounds(name)) for name in ("train", "val", "test")
         },
-        "test_status": "report-only; dates were exposed by earlier experiments",
+        "test_status": (
+            "not evaluated; frozen until every candidate and selection rule is fixed"
+            if args.skip_report_only
+            else "report-only; dates were exposed by earlier experiments"
+        ),
         "samples": {
             "train": len(train_data), "validation": len(val_ds), "test": len(test_ds)
         },
@@ -847,27 +1054,34 @@ def main() -> None:
         "best_epoch": best_epoch,
         "history": history,
         "validation": final["validation"],
-        "test_report_only": final["test"],
         "compute": {
             "seconds": round(time.time() - started, 2),
             "peak_cuda_memory_mb": peak_memory_mb,
         },
-        "checkpoint": str(checkpoint),
+        "checkpoint": str(best_checkpoint),
+        "latest_checkpoint": str(latest_checkpoint),
     }
+    if "test" in final:
+        report["test_report_only"] = final["test"]
     output = Path(args.output or (
         f"data/results/{result_prefix}_{args.fusion_mode.lower()}_seed{cfg.seed}.json"
     ))
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(json.dumps({
+    completion = {
         "fusion_mode": args.fusion_mode,
         "seed": cfg.seed,
         "best_epoch": best_epoch,
         "validation_revenue": final["validation"]["full_dual"]["mean_daily_revenue"],
-        "test_report_only_revenue": final["test"]["full_dual"]["mean_daily_revenue"],
-        "checkpoint": str(checkpoint),
+        "checkpoint": str(best_checkpoint),
+        "latest_checkpoint": str(latest_checkpoint),
         "output": str(output),
-    }, ensure_ascii=False), flush=True)
+    }
+    if "test" in final:
+        completion["test_report_only_revenue"] = final["test"][
+            "full_dual"
+        ]["mean_daily_revenue"]
+    print(json.dumps(completion, ensure_ascii=False), flush=True)
 
 
 if __name__ == "__main__":

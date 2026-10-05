@@ -6,7 +6,7 @@ from typing import Callable
 
 import torch
 
-from .policy import BESSSimulator, HardTopKPolicy
+from .policy import BESSSimulator, HardTopKPolicy, plan_track_override
 
 
 @dataclass(frozen=True)
@@ -77,6 +77,7 @@ def settle_joint_episode(
     *,
     initial_plan_soc_mwh: float | torch.Tensor | None = None,
     initial_actual_soc_mwh: float | torch.Tensor | None = None,
+    coordination_mode: str | None = None,
 ) -> dict:
     """按日期顺序执行完整系统，返回逐日现金收益和连续SOC。
 
@@ -114,11 +115,19 @@ def settle_joint_episode(
         spread_threshold=cfg.resolved_spread_threshold,
     )
     rt_policy = HardTopKPolicy(
-        1, 1, spread_threshold=cfg.resolved_spread_threshold
+        cfg.rt_topk_k_charge,
+        cfg.rt_topk_k_discharge,
+        spread_threshold=cfg.resolved_spread_threshold,
     )
-    rt_intended = rt_policy(
+    rt_candidates = rt_policy(
         p_rt_windows.reshape(days * 24, p_rt_windows.shape[-1])
     )[:, 0].reshape(days, 24)
+    mode = coordination_mode or getattr(cfg, "joint_coordination_mode", "rt_only")
+    if mode not in {"rt_only", "follow_da", "plan_track_topk"}:
+        raise ValueError(f"联合结算不支持的RT协调方式: {mode}")
+    da_signal_mode = getattr(cfg, "joint_da_signal_mode", "spread")
+    if da_signal_mode not in {"spread", "da_only"}:
+        raise ValueError(f"未知DA决策信号: {da_signal_mode}")
 
     daily_revenue = []
     da_legs = []
@@ -137,15 +146,25 @@ def settle_joint_episode(
             plan_soc = p_da.new_tensor(initial_soc)
             actual_soc = p_da.new_tensor(initial_soc)
 
-        intended_plan = da_policy(
-            (p_da[day] - p_rt_at_da[day]).reshape(1, 24)
+        da_signal = (
+            p_da[day] - p_rt_at_da[day]
+            if da_signal_mode == "spread" else p_da[day]
         )
+        intended_plan = da_policy(da_signal.reshape(1, 24))
         plan_projection = simulator.project_actions(intended_plan, plan_soc)
         plan = plan_projection.action[0]
         plan_soc = plan_projection.soc_path_mwh[0, -1]
 
+        if mode == "follow_da":
+            rt_intended = plan
+        elif mode == "plan_track_topk":
+            rt_intended = plan_track_override(
+                plan.reshape(1, 24), rt_candidates[day].reshape(1, 24)
+            )[0]
+        else:
+            rt_intended = rt_candidates[day]
         actual_projection = simulator.project_actions(
-            rt_intended[day].reshape(1, 24), actual_soc
+            rt_intended.reshape(1, 24), actual_soc
         )
         actual_net = actual_projection.net_energy_mwh[0]
         actual_action = actual_projection.action[0]
@@ -188,6 +207,8 @@ def settle_joint_episode(
         hourly_revenues.append(hourly_revenue)
 
     return {
+        "coordination_mode": mode,
+        "da_signal_mode": da_signal_mode,
         "daily_revenue": torch.stack(daily_revenue),
         "hourly_revenue": torch.stack(hourly_revenues),
         "da_leg": torch.stack(da_legs),
@@ -394,6 +415,8 @@ def joint_proxy_loss(
     ``element_mean``保留v1的额外按元素缩小。
     ``sample_sum_mean``先对每天所有决策维求和，再对天数
     取均值，与``per_day``估计的逐日损失梯度含义一致。
+    ``global_sum``直接做全episode内积，适用于``episode_scalar``已经
+    估计完整episode目标梯度的情形，避免再次除以天数。
     """
     if scale <= 0:
         raise ValueError("joint_proxy_scale必须为正")
@@ -406,6 +429,8 @@ def joint_proxy_loss(
         if prediction.ndim < 2:
             raise ValueError("sample_sum_mean要求第一维是交付日")
         reduced = product.reshape(prediction.shape[0], -1).sum(dim=1).mean()
+    elif reduction == "global_sum":
+        reduced = product.sum()
     else:
         raise ValueError(f"未知零阶代理reduction: {reduction}")
     return reduced / float(scale)

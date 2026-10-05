@@ -98,7 +98,7 @@ class PilotConfig:
     bess_energy_mwh: float = 4.0
     bess_eta: float = 0.95           # v3 对齐 w10（v1/v2=0.9）
     bess_init_soc_frac: float = 0.5
-    bess_kappa: float = 27.0         # 退化+交易成本 USD/MWh（w10，v1/v2=0）
+    bess_kappa: float = 5.7          # 项目主合同的单位运行与退化成本；偏差罚金另行计算
     bess_soc_min: float = 0.4        # SOC 下限 MWh（w10: 0.4）
     bess_soc_max: float = 3.6        # SOC 上限 MWh（w10: 3.6）
     bess_e_cyc: float = 4.0          # 每日放电上限 MWh（w10 §4.2 E_cyc）
@@ -108,6 +108,10 @@ class PilotConfig:
     oracle_type: str = "lp"          # Regret 只使用求解成功的 LP Oracle
     topk_k_charge: int = 4
     topk_k_discharge: int = 4
+    # 滚动RT的单个H=4窗口候选数。历史口径固定为1/1；
+    # 偏差罚金场景允许在验证集显式比较0/0（不额外偏离DA）。
+    rt_topk_k_charge: int = 1
+    rt_topk_k_discharge: int = 1
     topk_spread_threshold: float = -1.0   # <0 = 自动 κ/η（w10 §4.1 价差门控）；0=关闭
     ste_k: float = 5.0
 
@@ -149,6 +153,8 @@ class PilotConfig:
     frozen_rt_at_da_checkpoint: str = ""
     frozen_rt_checkpoint: str = ""
     frozen_coordination_mode: str = "rt_only"
+    # 0表示不强制天数；新正式口径设为182，防止误用旧验证集选epoch。
+    frozen_expected_validation_days: int = 0
     bootstrap_samples: int = 2000
 
     # ── 三模型联合 decision-aware 微调 ────────────────────────────────────
@@ -157,6 +163,15 @@ class PilotConfig:
     joint_da_checkpoint: str = ""
     joint_rt_at_da_checkpoint: str = ""
     joint_rt_checkpoint: str = ""
+    # 价格预测网络的形状不依赖退化成本。仅在显式kappa灵敏性/迁移实验中
+    # 允许source checkpoint的kappa不同；其余物理合同仍必须完全一致。
+    joint_allow_source_kappa_mismatch: bool = False
+    # spread使用p_DA-p_RT|DA制定DA计划；da_only只使用p_DA。
+    # 当罚金使RT严格跟随DA时，必须比较两者，不能默认spread。
+    joint_da_signal_mode: str = "spread"
+    # rt_only保留无罚金历史口径；plan_track_topk对应w10 §4.3：
+    # 先执行DA计划，再用剩余功率/SOC执行RT TopK。
+    joint_coordination_mode: str = "rt_only"
     joint_episode_days: int = 16
     joint_validation_batch_days: int = 8
     joint_pred_weight_da: float = 1.0
@@ -175,8 +190,8 @@ class PilotConfig:
     joint_beta_start: float = 0.05
     joint_beta_end: float = 0.30
     joint_beta_warmup_epochs: int = 4
-    # v1分别扰动p_DA和p_RT|DA；v2直接扰动共同决策变量spread，避免两路
-    # 独立高方差估计把同一个价差信号向相反方向推移。
+    # v1分别扰动p_DA和p_RT|DA；v2直接扰动共同决策变量spread；
+    # da_only用于只由p_DA制定计划的罚金合同，只允许DA获得收益代理。
     joint_da_proxy_mode: str = "independent_prices"
     # gaussian保持v1；orthogonal使用等范数正交高斯方向降低同一batch内方差。
     joint_zo_direction_mode: str = "gaussian"
@@ -194,8 +209,8 @@ class PilotConfig:
     joint_zo_directions_rt: int = 0
     joint_proxy_weight_spread: float = 1.0
     joint_proxy_weight_rt: float = 1.0
-    # element_mean保留v1；sample_sum_mean先对每日的决策维求和，
-    # 再对天数取均值，不会把已估计的输出梯度再除24/96。
+    # element_mean保留v1；sample_sum_mean先对每日的决策维求和再对天数
+    # 取均值；global_sum用于已经是完整episode目标梯度的episode_scalar。
     joint_proxy_reduction: str = "element_mean"
     # 风险效用=(1-w)*mean_revenue+w*lower_tail_mean；0保持只优化均值。
     joint_tail_weight: float = 0.0
@@ -204,6 +219,11 @@ class PilotConfig:
     joint_selection_tail_weight: float = 0.0
     # all保持v1；decoder_head只更新各自decoder和price_head，保护已选骨干。
     joint_trainable_scope: str = "all"
+    # 显式列出本次允许更新的独立模型。未列出的模型仍参与前向与结算，
+    # 但参数完全冻结，也不会为它创建optimizer或无意义的零阶估计。
+    joint_trainable_models: list[str] = field(
+        default_factory=lambda: ["da", "rt_at_da", "rt"]
+    )
     # v1单AdamW+全局clip；v2为三个独立模型分别建optimizer和clip。
     joint_separate_optimizers: bool = False
     # v2把未微调的强基线作为epoch 0候选；训练若没有真正

@@ -18,7 +18,12 @@ import numpy as np
 import pandas as pd
 import torch
 
-from .policy import BESSSimulator, HardTopKPolicy, LookaheadMPCPolicy
+from .policy import (
+    BESSSimulator,
+    HardTopKPolicy,
+    LookaheadMPCPolicy,
+    plan_track_override,
+)
 
 
 def _as_2d_float(value, name: str) -> torch.Tensor:
@@ -191,7 +196,9 @@ def locked_dual_backtest(
         soc_max=cfg.bess_soc_max,
         e_cyc=cfg.bess_e_cyc,
     )
-    if coordination_mode not in {"rt_only", "follow_da", "lookahead_mpc"}:
+    if coordination_mode not in {
+        "rt_only", "follow_da", "lookahead_mpc", "plan_track_topk"
+    }:
         raise ValueError(f"未知RT协调方式: {coordination_mode}")
     rt_candidates_all = rt_policy(rt_forecasts)[:, 0]
 
@@ -297,6 +304,11 @@ def locked_dual_backtest(
                 )[0, 0])
             elif coordination_mode == "follow_da":
                 rt_intended = da_action
+            elif coordination_mode == "plan_track_topk":
+                rt_intended = float(plan_track_override(
+                    torch.tensor([[da_action]], dtype=torch.float32),
+                    torch.tensor([[rt_candidate]], dtype=torch.float32),
+                )[0, 0])
             else:
                 rt_intended = rt_candidate
             changed_from_da_hours += int(abs(rt_intended - da_action) > 1e-8)

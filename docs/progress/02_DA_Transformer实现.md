@@ -26,6 +26,14 @@ DA Decoder有24个learnable query。每个query由三部分组成：内容query�
 
 它没有`p_rt`或`p_rt_da`输出头，因此不是把旧大模型换个名字。
 
+### 当前路径与旧`mean(memory)`路径的边界
+
+为避免把共享`QueryDecoder`中保留的兼容代码误认为当前DA结构，这里明确记录：
+
+- 当前所有独立DA，包括早期独立DA seed 0/1/2、F0/F1/F2融合消融、冻结的Huber DA以及V2联合微调中的DA，均实例化`DecisionAwareDAForecaster`，并显式设置`use_memory_context=False`；它们都没有使用`Proj(mean(memory))`。
+- `src/decision_aware/model.py`中的`mean(memory)`可选分支，以及仍引用`DecisionAwareTSFM`的`train_formal.py`、`compare_baselines_formal.py`，只为旧联合实验和历史checkpoint复现保留，不属于当前正式DA训练、消融、V2或统一基线流程。
+- 现阶段不删除这条旧分支，是为了保持历史checkpoint和旧实验可复现；后续若归档，应连同旧入口和配置整体迁移，不能只删除共享Decoder中的字段。
+
 ## 已通过的结构检查
 
 - 输出、memory、representation和来源权重形状正确；

@@ -30,8 +30,12 @@ from .model_da import DecisionAwareDAForecaster
 from .model_rt import DecisionAwareRTForecaster
 from .policy import (BESSSimulator, LookaheadMPCPolicy, STEPolicy, TopKPolicy, HardTopKPolicy,
                      greedy_hindsight_revenue, lp_oracle_revenue,
-                     lp_oracle_revenue_dual, LPSolveStatus,
-                     LPOracleSolveError)
+                     lp_oracle_revenue_dual, milp_oracle_revenue_dual,
+                     solve_dual_penalty_milp_day,
+                     lp_oracle_revenue_dual_plan_tracking_restricted,
+                     LPSolveStatus, MILPSolveStatus, DualMILPDispatch,
+                     DualMILPOracleResult, LPOracleSolveError,
+                     MILPOracleSolveError)
 from .loss import total_loss, total_loss_zo, anneal_alpha_beta
 from .loss_da import da_decision_aware_loss
 from .zero_order import (estimate_zo_gradient, estimate_zo_gradient_dual,
@@ -42,7 +46,10 @@ __all__ = [
     "DecisionAwareRTForecaster",
     "BESSSimulator", "LookaheadMPCPolicy", "STEPolicy", "TopKPolicy", "HardTopKPolicy",
     "greedy_hindsight_revenue", "lp_oracle_revenue", "lp_oracle_revenue_dual",
-    "LPSolveStatus", "LPOracleSolveError",
+    "milp_oracle_revenue_dual", "solve_dual_penalty_milp_day",
+    "lp_oracle_revenue_dual_plan_tracking_restricted",
+    "LPSolveStatus", "MILPSolveStatus", "DualMILPDispatch",
+    "DualMILPOracleResult", "LPOracleSolveError", "MILPOracleSolveError",
     "total_loss", "total_loss_zo", "anneal_alpha_beta", "da_decision_aware_loss",
     "estimate_zo_gradient", "estimate_zo_gradient_dual",
     "compute_l_proxy", "compute_epsilon",

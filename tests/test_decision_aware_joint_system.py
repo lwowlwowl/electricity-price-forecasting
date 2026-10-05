@@ -105,6 +105,43 @@ def test_training_kernel_matches_locked_dual_backtest_exactly():
     )
 
 
+def test_penalty_plan_track_kernel_matches_locked_backtest_exactly():
+    cfg = _cfg()
+    cfg.use_deviation_penalty = True
+    cfg.joint_coordination_mode = "plan_track_topk"
+    p_da, p_rt_da, p_rt, true_da, true_rt = _inputs(days=2)
+    episode = settle_joint_episode(
+        p_da, p_rt_da, p_rt, true_da, true_rt,
+        torch.tensor([True, False]), cfg,
+    )
+    timestamps = pd.date_range(
+        "2025-01-02 00:00", periods=48, freq="h", tz="America/Chicago"
+    )
+    dates = sorted(set(timestamps.date))
+    report = locked_dual_backtest(
+        {dates[i]: p_da[i] for i in range(2)},
+        p_rt.reshape(48, 4),
+        true_da.reshape(-1),
+        true_rt.reshape(-1),
+        timestamps,
+        cfg,
+        da_k_charge=1,
+        da_k_discharge=1,
+        rt_k_charge=1,
+        rt_k_discharge=1,
+        coordination_mode="plan_track_topk",
+        rt_at_da_price_forecasts={dates[i]: p_rt_da[i] for i in range(2)},
+    )
+    expected = torch.tensor([
+        report["daily"][str(day)]["net_revenue"] for day in dates
+    ])
+    assert episode["coordination_mode"] == "plan_track_topk"
+    assert episode["daily_revenue"].cpu() == pytest.approx(expected)
+    assert float(episode["deviation_penalty"].sum()) == pytest.approx(
+        report["revenue_components"]["deviation_penalty"]
+    )
+
+
 def test_segment_reset_matches_two_independent_soc_segments():
     cfg = _cfg()
     p_da, p_rt_da, p_rt, true_da, true_rt = _inputs(days=2)
@@ -241,3 +278,37 @@ def test_per_group_feedback_matches_rolling_rt_window_shape():
     assert diagnostic["feedback_mode"] == "per_group"
     assert diagnostic["finite"] is True
     assert diagnostic["gradient_norm"] > 0.0
+
+
+def test_episode_scalar_captures_future_state_coupling():
+    torch.manual_seed(23)
+    prediction = torch.tensor([[1.0], [2.0]])
+
+    def coupled_daily_revenue(value):
+        # Day 0's decision also changes day 1 revenue, just as SOC carries over.
+        return torch.stack((value[0, 0], 10.0 * value[0, 0] + value[1, 0]))
+
+    gradient, diagnostic = estimate_system_zo_gradient(
+        prediction,
+        coupled_daily_revenue,
+        epsilon=0.1,
+        directions=2,
+        pred_clamp=(-100.0, 100.0),
+        direction_mode="orthogonal",
+        feedback_mode="episode_scalar",
+    )
+
+    assert diagnostic["feedback_mode"] == "episode_scalar"
+    # The estimator is for loss=-mean(revenue):
+    # dL/dx0=-(1+10)/2, dL/dx1=-1/2.
+    assert gradient == pytest.approx(torch.tensor([[-5.5], [-0.5]]), abs=1e-5)
+
+
+def test_global_sum_proxy_preserves_episode_gradient_scale():
+    prediction = torch.tensor([[1.0, 2.0], [3.0, 4.0]], requires_grad=True)
+    gradient = torch.tensor([[2.0, -3.0], [5.0, 7.0]])
+    loss = joint_proxy_loss(
+        prediction, gradient, scale=2.0, reduction="global_sum"
+    )
+    loss.backward()
+    assert prediction.grad == pytest.approx(gradient / 2.0)
