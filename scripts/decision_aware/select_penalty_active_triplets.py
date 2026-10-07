@@ -37,6 +37,11 @@ from scripts.decision_aware.select_penalty_source_checkpoints import (  # noqa: 
 
 
 TASKS = ("da", "rt_at_da", "rt")
+DEFAULT_CANDIDATE_ROOTS = {
+    "da": "data/checkpoints/da_fusion_ablation_v2_penalty",
+    "rt_at_da": "data/checkpoints/rt_at_da_fusion_ablation",
+    "rt": "data/checkpoints/rt_fusion_ablation",
+}
 
 
 def _validate_active_contract(cfg: PilotConfig) -> None:
@@ -185,7 +190,7 @@ def _write_new_json(path: Path, value: dict) -> None:
         handle.write("\n")
 
 
-def main() -> None:
+def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--config",
@@ -198,8 +203,28 @@ def main() -> None:
         "--output",
         default="data/results/penalty_active_triplet_selection_v1.json",
     )
+    parser.add_argument(
+        "--da-checkpoint-root",
+        default=DEFAULT_CANDIDATE_ROOTS["da"],
+        help="DA候选根目录；正式默认值是偏差罚金合同下重训的9个纯Huber checkpoint",
+    )
+    parser.add_argument(
+        "--rt-at-da-checkpoint-root",
+        default=DEFAULT_CANDIDATE_ROOTS["rt_at_da"],
+        help="RT-at-DA候选根目录",
+    )
+    parser.add_argument(
+        "--rt-checkpoint-root",
+        default=DEFAULT_CANDIDATE_ROOTS["rt"],
+        help="滚动RT候选根目录",
+    )
     parser.add_argument("--max-validation-days", type=int, default=None)
     parser.add_argument("--progress-every", type=int, default=50)
+    return parser
+
+
+def main() -> None:
+    parser = _build_parser()
     args = parser.parse_args()
 
     cfg = PilotConfig.from_yaml(args.config)
@@ -228,16 +253,16 @@ def main() -> None:
     # 随后所有三元组只读内存中的numpy/tensor。
     candidates = {
         "da": _predict_candidates(
-            "da", _candidate_paths("data/checkpoints/da_fusion_ablation"),
+            "da", _candidate_paths(args.da_checkpoint_root),
             datasets["da"], indices["da"], device,
         ),
         "rt_at_da": _predict_candidates(
             "rt_at_da",
-            _candidate_paths("data/checkpoints/rt_at_da_fusion_ablation"),
+            _candidate_paths(args.rt_at_da_checkpoint_root),
             datasets["rt_at_da"], indices["rt_at_da"], device,
         ),
         "rt": _predict_candidates(
-            "rt", _candidate_paths("data/checkpoints/rt_fusion_ablation"),
+            "rt", _candidate_paths(args.rt_checkpoint_root),
             datasets["rt"], indices["rt"], device,
         ),
     }
@@ -284,6 +309,11 @@ def main() -> None:
         },
         "candidate_counts": {
             task: len(values) for task, values in candidates.items()
+        },
+        "candidate_roots": {
+            "da": args.da_checkpoint_root,
+            "rt_at_da": args.rt_at_da_checkpoint_root,
+            "rt": args.rt_checkpoint_root,
         },
         "triplet_count": len(ranking),
         "candidate_manifest": _candidate_manifest(candidates),

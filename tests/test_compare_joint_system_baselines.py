@@ -8,6 +8,7 @@ import torch
 
 from scripts.decision_aware.compare_joint_system_baselines import (
     _load_bundle_source_checkpoints,
+    _validate_evaluation_request,
 )
 
 
@@ -76,3 +77,18 @@ def test_joint_bundle_rejects_source_hash_mismatch(tmp_path: Path):
 
     with pytest.raises(ValueError, match="SHA256不匹配"):
         _load_bundle_source_checkpoints(bundle, tmp_path / "joint.pt")
+
+
+def test_report_only_requires_explicit_confirmation():
+    with pytest.raises(ValueError, match="confirm-report-only"):
+        _validate_evaluation_request("report_only", False)
+
+
+def test_validation_rejects_report_only_confirmation():
+    with pytest.raises(ValueError, match="validation"):
+        _validate_evaluation_request("validation", True)
+
+
+def test_valid_evaluation_requests_are_accepted():
+    _validate_evaluation_request("validation", False)
+    _validate_evaluation_request("report_only", True)

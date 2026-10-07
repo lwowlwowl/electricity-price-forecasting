@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import replace
+import gc
 import hashlib
 import json
 import math
@@ -715,9 +716,9 @@ def main():
         torch.cuda.manual_seed_all(cfg.seed)
         torch.cuda.reset_peak_memory_stats()
     amp_enabled = bool(cfg.use_amp and device.type == "cuda")
-    # 历史融合消融的所有候选都用CUDA autocast做验证预测。联合训练也用AMP，
-    # 但下面把GradScaler初始尺度降到64来避免默认尺度溢出；验证仍沿用历史
-    # AMP和固定batch口径，才能精确复现123.06基线。
+    # 历史融合消融的所有候选都用CUDA autocast做验证预测。联合训练也用AMP；
+    # loss scale由合同显式冻结，正式罚金配置使用1.0以覆盖极端RT批次。
+    # 验证仍沿用历史AMP和固定batch口径。
     evaluation_amp_enabled = device.type == "cuda"
 
     source_paths = {
@@ -836,6 +837,7 @@ def main():
         "rt_business_signal_active": rt_business_signal_active,
         "separate_optimizers": cfg.joint_separate_optimizers,
         "dropout_disabled_during_finetune": cfg.joint_disable_dropout,
+        "amp_init_scale": float(cfg.joint_amp_init_scale),
         "sources": source_contract,
     }, ensure_ascii=False), flush=True)
 
@@ -894,10 +896,12 @@ def main():
                 parameters, lr=cfg.lr, weight_decay=cfg.weight_decay
             )
         }
+    if not math.isfinite(cfg.joint_amp_init_scale) or cfg.joint_amp_init_scale <= 0:
+        raise ValueError("joint_amp_init_scale必须是有限正数")
     scaler = torch.amp.GradScaler(
         "cuda",
         enabled=amp_enabled,
-        init_scale=64.0,
+        init_scale=float(cfg.joint_amp_init_scale),
         growth_factor=2.0,
         backoff_factor=0.5,
         growth_interval=100000,
@@ -968,9 +972,15 @@ def main():
             stale = int(state.get("stale", 0))
             history = list(state.get("history", []))
             saved_best_path = state.get("source_best_checkpoint")
+            # latest状态可能从Windows迁移到Linux（或反向迁移）。checkpoint
+            # 内容保持不变，只把元数据中的路径分隔符按当前系统解释。
+            portable_saved_best_path = (
+                Path(str(saved_best_path).replace("\\", "/"))
+                if saved_best_path is not None else None
+            )
             if (
-                saved_best_path is not None
-                and Path(saved_best_path).resolve() != checkpoint_path.resolve()
+                portable_saved_best_path is not None
+                and portable_saved_best_path.resolve() != checkpoint_path.resolve()
             ):
                 raise ValueError(
                     "续训时--checkpoint必须与latest状态记录的最佳模型路径一致: "
@@ -1055,6 +1065,15 @@ def main():
                 outputs, batch, cfg, source_outputs
             )
             batch_offset += batch_days
+
+            # 这些变量只在部分收益代理分支中创建。统一初始化并在批次末尾
+            # 删除，避免最后一个训练批次的计算图跨到整段验证阶段。
+            # 这只改变显存生命周期，不改变任何预测、梯度或优化结果。
+            spread = None
+            grad_spread = diag_spread = None
+            grad_da = diag_da = None
+            grad_rt_da = diag_rt_da = None
+            grad_rt = diag_rt = None
 
             def settle(da_value, rt_da_value, rt_value):
                 return settle_joint_episode(
@@ -1265,6 +1284,21 @@ def main():
                     for name in models
                 },
             })
+
+            del (
+                raw_batch, batch, outputs, p_da, p_rt_at_da, p_rt,
+                true_da, true_rt, reset, source_outputs, pred_loss,
+                pred_parts, base, proxy_parts, proxy_loss, diagnostics,
+                parameter_gradient_norms, loss, settle, spread,
+                grad_spread, diag_spread, grad_da, diag_da,
+                grad_rt_da, diag_rt_da, grad_rt, diag_rt,
+            )
+
+        # 验证会再次前向三个模型。先释放训练循环最后一批留下的 Python
+        # 循环引用和 CUDA 缓存，避免因缓存碎片在下一轮或验证阶段 OOM。
+        if device.type == "cuda":
+            gc.collect()
+            torch.cuda.empty_cache()
 
         validation = evaluate(
             models, val_ds, cfg, device, evaluation_amp_enabled, args.max_val_days

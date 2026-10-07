@@ -1,5 +1,5 @@
-# 项目最终合同：运行与退化成本κ=5.7 USD/MWh。
-# 启用偏差罚金：3%容忍，超额部分按2倍实时价格考核。
+# 正式三路active联合微调合同。
+# checkpoint由完整182日、972个组合的验证日均净收益重选得到；report-only未参与。
 market: ERCOT
 node: LZ_LCRA
 data_version: v3
@@ -30,16 +30,19 @@ bess_kappa: 5.7
 bess_soc_min: 0.4
 bess_soc_max: 3.6
 bess_e_cyc: 4.0
+
+# 新Huber起点政策网格中，能让DA、RT-at-DA、滚动RT三路均参与决策的
+# spread + RT-active类别最佳固定策略。
 topk_k_charge: 4
 topk_k_discharge: 4
 rt_topk_k_charge: 1
 rt_topk_k_discharge: 1
 topk_spread_threshold: 25.0
 
+# data/results/penalty_active_triplet_selection_v1.json的正式胜出组合。
 joint_da_checkpoint: data/checkpoints/da_fusion_ablation_v2_penalty/f1_seed1/pilot_LZ_LCRA_best_full_dual.pt
-joint_rt_at_da_checkpoint: data/checkpoints/rt_at_da_fusion_ablation/f1b_seed0/pilot_LZ_LCRA_best_full_dual.pt
-joint_rt_checkpoint: data/checkpoints/rt_fusion_ablation/f0_seed0/pilot_LZ_LCRA_best_full_dual.pt
-# 三个正式来源checkpoint的内嵌κ均为5.7；主实验要求物理合同严格一致。
+joint_rt_at_da_checkpoint: data/checkpoints/rt_at_da_fusion_ablation/f0_seed2/pilot_LZ_LCRA_best_full_dual.pt
+joint_rt_checkpoint: data/checkpoints/rt_fusion_ablation/f0_seed1/pilot_LZ_LCRA_best_full_dual.pt
 joint_allow_source_kappa_mismatch: false
 
 joint_episode_days: 16
@@ -57,8 +60,6 @@ joint_proxy_weight_rt: 1.0
 joint_proxy_reduction: global_sum
 
 joint_zo_direction_mode: orthogonal
-# 连续SOC使今天动作影响后续日收益；必须用完整episode效用回传，不能把
-# 当天收益误当成当天动作的全部后果。RT当前关闭，但仍把备用合同一并修正。
 joint_zo_feedback_mode: episode_scalar
 joint_zo_rt_feedback_mode: episode_scalar
 joint_zo_epsilon_spread: 5.0
@@ -69,7 +70,6 @@ zo_rho: 0.05
 zo_K: 2
 pred_clamp: [-500.0, 10000.0]
 
-# episode_scalar梯度已是完整episode目标梯度；scale=1后再由beta与grad_clip控制。
 joint_proxy_scale: 1.0
 joint_beta_start: 0.001
 joint_beta_end: 0.003
@@ -79,7 +79,6 @@ joint_tail_fraction: 0.10
 joint_selection_tail_weight: 0.0
 
 joint_trainable_scope: price_head
-# 三个Transformer保持相互独立，但共同接受完整双结算收益信号。
 joint_trainable_models: [da, rt_at_da, rt]
 joint_separate_optimizers: true
 joint_include_baseline_candidate: true
@@ -96,5 +95,5 @@ early_stop_patience: 3
 use_amp: true
 num_workers: 0
 seed: 0
-checkpoint_dir: data/checkpoints/joint_decision_aware_v3_penalty_kappa57_seed0
+checkpoint_dir: data/checkpoints/joint_decision_aware_v3_penalty_active_kappa57_seed0
 bootstrap_samples: 2000

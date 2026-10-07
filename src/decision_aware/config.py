@@ -232,6 +232,9 @@ class PilotConfig:
     # source_anchor必须和确定性基线输出比较；v2在微调时保持eval
     # 以关闭dropout，但不使用no_grad，因此price head仍正常反传。
     joint_disable_dropout: bool = False
+    # 极端RT批次会放大零阶收益代理的price-head梯度。正式罚金训练使用1.0，
+    # 保留float16前向的同时避免GradScaler再次放大反向梯度。
+    joint_amp_init_scale: float = 1.0
 
     # ── 路径 ─────────────────────────────────────────────────────────────────
     checkpoint_dir: str = "data/checkpoints/da_tsfm_pilot_v3"

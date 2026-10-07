@@ -90,3 +90,11 @@ configs/archive/              旧参数/结构消融配置
 ```
 
 环境依赖见 `requirements.txt` 和 `requirements-windows-cuda.txt`。
+
+## 相关开源仓库与文献入口
+
+- Chronos-2：[amazon-science/chronos-forecasting](https://github.com/amazon-science/chronos-forecasting)
+- TimesFM：[google-research/timesfm](https://github.com/google-research/timesfm)
+- Toto：[DataDog/toto](https://github.com/DataDog/toto)
+- 本项目已经收集的论文、每篇论文带来的思路以及下一阶段待读清单：
+  [`docs/reference/README.md`](docs/reference/README.md)

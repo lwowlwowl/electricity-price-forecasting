@@ -1,5 +1,9 @@
 #!/usr/bin/env python
-"""在同一182日、同一物理/结算合同下横向比较五类完整系统。"""
+"""在同一数据切分、同一物理/结算合同下横向比较五类完整系统。
+
+默认只读取validation。report-only必须显式指定并确认，且GRU仍然只用
+validation早停；report-only始终只负责冻结后的最终打分。
+"""
 from __future__ import annotations
 
 import argparse
@@ -314,10 +318,13 @@ def _cache_metadata(
     contract: dict,
     model: str,
     seed: int,
+    evaluation_split: str,
     extra: dict | None = None,
 ) -> dict:
     metadata = {
-        "format_version": 1,
+        # validation沿用v1元数据，避免让已经冻结的正式缓存无故失效；
+        # report-only使用v2并显式登记评估切分。
+        "format_version": 1 if evaluation_split == "validation" else 2,
         "model": model,
         "seed": seed,
         "market": cfg.market,
@@ -328,6 +335,11 @@ def _cache_metadata(
         "context_len": cfg.context_len,
         "horizon_rt": cfg.horizon_rt,
     }
+    if evaluation_split == "report_only":
+        metadata.update({
+            "evaluation_split": evaluation_split,
+            "report_only_bounds": list(cfg.split_bounds("test")),
+        })
     if extra:
         metadata.update(extra)
     return metadata
@@ -363,15 +375,16 @@ def _write_prediction_cache(path: Path, predictions: dict, metadata: dict):
 
 def _xgboost_predictions(
     train_dataset,
-    val_dataset,
+    evaluation_dataset,
     train_indices: dict,
     contract: dict,
     cfg: PilotConfig,
     seed: int,
     cache_dir: Path,
     force: bool,
+    evaluation_split: str,
 ) -> tuple[dict, dict]:
-    metadata = _cache_metadata(cfg, contract, "xgboost", seed, {
+    metadata = _cache_metadata(cfg, contract, "xgboost", seed, evaluation_split, {
         "parameters": {
             "n_estimators": 180,
             "max_depth": 5,
@@ -380,14 +393,16 @@ def _xgboost_predictions(
             "colsample_bytree": 0.7,
         }
     })
-    cache = cache_dir / f"xgboost_seed{seed}_validation_predictions.npz"
+    cache = cache_dir / (
+        f"xgboost_seed{seed}_{evaluation_split}_predictions.npz"
+    )
     if not force:
         predictions = _read_prediction_cache(cache, metadata)
         if predictions is not None:
             return predictions, {"cache": str(cache), "cache_hit": True}
 
     datasets_train = _task_datasets(train_dataset)
-    datasets_val = _task_datasets(val_dataset)
+    datasets_evaluation = _task_datasets(evaluation_dataset)
     predictions = {}
     task_seconds = {}
     for task in ("da", "rt_at_da", "rt"):
@@ -395,11 +410,11 @@ def _xgboost_predictions(
         X_train, y_train = baseline_dataset_to_numpy(
             datasets_train[task], task, train_indices[task]
         )
-        X_val, _ = baseline_dataset_to_numpy(
-            datasets_val[task], task, contract[f"{task}_indices"]
+        X_evaluation, _ = baseline_dataset_to_numpy(
+            datasets_evaluation[task], task, contract[f"{task}_indices"]
         )
         estimator = fit_joint_xgboost(X_train, y_train, seed)
-        values = estimator.predict(X_val).astype(np.float32)
+        values = estimator.predict(X_evaluation).astype(np.float32)
         if task == "rt":
             values = values.reshape(len(contract["dates"]), 24, -1)
         predictions[task] = values
@@ -408,7 +423,7 @@ def _xgboost_predictions(
             "event": "xgboost_task_complete", "seed": seed, "task": task,
             "seconds": task_seconds[task], "train_samples": len(X_train),
         }, ensure_ascii=False), flush=True)
-        del X_train, y_train, X_val, estimator
+        del X_train, y_train, X_evaluation, estimator
     _write_prediction_cache(cache, predictions, metadata)
     return predictions, {
         "cache": str(cache), "cache_hit": False, "task_seconds": task_seconds,
@@ -530,7 +545,8 @@ def _predict_gru_task(
 
 def _gru_predictions(
     train_dataset,
-    val_dataset,
+    selection_dataset,
+    evaluation_dataset,
     train_indices: dict,
     contract: dict,
     cfg: PilotConfig,
@@ -540,8 +556,9 @@ def _gru_predictions(
     device: torch.device,
     cache_dir: Path,
     force: bool,
+    evaluation_split: str,
 ) -> tuple[dict, dict]:
-    metadata = _cache_metadata(cfg, contract, "gru", seed, {
+    metadata = _cache_metadata(cfg, contract, "gru", seed, evaluation_split, {
         "parameters": {
             "hidden_size": 64,
             "max_epochs": epochs,
@@ -551,24 +568,26 @@ def _gru_predictions(
             "selection": "validation_price_mae",
         }
     })
-    cache = cache_dir / f"gru_seed{seed}_validation_predictions.npz"
+    cache = cache_dir / f"gru_seed{seed}_{evaluation_split}_predictions.npz"
     if not force:
         predictions = _read_prediction_cache(cache, metadata)
         if predictions is not None:
             return predictions, {"cache": str(cache), "cache_hit": True}
 
     datasets_train = _task_datasets(train_dataset)
-    datasets_val = _task_datasets(val_dataset)
+    datasets_selection = _task_datasets(selection_dataset)
+    datasets_evaluation = _task_datasets(evaluation_dataset)
+    selection_indices = _task_indices(selection_dataset)
     predictions = {}
     histories = {}
     for task in ("da", "rt_at_da", "rt"):
         model, history = _train_gru_task(
-            task, datasets_train[task], datasets_val[task],
-            train_indices[task], contract[f"{task}_indices"], device,
+            task, datasets_train[task], datasets_selection[task],
+            train_indices[task], selection_indices[task], device,
             seed, epochs, patience,
         )
         values = _predict_gru_task(
-            model, datasets_val[task], contract[f"{task}_indices"], device
+            model, datasets_evaluation[task], contract[f"{task}_indices"], device
         )
         if task == "rt":
             values = values.reshape(len(contract["dates"]), 24, -1)
@@ -714,7 +733,7 @@ def _settle_and_summarize(
 def _paired_difference(candidate: dict, baseline: dict, cfg: PilotConfig,
                        seed: int) -> dict:
     if list(candidate["daily_net_revenue"]) != list(baseline["daily_net_revenue"]):
-        raise ValueError("配对比较的验证日期不一致")
+        raise ValueError("配对比较的评估日期不一致")
     values = np.asarray([
         candidate["daily_net_revenue"][date]
         - baseline["daily_net_revenue"][date]
@@ -779,6 +798,19 @@ def _paired_seed_average_difference(
     }
 
 
+def _validate_evaluation_request(
+    evaluation_split: str,
+    confirm_report_only: bool,
+) -> None:
+    if evaluation_split == "report_only" and not confirm_report_only:
+        raise ValueError(
+            "report_only仅能在模型、策略和选模规则全部冻结后披露；"
+            "若已冻结，请同时传入--confirm-report-only"
+        )
+    if evaluation_split == "validation" and confirm_report_only:
+        raise ValueError("validation评估不应传入--confirm-report-only")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -811,7 +843,22 @@ def main() -> None:
     parser.add_argument("--force-baselines", action="store_true")
     parser.add_argument("--max-train-days", type=int, default=None)
     parser.add_argument("--max-validation-days", type=int, default=None)
+    parser.add_argument(
+        "--evaluation-split",
+        choices=("validation", "report_only"),
+        default="validation",
+        help="默认validation；report_only只允许在全部候选冻结后最终披露",
+    )
+    parser.add_argument(
+        "--confirm-report-only",
+        action="store_true",
+        help="确认模型、策略和选模规则均已冻结，允许读取report-only",
+    )
     args = parser.parse_args()
+
+    _validate_evaluation_request(
+        args.evaluation_split, args.confirm_report_only
+    )
 
     started_all = time.time()
     requested = [value.strip() for value in args.models.split(",") if value.strip()]
@@ -836,13 +883,20 @@ def main() -> None:
         task: _load_source_checkpoint(path) for task, path in source_paths.items()
     }
     reference_stats = source_checkpoints["da"]["norm_stats"]
-    train_dataset, val_dataset, _, _ = build_joint_datasets(
+    train_dataset, val_dataset, report_only_dataset, _ = build_joint_datasets(
         cfg, norm_stats=reference_stats
     )
     if args.max_train_days is not None:
         train_dataset = copy.copy(train_dataset)
         train_dataset.windows = train_dataset.windows[:args.max_train_days]
-    contract = _truth_and_contract(val_dataset, args.max_validation_days)
+    evaluation_dataset = (
+        val_dataset
+        if args.evaluation_split == "validation"
+        else report_only_dataset
+    )
+    contract = _truth_and_contract(
+        evaluation_dataset, args.max_validation_days
+    )
     train_indices = _task_indices(train_dataset)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     cache_dir = Path(args.cache_dir)
@@ -854,9 +908,10 @@ def main() -> None:
         "event": "comparison_contract",
         "device": str(device),
         "train_days": len(train_dataset),
-        "validation_days": len(contract["dates"]),
-        "validation_first": contract["dates"][0],
-        "validation_last": contract["dates"][-1],
+        "evaluation_split": args.evaluation_split,
+        "evaluation_days": len(contract["dates"]),
+        "evaluation_first": contract["dates"][0],
+        "evaluation_last": contract["dates"][-1],
         "models": requested,
         "baseline_seeds": baseline_seeds,
         "deviation_penalty_enabled": cfg.use_deviation_penalty,
@@ -865,7 +920,7 @@ def main() -> None:
         ),
         "coordination_mode": cfg.joint_coordination_mode,
         "da_signal_mode": cfg.joint_da_signal_mode,
-        "same_182_day_contract": len(contract["dates"]) == 182,
+        "report_only_explicitly_confirmed": bool(args.confirm_report_only),
     }, ensure_ascii=False), flush=True)
 
     def register(name: str, predictions: dict, seed: int, source: dict):
@@ -880,15 +935,16 @@ def main() -> None:
 
     if "seasonal" in requested:
         register(
-            "seasonal", _seasonal_predictions(val_dataset, contract), 0,
+            "seasonal", _seasonal_predictions(evaluation_dataset, contract), 0,
             {"type": "weekly_seasonal", "lag_hours": 168},
         )
 
     if "xgboost" in requested:
         for seed in baseline_seeds:
             predictions, details = _xgboost_predictions(
-                train_dataset, val_dataset, train_indices, contract, cfg, seed,
-                cache_dir, args.force_baselines,
+                train_dataset, evaluation_dataset, train_indices, contract,
+                cfg, seed, cache_dir, args.force_baselines,
+                args.evaluation_split,
             )
             name = f"xgboost_seed{seed}"
             register(name, predictions, seed, {
@@ -899,9 +955,10 @@ def main() -> None:
     if "gru" in requested:
         for seed in baseline_seeds:
             predictions, details = _gru_predictions(
-                train_dataset, val_dataset, train_indices, contract, cfg, seed,
+                train_dataset, val_dataset, evaluation_dataset, train_indices,
+                contract, cfg, seed,
                 args.gru_epochs, args.gru_patience, device, cache_dir,
-                args.force_baselines,
+                args.force_baselines, args.evaluation_split,
             )
             name = f"gru_seed{seed}"
             register(name, predictions, seed, {
@@ -912,7 +969,7 @@ def main() -> None:
     if "transformer_huber" in requested:
         models = _build_transformers(source_checkpoints, device)
         predictions = _predict_transformer_system(
-            models, val_dataset, contract, device
+            models, evaluation_dataset, contract, device
         )
         register("transformer_huber", predictions, 0, {
             "type": "three_frozen_pure_huber_transformers",
@@ -952,7 +1009,7 @@ def main() -> None:
                 bundle_source_checkpoints, device, bundle["model_states"]
             )
             predictions = _predict_transformer_system(
-                models, val_dataset, contract, device
+                models, evaluation_dataset, contract, device
             )
             training_cfg = bundle.get("experiment_config", {})
             name = f"transformer_v2_seed{seed}"
@@ -1022,18 +1079,31 @@ def main() -> None:
     report = {
         "experiment": "joint_system_baseline_comparison_v1",
         "status": "formal" if (
-            len(train_dataset) == 1808 and len(contract["dates"]) == 182
+            len(train_dataset) == 1808
+            and len(contract["dates"]) == len(evaluation_dataset)
         ) else "diagnostic_subset",
-        "primary_metric": "validation_full_dual_mean_daily_net_revenue_usd",
+        "evaluation_split": args.evaluation_split,
+        "split_role": (
+            "model_selection_and_validation"
+            if args.evaluation_split == "validation"
+            else "final_report_only_disclosure"
+        ),
+        "report_only_explicitly_confirmed": bool(args.confirm_report_only),
+        "primary_metric": (
+            f"{args.evaluation_split}_full_dual_mean_daily_net_revenue_usd"
+        ),
         "selection_note": (
             "本表只使用验证集；2026 report-only没有读取、没有参与训练或排名。"
+            if args.evaluation_split == "validation"
+            else "这是冻结后的最终report-only披露；不参与训练、调参、选模或排名变更。"
         ),
         "contract": {
             "market": cfg.market,
             "node": cfg.node,
             "train_days": len(train_dataset),
-            "validation_days": len(contract["dates"]),
-            "validation_dates": contract["dates"],
+            "evaluation_split": args.evaluation_split,
+            "evaluation_days": len(contract["dates"]),
+            "evaluation_dates": contract["dates"],
             "same_true_da_rt": True,
             "initial_soc_mwh_each_continuous_segment": float(
                 cfg.bess_energy_mwh * cfg.bess_init_soc_frac

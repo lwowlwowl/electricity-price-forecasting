@@ -1,0 +1,112 @@
+{
+  "experiment": "penalty_experiment_final_closure_kappa57",
+  "status": "closed",
+  "model_selection_frozen_before_report_only": true,
+  "report_only_used_for_training_tuning_or_reselection": false,
+  "primary_selection_split": "validation_2025-07-01_to_2025-12-30_182_days",
+  "final_disclosure_split": "report_only_2026-01-01_to_2026-05-31_150_days",
+  "contract": {
+    "market": "ERCOT",
+    "node": "LZ_LCRA",
+    "degradation_usd_per_mwh": 5.7,
+    "deviation_penalty_enabled": true,
+    "deviation_penalty_formula": "2*abs(RT_price)*max(abs(u_RT_actual-u_DA)-0.03*abs(u_DA),0)",
+    "continuous_soc": true,
+    "terminal_soc_monetized": false
+  },
+  "comparison_rows": [
+    {
+      "system": "seasonal",
+      "policy_family": "safe_da_only_follow_da",
+      "validation_mean_daily_revenue": 95.58438706136012,
+      "validation_seed_sample_std": 0.0,
+      "report_only_mean_daily_revenue": 62.88722718556722,
+      "report_only_seed_sample_std": 0.0
+    },
+    {
+      "system": "xgboost",
+      "policy_family": "safe_da_only_follow_da",
+      "validation_mean_daily_revenue": 97.31611867527386,
+      "validation_seed_sample_std": 0.6522557804520964,
+      "report_only_mean_daily_revenue": 62.4429153781467,
+      "report_only_seed_sample_std": 3.8624987971505127
+    },
+    {
+      "system": "gru",
+      "policy_family": "safe_da_only_follow_da",
+      "validation_mean_daily_revenue": 60.40672563109206,
+      "validation_seed_sample_std": 8.898390799218705,
+      "report_only_mean_daily_revenue": -6.525460898081463,
+      "report_only_seed_sample_std": 46.20393795836853
+    },
+    {
+      "system": "transformer_huber",
+      "policy_family": "safe_da_only_follow_da",
+      "validation_mean_daily_revenue": 83.70280732165327,
+      "validation_seed_sample_std": 0.0,
+      "report_only_mean_daily_revenue": 47.80370155334472,
+      "report_only_seed_sample_std": 0.0
+    },
+    {
+      "system": "transformer_v2",
+      "policy_family": "safe_da_only_follow_da",
+      "validation_mean_daily_revenue": 64.30881877696557,
+      "validation_seed_sample_std": 0.013313205007460327,
+      "report_only_mean_daily_revenue": 21.51980857955085,
+      "report_only_seed_sample_std": 0.5609314813229119
+    },
+    {
+      "system": "transformer_v3_penalty_active_joint",
+      "policy_family": "active_spread_plan_track_topk",
+      "validation_mean_daily_revenue": 50.45496142658518,
+      "validation_seed_sample_std": 0.3606922375310575,
+      "report_only_mean_daily_revenue": -72.80437916238388,
+      "report_only_seed_sample_std": 4.4662941253039605
+    },
+    {
+      "system": "transformer_v3_penalty_active_epoch0",
+      "policy_family": "active_spread_plan_track_topk",
+      "validation_mean_daily_revenue": 49.67329750871951,
+      "validation_seed_sample_std": 0.0,
+      "report_only_mean_daily_revenue": -67.80489749590556,
+      "report_only_seed_sample_std": 0.0
+    }
+  ],
+  "selection_frozen_on_validation": {
+    "winner": "xgboost",
+    "mean_daily_revenue": 97.31611867527386,
+    "note": "report-only不会改变这项预先冻结的选择"
+  },
+  "report_only_disclosure": {
+    "numerical_best": "seasonal",
+    "mean_daily_revenue": 62.88722718556722,
+    "active_joint_three_seed": {
+      "mean": -72.80437916238388,
+      "sample_std": 4.4662941253039605,
+      "members": [
+        -75.20285198617326,
+        -75.55903694468338,
+        -67.651248556295
+      ],
+      "seed_count": 3
+    },
+    "active_epoch0_mean_daily_revenue": -67.80489749590556,
+    "active_joint_minus_active_epoch0": -4.999481666478317
+  },
+  "conclusion": "偏差罚金版已完成与旧版相同的冻结验证、三seed和最终report-only闭环。安全策略验证冠军按预先规则冻结；active联合微调未形成样本外改善，不能据report-only回头调参。",
+  "artifacts": {
+    "safe_validation": "data/results/joint_system_baseline_comparison_validation_penalty_kappa57_final.json",
+    "safe_report_only": "data/results/joint_system_baseline_comparison_report_only_penalty_kappa57_final.json",
+    "active_training": [
+      "data/results/joint_decision_aware_v3_penalty_active_kappa57_seed0.json",
+      "data/results/joint_decision_aware_v3_penalty_active_kappa57_seed1.json",
+      "data/results/joint_decision_aware_v3_penalty_active_kappa57_seed2.json"
+    ],
+    "active_report_only": [
+      "data/results/joint_decision_aware_v3_penalty_active_kappa57_seed0_report_only_final.json",
+      "data/results/joint_decision_aware_v3_penalty_active_kappa57_seed1_report_only_final.json",
+      "data/results/joint_decision_aware_v3_penalty_active_kappa57_seed2_report_only_final.json"
+    ],
+    "active_epoch0_report_only": "data/results/joint_system_active_epoch0_report_only_penalty_kappa57_final.json"
+  }
+}

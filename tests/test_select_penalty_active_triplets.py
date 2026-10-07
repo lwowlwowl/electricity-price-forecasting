@@ -14,6 +14,8 @@ sys.path.insert(0, str(ROOT))
 
 from decision_aware.config import PilotConfig
 from scripts.decision_aware.select_penalty_active_triplets import (
+    DEFAULT_CANDIDATE_ROOTS,
+    _build_parser,
     _validate_active_contract,
     _write_new_json,
     evaluate_triplet_grid,
@@ -93,6 +95,52 @@ def test_active_contract_rejects_zero_rt_topk():
     cfg.rt_topk_k_charge = 0
     with pytest.raises(ValueError, match="K都大于0"):
         _validate_active_contract(cfg)
+
+
+def test_formal_selector_defaults_to_penalty_retrained_da_checkpoints():
+    args = _build_parser().parse_args([])
+
+    assert args.da_checkpoint_root == DEFAULT_CANDIDATE_ROOTS["da"]
+    assert args.da_checkpoint_root.endswith("da_fusion_ablation_v2_penalty")
+    assert args.rt_at_da_checkpoint_root == DEFAULT_CANDIDATE_ROOTS["rt_at_da"]
+    assert args.rt_checkpoint_root == DEFAULT_CANDIDATE_ROOTS["rt"]
+
+
+def test_formal_penalty_config_freezes_best_three_model_active_policy():
+    cfg = PilotConfig.from_yaml(
+        ROOT / "configs/decision_aware/joint_decision_aware_v3_penalty.yaml"
+    )
+
+    assert cfg.use_deviation_penalty is True
+    assert cfg.bess_kappa == pytest.approx(5.7)
+    assert cfg.joint_da_signal_mode == "spread"
+    assert cfg.joint_coordination_mode == "plan_track_topk"
+    assert (cfg.topk_k_charge, cfg.topk_k_discharge) == (4, 4)
+    assert (cfg.rt_topk_k_charge, cfg.rt_topk_k_discharge) == (1, 1)
+    assert cfg.topk_spread_threshold == pytest.approx(25.0)
+    assert cfg.joint_allow_source_kappa_mismatch is False
+
+
+def test_active_training_config_freezes_formal_selected_triplet():
+    cfg = PilotConfig.from_yaml(
+        ROOT / "configs/decision_aware/"
+        "joint_decision_aware_v3_penalty_active_kappa57.yaml"
+    )
+
+    assert cfg.joint_da_checkpoint.endswith(
+        "da_fusion_ablation_v2_penalty/f1_seed1/"
+        "pilot_LZ_LCRA_best_full_dual.pt"
+    )
+    assert cfg.joint_rt_at_da_checkpoint.endswith(
+        "rt_at_da_fusion_ablation/f0_seed2/"
+        "pilot_LZ_LCRA_best_full_dual.pt"
+    )
+    assert cfg.joint_rt_checkpoint.endswith(
+        "rt_fusion_ablation/f0_seed1/pilot_LZ_LCRA_best_full_dual.pt"
+    )
+    assert cfg.joint_trainable_models == ["da", "rt_at_da", "rt"]
+    assert cfg.joint_include_baseline_candidate is True
+    assert cfg.joint_amp_init_scale == pytest.approx(1.0)
 
 
 def test_new_json_writer_refuses_to_overwrite(tmp_path: Path):

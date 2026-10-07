@@ -323,4 +323,4 @@ train.py 两阶段训练逻辑（Stage 1 冻结底层训 spike head → Stage 2 
 | 融合模型配置 | `configs/fusion/` |
 | 实验结果 | `data/results/` |
 | Checkpoint | `data/checkpoints/` |
-| 参考论文 | `docs/reference/main.pdf`（Lago 2021）+ `docs/reference/old_main.pdf`（Weron 2014）|
+| 参考论文 | `docs/reference/1.pdf`（Lago 2021）+ `docs/reference/2.pdf`（Weron 2014）|

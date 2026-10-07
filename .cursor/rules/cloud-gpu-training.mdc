@@ -1,0 +1,14 @@
+---
+description: AutoDL云GPU配置与长时间计算的执行偏好
+alwaysApply: true
+---
+
+# AutoDL云GPU
+
+- 如果预计本地训练或批量评估需要较长等待（通常超过10分钟），或者要运行多seed、全量XGBoost/GRU/Transformer训练，开始前主动建议使用AutoDL云GPU，并给出大致时间与费用估算。
+- 短小只读检查、单元测试和分钟级推理优先在本地执行；不要为很小的任务启动付费云实例。
+- 已有AutoDL实例的已知配置：重庆A区038机，实例ID `a8f742b5ee-2c62264b`；RTX 4090D 24GB×1；15 vCPU Intel Xeon Platinum 8474C；内存80GB；系统盘30GB；数据盘50GB SSD；PyTorch 2.8.0；Python 3.12；Ubuntu 22.04；CUDA 12.8；约1.88元/小时。
+- 上次使用的SSH入口为 `ssh -p 25855 root@connect.cqa1.seetacloud.com`。实例重启后必须先核对控制台当前SSH地址、端口和状态，不能假设入口永久不变。
+- 不在仓库规则、日志或文档中保存SSH密码、私钥或其他凭据。
+- 云端长任务使用可续跑checkpoint、独立日志和明确输出目录；训练完成后先校验并下载结果，再提醒关闭实例节省费用。
+- 电脑关机不影响已在云容器中独立启动的任务，前提是云实例保持运行且任务不是依附本地SSH前台会话；优先使用 `tmux`、`screen` 或 `nohup`。
