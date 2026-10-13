@@ -1,0 +1,45 @@
+{
+  "status": "complete",
+  "year": 2024,
+  "retrained": false,
+  "selection_allowed": false,
+  "checkpoint_training_years": [
+    2020,
+    2021,
+    2022
+  ],
+  "checkpoint_training_markets": [
+    "CAISO",
+    "NYISO",
+    "PJM"
+  ],
+  "baseline_training_years": [
+    2020,
+    2021,
+    2022,
+    2023
+  ],
+  "baseline_saw_target_market": true,
+  "equal_training_data_comparison": false,
+  "days": 363,
+  "nodes": 15,
+  "universal_usd_per_node_day": 73.37555847744397,
+  "xgboost_usd_per_node_day": 90.69091958351444,
+  "paired": {
+    "mean_daily_revenue_difference": -17.31536110607046,
+    "7day_block_bootstrap_95ci": [
+      -30.855680255664904,
+      -5.056144796061008
+    ]
+  },
+  "positive_mean_difference": false,
+  "paired_95ci_entirely_above_zero": false,
+  "total_soc_violations": 0,
+  "locked_2025_evaluated": false,
+  "limits": [
+    "Single seed; no claim of seed stability",
+    "ERCOT settlement only; other markets have prediction evidence only",
+    "LOMO validation-selected checkpoints; not an untouched-market test",
+    "Three independent models; no joint-profit retraining in this check"
+  ]
+}

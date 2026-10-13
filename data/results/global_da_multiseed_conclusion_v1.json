@@ -1,0 +1,56 @@
+{
+  "experiment": "ercot_global_da_antiblend_multiseed_conclusion",
+  "status": "2023_inner_validation_candidate_not_final",
+  "selection_allowed": true,
+  "outer_test_used": false,
+  "formula": "p_da = 1.20 * p_xgboost - 0.20 * p_global",
+  "baseline": {
+    "name": "xgboost_robust_three_task",
+    "macro_mean_daily_revenue": 292.2892646773067
+  },
+  "candidates": {
+    "seed0": {
+      "global_da_macro_mae": 41.51444327237959,
+      "macro_mean_daily_revenue": 298.28486252575897,
+      "difference_vs_baseline": 5.99559784845226,
+      "paired_7day_block_bootstrap_95ci": [-3.2662066453017276, 16.28286560170412]
+    },
+    "seed1": {
+      "global_da_macro_mae": 43.05984102347812,
+      "macro_mean_daily_revenue": 279.78289305360664,
+      "difference_vs_baseline": -12.506371623700046,
+      "paired_7day_block_bootstrap_95ci": [-21.738953732468836, -4.501617556381915]
+    },
+    "seed2": {
+      "global_da_macro_mae": 40.60109080926774,
+      "macro_mean_daily_revenue": 278.7786867566218,
+      "difference_vs_baseline": -13.51057792068483,
+      "paired_7day_block_bootstrap_95ci": [-21.34050257608996, -7.3437629676395515]
+    },
+    "equal_weight_global_seed_ensemble": {
+      "macro_mean_daily_revenue": 291.28237499303947,
+      "difference_vs_baseline": -1.0068896842671857,
+      "paired_7day_block_bootstrap_95ci": [-4.594008483847569, 3.069864207336089],
+      "macro_positive_day_rate": 0.7817679558011049,
+      "node_positive_mean_revenue_rate": 1.0,
+      "worst_node_mean_daily_revenue": 238.4554513584631,
+      "best_node_mean_daily_revenue": 325.210282785688
+    }
+  },
+  "single_seed_revenue_summary": {
+    "mean": 285.6154807786625,
+    "sample_standard_deviation": 10.983489106926463
+  },
+  "decision": {
+    "passes_multiseed_gate": false,
+    "promote_to_outer_2024": false,
+    "current_inner_validation_champion": "xgboost_robust_three_task",
+    "reason": "seed0 improvement did not reproduce for seeds 1 and 2; the three-seed prediction ensemble also remained below the robust XGBoost baseline"
+  },
+  "source_results": [
+    "data/results/global_da_antiblend_peak_continuous_mpc_v1.json",
+    "data/results/global_da_seed1_antiblend_continuous_mpc_v1.json",
+    "data/results/global_da_seed2_antiblend_continuous_mpc_v1.json",
+    "data/results/global_da_ensemble_antiblend_continuous_mpc_v1.json"
+  ]
+}

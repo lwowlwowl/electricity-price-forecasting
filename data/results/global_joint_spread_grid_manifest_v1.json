@@ -1,0 +1,27 @@
+{
+  "experiment": "global_joint_spread_grid_candidate_manifest_v1",
+  "phase": "inner",
+  "selection_rule": "full dual-settlement comparison on 2023 inner validation",
+  "families": {
+    "jointspread_a": {
+      "da": "data/checkpoints/global_joint_spread_grid_v1/jointspread_a/da.pt",
+      "rt_at_da": "data/checkpoints/global_joint_spread_grid_v1/jointspread_a/rt_at_da.pt",
+      "rt": "data/checkpoints/global_joint_spread_grid_v1/jointspread_a/rt.pt"
+    },
+    "jointspread_b": {
+      "da": "data/checkpoints/global_joint_spread_grid_v1/jointspread_b/da.pt",
+      "rt_at_da": "data/checkpoints/global_joint_spread_grid_v1/jointspread_b/rt_at_da.pt",
+      "rt": "data/checkpoints/global_joint_spread_grid_v1/jointspread_b/rt.pt"
+    },
+    "jointspread_c": {
+      "da": "data/checkpoints/global_joint_spread_grid_v1/jointspread_c/da.pt",
+      "rt_at_da": "data/checkpoints/global_joint_spread_grid_v1/jointspread_c/rt_at_da.pt",
+      "rt": "data/checkpoints/global_joint_spread_grid_v1/jointspread_c/rt.pt"
+    },
+    "jointspread_d": {
+      "da": "data/checkpoints/global_joint_spread_grid_v1/jointspread_d/da.pt",
+      "rt_at_da": "data/checkpoints/global_joint_spread_grid_v1/jointspread_d/rt_at_da.pt",
+      "rt": "data/checkpoints/global_joint_spread_grid_v1/jointspread_d/rt.pt"
+    }
+  }
+}

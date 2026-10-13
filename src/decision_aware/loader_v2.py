@@ -56,6 +56,67 @@ def resolve_ercot_unified_path() -> str:
     return resolve_market_unified_path("ERCOT")
 
 
+def _prepare_market_node(raw_df: pd.DataFrame,
+                         market: str,
+                         node: str,
+                         start: str,
+                         end: str,
+                         dropna: bool,
+                         include_weather: bool) -> pd.DataFrame:
+    """从已加载的只读市场表构造一个节点宽表。"""
+    df = raw_df[raw_df["node"] == node].copy()
+    if df.empty:
+        raise ValueError(f"{market} 数据中找不到节点 {node!r}")
+    df["timestamp_utc"] = pd.to_datetime(df["timestamp_utc"], utc=True)
+    df["timestamp_local"] = (
+        pd.to_datetime(df["timestamp_local"], utc=True)
+        .dt.tz_convert(market_timezone(market))
+    )
+    df = df.set_index("timestamp_utc").sort_index()
+    out = pd.DataFrame({
+        "price_da": df["day_ahead_price_usd_mwh"].astype(float),
+        "price_rt": df["real_time_price_usd_mwh"].astype(float),
+        "load": df["actual_load_mw"].astype(float),
+        "wind": df["wind_actual_mw"].astype(float),
+        "solar": df["solar_actual_mw"].astype(float),
+    })
+    local_idx = pd.DatetimeIndex(df["timestamp_local"])
+    hour = local_idx.hour
+    dow = local_idx.dayofweek
+    month = local_idx.month
+    out["hour_sin"] = np_sin(hour, 24)
+    out["hour_cos"] = np_cos(hour, 24)
+    out["dow_sin"] = np_sin(dow, 7)
+    out["dow_cos"] = np_cos(dow, 7)
+    out["month_sin"] = np_sin(month - 1, 12)
+    out["month_cos"] = np_cos(month - 1, 12)
+    out["is_weekend"] = df["is_weekend"].astype(float).values
+    out["is_holiday"] = df["is_holiday"].astype(float).values
+    if include_weather:
+        weather_cols = [
+            "actual_temperature_2m_c", "actual_relative_humidity_2m_pct",
+            "actual_dew_point_2m_c", "actual_surface_pressure_hpa",
+            "actual_cloud_cover_pct", "actual_precipitation_mm",
+            "actual_wind_speed_10m_ms", "actual_wind_gusts_10m_ms",
+            "actual_shortwave_radiation_wm2",
+            "forecast_temperature_2m_c", "forecast_relative_humidity_2m_pct",
+            "forecast_dew_point_2m_c", "forecast_cloud_cover_pct",
+            "forecast_precipitation_mm", "forecast_wind_speed_10m_ms",
+            "forecast_wind_gust_10m_ms", "forecast_shortwave_radiation_wm2",
+        ]
+        for col in weather_cols:
+            if col in df.columns:
+                out[col] = df[col].astype(float).values
+    if start:
+        out = out[out.index >= pd.Timestamp(start, tz="UTC")]
+    if end:
+        out = out[out.index <= pd.Timestamp(end, tz="UTC")]
+    if dropna:
+        out = out.dropna()
+    out.index.name = "timestamp_utc"
+    return out
+
+
 def load_market_unified(market: str,
                         node: str,
                         start: str = "2020-01-01",
@@ -72,65 +133,40 @@ def load_market_unified(market: str,
       8 列 forecast_* +24h 天气预测值。
     """
     market = market.upper()
-    df = pd.read_parquet(resolve_market_unified_path(market))
-    # 筛节点
-    df = df[df["node"] == node].copy()
-    if df.empty:
-        raise ValueError(f"{market} 数据中找不到节点 {node!r}")
-    # 以 UTC 索引保证全表按绝对时间排序
-    df["timestamp_utc"] = pd.to_datetime(df["timestamp_utc"], utc=True)
-    df["timestamp_local"] = (
-        pd.to_datetime(df["timestamp_local"], utc=True)
-        .dt.tz_convert(market_timezone(market))
+    raw_df = pd.read_parquet(resolve_market_unified_path(market))
+    return _prepare_market_node(
+        raw_df, market, node, start, end, dropna, include_weather
     )
-    df = df.set_index("timestamp_utc").sort_index()
-    # 重命名为统一列名
-    out = pd.DataFrame({
-        "price_da": df["day_ahead_price_usd_mwh"].astype(float),
-        "price_rt": df["real_time_price_usd_mwh"].astype(float),
-        "load": df["actual_load_mw"].astype(float),
-        "wind": df["wind_actual_mw"].astype(float),
-        "solar": df["solar_actual_mw"].astype(float),
-    })
-    # Calendar：从 ERCOT 本地时间而不是 UTC 派生，避免日/周周期与市场运行时钟错位。
-    local_idx = pd.DatetimeIndex(df["timestamp_local"])
-    hour = local_idx.hour
-    dow = local_idx.dayofweek
-    month = local_idx.month
-    out["hour_sin"] = np_sin(hour, 24)
-    out["hour_cos"] = np_cos(hour, 24)
-    out["dow_sin"] = np_sin(dow, 7)
-    out["dow_cos"] = np_cos(dow, 7)
-    out["month_sin"] = np_sin(month - 1, 12)
-    out["month_cos"] = np_cos(month - 1, 12)
-    # 与原表标志交叉一致；保留原始标签避免依赖时区转换边界。
-    out["is_weekend"] = df["is_weekend"].astype(float).values
-    out["is_holiday"] = df["is_holiday"].astype(float).values
-    # 天气列（可选）
-    if include_weather:
-        weather_cols = [
-            "actual_temperature_2m_c", "actual_relative_humidity_2m_pct",
-            "actual_dew_point_2m_c", "actual_surface_pressure_hpa",
-            "actual_cloud_cover_pct", "actual_precipitation_mm",
-            "actual_wind_speed_10m_ms", "actual_wind_gusts_10m_ms",
-            "actual_shortwave_radiation_wm2",
-            "forecast_temperature_2m_c", "forecast_relative_humidity_2m_pct",
-            "forecast_dew_point_2m_c", "forecast_cloud_cover_pct",
-            "forecast_precipitation_mm", "forecast_wind_speed_10m_ms",
-            "forecast_wind_gust_10m_ms", "forecast_shortwave_radiation_wm2",
-        ]
-        for col in weather_cols:
-            if col in df.columns:
-                out[col] = df[col].astype(float).values
-    # 时间裁剪
-    if start:
-        out = out[out.index >= pd.Timestamp(start, tz="UTC")]
-    if end:
-        out = out[out.index <= pd.Timestamp(end, tz="UTC")]
-    if dropna:
-        out = out.dropna()
-    out.index.name = "timestamp_utc"
-    return out
+
+
+def load_market_unified_nodes(market: str,
+                              nodes: list[str] | tuple[str, ...],
+                              start: str = "2020-01-01",
+                              end: str = "2026-06-02",
+                              dropna: bool = True,
+                              include_weather: bool = False,
+                              read_end_utc: str | None = None,
+                              ) -> dict[str, pd.DataFrame]:
+    """只读一次市场Parquet，返回多个节点宽表。"""
+    market = market.upper()
+    if not nodes:
+        raise ValueError("nodes不能为空")
+    if len(set(nodes)) != len(nodes):
+        raise ValueError("nodes不能包含重复节点")
+    # Predicate pushdown keeps locked future labels out of the loaded table.
+    read_options = {}
+    if read_end_utc is not None:
+        cutoff = pd.Timestamp(read_end_utc)
+        if cutoff.tzinfo is None:
+            raise ValueError("read_end_utc必须包含时区")
+        read_options["filters"] = [("timestamp_utc", "<", cutoff.tz_convert("UTC"))]
+    raw_df = pd.read_parquet(resolve_market_unified_path(market), **read_options)
+    return {
+        node: _prepare_market_node(
+            raw_df, market, node, start, end, dropna, include_weather
+        )
+        for node in nodes
+    }
 
 
 def load_ercot_unified(node: str = "LZ_LCRA",

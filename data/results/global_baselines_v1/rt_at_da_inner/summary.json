@@ -1,0 +1,318 @@
+{
+  "task": "rt_at_da",
+  "phase": "inner",
+  "smoke_only": false,
+  "nodes": [
+    "HB_BUSAVG",
+    "HB_HOUSTON",
+    "HB_HUBAVG",
+    "HB_NORTH",
+    "HB_PAN",
+    "HB_SOUTH",
+    "HB_WEST",
+    "LZ_AEN",
+    "LZ_CPS",
+    "LZ_HOUSTON",
+    "LZ_LCRA",
+    "LZ_NORTH",
+    "LZ_RAYBN",
+    "LZ_SOUTH",
+    "LZ_WEST"
+  ],
+  "contract_hash": "0c5956fb9fd24b5774b6fbdb066a202b17572fa57d012c67bf7354ce7c7d8dd6",
+  "entity_mapping_hash": "2dca4b8cfae5d7d8f88d9d0a23d328aaeea7ba4ea6685b27336d1d01389160e9",
+  "models": {
+    "seasonal": {
+      "macro_mae": 50.60180357430862,
+      "macro_rmse": 273.6581895266655,
+      "node_count": 15,
+      "nodes": {
+        "HB_BUSAVG": {
+          "mae": 47.3168579758763,
+          "rmse": 269.35610360087736,
+          "samples": 363
+        },
+        "HB_HOUSTON": {
+          "mae": 47.8846143200129,
+          "rmse": 272.60702968527886,
+          "samples": 363
+        },
+        "HB_HUBAVG": {
+          "mae": 47.884349539887,
+          "rmse": 268.0337726429174,
+          "samples": 363
+        },
+        "HB_NORTH": {
+          "mae": 48.168692311379836,
+          "rmse": 276.04171401352824,
+          "samples": 363
+        },
+        "HB_PAN": {
+          "mae": 53.345649849138326,
+          "rmse": 275.9114694934036,
+          "samples": 363
+        },
+        "HB_SOUTH": {
+          "mae": 44.1693298395428,
+          "rmse": 252.28541043866412,
+          "samples": 363
+        },
+        "HB_WEST": {
+          "mae": 54.775894399454515,
+          "rmse": 276.565942556592,
+          "samples": 363
+        },
+        "LZ_AEN": {
+          "mae": 55.29929653283706,
+          "rmse": 295.9400290639224,
+          "samples": 363
+        },
+        "LZ_CPS": {
+          "mae": 49.360600285596924,
+          "rmse": 280.557352983127,
+          "samples": 363
+        },
+        "LZ_HOUSTON": {
+          "mae": 48.110187457620206,
+          "rmse": 271.9810946275844,
+          "samples": 363
+        },
+        "LZ_LCRA": {
+          "mae": 53.03990051498595,
+          "rmse": 290.7180967333427,
+          "samples": 363
+        },
+        "LZ_NORTH": {
+          "mae": 48.542030521173224,
+          "rmse": 276.5600990444884,
+          "samples": 363
+        },
+        "LZ_RAYBN": {
+          "mae": 48.85373265950295,
+          "rmse": 277.41507209321554,
+          "samples": 363
+        },
+        "LZ_SOUTH": {
+          "mae": 43.5204792967874,
+          "rmse": 235.2431417710939,
+          "samples": 363
+        },
+        "LZ_WEST": {
+          "mae": 68.75543811083391,
+          "rmse": 285.6565141519471,
+          "samples": 363
+        }
+      },
+      "elapsed_seconds": 0.7438005000003614,
+      "protocol": "weekly_lag_168"
+    },
+    "xgboost": {
+      "macro_mae": 76.71998533438764,
+      "macro_rmse": 252.36489610576612,
+      "node_count": 15,
+      "nodes": {
+        "HB_BUSAVG": {
+          "mae": 74.34867488509619,
+          "rmse": 250.11096928538697,
+          "samples": 363
+        },
+        "HB_HOUSTON": {
+          "mae": 80.29268088177818,
+          "rmse": 265.74485024217506,
+          "samples": 363
+        },
+        "HB_HUBAVG": {
+          "mae": 74.90584361801491,
+          "rmse": 244.92692240374996,
+          "samples": 363
+        },
+        "HB_NORTH": {
+          "mae": 77.15890066042623,
+          "rmse": 256.37393651008426,
+          "samples": 363
+        },
+        "HB_PAN": {
+          "mae": 66.82785712977851,
+          "rmse": 245.6123772470713,
+          "samples": 363
+        },
+        "HB_SOUTH": {
+          "mae": 72.37362266358988,
+          "rmse": 230.2896974350944,
+          "samples": 363
+        },
+        "HB_WEST": {
+          "mae": 73.89447359106394,
+          "rmse": 249.5189160838757,
+          "samples": 363
+        },
+        "LZ_AEN": {
+          "mae": 80.26722814603389,
+          "rmse": 265.92431598012075,
+          "samples": 363
+        },
+        "LZ_CPS": {
+          "mae": 74.44063910280272,
+          "rmse": 248.13499019479264,
+          "samples": 363
+        },
+        "LZ_HOUSTON": {
+          "mae": 81.26340717216799,
+          "rmse": 267.06120557041186,
+          "samples": 363
+        },
+        "LZ_LCRA": {
+          "mae": 80.59666089965314,
+          "rmse": 267.5643707471443,
+          "samples": 363
+        },
+        "LZ_NORTH": {
+          "mae": 76.8633994940371,
+          "rmse": 250.92613780667781,
+          "samples": 363
+        },
+        "LZ_RAYBN": {
+          "mae": 80.46010363896796,
+          "rmse": 259.3107039899184,
+          "samples": 363
+        },
+        "LZ_SOUTH": {
+          "mae": 68.99014980578625,
+          "rmse": 222.82427925625663,
+          "samples": 363
+        },
+        "LZ_WEST": {
+          "mae": 88.11613832661766,
+          "rmse": 261.14976883373214,
+          "samples": 363
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 219.81335140000738,
+      "last_run_elapsed_seconds": 219.81335140000738,
+      "last_run_computed_nodes": [
+        "HB_BUSAVG",
+        "HB_NORTH",
+        "HB_HUBAVG",
+        "HB_HOUSTON",
+        "HB_PAN",
+        "HB_WEST",
+        "HB_SOUTH",
+        "LZ_AEN",
+        "LZ_CPS",
+        "LZ_HOUSTON",
+        "LZ_LCRA",
+        "LZ_NORTH",
+        "LZ_RAYBN",
+        "LZ_SOUTH",
+        "LZ_WEST"
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "local_per_node_xgboost"
+    },
+    "xgboost_pseudohuber": {
+      "macro_mae": 35.22886450753019,
+      "macro_rmse": 226.9401413729527,
+      "node_count": 15,
+      "nodes": {
+        "HB_BUSAVG": {
+          "mae": 33.263396686706386,
+          "rmse": 224.1152818876077,
+          "samples": 363
+        },
+        "HB_HOUSTON": {
+          "mae": 33.98973634988987,
+          "rmse": 228.12894190269833,
+          "samples": 363
+        },
+        "HB_HUBAVG": {
+          "mae": 33.80300647849326,
+          "rmse": 223.21571910097646,
+          "samples": 363
+        },
+        "HB_NORTH": {
+          "mae": 33.62389920548122,
+          "rmse": 230.74221927869777,
+          "samples": 363
+        },
+        "HB_PAN": {
+          "mae": 37.27887103139365,
+          "rmse": 229.73790329428815,
+          "samples": 363
+        },
+        "HB_SOUTH": {
+          "mae": 30.87028207105601,
+          "rmse": 207.72976694871525,
+          "samples": 363
+        },
+        "HB_WEST": {
+          "mae": 37.64637859700655,
+          "rmse": 230.17896569442783,
+          "samples": 363
+        },
+        "LZ_AEN": {
+          "mae": 38.10920164591717,
+          "rmse": 242.09213763435272,
+          "samples": 363
+        },
+        "LZ_CPS": {
+          "mae": 34.27457675412141,
+          "rmse": 232.14493350487714,
+          "samples": 363
+        },
+        "LZ_HOUSTON": {
+          "mae": 33.77213827653139,
+          "rmse": 227.45254048143286,
+          "samples": 363
+        },
+        "LZ_LCRA": {
+          "mae": 36.745730790854054,
+          "rmse": 238.56955070192674,
+          "samples": 363
+        },
+        "LZ_NORTH": {
+          "mae": 34.238146049707815,
+          "rmse": 231.01767317082096,
+          "samples": 363
+        },
+        "LZ_RAYBN": {
+          "mae": 34.41779924417561,
+          "rmse": 232.52702879599553,
+          "samples": 363
+        },
+        "LZ_SOUTH": {
+          "mae": 30.07847953914546,
+          "rmse": 191.42279210251343,
+          "samples": 363
+        },
+        "LZ_WEST": {
+          "mae": 46.321324892473044,
+          "rmse": 235.02666609495878,
+          "samples": 363
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 556.0338940999936,
+      "last_run_elapsed_seconds": 556.0338940999936,
+      "last_run_computed_nodes": [
+        "HB_HOUSTON",
+        "HB_BUSAVG",
+        "HB_HUBAVG",
+        "HB_NORTH",
+        "HB_PAN",
+        "HB_SOUTH",
+        "LZ_AEN",
+        "HB_WEST",
+        "LZ_HOUSTON",
+        "LZ_CPS",
+        "LZ_LCRA",
+        "LZ_NORTH",
+        "LZ_RAYBN",
+        "LZ_SOUTH",
+        "LZ_WEST"
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "local_per_node_xgboost_pseudohuber"
+    }
+  }
+}

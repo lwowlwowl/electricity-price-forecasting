@@ -1,0 +1,23 @@
+{
+  "name": "cloud_global_inner_seed0_screen_v1",
+  "formal_result": false,
+  "purpose": "seed-0 low-budget architecture screening before full inner selection",
+  "market": "ERCOT",
+  "train_stage": "2020-01-01/2022-12-31",
+  "validation_stage": "2023-01-01/2023-12-31",
+  "seed": 0,
+  "epochs_per_run": 3,
+  "selection_metric": "node-equal macro MAE",
+  "sequential_gpu_runs": true,
+  "tasks": ["da", "rt_at_da", "rt"],
+  "configurations": [
+    "configs/decision_aware/global_ercot_huber_f0_v1.yaml",
+    "configs/decision_aware/global_ercot_huber_v1.yaml"
+  ],
+  "notes": [
+    "The six runs have independent models, optimizers, and checkpoint directories.",
+    "Every epoch evaluates the full 2023 validation year.",
+    "This screen cannot be reported as a final model comparison.",
+    "latest.pt is retained so a selected run can be extended with --resume."
+  ]
+}

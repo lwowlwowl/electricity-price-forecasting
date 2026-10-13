@@ -708,6 +708,8 @@ def solve_dual_penalty_milp_day(
     simulator: BESSSimulator,
     *,
     sample_index: int = -1,
+    initial_plan_soc_mwh: float | None = None,
+    initial_actual_soc_mwh: float | None = None,
 ) -> DualMILPOracleResult:
     """Solve the exact joint DA/RT Oracle for one settlement day.
 
@@ -732,7 +734,17 @@ def solve_dual_penalty_milp_day(
 
     horizon = int(da.size)
     power_energy = float(simulator.P * simulator.dt)
-    initial_soc = float(simulator.E * simulator.init_soc_frac)
+    default_initial_soc = float(simulator.E * simulator.init_soc_frac)
+    initial_plan_soc = float(
+        default_initial_soc
+        if initial_plan_soc_mwh is None
+        else initial_plan_soc_mwh
+    )
+    initial_actual_soc = float(
+        default_initial_soc
+        if initial_actual_soc_mwh is None
+        else initial_actual_soc_mwh
+    )
     eta = float(simulator.eta)
     soc_min = float(simulator.s_min)
     soc_max = float(simulator.s_max)
@@ -742,8 +754,12 @@ def solve_dual_penalty_milp_day(
         raise ValueError("MILP Oracle要求正的功率、步长和效率")
     if cycle_limit < 0.0 or soc_min > soc_max:
         raise ValueError("MILP Oracle收到无效的循环或SOC边界")
-    if not soc_min - 1e-9 <= initial_soc <= soc_max + 1e-9:
-        raise ValueError("初始SOC超出SOC上下限")
+    for label, value in (
+        ("initial_plan_soc_mwh", initial_plan_soc),
+        ("initial_actual_soc_mwh", initial_actual_soc),
+    ):
+        if not soc_min - 1e-9 <= value <= soc_max + 1e-9:
+            raise ValueError(f"{label}超出SOC上下限")
 
     # Variable order per H-vector:
     #   DA discharge, DA charge, RT discharge, RT charge,
@@ -792,7 +808,10 @@ def solve_dual_penalty_milp_day(
         row_upper.append(float(upper))
 
     # Separate planned and actual SOC trajectories.
-    for discharge_slice, charge_slice in ((dd, dc), (rd, rc)):
+    for discharge_slice, charge_slice, initial_soc in (
+        (dd, dc, initial_plan_soc),
+        (rd, rc, initial_actual_soc),
+    ):
         for step in range(horizon):
             row = np.zeros(variable_count, dtype=np.float64)
             row[discharge_slice.start:discharge_slice.start + step + 1] = -1.0 / eta
@@ -897,7 +916,7 @@ def solve_dual_penalty_milp_day(
         - deviation_penalty
     )
 
-    def soc_path(discharge, charge):
+    def soc_path(discharge, charge, initial_soc):
         changes = -discharge / eta + charge * eta
         return np.concatenate(([initial_soc], initial_soc + np.cumsum(changes)))
 
@@ -906,8 +925,8 @@ def solve_dual_penalty_milp_day(
         da_charge_mwh=da_charge,
         rt_discharge_mwh=rt_discharge,
         rt_charge_mwh=rt_charge,
-        da_soc_path_mwh=soc_path(da_discharge, da_charge),
-        rt_soc_path_mwh=soc_path(rt_discharge, rt_charge),
+        da_soc_path_mwh=soc_path(da_discharge, da_charge, initial_plan_soc),
+        rt_soc_path_mwh=soc_path(rt_discharge, rt_charge, initial_actual_soc),
         deviation_mwh=deviation,
         tolerance_mwh=tolerance,
         excess_mwh=excess,

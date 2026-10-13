@@ -1,0 +1,29 @@
+{
+  "protocol": "leave_one_market_out_zero_shot",
+  "task": "rt_at_da",
+  "holdout_market": "CAISO",
+  "training_markets": [
+    "ERCOT",
+    "NYISO",
+    "PJM"
+  ],
+  "uses_node_id_for_prediction": false,
+  "uses_market_id_for_prediction": false,
+  "normalization_mode": "context_robust",
+  "checkpoint": "data/checkpoints/universal_lomo_holdout_caiso_rt_at_da_v1/rt_at_da_inner_seed0/best.pt",
+  "checkpoint_sha256": "d4df6760934faeb8b1f958860d5b4b5d6d48dd024152f450d438861e6e65405a",
+  "node_macro_mae": 21.03159014383952,
+  "node_macro_rmse": 34.68092409769694,
+  "per_node_mae": {
+    "TH_NP15_GEN-APND": 17.44040870666504,
+    "TH_SP15_GEN-APND": 23.355716705322266,
+    "TH_ZP26_GEN-APND": 22.29864501953125
+  },
+  "per_node_rmse": {
+    "TH_NP15_GEN-APND": 30.162946701049805,
+    "TH_SP15_GEN-APND": 39.25088119506836,
+    "TH_ZP26_GEN-APND": 34.628944396972656
+  },
+  "final_profit_claim_allowed": false,
+  "note": "单任务留出市场筛选；完整盈利必须等待通用DA/RT-at-DA/RT三模型。"
+}

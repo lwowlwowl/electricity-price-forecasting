@@ -1,0 +1,346 @@
+{
+  "task": "da",
+  "market": "NYISO",
+  "configured_market": "NYISO",
+  "da_issue_hour_local": 5,
+  "market_contract_smoke_only": false,
+  "phase": "inner",
+  "smoke_only": false,
+  "nodes": [
+    "CAPITL",
+    "CENTRL",
+    "DUNWOD",
+    "GENESE",
+    "HUD VL",
+    "LONGIL",
+    "MHK VL",
+    "MILLWD",
+    "N.Y.C.",
+    "NORTH",
+    "WEST"
+  ],
+  "contract_hash": "0c5956fb9fd24b5774b6fbdb066a202b17572fa57d012c67bf7354ce7c7d8dd6",
+  "entity_mapping_hash": "baad31de9bf8345f2fa59aaae89d1574cfc9d0f3441859ee2dd653d66c491af9",
+  "models": {
+    "seasonal": {
+      "macro_mae": 12.284504545841191,
+      "macro_rmse": 31.468825559204415,
+      "node_count": 11,
+      "nodes": {
+        "CAPITL": {
+          "mae": 16.1091896076614,
+          "rmse": 43.51344298191981,
+          "samples": 363
+        },
+        "CENTRL": {
+          "mae": 10.470812657210015,
+          "rmse": 27.79493208898237,
+          "samples": 363
+        },
+        "DUNWOD": {
+          "mae": 12.252912070797166,
+          "rmse": 32.62988115477486,
+          "samples": 363
+        },
+        "GENESE": {
+          "mae": 10.124994260220488,
+          "rmse": 25.8878890725389,
+          "samples": 363
+        },
+        "HUD VL": {
+          "mae": 12.144327376116514,
+          "rmse": 32.518638475199126,
+          "samples": 363
+        },
+        "LONGIL": {
+          "mae": 17.33257688985602,
+          "rmse": 38.12199318872423,
+          "samples": 363
+        },
+        "MHK VL": {
+          "mae": 10.957020208964773,
+          "rmse": 28.837680392911096,
+          "samples": 363
+        },
+        "MILLWD": {
+          "mae": 12.266409536585883,
+          "rmse": 32.62917392667774,
+          "samples": 363
+        },
+        "N.Y.C.": {
+          "mae": 12.264962119285507,
+          "rmse": 32.725212108941605,
+          "samples": 363
+        },
+        "NORTH": {
+          "mae": 11.459167814841777,
+          "rmse": 27.511769900630362,
+          "samples": 363
+        },
+        "WEST": {
+          "mae": 9.747177462713559,
+          "rmse": 23.986467859948444,
+          "samples": 363
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 2.006913400000485,
+      "last_run_elapsed_seconds": 2.006913400000485,
+      "last_run_computed_nodes": [
+        "HUD VL",
+        "GENESE",
+        "DUNWOD",
+        "CENTRL",
+        "LONGIL",
+        "CAPITL",
+        "MHK VL",
+        "N.Y.C.",
+        "NORTH",
+        "WEST",
+        "MILLWD"
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "weekly_lag_168"
+    },
+    "xgboost": {
+      "macro_mae": 7.0929449820662915,
+      "macro_rmse": 15.788259467610196,
+      "node_count": 11,
+      "nodes": {
+        "CAPITL": {
+          "mae": 9.013052170872141,
+          "rmse": 22.07709151093174,
+          "samples": 363
+        },
+        "CENTRL": {
+          "mae": 6.767443529775758,
+          "rmse": 15.181025318386514,
+          "samples": 363
+        },
+        "DUNWOD": {
+          "mae": 6.29385351850091,
+          "rmse": 14.926729535548604,
+          "samples": 363
+        },
+        "GENESE": {
+          "mae": 6.463004514096087,
+          "rmse": 13.640610939286043,
+          "samples": 363
+        },
+        "HUD VL": {
+          "mae": 6.196247471949723,
+          "rmse": 15.098288223474285,
+          "samples": 363
+        },
+        "LONGIL": {
+          "mae": 9.041236477778305,
+          "rmse": 18.410685118837364,
+          "samples": 363
+        },
+        "MHK VL": {
+          "mae": 7.005037465699776,
+          "rmse": 15.528858716241093,
+          "samples": 363
+        },
+        "MILLWD": {
+          "mae": 6.464619650766322,
+          "rmse": 15.235628187526913,
+          "samples": 363
+        },
+        "N.Y.C.": {
+          "mae": 6.327806058118275,
+          "rmse": 14.773267128208568,
+          "samples": 363
+        },
+        "NORTH": {
+          "mae": 7.512237355923768,
+          "rmse": 15.415201420710718,
+          "samples": 363
+        },
+        "WEST": {
+          "mae": 6.937856589248139,
+          "rmse": 13.38346804456028,
+          "samples": 363
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 165.21039069999824,
+      "last_run_elapsed_seconds": 165.21039069999824,
+      "last_run_computed_nodes": [
+        "GENESE",
+        "DUNWOD",
+        "HUD VL",
+        "CENTRL",
+        "CAPITL",
+        "LONGIL",
+        "MHK VL",
+        "MILLWD",
+        "N.Y.C.",
+        "NORTH",
+        "WEST"
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "local_per_node_xgboost_squared_error"
+    },
+    "xgboost_absolute": {
+      "macro_mae": 6.7999317372213595,
+      "macro_rmse": 15.675696693259262,
+      "node_count": 11,
+      "nodes": {
+        "CAPITL": {
+          "mae": 8.356523234708469,
+          "rmse": 21.990726428425468,
+          "samples": 363
+        },
+        "CENTRL": {
+          "mae": 6.494476964924727,
+          "rmse": 14.660377864918797,
+          "samples": 363
+        },
+        "DUNWOD": {
+          "mae": 6.196458452004046,
+          "rmse": 15.247639851430037,
+          "samples": 363
+        },
+        "GENESE": {
+          "mae": 6.083610215791329,
+          "rmse": 13.314274870936107,
+          "samples": 363
+        },
+        "HUD VL": {
+          "mae": 6.107956984072677,
+          "rmse": 15.393731558612762,
+          "samples": 363
+        },
+        "LONGIL": {
+          "mae": 8.91455090275809,
+          "rmse": 19.160671553859796,
+          "samples": 363
+        },
+        "MHK VL": {
+          "mae": 6.758554066563003,
+          "rmse": 14.981032610755863,
+          "samples": 363
+        },
+        "MILLWD": {
+          "mae": 6.314578386706097,
+          "rmse": 15.484033702042247,
+          "samples": 363
+        },
+        "N.Y.C.": {
+          "mae": 6.25889380017588,
+          "rmse": 15.323918636613064,
+          "samples": 363
+        },
+        "NORTH": {
+          "mae": 6.972909165619846,
+          "rmse": 14.62766454510181,
+          "samples": 363
+        },
+        "WEST": {
+          "mae": 6.340736936110767,
+          "rmse": 12.248592003155943,
+          "samples": 363
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 217.05025410000235,
+      "last_run_elapsed_seconds": 0.0502314999976079,
+      "last_run_computed_nodes": [],
+      "last_run_reused_nodes": [
+        "CAPITL",
+        "CENTRL",
+        "GENESE",
+        "DUNWOD",
+        "HUD VL",
+        "LONGIL",
+        "MILLWD",
+        "NORTH",
+        "MHK VL",
+        "N.Y.C.",
+        "WEST"
+      ],
+      "protocol": "local_per_node_xgboost_absolute_error"
+    },
+    "xgboost_pseudohuber": {
+      "macro_mae": 6329.754323424832,
+      "macro_rmse": 8173.067092108302,
+      "node_count": 11,
+      "nodes": {
+        "CAPITL": {
+          "mae": 9296.435031191102,
+          "rmse": 11584.914629767823,
+          "samples": 363
+        },
+        "CENTRL": {
+          "mae": 490.7163785051818,
+          "rmse": 1220.7016880258423,
+          "samples": 363
+        },
+        "DUNWOD": {
+          "mae": 8677.643076148133,
+          "rmse": 11149.444704900445,
+          "samples": 363
+        },
+        "GENESE": {
+          "mae": 223.44269707582762,
+          "rmse": 596.3617512457996,
+          "samples": 363
+        },
+        "HUD VL": {
+          "mae": 7925.791289978038,
+          "rmse": 10299.841872357158,
+          "samples": 363
+        },
+        "LONGIL": {
+          "mae": 23867.947686306372,
+          "rmse": 29427.405595962537,
+          "samples": 363
+        },
+        "MHK VL": {
+          "mae": 434.5980265327174,
+          "rmse": 1092.5788097181469,
+          "samples": 363
+        },
+        "MILLWD": {
+          "mae": 8528.34231581088,
+          "rmse": 10986.074992747699,
+          "samples": 363
+        },
+        "N.Y.C.": {
+          "mae": 9655.873787328997,
+          "rmse": 12286.807529183186,
+          "samples": 363
+        },
+        "NORTH": {
+          "mae": 7.449434763639892,
+          "rmse": 14.899663203968897,
+          "samples": 363
+        },
+        "WEST": {
+          "mae": 519.0578340322628,
+          "rmse": 1244.7067760787215,
+          "samples": 363
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 75.47665259999849,
+      "last_run_elapsed_seconds": 75.47665259999849,
+      "last_run_computed_nodes": [
+        "DUNWOD",
+        "CAPITL",
+        "LONGIL",
+        "HUD VL",
+        "CENTRL",
+        "N.Y.C.",
+        "MILLWD",
+        "GENESE",
+        "MHK VL",
+        "WEST",
+        "NORTH"
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "local_per_node_xgboost_pseudohuber"
+    }
+  }
+}

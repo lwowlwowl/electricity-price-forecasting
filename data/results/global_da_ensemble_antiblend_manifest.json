@@ -1,0 +1,14 @@
+{
+  "experiment": "global_da_fixed_weight_blend_screen",
+  "status": "2023_inner_validation_candidate_not_final",
+  "selection_target": "full continuous MPC net revenue",
+  "families": [
+    {
+      "family": "blendgm20",
+      "xgboost_weight": 1.2,
+      "global_weight": -0.2,
+      "global_source_family": "globalensemble"
+    }
+  ],
+  "prediction_dir": "data/results/global_da_ensemble_antiblend_predictions"
+}

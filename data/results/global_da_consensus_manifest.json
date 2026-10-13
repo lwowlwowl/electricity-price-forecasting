@@ -1,0 +1,57 @@
+{
+  "experiment": "global_da_multiseed_consensus_residual_gate",
+  "status": "2023_inner_validation_candidate_not_final",
+  "weight": 0.2,
+  "baseline_direction_accuracy_vs_realized_spread": 0.5949152023510684,
+  "ungated_seed_mean_direction_accuracy_vs_realized_spread": 0.5911192065144186,
+  "diagnostics": {
+    "per_seed_corrected_direction_consensus_fraction": 0.7771962044689318,
+    "residual_direction_consensus_fraction": 0.4294842363024181,
+    "ungated_sign_flip_fraction_vs_xgboost": 0.09810988674625039
+  },
+  "candidates": {
+    "consdir": {
+      "gate_fraction": 0.7771962044689318,
+      "sign_flip_fraction_vs_xgboost": 0.02649984695439241,
+      "direction_accuracy_vs_realized_spread": 0.594081001653095,
+      "clip_usd": null
+    },
+    "consres": {
+      "gate_fraction": 0.4294842363024181,
+      "sign_flip_fraction_vs_xgboost": 0.05749158249158249,
+      "direction_accuracy_vs_realized_spread": 0.5917238106900141,
+      "clip_usd": null
+    },
+    "consboth": {
+      "gate_fraction": 0.37141108050198957,
+      "sign_flip_fraction_vs_xgboost": 0.02649984695439241,
+      "direction_accuracy_vs_realized_spread": 0.594081001653095,
+      "clip_usd": null
+    },
+    "conscv100": {
+      "gate_fraction": 0.4097796143250689,
+      "sign_flip_fraction_vs_xgboost": 0.02623201714110805,
+      "direction_accuracy_vs_realized_spread": 0.5939968162615563,
+      "clip_usd": null
+    },
+    "conscv050": {
+      "gate_fraction": 0.19631925313743495,
+      "sign_flip_fraction_vs_xgboost": 0.01790633608815427,
+      "direction_accuracy_vs_realized_spread": 0.593583542521276,
+      "clip_usd": null
+    },
+    "consclip10": {
+      "gate_fraction": 0.7771962044689318,
+      "sign_flip_fraction_vs_xgboost": 0.026484542393633303,
+      "direction_accuracy_vs_realized_spread": 0.594081001653095,
+      "clip_usd": 10.0
+    },
+    "consclip25": {
+      "gate_fraction": 0.7771962044689318,
+      "sign_flip_fraction_vs_xgboost": 0.02649984695439241,
+      "direction_accuracy_vs_realized_spread": 0.594081001653095,
+      "clip_usd": 25.0
+    }
+  },
+  "output_dir": "data/results/global_da_consensus_predictions"
+}

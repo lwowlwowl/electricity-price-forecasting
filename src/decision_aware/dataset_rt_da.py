@@ -18,6 +18,15 @@ class DecisionAwareRTAtDADataset(DecisionAwareDADataset):
         sample = super().__getitem__(idx)
         # 使用明确名称，避免把这个长提前量目标与小时滚动RT目标混淆。
         sample["price_rt_at_da_tgt"] = sample.pop("price_rt_tgt")
+        if bool(getattr(self.cfg, "global_use_critical_event_weighting", False)):
+            # 只供训练损失识别真实DA-RT关键价差；模型forward不读取此字段。
+            # 默认配置仍不携带DA真值，保持既有信息边界和测试合同不变。
+            sample["price_da_tgt_weighting_only"] = sample["price_da_tgt"]
+        if str(
+            getattr(self.cfg, "rt_at_da_parameterization", "direct_price")
+        ).lower() in {"da_minus_spread", "economic_regime"}:
+            # 仅作为训练监督构造DA-RT价差；模型forward从不读取这个真值。
+            sample["price_da_tgt_spread_only"] = sample["price_da_tgt"]
         # 该任务不监督DA价格，专用batch不携带交付日真实DA标签。
         sample.pop("price_da_tgt")
         return sample

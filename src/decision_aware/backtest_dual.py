@@ -421,3 +421,43 @@ def locked_dual_backtest(
         ),
         "daily": daily,
     }
+
+
+def locked_dual_backtest_by_node(
+    node_inputs: Mapping[str, Mapping[str, object]],
+    cfg,
+    **contract_kwargs,
+) -> dict:
+    """逐节点独立运行完整回测，绝不把一个节点的SOC传给另一个节点。"""
+    if not node_inputs:
+        raise ValueError("多节点回测至少需要一个节点")
+    required = {
+        "da_price_forecasts",
+        "rt_price_forecasts",
+        "realized_da_price",
+        "realized_rt_price",
+        "local_timestamps",
+    }
+    reports: dict[str, dict] = {}
+    for node in sorted(node_inputs):
+        inputs = node_inputs[node]
+        missing = sorted(required - set(inputs))
+        if missing:
+            raise ValueError(f"节点{node}缺少回测输入: {missing}")
+        reports[node] = locked_dual_backtest(
+            inputs["da_price_forecasts"],
+            inputs["rt_price_forecasts"],
+            inputs["realized_da_price"],
+            inputs["realized_rt_price"],
+            inputs["local_timestamps"],
+            cfg,
+            rt_at_da_price_forecasts=inputs.get("rt_at_da_price_forecasts"),
+            **contract_kwargs,
+        )
+    mean_daily = [report["mean_daily_revenue"] for report in reports.values()]
+    return {
+        "node_count": len(reports),
+        "soc_scope": "independent_per_node",
+        "macro_mean_daily_revenue": float(np.mean(mean_daily)),
+        "node_reports": reports,
+    }

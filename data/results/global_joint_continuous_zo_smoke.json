@@ -1,0 +1,100 @@
+{
+  "status": "passed",
+  "purpose": "global three-model continuous penalty-aware MPC zero-order gradient smoke",
+  "not_a_model_selection_result": true,
+  "node": "LZ_LCRA",
+  "days": 1,
+  "dates": [
+    "2023-01-01"
+  ],
+  "device": "cpu",
+  "seed": 2026,
+  "contract": {
+    "three_independent_models": true,
+    "separate_parameter_sets": {
+      "da__rt_at_da": 0,
+      "da__rt": 0,
+      "rt_at_da__rt": 0
+    },
+    "decisions": "forecast_only",
+    "settlement": "realized prices after action",
+    "deviation_penalty": true,
+    "degradation_cost_usd_per_mwh": 5.7,
+    "soc_reset": "per node or true time gap"
+  },
+  "checkpoints": {
+    "da": {
+      "path": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed0/candidate_epoch_010.pt",
+      "sha256": "e918a3cb9894b426671f4822c9734d714cc8ed109362b37f8ddba11e10125f12"
+    },
+    "rt_at_da": {
+      "path": "data/checkpoints/global_ercot_huber_f0_stable_v2/rt_at_da_inner_seed0/candidate_epoch_010.pt",
+      "sha256": "acc769075387f44ce65f8e424946345db7657d2eb808dea81f45883274f0fcd6"
+    },
+    "rt": {
+      "path": "data/checkpoints/global_ercot_huber_f1_stable_v2/rt_inner_seed0/candidate_epoch_008.pt",
+      "sha256": "b2e8dc7b7386a07970d3197d4c4e872794adabb9ddd4e950894da52b9c2227b6"
+    }
+  },
+  "baseline_daily_revenue": [
+    -270.6829833984375
+  ],
+  "baseline_mean_daily_revenue": -270.6829833984375,
+  "epsilon": {
+    "spread": 10.0,
+    "rt": 15.0
+  },
+  "directions": 1,
+  "diagnostics": {
+    "spread": {
+      "gradient_norm": 25.708988189697266,
+      "gradient_rms": 5.2478251457214355,
+      "nonzero_fraction": 1.0,
+      "changed_direction_fraction": 1.0,
+      "changed_day_fraction": 1.0,
+      "finite": true,
+      "direction_mode": "orthogonal",
+      "feedback_mode": "episode_scalar",
+      "tail_weight": 0.0,
+      "tail_fraction": 0.1,
+      "directional_loss_differences": [
+        -5.247825622558594
+      ],
+      "utilities_plus": [
+        -182.57199096679688
+      ],
+      "utilities_minus": [
+        -287.52850341796875
+      ],
+      "per_day_directional_loss_differences": []
+    },
+    "rt": {
+      "gradient_norm": 27.048633575439453,
+      "gradient_rms": 2.7606394290924072,
+      "nonzero_fraction": 1.0,
+      "changed_direction_fraction": 1.0,
+      "changed_day_fraction": 1.0,
+      "finite": true,
+      "direction_mode": "orthogonal",
+      "feedback_mode": "episode_scalar",
+      "tail_weight": 0.0,
+      "tail_fraction": 0.1,
+      "directional_loss_differences": [
+        -2.7606394290924072
+      ],
+      "utilities_plus": [
+        -280.3831787109375
+      ],
+      "utilities_minus": [
+        -363.2023620605469
+      ],
+      "per_day_directional_loss_differences": []
+    }
+  },
+  "parameter_gradient_norms": {
+    "da": 219470.734375,
+    "rt_at_da": 234540.984375,
+    "rt": 188702.921875
+  },
+  "proxy_loss": 192.8937530517578
+}

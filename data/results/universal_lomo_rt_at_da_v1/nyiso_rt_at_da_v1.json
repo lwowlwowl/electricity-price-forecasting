@@ -1,0 +1,45 @@
+{
+  "protocol": "leave_one_market_out_zero_shot",
+  "task": "rt_at_da",
+  "holdout_market": "NYISO",
+  "training_markets": [
+    "CAISO",
+    "ERCOT",
+    "PJM"
+  ],
+  "uses_node_id_for_prediction": false,
+  "uses_market_id_for_prediction": false,
+  "normalization_mode": "context_robust",
+  "checkpoint": "data/checkpoints/universal_lomo_holdout_nyiso_rt_at_da_v1/rt_at_da_inner_seed0/best.pt",
+  "checkpoint_sha256": "f415f94b503fb1b59717d7411146534425a585eed11bc7a5a09c160db2b038db",
+  "node_macro_mae": 10.730052947998047,
+  "node_macro_rmse": 29.491722106933594,
+  "per_node_mae": {
+    "CAPITL": 13.104891777038574,
+    "CENTRL": 8.976741790771484,
+    "DUNWOD": 10.272095680236816,
+    "GENESE": 8.643733024597168,
+    "HUD VL": 10.02238941192627,
+    "LONGIL": 17.76056671142578,
+    "MHK VL": 8.888076782226562,
+    "MILLWD": 10.382611274719238,
+    "N.Y.C.": 10.735029220581055,
+    "NORTH": 11.1901216506958,
+    "WEST": 8.054325103759766
+  },
+  "per_node_rmse": {
+    "CAPITL": 35.897953033447266,
+    "CENTRL": 24.771926879882812,
+    "DUNWOD": 28.548912048339844,
+    "GENESE": 23.31175994873047,
+    "HUD VL": 28.089250564575195,
+    "LONGIL": 43.977813720703125,
+    "MHK VL": 25.00766944885254,
+    "MILLWD": 29.093212127685547,
+    "N.Y.C.": 33.55425262451172,
+    "NORTH": 30.770294189453125,
+    "WEST": 21.38589859008789
+  },
+  "final_profit_claim_allowed": false,
+  "note": "单任务留出市场筛选；完整盈利必须等待通用DA/RT-at-DA/RT三模型。"
+}

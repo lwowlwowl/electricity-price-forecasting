@@ -1,0 +1,72 @@
+{
+  "experiment": "ercot_global_da_frozen_candidate_2024_outer_validation",
+  "status": "2024_outer_validation_complete_2025_untouched",
+  "selection_allowed": true,
+  "locked_2025_used": false,
+  "frozen_candidate": {
+    "architecture": "Global F1 DA",
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "aggregation": "per-hour median",
+    "formula": "p_da = 1.15 * p_xgboost - 0.15 * median(p_global_seed0, seed1, seed2)",
+    "rt_at_da": "xgboost_pseudohuber",
+    "rolling_rt": "xgboost_absolute",
+    "training_protocol": "frozen_inner_plan",
+    "frozen_final_epochs_by_seed": {
+      "0": 10,
+      "1": 5,
+      "2": 19
+    }
+  },
+  "candidate": {
+    "macro_mean_daily_revenue": 86.48675242030811,
+    "macro_median_daily_revenue": 25.817181228269966,
+    "top_10_days_total_revenue_share": 0.3916048796574214,
+    "macro_mean_daily_revenue_components": {
+      "da_leg": 125.10589066215645,
+      "rt_deviation_leg": -0.08323827227744808,
+      "degradation_cost": 28.369573985083434,
+      "deviation_penalty": 10.166325984487457
+    },
+    "macro_positive_day_rate": 0.7768595041322314,
+    "node_positive_mean_revenue_rate": 1.0,
+    "worst_node_mean_daily_revenue": 68.40853121026913,
+    "best_node_mean_daily_revenue": 111.87108031058398
+  },
+  "baseline": {
+    "name": "xgboost_robust_three_task",
+    "macro_mean_daily_revenue": 90.69091958351444,
+    "macro_median_daily_revenue": 29.150943705825448,
+    "top_10_days_total_revenue_share": 0.39460451368136773,
+    "macro_mean_daily_revenue_components": {
+      "da_leg": 131.60033865858043,
+      "rt_deviation_leg": 0.07433347802154629,
+      "degradation_cost": 30.462189377125082,
+      "deviation_penalty": 10.521563175962465
+    }
+  },
+  "paired_comparison": {
+    "mean_daily_revenue_difference": -4.204167163206333,
+    "7day_block_bootstrap_95ci": [
+      -8.014720980937994,
+      -1.233055384237352
+    ],
+    "beats_baseline_on_mean": false,
+    "statistically_clear_positive": false
+  },
+  "methodology_control": {
+    "2024_used_for_training_control": false,
+    "strict_outer_result": true,
+    "leakage_audit": "data/results/global_da_outer_frozen_training_audit_v1.json",
+    "discarded_diagnostic_run": "An earlier diagnostic selected epochs from 2024 MAE and is not used for the reported decision."
+  },
+  "decision": {
+    "eligible_for_final_2020_2024_retraining": false,
+    "strong_win": false,
+    "next_step": "keep 2025 locked; return to inner-development evidence and redesign without tuning on 2024"
+  },
+  "source_result": "data/results/global_da_outer_frozen_median_antiblend_continuous_mpc_v1.json"
+}

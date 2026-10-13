@@ -103,6 +103,30 @@ def test_data_after_issue_time_cannot_change_context() -> None:
     )
 
 
+def test_lag168_anchor_is_historical_and_matches_exact_timestamp() -> None:
+    frame = _frame("2019-12-20", "2020-01-04")
+    cfg = _cfg()
+    cfg.global_residual_anchor = "lag168"
+    dataset = DecisionAwareDADataset(frame, cfg, "train")
+    index = next(
+        i for i, window in enumerate(dataset.windows)
+        if str(window.delivery_date) == "2020-01-02"
+    )
+    window = dataset.windows[index]
+    sample = dataset[index]
+
+    assert window.lag168_positions is not None
+    assert np.all(window.lag168_positions < window.context_end)
+    np.testing.assert_array_equal(
+        sample["price_da_lag168"].numpy(),
+        frame["price_da"].to_numpy()[window.target_positions - 168],
+    )
+    np.testing.assert_array_equal(
+        sample["price_rt_lag168"].numpy(),
+        frame["price_rt"].to_numpy()[window.target_positions - 168],
+    )
+
+
 def test_only_known_future_calendar_is_exposed() -> None:
     frame = _frame("2019-12-20", "2020-01-04")
     dataset = DecisionAwareDADataset(frame, _cfg(), "train")
@@ -128,6 +152,38 @@ def test_validation_reuses_training_statistics() -> None:
     val = DecisionAwareDADataset(frame, cfg, "val", norm_stats=train.norm_stats)
 
     assert val.norm_stats is train.norm_stats
+
+
+def test_context_robust_normalization_needs_no_entity_scaler_or_future_target() -> None:
+    frame = _frame("2019-12-20", "2020-01-04")
+    cfg = _cfg()
+    cfg.global_normalization_mode = "context_robust"
+    first = DecisionAwareDADataset(frame, cfg, "train")
+    index = next(
+        i for i, window in enumerate(first.windows)
+        if str(window.delivery_date) == "2020-01-02"
+    )
+    window = first.windows[index]
+    changed_frame = frame.copy()
+    changed_frame.iloc[
+        window.target_positions,
+        changed_frame.columns.get_loc("price_da"),
+    ] += 1_000_000.0
+    # 验证集不传训练节点scaler也可以构造；归一化只能读取起报前历史。
+    second = DecisionAwareDADataset(changed_frame, cfg, "train")
+    changed_index = next(
+        i for i, item in enumerate(second.windows)
+        if str(item.delivery_date) == "2020-01-02"
+    )
+
+    before = first[index]
+    after = second[changed_index]
+    np.testing.assert_array_equal(
+        before["price_da_ctx"].numpy(), after["price_da_ctx"].numpy()
+    )
+    assert before["price_da_mean"].item() == after["price_da_mean"].item()
+    assert before["price_da_std"].item() == after["price_da_std"].item()
+    assert first.norm_stats["mode"] == "context_robust"
 
 
 def test_experiment_can_freeze_explicit_time_split() -> None:

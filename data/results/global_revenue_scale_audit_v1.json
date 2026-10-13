@@ -1,0 +1,80 @@
+{
+  "experiment": "global_continuous_mpc_revenue_scale_audit",
+  "purpose": "explain mean revenue scale without changing model selection",
+  "selection_allowed": false,
+  "inner_2023": {
+    "split": "2023 inner validation only",
+    "days": 362,
+    "node_count": 15,
+    "mean_daily_revenue": 292.28926467730673,
+    "median_daily_revenue": 38.12761136386639,
+    "p10_daily_revenue": -10.990384862948172,
+    "p90_daily_revenue": 642.5743333117493,
+    "minimum_daily_revenue": -206.06570119255625,
+    "maximum_daily_revenue": 7988.891012363562,
+    "positive_day_rate": 0.7928176795580111,
+    "top_5_days_total_revenue_share": 0.2897403278878542,
+    "top_10_days_total_revenue_share": 0.4695163288353395,
+    "mean_daily_revenue_without_top_5_days": 210.50885820605225,
+    "mean_daily_actual_throughput_mwh": 5.275710900077419,
+    "mean_daily_revenue_components": {
+      "da_leg": 333.4977952365029,
+      "rt_deviation_leg": -1.2705817595207198,
+      "degradation_cost": 30.07155213044128,
+      "deviation_penalty": 9.86639666923426
+    },
+    "reconstructed_mean_daily_revenue": 292.2892646773067,
+    "total_soc_violation_count": 0,
+    "policy": {
+      "da": "daily predicted DA-minus-RT-at-DA spread direction followed by joint penalty-aware continuous LP; plan locked",
+      "rt": "hourly predicted-price fixed-DA continuous LP; four-hour horizon; execute first action",
+      "truth_access": "realized DA/RT only after action for settlement",
+      "deviation_penalty_enabled": true,
+      "degradation_usd_per_actual_throughput_mwh": 5.7,
+      "terminal_soc_monetized_in_settlement": false,
+      "mpc_terminal_opportunity_value": "last visible predicted RT price; decision-only anti-myopia term"
+    }
+  },
+  "outer_2024_baseline": {
+    "split": "2024 outer validation only",
+    "days": 363,
+    "node_count": 15,
+    "mean_daily_revenue": 90.69091958351444,
+    "median_daily_revenue": 29.150943705825448,
+    "p10_daily_revenue": -14.063258632825335,
+    "p90_daily_revenue": 183.43550208059065,
+    "minimum_daily_revenue": -57.685722570918095,
+    "maximum_daily_revenue": 4003.9758761075295,
+    "positive_day_rate": 0.7851239669421488,
+    "top_5_days_total_revenue_share": 0.26835381402226693,
+    "top_10_days_total_revenue_share": 0.39460451368136773,
+    "mean_daily_revenue_without_top_5_days": 67.28039258670745,
+    "mean_daily_actual_throughput_mwh": 5.344243750372823,
+    "mean_daily_revenue_components": {
+      "da_leg": 131.60033865858043,
+      "rt_deviation_leg": 0.07433347802154629,
+      "degradation_cost": 30.462189377125082,
+      "deviation_penalty": 10.521563175962465
+    },
+    "reconstructed_mean_daily_revenue": 90.69091958351441,
+    "total_soc_violation_count": 0,
+    "policy": {
+      "da": "daily predicted DA-minus-RT-at-DA spread direction followed by joint penalty-aware continuous LP; plan locked",
+      "rt": "hourly predicted-price fixed-DA continuous LP; four-hour horizon; execute first action",
+      "truth_access": "realized DA/RT only after action for settlement",
+      "deviation_penalty_enabled": true,
+      "degradation_usd_per_actual_throughput_mwh": 5.7,
+      "terminal_soc_monetized_in_settlement": false,
+      "mpc_terminal_opportunity_value": "last visible predicted RT price; decision-only anti-myopia term"
+    }
+  },
+  "comparison": {
+    "mean_daily_revenue_difference_2024_minus_2023": -201.5983450937923,
+    "median_daily_revenue_difference_2024_minus_2023": -8.976667658040945,
+    "interpretation": "same settlement contract; annual means differ mainly because electricity-price opportunity distributions are heavy-tailed"
+  },
+  "sources": [
+    "data/results/global_xgboost_robust_continuous_mpc_backtest_v1.json",
+    "data/results/global_xgboost_robust_continuous_mpc_outer_v1.json"
+  ]
+}

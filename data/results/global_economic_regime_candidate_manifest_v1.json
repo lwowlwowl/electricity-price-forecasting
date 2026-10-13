@@ -1,0 +1,25 @@
+{
+  "experiment": "global_ercot_economic_regime_v1_candidates",
+  "phase": "inner",
+  "seed": 0,
+  "2024_used": false,
+  "2025_used": false,
+  "selection_rule": "freeze the current best DA, base RT-at-DA representation, and rolling-RT; retain three linear economic-regime heads by 2023 node-macro three-class accuracy; select only by frozen full settlement",
+  "families": {
+    "regime0": {
+      "da": "data/checkpoints/cloud_taskloss_20261010/global_ercot_taskloss_da_mae_v1/da_inner_seed0/candidate_epoch_005.pt",
+      "rt_at_da": "data/checkpoints/global_ercot_economic_regime_rt_at_da_v1/rt_at_da_inner_seed0/candidate_epoch_020.pt",
+      "rt": "data/checkpoints/cloud_taskloss_20261010/global_ercot_taskloss_rt_mae_v1/rt_inner_seed0/candidate_epoch_005.pt"
+    },
+    "regime1": {
+      "da": "data/checkpoints/cloud_taskloss_20261010/global_ercot_taskloss_da_mae_v1/da_inner_seed0/candidate_epoch_005.pt",
+      "rt_at_da": "data/checkpoints/global_ercot_economic_regime_rt_at_da_v1/rt_at_da_inner_seed0/candidate_epoch_018.pt",
+      "rt": "data/checkpoints/cloud_taskloss_20261010/global_ercot_taskloss_rt_mae_v1/rt_inner_seed0/candidate_epoch_005.pt"
+    },
+    "regime2": {
+      "da": "data/checkpoints/cloud_taskloss_20261010/global_ercot_taskloss_da_mae_v1/da_inner_seed0/candidate_epoch_005.pt",
+      "rt_at_da": "data/checkpoints/global_ercot_economic_regime_rt_at_da_v1/rt_at_da_inner_seed0/candidate_epoch_019.pt",
+      "rt": "data/checkpoints/cloud_taskloss_20261010/global_ercot_taskloss_rt_mae_v1/rt_inner_seed0/candidate_epoch_005.pt"
+    }
+  }
+}

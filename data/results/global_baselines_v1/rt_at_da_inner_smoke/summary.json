@@ -1,0 +1,39 @@
+{
+  "task": "rt_at_da",
+  "phase": "inner",
+  "smoke_only": true,
+  "nodes": [
+    "HB_BUSAVG",
+    "HB_HOUSTON"
+  ],
+  "contract_hash": "0c5956fb9fd24b5774b6fbdb066a202b17572fa57d012c67bf7354ce7c7d8dd6",
+  "entity_mapping_hash": "2dca4b8cfae5d7d8f88d9d0a23d328aaeea7ba4ea6685b27336d1d01389160e9",
+  "models": {
+    "xgboost_pseudohuber": {
+      "macro_mae": 1958.2964184879288,
+      "macro_rmse": 2711.7202339393552,
+      "node_count": 2,
+      "nodes": {
+        "HB_BUSAVG": {
+          "mae": 1697.9439281915645,
+          "rmse": 2358.7974454315377,
+          "samples": 4
+        },
+        "HB_HOUSTON": {
+          "mae": 2218.648908784293,
+          "rmse": 3064.6430224471724,
+          "samples": 4
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 3.1071640999871306,
+      "last_run_elapsed_seconds": 3.1071640999871306,
+      "last_run_computed_nodes": [
+        "HB_BUSAVG",
+        "HB_HOUSTON"
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "local_per_node_xgboost_pseudohuber"
+    }
+  }
+}

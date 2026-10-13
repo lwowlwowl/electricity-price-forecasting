@@ -1,0 +1,234 @@
+{
+  "experiment": "global_f0_f1_stable_v2_inner_seed0_summary",
+  "status": "2023_inner_validation_candidate_not_final",
+  "selection_allowed_for": "next-stage candidate promotion only",
+  "selection_forbidden_for": "2025 final claim",
+  "download_integrity": {
+    "files_checked": 45,
+    "sha256_mismatches": 0
+  },
+  "candidate_filter": {
+    "experiment": "global_f0_f1_stable_v2_forecast_candidate_filter",
+    "phase": "inner",
+    "seed": 0,
+    "selection_rule": "pool retained F0/F1 epoch candidates; keep overall top-2 per task by 2023 node-equal macro MAE; use full settlement only to select among the resulting 2x2x2 triplets",
+    "selected_by_task": {
+      "da": [
+        {
+          "architecture": "f1",
+          "task": "da",
+          "epoch": 10,
+          "macro_mae": 41.51444327237959,
+          "checkpoint": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed0/candidate_epoch_010.pt",
+          "checkpoint_sha256": "e918a3cb9894b426671f4822c9734d714cc8ed109362b37f8ddba11e10125f12"
+        },
+        {
+          "architecture": "f1",
+          "task": "da",
+          "epoch": 14,
+          "macro_mae": 43.387377153320124,
+          "checkpoint": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed0/candidate_epoch_014.pt",
+          "checkpoint_sha256": "13d96377a8aa5f353681d2ee27632f30526f1f8864804807212ac2575e5c1b7b"
+        }
+      ],
+      "rt_at_da": [
+        {
+          "architecture": "f1",
+          "task": "rt_at_da",
+          "epoch": 4,
+          "macro_mae": 42.81100729559043,
+          "checkpoint": "data/checkpoints/global_ercot_huber_f1_stable_v2/rt_at_da_inner_seed0/candidate_epoch_004.pt",
+          "checkpoint_sha256": "c28d2342cde924f12528184353316f39d57ae8bfa7ae9931ae2c66a0c3aeb3bd"
+        },
+        {
+          "architecture": "f0",
+          "task": "rt_at_da",
+          "epoch": 10,
+          "macro_mae": 43.576375419049235,
+          "checkpoint": "data/checkpoints/global_ercot_huber_f0_stable_v2/rt_at_da_inner_seed0/candidate_epoch_010.pt",
+          "checkpoint_sha256": "acc769075387f44ce65f8e424946345db7657d2eb808dea81f45883274f0fcd6"
+        }
+      ],
+      "rt": [
+        {
+          "architecture": "f1",
+          "task": "rt",
+          "epoch": 8,
+          "macro_mae": 32.730521221441535,
+          "checkpoint": "data/checkpoints/global_ercot_huber_f1_stable_v2/rt_inner_seed0/candidate_epoch_008.pt",
+          "checkpoint_sha256": "b2e8dc7b7386a07970d3197d4c4e872794adabb9ddd4e950894da52b9c2227b6"
+        },
+        {
+          "architecture": "f0",
+          "task": "rt",
+          "epoch": 8,
+          "macro_mae": 33.63564494650873,
+          "checkpoint": "data/checkpoints/global_ercot_huber_f0_stable_v2/rt_inner_seed0/candidate_epoch_008.pt",
+          "checkpoint_sha256": "854ba1c194b26977d3b919e600232d08b5503e6d73667586d7777fe70e03cdf7"
+        }
+      ]
+    },
+    "families": {
+      "c0": {
+        "da": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed0/candidate_epoch_010.pt",
+        "rt_at_da": "data/checkpoints/global_ercot_huber_f1_stable_v2/rt_at_da_inner_seed0/candidate_epoch_004.pt",
+        "rt": "data/checkpoints/global_ercot_huber_f1_stable_v2/rt_inner_seed0/candidate_epoch_008.pt"
+      },
+      "c1": {
+        "da": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed0/candidate_epoch_014.pt",
+        "rt_at_da": "data/checkpoints/global_ercot_huber_f0_stable_v2/rt_at_da_inner_seed0/candidate_epoch_010.pt",
+        "rt": "data/checkpoints/global_ercot_huber_f0_stable_v2/rt_inner_seed0/candidate_epoch_008.pt"
+      }
+    }
+  },
+  "best_global_triplet": {
+    "label": "da_c0__rt_at_da_c1__rt_c0",
+    "candidate_family_by_task": {
+      "da": "c0",
+      "rt_at_da": "c1",
+      "rt": "c0"
+    },
+    "checkpoint_by_task": {
+      "da": {
+        "architecture": "f1",
+        "task": "da",
+        "epoch": 10,
+        "macro_mae": 41.51444327237959,
+        "checkpoint": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed0/candidate_epoch_010.pt",
+        "checkpoint_sha256": "e918a3cb9894b426671f4822c9734d714cc8ed109362b37f8ddba11e10125f12"
+      },
+      "rt_at_da": {
+        "architecture": "f0",
+        "task": "rt_at_da",
+        "epoch": 10,
+        "macro_mae": 43.576375419049235,
+        "checkpoint": "data/checkpoints/global_ercot_huber_f0_stable_v2/rt_at_da_inner_seed0/candidate_epoch_010.pt",
+        "checkpoint_sha256": "acc769075387f44ce65f8e424946345db7657d2eb808dea81f45883274f0fcd6"
+      },
+      "rt": {
+        "architecture": "f1",
+        "task": "rt",
+        "epoch": 8,
+        "macro_mae": 32.730521221441535,
+        "checkpoint": "data/checkpoints/global_ercot_huber_f1_stable_v2/rt_inner_seed0/candidate_epoch_008.pt",
+        "checkpoint_sha256": "b2e8dc7b7386a07970d3197d4c4e872794adabb9ddd4e950894da52b9c2227b6"
+      }
+    },
+    "macro_mean_daily_revenue": 192.82674927935597,
+    "bootstrap_95ci": [
+      74.37183713792426,
+      335.788818870056
+    ],
+    "positive_day_rate": 0.4558011049723757,
+    "node_positive_mean_revenue_rate": 1.0,
+    "worst_node_mean_daily_revenue": 148.67777588760936,
+    "best_node_mean_daily_revenue": 220.78770191101833,
+    "tail_10pct_mean_daily_revenue": -97.59004718296522,
+    "maximum_drawdown_usd": 1326.5479206582888,
+    "revenue_components_per_node_day": {
+      "da_leg": 228.57484029787608,
+      "rt_deviation_leg": -3.9378897790519263,
+      "degradation_cost": 14.507748239315896,
+      "deviation_penalty": 17.30245300015233
+    },
+    "actual_throughput_mwh_per_node_day": 2.5452189893536654,
+    "soc_violation_count": 0
+  },
+  "seasonal": {
+    "macro_mean_daily_revenue": 213.7797541925254
+  },
+  "paired_global_minus_seasonal": {
+    "mean_daily_revenue_difference_vs_seasonal": -20.95300491316943,
+    "7day_block_bootstrap_95ci": [
+      -102.88329211373686,
+      52.41303600198526
+    ]
+  },
+  "improvement_over_three_epoch_global_usd_per_node_day": 58.24596030530657,
+  "forecast_diagnostics": {
+    "stable_global_champion": {
+      "nodes": 15,
+      "common_days": 362,
+      "da_mae": 41.58892059326172,
+      "rt_at_da_mae": 43.66239929199219,
+      "rt_first_step_mae": 31.399097442626953,
+      "predicted_spread_abs_mean": 20.418739318847656,
+      "predicted_spread_abs_q95": 74.84202575683594,
+      "predicted_spread_abs_q99": 189.82171630859375,
+      "true_spread_abs_mean": 34.886436462402344,
+      "true_spread_abs_q95": 101.68024444580078,
+      "true_spread_abs_q99": 721.2633056640625,
+      "spread_pearson_correlation": 0.036076261593373,
+      "spread_direction_accuracy": 0.5657918968692449
+    },
+    "seasonal": {
+      "nodes": 15,
+      "common_days": 362,
+      "da_mae": 48.11006546020508,
+      "rt_at_da_mae": 50.7254524230957,
+      "rt_first_step_mae": 50.7254524230957,
+      "predicted_spread_abs_mean": 35.04841232299805,
+      "predicted_spread_abs_q95": 101.88249206542969,
+      "predicted_spread_abs_q99": 721.2633056640625,
+      "true_spread_abs_mean": 34.886436462402344,
+      "true_spread_abs_q95": 101.68024444580078,
+      "true_spread_abs_q99": 721.2633056640625,
+      "spread_pearson_correlation": 0.07732497176951969,
+      "spread_direction_accuracy": 0.5798342541436464
+    }
+  },
+  "ranking": [
+    {
+      "rank": 1,
+      "triplet": "da_seasonal__rt_at_da_seasonal__rt_seasonal",
+      "macro_mean_daily_revenue": 213.7797541925254
+    },
+    {
+      "rank": 2,
+      "triplet": "da_c0__rt_at_da_c1__rt_c0",
+      "macro_mean_daily_revenue": 192.82674927935597
+    },
+    {
+      "rank": 3,
+      "triplet": "da_c1__rt_at_da_c1__rt_c0",
+      "macro_mean_daily_revenue": 192.47780905483913
+    },
+    {
+      "rank": 4,
+      "triplet": "da_c0__rt_at_da_c0__rt_c0",
+      "macro_mean_daily_revenue": 190.69828504252206
+    },
+    {
+      "rank": 5,
+      "triplet": "da_c0__rt_at_da_c1__rt_c1",
+      "macro_mean_daily_revenue": 187.59387271641762
+    },
+    {
+      "rank": 6,
+      "triplet": "da_c1__rt_at_da_c1__rt_c1",
+      "macro_mean_daily_revenue": 187.05833642602028
+    },
+    {
+      "rank": 7,
+      "triplet": "da_c0__rt_at_da_c0__rt_c1",
+      "macro_mean_daily_revenue": 185.95251175647195
+    },
+    {
+      "rank": 8,
+      "triplet": "da_c1__rt_at_da_c0__rt_c0",
+      "macro_mean_daily_revenue": 179.0448312146819
+    },
+    {
+      "rank": 9,
+      "triplet": "da_c1__rt_at_da_c0__rt_c1",
+      "macro_mean_daily_revenue": 177.52565417011172
+    }
+  ],
+  "limitations": [
+    "seed 0 only",
+    "2023 inner validation only",
+    "F0/F1 historical architectures only",
+    "Seasonal comparison interval crosses zero",
+    "not a 2024 outer-confirmed or 2025 locked-test result"
+  ]
+}

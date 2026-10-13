@@ -1,0 +1,1210 @@
+{
+  "experiment": "global_joint_continuous_zo_inner_development",
+  "status": "trained_not_yet_selected",
+  "family": "jointspread_a",
+  "device": "cuda",
+  "source_checkpoints": {
+    "da": {
+      "path": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed0/candidate_epoch_010.pt",
+      "sha256": "e918a3cb9894b426671f4822c9734d714cc8ed109362b37f8ddba11e10125f12"
+    },
+    "rt_at_da": {
+      "path": "data/checkpoints/global_ercot_huber_f0_stable_v2/rt_at_da_inner_seed0/candidate_epoch_010.pt",
+      "sha256": "acc769075387f44ce65f8e424946345db7657d2eb808dea81f45883274f0fcd6"
+    },
+    "rt": {
+      "path": "data/checkpoints/global_ercot_huber_f1_stable_v2/rt_inner_seed0/candidate_epoch_008.pt",
+      "sha256": "b2e8dc7b7386a07970d3197d4c4e872794adabb9ddd4e950894da52b9c2227b6"
+    }
+  },
+  "parameters": {
+    "da_checkpoint": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed0/candidate_epoch_010.pt",
+    "rt_at_da_checkpoint": "data/checkpoints/global_ercot_huber_f0_stable_v2/rt_at_da_inner_seed0/candidate_epoch_010.pt",
+    "rt_checkpoint": "data/checkpoints/global_ercot_huber_f1_stable_v2/rt_inner_seed0/candidate_epoch_008.pt",
+    "family": "jointspread_a",
+    "output_dir": "data/checkpoints/global_joint_spread_grid_v1",
+    "result": "data/results/cloud_global_joint_spread_grid_v1/jointspread_a_train.json",
+    "epochs": 2,
+    "episode_days": 2,
+    "episodes_per_node": 2,
+    "max_nodes": 15,
+    "directions": 1,
+    "epsilon_spread": 10.0,
+    "epsilon_rt": 15.0,
+    "profit_weight": 0.003,
+    "proxy_scale": 1000.0,
+    "prediction_scale": 25.0,
+    "spread_weight": 0.05,
+    "direction_weight": 0.05,
+    "direction_threshold": 6.0,
+    "direction_temperature": 25.0,
+    "lr": 2e-05,
+    "scope": "price_head",
+    "seed": 20261009,
+    "device": "cuda"
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "batches": 30,
+      "mean_base_revenue": 65.8510927915573,
+      "mean_prediction_loss": 0.6650328526894251,
+      "mean_proxy_loss": -0.0059782718618710835,
+      "rows": [
+        {
+          "batch": 1,
+          "node_id": 7,
+          "dates": [
+            "2022-01-18",
+            "2022-01-19"
+          ],
+          "base_mean_revenue": -37.02887725830078,
+          "prediction_loss": 0.18914298713207245,
+          "base_prediction_loss": 0.16792404651641846,
+          "spread_magnitude_loss": 0.00010266155004501343,
+          "spread_direction_loss": 0.42427635192871094,
+          "important_spread_fraction": 0.5208333730697632,
+          "proxy_loss": 0.24767553806304932,
+          "total_loss": 0.18931858241558075,
+          "gradient_norm_before_clip": 71.98585510253906,
+          "spread_gradient_norm": 6.510680198669434,
+          "rt_gradient_norm": 38.030311584472656
+        },
+        {
+          "batch": 2,
+          "node_id": 2,
+          "dates": [
+            "2022-12-19",
+            "2022-12-20"
+          ],
+          "base_mean_revenue": 42.28620910644531,
+          "prediction_loss": 0.289548397064209,
+          "base_prediction_loss": 0.25500568747520447,
+          "spread_magnitude_loss": 0.00010487189138075337,
+          "spread_direction_loss": 0.6907495856285095,
+          "important_spread_fraction": 0.5625,
+          "proxy_loss": -2.247333288192749,
+          "total_loss": 0.28193774819374084,
+          "gradient_norm_before_clip": 75.74604034423828,
+          "spread_gradient_norm": 8.895769119262695,
+          "rt_gradient_norm": 86.85114288330078
+        },
+        {
+          "batch": 3,
+          "node_id": 10,
+          "dates": [
+            "2022-07-23",
+            "2022-07-24"
+          ],
+          "base_mean_revenue": 362.88726806640625,
+          "prediction_loss": 0.27924031019210815,
+          "base_prediction_loss": 0.2542138993740082,
+          "spread_magnitude_loss": 0.0006368110771290958,
+          "spread_direction_loss": 0.4998914301395416,
+          "important_spread_fraction": 0.5416666865348816,
+          "proxy_loss": 0.17697538435459137,
+          "total_loss": 0.2789335250854492,
+          "gradient_norm_before_clip": 37.83744812011719,
+          "spread_gradient_norm": 6.1296563148498535,
+          "rt_gradient_norm": 3.4934489727020264
+        },
+        {
+          "batch": 4,
+          "node_id": 6,
+          "dates": [
+            "2020-12-14",
+            "2020-12-15"
+          ],
+          "base_mean_revenue": 9.34919548034668,
+          "prediction_loss": 0.3477848768234253,
+          "base_prediction_loss": 0.30775323510169983,
+          "spread_magnitude_loss": 0.00034345686435699463,
+          "spread_direction_loss": 0.8002896904945374,
+          "important_spread_fraction": 0.3333333432674408,
+          "proxy_loss": -0.16366836428642273,
+          "total_loss": 0.3462505340576172,
+          "gradient_norm_before_clip": 73.13965606689453,
+          "spread_gradient_norm": 5.137031078338623,
+          "rt_gradient_norm": 6.671367168426514
+        },
+        {
+          "batch": 5,
+          "node_id": 12,
+          "dates": [
+            "2022-02-23",
+            "2022-02-24"
+          ],
+          "base_mean_revenue": 76.98107147216797,
+          "prediction_loss": 7.505277633666992,
+          "base_prediction_loss": 7.454848289489746,
+          "spread_magnitude_loss": 0.22573594748973846,
+          "spread_direction_loss": 0.7828491926193237,
+          "important_spread_fraction": 0.7083333730697632,
+          "proxy_loss": -5.6965532302856445,
+          "total_loss": 7.465672016143799,
+          "gradient_norm_before_clip": 81.2293472290039,
+          "spread_gradient_norm": 19.672639846801758,
+          "rt_gradient_norm": 19.46068572998047
+        },
+        {
+          "batch": 6,
+          "node_id": 14,
+          "dates": [
+            "2020-04-20",
+            "2020-04-21"
+          ],
+          "base_mean_revenue": 55.32529067993164,
+          "prediction_loss": 0.38960927724838257,
+          "base_prediction_loss": 0.3556300103664398,
+          "spread_magnitude_loss": 0.00034727901220321655,
+          "spread_direction_loss": 0.6792381405830383,
+          "important_spread_fraction": 0.3333333432674408,
+          "proxy_loss": -2.05363392829895,
+          "total_loss": 0.38227951526641846,
+          "gradient_norm_before_clip": 87.21276092529297,
+          "spread_gradient_norm": 2.0212979316711426,
+          "rt_gradient_norm": 23.93735122680664
+        },
+        {
+          "batch": 7,
+          "node_id": 1,
+          "dates": [
+            "2022-05-10",
+            "2022-05-11"
+          ],
+          "base_mean_revenue": 495.1879577636719,
+          "prediction_loss": 5.692066192626953,
+          "base_prediction_loss": 5.6204729080200195,
+          "spread_magnitude_loss": 0.12686727941036224,
+          "spread_direction_loss": 1.3050010204315186,
+          "important_spread_fraction": 0.7916666865348816,
+          "proxy_loss": -3.4237446784973145,
+          "total_loss": 5.6647186279296875,
+          "gradient_norm_before_clip": 69.63079833984375,
+          "spread_gradient_norm": 3.5410525798797607,
+          "rt_gradient_norm": 11.557127952575684
+        },
+        {
+          "batch": 8,
+          "node_id": 4,
+          "dates": [
+            "2022-01-27",
+            "2022-01-28"
+          ],
+          "base_mean_revenue": 14.348747253417969,
+          "prediction_loss": 0.2510952651500702,
+          "base_prediction_loss": 0.21742448210716248,
+          "spread_magnitude_loss": 0.00021139781165402383,
+          "spread_direction_loss": 0.6732045412063599,
+          "important_spread_fraction": 0.4166666865348816,
+          "proxy_loss": 0.0014061089605093002,
+          "total_loss": 0.25034621357917786,
+          "gradient_norm_before_clip": 40.28438949584961,
+          "spread_gradient_norm": 8.248871803283691,
+          "rt_gradient_norm": 6.0066070556640625
+        },
+        {
+          "batch": 9,
+          "node_id": 0,
+          "dates": [
+            "2022-09-27",
+            "2022-09-28"
+          ],
+          "base_mean_revenue": 77.6425552368164,
+          "prediction_loss": 0.1960431933403015,
+          "base_prediction_loss": 0.15366481244564056,
+          "spread_magnitude_loss": 0.00026274225092493,
+          "spread_direction_loss": 0.8473047614097595,
+          "important_spread_fraction": 0.3958333432674408,
+          "proxy_loss": -1.7865976095199585,
+          "total_loss": 0.19009526073932648,
+          "gradient_norm_before_clip": 44.37968826293945,
+          "spread_gradient_norm": 0.9120092391967773,
+          "rt_gradient_norm": 42.196800231933594
+        },
+        {
+          "batch": 10,
+          "node_id": 9,
+          "dates": [
+            "2021-12-07",
+            "2021-12-08"
+          ],
+          "base_mean_revenue": 30.632518768310547,
+          "prediction_loss": 0.31345421075820923,
+          "base_prediction_loss": 0.2800236940383911,
+          "spread_magnitude_loss": 0.00022827833890914917,
+          "spread_direction_loss": 0.6683818697929382,
+          "important_spread_fraction": 0.6041666865348816,
+          "proxy_loss": 1.0480858087539673,
+          "total_loss": 0.3156580924987793,
+          "gradient_norm_before_clip": 66.34842681884766,
+          "spread_gradient_norm": 5.893642425537109,
+          "rt_gradient_norm": 43.676918029785156
+        },
+        {
+          "batch": 11,
+          "node_id": 5,
+          "dates": [
+            "2021-12-21",
+            "2021-12-22"
+          ],
+          "base_mean_revenue": 38.51185989379883,
+          "prediction_loss": 0.1866966187953949,
+          "base_prediction_loss": 0.1523772031068802,
+          "spread_magnitude_loss": 7.352232933044434e-05,
+          "spread_direction_loss": 0.6863145232200623,
+          "important_spread_fraction": 0.3125,
+          "proxy_loss": -0.0463230274617672,
+          "total_loss": 0.18599756062030792,
+          "gradient_norm_before_clip": 63.041725158691406,
+          "spread_gradient_norm": 3.1527068614959717,
+          "rt_gradient_norm": 5.032726287841797
+        },
+        {
+          "batch": 12,
+          "node_id": 8,
+          "dates": [
+            "2020-07-20",
+            "2020-07-21"
+          ],
+          "base_mean_revenue": 8.156768798828125,
+          "prediction_loss": 0.22102133929729462,
+          "base_prediction_loss": 0.1851072758436203,
+          "spread_magnitude_loss": 6.178518378874287e-05,
+          "spread_direction_loss": 0.7182195782661438,
+          "important_spread_fraction": 0.1875,
+          "proxy_loss": -0.16599714756011963,
+          "total_loss": 0.2198602706193924,
+          "gradient_norm_before_clip": 30.36073875427246,
+          "spread_gradient_norm": 3.2551205158233643,
+          "rt_gradient_norm": 4.881679534912109
+        },
+        {
+          "batch": 13,
+          "node_id": 3,
+          "dates": [
+            "2021-11-15",
+            "2021-11-16"
+          ],
+          "base_mean_revenue": 25.410512924194336,
+          "prediction_loss": 0.2592197358608246,
+          "base_prediction_loss": 0.22590884566307068,
+          "spread_magnitude_loss": 0.000527468859218061,
+          "spread_direction_loss": 0.6656900644302368,
+          "important_spread_fraction": 0.4375,
+          "proxy_loss": -1.532600998878479,
+          "total_loss": 0.2538442611694336,
+          "gradient_norm_before_clip": 39.384376525878906,
+          "spread_gradient_norm": 16.2635440826416,
+          "rt_gradient_norm": 48.934844970703125
+        },
+        {
+          "batch": 14,
+          "node_id": 13,
+          "dates": [
+            "2022-10-07",
+            "2022-10-08"
+          ],
+          "base_mean_revenue": 67.36900329589844,
+          "prediction_loss": 0.15976972877979279,
+          "base_prediction_loss": 0.13244366645812988,
+          "spread_magnitude_loss": 0.00024158756423275918,
+          "spread_direction_loss": 0.5462794899940491,
+          "important_spread_fraction": 0.4791666865348816,
+          "proxy_loss": 0.4938438832759857,
+          "total_loss": 0.1607719510793686,
+          "gradient_norm_before_clip": 39.366127014160156,
+          "spread_gradient_norm": 5.922018527984619,
+          "rt_gradient_norm": 42.37290954589844
+        },
+        {
+          "batch": 15,
+          "node_id": 11,
+          "dates": [
+            "2021-05-17",
+            "2021-05-18"
+          ],
+          "base_mean_revenue": -0.20155811309814453,
+          "prediction_loss": 0.17775745689868927,
+          "base_prediction_loss": 0.14023184776306152,
+          "spread_magnitude_loss": 0.00016232332563959062,
+          "spread_direction_loss": 0.7503496408462524,
+          "important_spread_fraction": 0.4791666865348816,
+          "proxy_loss": -0.4414706528186798,
+          "total_loss": 0.17589975893497467,
+          "gradient_norm_before_clip": 39.388954162597656,
+          "spread_gradient_norm": 2.633357286453247,
+          "rt_gradient_norm": 13.681818008422852
+        },
+        {
+          "batch": 16,
+          "node_id": 2,
+          "dates": [
+            "2020-06-03",
+            "2020-06-04"
+          ],
+          "base_mean_revenue": 44.1668586730957,
+          "prediction_loss": 0.21370507776737213,
+          "base_prediction_loss": 0.18749748170375824,
+          "spread_magnitude_loss": 0.0002647241053637117,
+          "spread_direction_loss": 0.5238873958587646,
+          "important_spread_fraction": 0.1666666716337204,
+          "proxy_loss": -1.3301783800125122,
+          "total_loss": 0.20907342433929443,
+          "gradient_norm_before_clip": 60.7804069519043,
+          "spread_gradient_norm": 3.521876573562622,
+          "rt_gradient_norm": 24.91567039489746
+        },
+        {
+          "batch": 17,
+          "node_id": 8,
+          "dates": [
+            "2021-06-24",
+            "2021-06-25"
+          ],
+          "base_mean_revenue": 42.166805267333984,
+          "prediction_loss": 0.15388041734695435,
+          "base_prediction_loss": 0.12436332553625107,
+          "spread_magnitude_loss": 0.0002317875623703003,
+          "spread_direction_loss": 0.5901100635528564,
+          "important_spread_fraction": 0.25,
+          "proxy_loss": -1.1904188394546509,
+          "total_loss": 0.14984752237796783,
+          "gradient_norm_before_clip": 29.265830993652344,
+          "spread_gradient_norm": 7.59320592880249,
+          "rt_gradient_norm": 27.092029571533203
+        },
+        {
+          "batch": 18,
+          "node_id": 1,
+          "dates": [
+            "2020-07-25",
+            "2020-07-26"
+          ],
+          "base_mean_revenue": 2.7416276931762695,
+          "prediction_loss": 0.1809665709733963,
+          "base_prediction_loss": 0.13945820927619934,
+          "spread_magnitude_loss": 9.39170568017289e-05,
+          "spread_direction_loss": 0.830073356628418,
+          "important_spread_fraction": 0.25,
+          "proxy_loss": 0.11926542222499847,
+          "total_loss": 0.18078145384788513,
+          "gradient_norm_before_clip": 24.188735961914062,
+          "spread_gradient_norm": 10.871980667114258,
+          "rt_gradient_norm": 3.1466896533966064
+        },
+        {
+          "batch": 19,
+          "node_id": 13,
+          "dates": [
+            "2022-03-29",
+            "2022-03-30"
+          ],
+          "base_mean_revenue": 57.61574935913086,
+          "prediction_loss": 0.4827705919742584,
+          "base_prediction_loss": 0.4451685845851898,
+          "spread_magnitude_loss": 0.0021437034010887146,
+          "spread_direction_loss": 0.749896228313446,
+          "important_spread_fraction": 0.6875,
+          "proxy_loss": 5.695217132568359,
+          "total_loss": 0.49840790033340454,
+          "gradient_norm_before_clip": 28.41638946533203,
+          "spread_gradient_norm": 49.74287796020508,
+          "rt_gradient_norm": 97.0499496459961
+        },
+        {
+          "batch": 20,
+          "node_id": 7,
+          "dates": [
+            "2021-12-17",
+            "2021-12-18"
+          ],
+          "base_mean_revenue": -0.17543500661849976,
+          "prediction_loss": 0.1185278594493866,
+          "base_prediction_loss": 0.0856802687048912,
+          "spread_magnitude_loss": 0.00012479971337597817,
+          "spread_direction_loss": 0.6568268537521362,
+          "important_spread_fraction": 0.4375,
+          "proxy_loss": 0.14727067947387695,
+          "total_loss": 0.1186140850186348,
+          "gradient_norm_before_clip": 18.625612258911133,
+          "spread_gradient_norm": 6.317668437957764,
+          "rt_gradient_norm": 12.071358680725098
+        },
+        {
+          "batch": 21,
+          "node_id": 10,
+          "dates": [
+            "2021-01-31",
+            "2021-02-01"
+          ],
+          "base_mean_revenue": 9.211174011230469,
+          "prediction_loss": 0.0671277716755867,
+          "base_prediction_loss": 0.03992713987827301,
+          "spread_magnitude_loss": 4.1825078369583935e-05,
+          "spread_direction_loss": 0.5439708232879639,
+          "important_spread_fraction": 0.1458333432674408,
+          "proxy_loss": 0.1732655018568039,
+          "total_loss": 0.06744618713855743,
+          "gradient_norm_before_clip": 22.211088180541992,
+          "spread_gradient_norm": 4.488094329833984,
+          "rt_gradient_norm": 11.473977088928223
+        },
+        {
+          "batch": 22,
+          "node_id": 0,
+          "dates": [
+            "2022-09-11",
+            "2022-09-12"
+          ],
+          "base_mean_revenue": 79.33956909179688,
+          "prediction_loss": 0.3051190674304962,
+          "base_prediction_loss": 0.2711472511291504,
+          "spread_magnitude_loss": 0.00046616047620773315,
+          "spread_direction_loss": 0.6789703965187073,
+          "important_spread_fraction": 0.4791666865348816,
+          "proxy_loss": 0.16890905797481537,
+          "total_loss": 0.30471041798591614,
+          "gradient_norm_before_clip": 40.814632415771484,
+          "spread_gradient_norm": 6.01532506942749,
+          "rt_gradient_norm": 2.3872146606445312
+        },
+        {
+          "batch": 23,
+          "node_id": 9,
+          "dates": [
+            "2020-12-24",
+            "2020-12-25"
+          ],
+          "base_mean_revenue": 14.267730712890625,
+          "prediction_loss": 0.3728899359703064,
+          "base_prediction_loss": 0.3314899504184723,
+          "spread_magnitude_loss": 0.0015192478895187378,
+          "spread_direction_loss": 0.8264800906181335,
+          "important_spread_fraction": 0.3125,
+          "proxy_loss": 8.218111991882324,
+          "total_loss": 0.3964255750179291,
+          "gradient_norm_before_clip": 55.4988899230957,
+          "spread_gradient_norm": 1.2705957889556885,
+          "rt_gradient_norm": 197.8836669921875
+        },
+        {
+          "batch": 24,
+          "node_id": 3,
+          "dates": [
+            "2022-12-14",
+            "2022-12-15"
+          ],
+          "base_mean_revenue": 87.36686706542969,
+          "prediction_loss": 0.27763238549232483,
+          "base_prediction_loss": 0.24640122056007385,
+          "spread_magnitude_loss": 0.0001696944236755371,
+          "spread_direction_loss": 0.6244534850120544,
+          "important_spread_fraction": 0.75,
+          "proxy_loss": -0.003092000260949135,
+          "total_loss": 0.27679020166397095,
+          "gradient_norm_before_clip": 77.5843505859375,
+          "spread_gradient_norm": 0.9214258193969727,
+          "rt_gradient_norm": 0.5888063907623291
+        },
+        {
+          "batch": 25,
+          "node_id": 11,
+          "dates": [
+            "2021-09-18",
+            "2021-09-19"
+          ],
+          "base_mean_revenue": 73.72769165039062,
+          "prediction_loss": 0.20671221613883972,
+          "base_prediction_loss": 0.1704472303390503,
+          "spread_magnitude_loss": 0.00043662142707034945,
+          "spread_direction_loss": 0.7248630523681641,
+          "important_spread_fraction": 0.5,
+          "proxy_loss": 2.6321935653686523,
+          "total_loss": 0.21398866176605225,
+          "gradient_norm_before_clip": 53.048248291015625,
+          "spread_gradient_norm": 3.0062403678894043,
+          "rt_gradient_norm": 76.89945983886719
+        },
+        {
+          "batch": 26,
+          "node_id": 4,
+          "dates": [
+            "2020-02-02",
+            "2020-02-03"
+          ],
+          "base_mean_revenue": -4.060426712036133,
+          "prediction_loss": 0.23037877678871155,
+          "base_prediction_loss": 0.1895895004272461,
+          "spread_magnitude_loss": 0.0003231515584047884,
+          "spread_direction_loss": 0.8154625296592712,
+          "important_spread_fraction": 0.7708333730697632,
+          "proxy_loss": -0.017601823434233665,
+          "total_loss": 0.2296348214149475,
+          "gradient_norm_before_clip": 45.04133605957031,
+          "spread_gradient_norm": 2.1705565452575684,
+          "rt_gradient_norm": 1.3192545175552368
+        },
+        {
+          "batch": 27,
+          "node_id": 6,
+          "dates": [
+            "2021-05-14",
+            "2021-05-15"
+          ],
+          "base_mean_revenue": 1.6221847534179688,
+          "prediction_loss": 0.23548835515975952,
+          "base_prediction_loss": 0.20289191603660583,
+          "spread_magnitude_loss": 0.00018193076539319009,
+          "spread_direction_loss": 0.6517468094825745,
+          "important_spread_fraction": 0.5416666865348816,
+          "proxy_loss": 0.29302456974983215,
+          "total_loss": 0.23566097021102905,
+          "gradient_norm_before_clip": 25.683900833129883,
+          "spread_gradient_norm": 9.939377784729004,
+          "rt_gradient_norm": 22.6290225982666
+        },
+        {
+          "batch": 28,
+          "node_id": 14,
+          "dates": [
+            "2020-10-17",
+            "2020-10-18"
+          ],
+          "base_mean_revenue": 0.7376205325126648,
+          "prediction_loss": 0.3125002682209015,
+          "base_prediction_loss": 0.2788776159286499,
+          "spread_magnitude_loss": 0.00021009892225265503,
+          "spread_direction_loss": 0.6722434163093567,
+          "important_spread_fraction": 0.5833333730697632,
+          "proxy_loss": 0.24427784979343414,
+          "total_loss": 0.3122955858707428,
+          "gradient_norm_before_clip": 73.21641540527344,
+          "spread_gradient_norm": 15.227758407592773,
+          "rt_gradient_norm": 2.8011410236358643
+        },
+        {
+          "batch": 29,
+          "node_id": 12,
+          "dates": [
+            "2022-07-31",
+            "2022-08-01"
+          ],
+          "base_mean_revenue": 270.5340270996094,
+          "prediction_loss": 0.24764184653759003,
+          "base_prediction_loss": 0.2305334508419037,
+          "spread_magnitude_loss": 0.0001074671745300293,
+          "spread_direction_loss": 0.3420603275299072,
+          "important_spread_fraction": 0.6875,
+          "proxy_loss": 0.011218806728720665,
+          "total_loss": 0.24693258106708527,
+          "gradient_norm_before_clip": 65.87136840820312,
+          "spread_gradient_norm": 0.2540566921234131,
+          "rt_gradient_norm": 0.1368669718503952
+        },
+        {
+          "batch": 30,
+          "node_id": 5,
+          "dates": [
+            "2020-05-30",
+            "2020-05-31"
+          ],
+          "base_mean_revenue": 29.412216186523438,
+          "prediction_loss": 0.08791721612215042,
+          "base_prediction_loss": 0.05950361117720604,
+          "spread_magnitude_loss": 3.3850472391350195e-05,
+          "spread_direction_loss": 0.5682383179664612,
+          "important_spread_fraction": 0.125,
+          "proxy_loss": 0.24912451207637787,
+          "total_loss": 0.08840084075927734,
+          "gradient_norm_before_clip": 6.6695451736450195,
+          "spread_gradient_norm": 0.029499057680368423,
+          "rt_gradient_norm": 13.836424827575684
+        }
+      ]
+    },
+    {
+      "epoch": 2,
+      "batches": 30,
+      "mean_base_revenue": 64.27388420104981,
+      "mean_prediction_loss": 0.8348169977466265,
+      "mean_proxy_loss": 0.22525342538331947,
+      "rows": [
+        {
+          "batch": 1,
+          "node_id": 5,
+          "dates": [
+            "2021-08-08",
+            "2021-08-09"
+          ],
+          "base_mean_revenue": 33.01005554199219,
+          "prediction_loss": 0.1609419286251068,
+          "base_prediction_loss": 0.1271015703678131,
+          "spread_magnitude_loss": 6.302198016783223e-05,
+          "spread_direction_loss": 0.6767444014549255,
+          "important_spread_fraction": 0.25,
+          "proxy_loss": -0.6098054647445679,
+          "total_loss": 0.15862968564033508,
+          "gradient_norm_before_clip": 33.191646575927734,
+          "spread_gradient_norm": 10.244256973266602,
+          "rt_gradient_norm": 27.704544067382812
+        },
+        {
+          "batch": 2,
+          "node_id": 9,
+          "dates": [
+            "2021-02-25",
+            "2021-02-26"
+          ],
+          "base_mean_revenue": 12.43298625946045,
+          "prediction_loss": 0.47458165884017944,
+          "base_prediction_loss": 0.4404556155204773,
+          "spread_magnitude_loss": 0.003150669392198324,
+          "spread_direction_loss": 0.6793699860572815,
+          "important_spread_fraction": 0.2708333432674408,
+          "proxy_loss": 0.32102343440055847,
+          "total_loss": 0.47412097454071045,
+          "gradient_norm_before_clip": 40.46137237548828,
+          "spread_gradient_norm": 6.5651044845581055,
+          "rt_gradient_norm": 32.23136520385742
+        },
+        {
+          "batch": 3,
+          "node_id": 13,
+          "dates": [
+            "2020-07-13",
+            "2020-07-14"
+          ],
+          "base_mean_revenue": 53.717376708984375,
+          "prediction_loss": 0.20831480622291565,
+          "base_prediction_loss": 0.1731155961751938,
+          "spread_magnitude_loss": 0.0001209204419865273,
+          "spread_direction_loss": 0.7038632035255432,
+          "important_spread_fraction": 0.1875,
+          "proxy_loss": -0.43759289383888245,
+          "total_loss": 0.2063770741224289,
+          "gradient_norm_before_clip": 41.24039077758789,
+          "spread_gradient_norm": 0.11599556356668472,
+          "rt_gradient_norm": 17.576990127563477
+        },
+        {
+          "batch": 4,
+          "node_id": 2,
+          "dates": [
+            "2020-02-23",
+            "2020-02-24"
+          ],
+          "base_mean_revenue": -5.494137763977051,
+          "prediction_loss": 0.09213173389434814,
+          "base_prediction_loss": 0.05570452660322189,
+          "spread_magnitude_loss": 6.948163354536518e-05,
+          "spread_direction_loss": 0.7284746766090393,
+          "important_spread_fraction": 0.2083333432674408,
+          "proxy_loss": 0.05335147678852081,
+          "total_loss": 0.09201539307832718,
+          "gradient_norm_before_clip": 10.867691040039062,
+          "spread_gradient_norm": 9.103521347045898,
+          "rt_gradient_norm": 43.11146926879883
+        },
+        {
+          "batch": 5,
+          "node_id": 3,
+          "dates": [
+            "2021-11-28",
+            "2021-11-29"
+          ],
+          "base_mean_revenue": 18.34010887145996,
+          "prediction_loss": 0.28955259919166565,
+          "base_prediction_loss": 0.2580101490020752,
+          "spread_magnitude_loss": 0.0004235506057739258,
+          "spread_direction_loss": 0.6304253935813904,
+          "important_spread_fraction": 0.3125,
+          "proxy_loss": -0.29960185289382935,
+          "total_loss": 0.2877851128578186,
+          "gradient_norm_before_clip": 28.562801361083984,
+          "spread_gradient_norm": 5.369334697723389,
+          "rt_gradient_norm": 4.60695219039917
+        },
+        {
+          "batch": 6,
+          "node_id": 4,
+          "dates": [
+            "2020-05-23",
+            "2020-05-24"
+          ],
+          "base_mean_revenue": -8.771474838256836,
+          "prediction_loss": 0.16653266549110413,
+          "base_prediction_loss": 0.1339571475982666,
+          "spread_magnitude_loss": 0.00012950599193572998,
+          "spread_direction_loss": 0.6513805985450745,
+          "important_spread_fraction": 0.4166666865348816,
+          "proxy_loss": 0.08261797577142715,
+          "total_loss": 0.16628091037273407,
+          "gradient_norm_before_clip": 16.122344970703125,
+          "spread_gradient_norm": 4.915619373321533,
+          "rt_gradient_norm": 12.656452178955078
+        },
+        {
+          "batch": 7,
+          "node_id": 1,
+          "dates": [
+            "2022-08-03",
+            "2022-08-04"
+          ],
+          "base_mean_revenue": 555.983642578125,
+          "prediction_loss": 0.9221673607826233,
+          "base_prediction_loss": 0.8734585046768188,
+          "spread_magnitude_loss": 0.004657219164073467,
+          "spread_direction_loss": 0.9695197939872742,
+          "important_spread_fraction": 0.6041666865348816,
+          "proxy_loss": 0.7496006488800049,
+          "total_loss": 0.9216496348381042,
+          "gradient_norm_before_clip": 7.6454877853393555,
+          "spread_gradient_norm": 14.2227783203125,
+          "rt_gradient_norm": 0.6143085360527039
+        },
+        {
+          "batch": 8,
+          "node_id": 7,
+          "dates": [
+            "2020-06-13",
+            "2020-06-14"
+          ],
+          "base_mean_revenue": -34.256187438964844,
+          "prediction_loss": 0.13815762102603912,
+          "base_prediction_loss": 0.10522612929344177,
+          "spread_magnitude_loss": 4.5843422412872314e-05,
+          "spread_direction_loss": 0.65858393907547,
+          "important_spread_fraction": 0.1666666716337204,
+          "proxy_loss": -0.1283106505870819,
+          "total_loss": 0.13735821843147278,
+          "gradient_norm_before_clip": 29.248489379882812,
+          "spread_gradient_norm": 10.592179298400879,
+          "rt_gradient_norm": 19.263004302978516
+        },
+        {
+          "batch": 9,
+          "node_id": 0,
+          "dates": [
+            "2022-07-22",
+            "2022-07-23"
+          ],
+          "base_mean_revenue": 335.8197937011719,
+          "prediction_loss": 0.28183868527412415,
+          "base_prediction_loss": 0.2674945890903473,
+          "spread_magnitude_loss": 0.00025997310876846313,
+          "spread_direction_loss": 0.2866218686103821,
+          "important_spread_fraction": 0.6875,
+          "proxy_loss": 2.355494737625122,
+          "total_loss": 0.28805965185165405,
+          "gradient_norm_before_clip": 46.391944885253906,
+          "spread_gradient_norm": 1.2359362840652466,
+          "rt_gradient_norm": 52.34931564331055
+        },
+        {
+          "batch": 10,
+          "node_id": 14,
+          "dates": [
+            "2021-11-11",
+            "2021-11-12"
+          ],
+          "base_mean_revenue": 22.865848541259766,
+          "prediction_loss": 0.3959053158760071,
+          "base_prediction_loss": 0.36905694007873535,
+          "spread_magnitude_loss": 0.0002542113361414522,
+          "spread_direction_loss": 0.5367133021354675,
+          "important_spread_fraction": 0.75,
+          "proxy_loss": 1.4167424440383911,
+          "total_loss": 0.39896783232688904,
+          "gradient_norm_before_clip": 27.870412826538086,
+          "spread_gradient_norm": 18.214542388916016,
+          "rt_gradient_norm": 35.93109893798828
+        },
+        {
+          "batch": 11,
+          "node_id": 12,
+          "dates": [
+            "2021-10-04",
+            "2021-10-05"
+          ],
+          "base_mean_revenue": 32.48755645751953,
+          "prediction_loss": 0.34433990716934204,
+          "base_prediction_loss": 0.30518510937690735,
+          "spread_magnitude_loss": 0.0008495226502418518,
+          "spread_direction_loss": 0.7822467684745789,
+          "important_spread_fraction": 0.3958333432674408,
+          "proxy_loss": -0.038265034556388855,
+          "total_loss": 0.34319207072257996,
+          "gradient_norm_before_clip": 50.631736755371094,
+          "spread_gradient_norm": 13.814406394958496,
+          "rt_gradient_norm": 0.9345981478691101
+        },
+        {
+          "batch": 12,
+          "node_id": 6,
+          "dates": [
+            "2022-12-22",
+            "2022-12-23"
+          ],
+          "base_mean_revenue": 182.52365112304688,
+          "prediction_loss": 8.007780075073242,
+          "base_prediction_loss": 7.965784072875977,
+          "spread_magnitude_loss": 0.15035930275917053,
+          "spread_direction_loss": 0.6895575523376465,
+          "important_spread_fraction": 1.0,
+          "proxy_loss": 0.4602104723453522,
+          "total_loss": 7.985136985778809,
+          "gradient_norm_before_clip": 47.193111419677734,
+          "spread_gradient_norm": 28.646455764770508,
+          "rt_gradient_norm": 139.36582946777344
+        },
+        {
+          "batch": 13,
+          "node_id": 8,
+          "dates": [
+            "2020-09-27",
+            "2020-09-28"
+          ],
+          "base_mean_revenue": -1.1738166809082031,
+          "prediction_loss": 0.198356032371521,
+          "base_prediction_loss": 0.1610240936279297,
+          "spread_magnitude_loss": 0.0001599217503098771,
+          "spread_direction_loss": 0.7464785575866699,
+          "important_spread_fraction": 0.3541666865348816,
+          "proxy_loss": -0.06773002445697784,
+          "total_loss": 0.19755776226520538,
+          "gradient_norm_before_clip": 27.866212844848633,
+          "spread_gradient_norm": 5.710702896118164,
+          "rt_gradient_norm": 9.13134479522705
+        },
+        {
+          "batch": 14,
+          "node_id": 11,
+          "dates": [
+            "2021-09-18",
+            "2021-09-19"
+          ],
+          "base_mean_revenue": 73.72769165039062,
+          "prediction_loss": 0.19883759319782257,
+          "base_prediction_loss": 0.16261781752109528,
+          "spread_magnitude_loss": 0.00043317428207956254,
+          "spread_direction_loss": 0.7239624261856079,
+          "important_spread_fraction": 0.5,
+          "proxy_loss": 2.1105613708496094,
+          "total_loss": 0.20457275211811066,
+          "gradient_norm_before_clip": 50.6421012878418,
+          "spread_gradient_norm": 6.713933944702148,
+          "rt_gradient_norm": 45.86983108520508
+        },
+        {
+          "batch": 15,
+          "node_id": 10,
+          "dates": [
+            "2022-02-23",
+            "2022-02-24"
+          ],
+          "base_mean_revenue": 82.03849029541016,
+          "prediction_loss": 7.465382099151611,
+          "base_prediction_loss": 7.4133148193359375,
+          "spread_magnitude_loss": 0.2270883321762085,
+          "spread_direction_loss": 0.8142576217651367,
+          "important_spread_fraction": 0.6875,
+          "proxy_loss": -3.1148521900177,
+          "total_loss": 7.43364143371582,
+          "gradient_norm_before_clip": 73.73899841308594,
+          "spread_gradient_norm": 20.528207778930664,
+          "rt_gradient_norm": 19.811508178710938
+        },
+        {
+          "batch": 16,
+          "node_id": 12,
+          "dates": [
+            "2022-11-02",
+            "2022-11-03"
+          ],
+          "base_mean_revenue": 39.05201721191406,
+          "prediction_loss": 0.30829954147338867,
+          "base_prediction_loss": 0.2767263650894165,
+          "spread_magnitude_loss": 0.0001054033637046814,
+          "spread_direction_loss": 0.6313581466674805,
+          "important_spread_fraction": 0.7291666865348816,
+          "proxy_loss": -0.05059295892715454,
+          "total_loss": 0.307222843170166,
+          "gradient_norm_before_clip": 83.36412048339844,
+          "spread_gradient_norm": 1.9920475482940674,
+          "rt_gradient_norm": 4.943342208862305
+        },
+        {
+          "batch": 17,
+          "node_id": 10,
+          "dates": [
+            "2021-11-11",
+            "2021-11-12"
+          ],
+          "base_mean_revenue": 30.037067413330078,
+          "prediction_loss": 0.20909202098846436,
+          "base_prediction_loss": 0.17714206874370575,
+          "spread_magnitude_loss": 0.00021493187523446977,
+          "spread_direction_loss": 0.6387842297554016,
+          "important_spread_fraction": 0.5208333730697632,
+          "proxy_loss": 0.3727739453315735,
+          "total_loss": 0.20958305895328522,
+          "gradient_norm_before_clip": 16.437114715576172,
+          "spread_gradient_norm": 21.928253173828125,
+          "rt_gradient_norm": 5.644201755523682
+        },
+        {
+          "batch": 18,
+          "node_id": 0,
+          "dates": [
+            "2020-05-23",
+            "2020-05-24"
+          ],
+          "base_mean_revenue": -23.870901107788086,
+          "prediction_loss": 0.11025667190551758,
+          "base_prediction_loss": 0.07803019136190414,
+          "spread_magnitude_loss": 6.088117879698984e-05,
+          "spread_direction_loss": 0.6444686055183411,
+          "important_spread_fraction": 0.1666666716337204,
+          "proxy_loss": 0.0016281306743621826,
+          "total_loss": 0.10993078351020813,
+          "gradient_norm_before_clip": 17.637115478515625,
+          "spread_gradient_norm": 12.399574279785156,
+          "rt_gradient_norm": 1.289643406867981
+        },
+        {
+          "batch": 19,
+          "node_id": 7,
+          "dates": [
+            "2022-02-01",
+            "2022-02-02"
+          ],
+          "base_mean_revenue": -41.99269104003906,
+          "prediction_loss": 0.11294838786125183,
+          "base_prediction_loss": 0.09119866788387299,
+          "spread_magnitude_loss": 0.000101432204246521,
+          "spread_direction_loss": 0.43489283323287964,
+          "important_spread_fraction": 0.9791666865348816,
+          "proxy_loss": 0.3212195336818695,
+          "total_loss": 0.11357320100069046,
+          "gradient_norm_before_clip": 17.55301856994629,
+          "spread_gradient_norm": 5.707760810852051,
+          "rt_gradient_norm": 15.961382865905762
+        },
+        {
+          "batch": 20,
+          "node_id": 14,
+          "dates": [
+            "2022-06-13",
+            "2022-06-14"
+          ],
+          "base_mean_revenue": 71.86968231201172,
+          "prediction_loss": 1.1445831060409546,
+          "base_prediction_loss": 1.1256308555603027,
+          "spread_magnitude_loss": 0.00044280788279138505,
+          "spread_direction_loss": 0.37860146164894104,
+          "important_spread_fraction": 0.875,
+          "proxy_loss": 0.02730119228363037,
+          "total_loss": 1.1412311792373657,
+          "gradient_norm_before_clip": 86.03085327148438,
+          "spread_gradient_norm": 2.1500515937805176,
+          "rt_gradient_norm": 1.9868193864822388
+        },
+        {
+          "batch": 21,
+          "node_id": 4,
+          "dates": [
+            "2022-11-07",
+            "2022-11-08"
+          ],
+          "base_mean_revenue": 46.213985443115234,
+          "prediction_loss": 0.4219849407672882,
+          "base_prediction_loss": 0.38492414355278015,
+          "spread_magnitude_loss": 0.0004250854253768921,
+          "spread_direction_loss": 0.7407907247543335,
+          "important_spread_fraction": 0.625,
+          "proxy_loss": -0.16671201586723328,
+          "total_loss": 0.420218825340271,
+          "gradient_norm_before_clip": 30.15894317626953,
+          "spread_gradient_norm": 18.020523071289062,
+          "rt_gradient_norm": 32.902828216552734
+        },
+        {
+          "batch": 22,
+          "node_id": 2,
+          "dates": [
+            "2022-04-28",
+            "2022-04-29"
+          ],
+          "base_mean_revenue": 58.21641540527344,
+          "prediction_loss": 0.3469572067260742,
+          "base_prediction_loss": 0.30475085973739624,
+          "spread_magnitude_loss": 0.0008802935481071472,
+          "spread_direction_loss": 0.8432464599609375,
+          "important_spread_fraction": 0.9791666865348816,
+          "proxy_loss": 0.05425519496202469,
+          "total_loss": 0.34607911109924316,
+          "gradient_norm_before_clip": 50.95676040649414,
+          "spread_gradient_norm": 7.661484241485596,
+          "rt_gradient_norm": 19.726545333862305
+        },
+        {
+          "batch": 23,
+          "node_id": 3,
+          "dates": [
+            "2020-03-11",
+            "2020-03-12"
+          ],
+          "base_mean_revenue": 16.926881790161133,
+          "prediction_loss": 0.5269765853881836,
+          "base_prediction_loss": 0.4878411293029785,
+          "spread_magnitude_loss": 0.0016533310990780592,
+          "spread_direction_loss": 0.78105628490448,
+          "important_spread_fraction": 0.3333333432674408,
+          "proxy_loss": -0.4442422389984131,
+          "total_loss": 0.5240629315376282,
+          "gradient_norm_before_clip": 50.494529724121094,
+          "spread_gradient_norm": 6.969391345977783,
+          "rt_gradient_norm": 23.202260971069336
+        },
+        {
+          "batch": 24,
+          "node_id": 13,
+          "dates": [
+            "2022-04-18",
+            "2022-04-19"
+          ],
+          "base_mean_revenue": 0.0,
+          "prediction_loss": 0.30489665269851685,
+          "base_prediction_loss": 0.2528403699398041,
+          "spread_magnitude_loss": 0.0007828052039258182,
+          "spread_direction_loss": 1.0403430461883545,
+          "important_spread_fraction": 0.6041666865348816,
+          "proxy_loss": 0.12561088800430298,
+          "total_loss": 0.3043587803840637,
+          "gradient_norm_before_clip": 69.01397705078125,
+          "spread_gradient_norm": 13.39914321899414,
+          "rt_gradient_norm": 13.575812339782715
+        },
+        {
+          "batch": 25,
+          "node_id": 6,
+          "dates": [
+            "2021-07-27",
+            "2021-07-28"
+          ],
+          "base_mean_revenue": 200.70556640625,
+          "prediction_loss": 1.032483458518982,
+          "base_prediction_loss": 0.9894949197769165,
+          "spread_magnitude_loss": 0.0014084255089983344,
+          "spread_direction_loss": 0.8583622574806213,
+          "important_spread_fraction": 0.4583333432674408,
+          "proxy_loss": 3.999727249145508,
+          "total_loss": 1.0413851737976074,
+          "gradient_norm_before_clip": 49.38957214355469,
+          "spread_gradient_norm": 116.25794982910156,
+          "rt_gradient_norm": 20.483226776123047
+        },
+        {
+          "batch": 26,
+          "node_id": 11,
+          "dates": [
+            "2021-10-12",
+            "2021-10-13"
+          ],
+          "base_mean_revenue": 23.627288818359375,
+          "prediction_loss": 0.2276814877986908,
+          "base_prediction_loss": 0.18680624663829803,
+          "spread_magnitude_loss": 0.00029656788683496416,
+          "spread_direction_loss": 0.8172082304954529,
+          "important_spread_fraction": 0.5833333730697632,
+          "proxy_loss": -0.8428034782409668,
+          "total_loss": 0.22447001934051514,
+          "gradient_norm_before_clip": 44.476036071777344,
+          "spread_gradient_norm": 25.47527313232422,
+          "rt_gradient_norm": 53.44525146484375
+        },
+        {
+          "batch": 27,
+          "node_id": 1,
+          "dates": [
+            "2021-07-05",
+            "2021-07-06"
+          ],
+          "base_mean_revenue": 34.952980041503906,
+          "prediction_loss": 0.17102916538715363,
+          "base_prediction_loss": 0.14539675414562225,
+          "spread_magnitude_loss": 0.00012476742267608643,
+          "spread_direction_loss": 0.512523353099823,
+          "important_spread_fraction": 0.3125,
+          "proxy_loss": 0.8968444466590881,
+          "total_loss": 0.1732066124677658,
+          "gradient_norm_before_clip": 30.932891845703125,
+          "spread_gradient_norm": 4.018130302429199,
+          "rt_gradient_norm": 21.969818115234375
+        },
+        {
+          "batch": 28,
+          "node_id": 5,
+          "dates": [
+            "2021-05-09",
+            "2021-05-10"
+          ],
+          "base_mean_revenue": 39.1192741394043,
+          "prediction_loss": 0.1409796178340912,
+          "base_prediction_loss": 0.10635469853878021,
+          "spread_magnitude_loss": 0.0002484619617462158,
+          "spread_direction_loss": 0.6922500729560852,
+          "important_spread_fraction": 0.4375,
+          "proxy_loss": -0.04311005771160126,
+          "total_loss": 0.1404273509979248,
+          "gradient_norm_before_clip": 9.15857982635498,
+          "spread_gradient_norm": 6.312904357910156,
+          "rt_gradient_norm": 1.62764573097229
+        },
+        {
+          "batch": 29,
+          "node_id": 9,
+          "dates": [
+            "2021-08-19",
+            "2021-08-20"
+          ],
+          "base_mean_revenue": 72.97151947021484,
+          "prediction_loss": 0.533617377281189,
+          "base_prediction_loss": 0.5059760808944702,
+          "spread_magnitude_loss": 0.005330771207809448,
+          "spread_direction_loss": 0.5474949479103088,
+          "important_spread_fraction": 0.375,
+          "proxy_loss": -0.3587200939655304,
+          "total_loss": 0.5309403538703918,
+          "gradient_norm_before_clip": 14.42002010345459,
+          "spread_gradient_norm": 2.14054799079895,
+          "rt_gradient_norm": 12.819051742553711
+        },
+        {
+          "batch": 30,
+          "node_id": 8,
+          "dates": [
+            "2020-01-25",
+            "2020-01-26"
+          ],
+          "base_mean_revenue": 7.135854721069336,
+          "prediction_loss": 0.1079036295413971,
+          "base_prediction_loss": 0.06510992348194122,
+          "spread_magnitude_loss": 8.709728717803955e-05,
+          "spread_direction_loss": 0.8557871580123901,
+          "important_spread_fraction": 0.0625,
+          "proxy_loss": 0.010978574864566326,
+          "total_loss": 0.10761285573244095,
+          "gradient_norm_before_clip": 32.794105529785156,
+          "spread_gradient_norm": 1.8476371765136719,
+          "rt_gradient_norm": 3.2808468341827393
+        }
+      ]
+    }
+  ],
+  "runtime_seconds": 30.976939365267754,
+  "candidate_manifest": "data/checkpoints/global_joint_spread_grid_v1/jointspread_a/candidate_manifest.json",
+  "2024_used": false,
+  "2025_used": false
+}

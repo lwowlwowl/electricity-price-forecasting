@@ -1,0 +1,22 @@
+# NYISO价格预测/基线合同；05:00 Eastern为本项目冻结DA起报时刻。
+market: NYISO
+data_version: v3
+context_len: 168
+horizon_da: 24
+horizon_rt: 4
+da_issue_hour_local: 5
+train_stride: 1
+val_stride: 1
+eval_stride: 1
+use_dual_settlement: true
+use_dual_split: true
+use_deviation_penalty: true
+bess_power_mw: 1.0
+bess_energy_mwh: 4.0
+bess_eta: 0.95
+bess_init_soc_frac: 0.5
+bess_kappa: 5.7
+bess_soc_min: 0.4
+bess_soc_max: 3.6
+bess_e_cyc: 4.0
+seed: 0

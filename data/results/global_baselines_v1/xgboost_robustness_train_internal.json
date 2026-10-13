@@ -1,0 +1,319 @@
+{
+  "experiment": "xgboost_objective_selection_train_internal",
+  "selection_data": "2020-2021 fit; 2022 holdout; 2023 never used for selection",
+  "task": "rt_at_da",
+  "split_date": "2022-01-01",
+  "contract_hash": "0c5956fb9fd24b5774b6fbdb066a202b17572fa57d012c67bf7354ce7c7d8dd6",
+  "n_estimators": 180,
+  "summary": {
+    "squared": {
+      "objective": "reg:squarederror",
+      "macro_mae": 99.81621915099949,
+      "macro_rmse": 291.41648047199345,
+      "nodes": {
+        "HB_BUSAVG": {
+          "mae": 92.45985957589801,
+          "rmse": 278.24279675809686,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_HOUSTON": {
+          "mae": 105.78039214973509,
+          "rmse": 299.1420533578658,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_HUBAVG": {
+          "mae": 93.174222998163,
+          "rmse": 277.91306802204844,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_NORTH": {
+          "mae": 88.3648639526216,
+          "rmse": 272.9211674955029,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_PAN": {
+          "mae": 101.4553623726587,
+          "rmse": 285.14946939564214,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_SOUTH": {
+          "mae": 100.48378866518586,
+          "rmse": 276.6169059951353,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_WEST": {
+          "mae": 98.92642236258688,
+          "rmse": 282.9672773133772,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_AEN": {
+          "mae": 103.2454645377525,
+          "rmse": 323.5376358555881,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_CPS": {
+          "mae": 104.57088439250822,
+          "rmse": 304.98971062380724,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_HOUSTON": {
+          "mae": 107.67518171989794,
+          "rmse": 301.85523400008736,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_LCRA": {
+          "mae": 102.79147198266834,
+          "rmse": 308.5661849288567,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_NORTH": {
+          "mae": 94.18796304801974,
+          "rmse": 296.04791083354735,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_RAYBN": {
+          "mae": 97.92141931508138,
+          "rmse": 286.19358252399894,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_SOUTH": {
+          "mae": 102.4467807541353,
+          "rmse": 270.76833288515894,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_WEST": {
+          "mae": 103.75920943807922,
+          "rmse": 306.3358770911881,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        }
+      }
+    },
+    "absolute": {
+      "objective": "reg:absoluteerror",
+      "macro_mae": 33.32843303341361,
+      "macro_rmse": 168.9581424922489,
+      "nodes": {
+        "HB_BUSAVG": {
+          "mae": 31.210234207580566,
+          "rmse": 164.72136741498542,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_HOUSTON": {
+          "mae": 35.194326851643375,
+          "rmse": 181.06107951686857,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_HUBAVG": {
+          "mae": 32.14701149645949,
+          "rmse": 164.99319063801644,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_NORTH": {
+          "mae": 30.677450907680047,
+          "rmse": 168.91524968930963,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_PAN": {
+          "mae": 38.34780857375356,
+          "rmse": 169.56891057328818,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_SOUTH": {
+          "mae": 29.849362679799295,
+          "rmse": 152.68062365082545,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_WEST": {
+          "mae": 36.188657782483,
+          "rmse": 169.47010653190858,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_AEN": {
+          "mae": 33.43739165122271,
+          "rmse": 182.14469312944036,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_CPS": {
+          "mae": 32.475918470465764,
+          "rmse": 172.4802459683576,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_HOUSTON": {
+          "mae": 35.54146090545168,
+          "rmse": 181.57082214133334,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_LCRA": {
+          "mae": 33.259567421400675,
+          "rmse": 177.30669029724726,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_NORTH": {
+          "mae": 31.315078739155158,
+          "rmse": 170.14909696812396,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_RAYBN": {
+          "mae": 31.049710782739325,
+          "rmse": 170.77204600912827,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_SOUTH": {
+          "mae": 29.886110223015695,
+          "rmse": 135.33076524287884,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_WEST": {
+          "mae": 39.34640480835369,
+          "rmse": 173.20724961202177,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        }
+      }
+    },
+    "pseudohuber": {
+      "objective": "reg:pseudohubererror",
+      "macro_mae": 31.961556615018665,
+      "macro_rmse": 170.0899470678192,
+      "nodes": {
+        "HB_BUSAVG": {
+          "mae": 29.676061392786195,
+          "rmse": 165.6899551913705,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_HOUSTON": {
+          "mae": 33.843166026578245,
+          "rmse": 181.92761035739335,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_HUBAVG": {
+          "mae": 30.224054034731935,
+          "rmse": 165.73720927654608,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_NORTH": {
+          "mae": 29.397959829198626,
+          "rmse": 169.65183776972822,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_PAN": {
+          "mae": 36.32682551849614,
+          "rmse": 170.8090841196009,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_SOUTH": {
+          "mae": 28.47692524995659,
+          "rmse": 153.39020879751985,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "HB_WEST": {
+          "mae": 34.65208486838878,
+          "rmse": 170.66493868295728,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_AEN": {
+          "mae": 32.15620381229237,
+          "rmse": 183.08645632210258,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_CPS": {
+          "mae": 31.29697517473955,
+          "rmse": 173.3282192026176,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_HOUSTON": {
+          "mae": 34.63828627110954,
+          "rmse": 183.21691089474936,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_LCRA": {
+          "mae": 31.922358461472875,
+          "rmse": 178.23156272706893,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_NORTH": {
+          "mae": 29.59671815857596,
+          "rmse": 171.04394263004883,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_RAYBN": {
+          "mae": 30.00488983104634,
+          "rmse": 171.59267450738832,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_SOUTH": {
+          "mae": 28.28497921681954,
+          "rmse": 137.3074272265456,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        },
+        "LZ_WEST": {
+          "mae": 38.92586137908726,
+          "rmse": 175.67116831165063,
+          "fit_samples": 719,
+          "holdout_samples": 363
+        }
+      }
+    }
+  },
+  "ranking": [
+    {
+      "rank": 1,
+      "name": "pseudohuber",
+      "macro_mae": 31.961556615018665
+    },
+    {
+      "rank": 2,
+      "name": "absolute",
+      "macro_mae": 33.32843303341361
+    },
+    {
+      "rank": 3,
+      "name": "squared",
+      "macro_mae": 99.81621915099949
+    }
+  ],
+  "runtime_seconds": 594.8507178000145
+}

@@ -1,0 +1,51 @@
+{
+  "experiment": "global_da_fixed_weight_blend_screen",
+  "status": "2023_inner_validation_candidate_not_final",
+  "phase": "inner",
+  "selection_target": "full continuous MPC net revenue",
+  "families": [
+    {
+      "family": "blendgm05",
+      "xgboost_weight": 1.05,
+      "global_weight": -0.05,
+      "global_source_family": "globalmedian"
+    },
+    {
+      "family": "blendgm10",
+      "xgboost_weight": 1.1,
+      "global_weight": -0.1,
+      "global_source_family": "globalmedian"
+    },
+    {
+      "family": "blendgm15",
+      "xgboost_weight": 1.15,
+      "global_weight": -0.15,
+      "global_source_family": "globalmedian"
+    },
+    {
+      "family": "blendgm20",
+      "xgboost_weight": 1.2,
+      "global_weight": -0.2,
+      "global_source_family": "globalmedian"
+    },
+    {
+      "family": "blendgm25",
+      "xgboost_weight": 1.25,
+      "global_weight": -0.25,
+      "global_source_family": "globalmedian"
+    },
+    {
+      "family": "blendgm30",
+      "xgboost_weight": 1.3,
+      "global_weight": -0.3,
+      "global_source_family": "globalmedian"
+    },
+    {
+      "family": "blendgm40",
+      "xgboost_weight": 1.4,
+      "global_weight": -0.4,
+      "global_source_family": "globalmedian"
+    }
+  ],
+  "prediction_dir": "data/results/global_da_median_weight_screen_predictions"
+}

@@ -1,0 +1,54 @@
+{
+  "experiment": "global_da_robust_candidate_pool",
+  "selection": "top unique candidates by 2023 inner-validation node-macro MAE",
+  "top_k": 4,
+  "selected": [
+    {
+      "macro_mae": 39.59117677135134,
+      "epoch": 5,
+      "checkpoint": "data/checkpoints/global_ercot_mae_f1_v1/da_inner_seed0/candidate_epoch_005.pt",
+      "checkpoint_sha256": "def83108aa0a465b12d3b8a5beef11250591e474995ac8826867ad3a5d92e2cf",
+      "source_run": "data/checkpoints/global_ercot_mae_f1_v1/da_inner_seed0"
+    },
+    {
+      "macro_mae": 41.26347275358258,
+      "epoch": 4,
+      "checkpoint": "data/checkpoints/global_ercot_mae_f1_v1/da_inner_seed0/candidate_epoch_004.pt",
+      "checkpoint_sha256": "65fdbaa461691aa2d867c7a0dc9eb1a07a299f9d48341773a8cd496911dd24c7",
+      "source_run": "data/checkpoints/global_ercot_mae_f1_v1/da_inner_seed0"
+    },
+    {
+      "macro_mae": 41.51444327237959,
+      "epoch": 0,
+      "checkpoint": "data/checkpoints/global_ercot_mae_f1_v1/da_inner_seed0/candidate_epoch_000.pt",
+      "checkpoint_sha256": "ac1daa0f1a5a6986304c31a1b7397a3b8c7f6f02ebd9f09db466d468557042b3",
+      "source_run": "data/checkpoints/global_ercot_mae_f1_v1/da_inner_seed0"
+    },
+    {
+      "macro_mae": 46.66299724508799,
+      "epoch": 4,
+      "checkpoint": "data/checkpoints/global_ercot_mae_f1_decoder_v1/da_inner_seed0/candidate_epoch_004.pt",
+      "checkpoint_sha256": "de0e278ae5cde8eddacbee504c58077d74f695b0fd1b47f9ed418bc9284e9988",
+      "source_run": "data/checkpoints/global_ercot_mae_f1_decoder_v1/da_inner_seed0"
+    }
+  ],
+  "families": {
+    "daopt0": {
+      "da": "data/checkpoints/global_ercot_mae_f1_v1/da_inner_seed0/candidate_epoch_005.pt"
+    },
+    "daopt1": {
+      "da": "data/checkpoints/global_ercot_mae_f1_v1/da_inner_seed0/candidate_epoch_004.pt"
+    },
+    "daopt2": {
+      "da": "data/checkpoints/global_ercot_mae_f1_v1/da_inner_seed0/candidate_epoch_000.pt"
+    },
+    "daopt3": {
+      "da": "data/checkpoints/global_ercot_mae_f1_decoder_v1/da_inner_seed0/candidate_epoch_004.pt"
+    }
+  },
+  "prediction_dir": "data/results/global_da_robust_predictions",
+  "template_only_tasks": {
+    "rt_at_da": "c1; only satisfies archive schema and is not used in requested triplets",
+    "rt": "c0; only satisfies archive schema and is not used in requested triplets"
+  }
+}

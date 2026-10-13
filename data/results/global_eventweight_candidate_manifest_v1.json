@@ -1,0 +1,75 @@
+{
+  "experiment": "global_ercot_eventweight_v1_candidates",
+  "phase": "inner",
+  "seed": 0,
+  "2024_used": false,
+  "2025_used": false,
+  "selection_rule": "train each task from scratch without lag168; retain top-K epochs by 2023 node-equal macro MAE; select only among the resulting Cartesian triplets using the frozen full settlement",
+  "losses": {
+    "da": "mae",
+    "rt_at_da": "pseudo_huber",
+    "rt": "mae"
+  },
+  "selected_by_task": {
+    "da": [
+      {
+        "task": "da",
+        "epoch": 3,
+        "macro_mae": 37.797991364119724,
+        "checkpoint": "data/checkpoints/global_ercot_eventweight_da_mae_v1/da_inner_seed0/candidate_epoch_003.pt",
+        "checkpoint_sha256": "0d36075e15f79b443417f1288732e66b643422929e365fd29c88a5e846c524c4"
+      },
+      {
+        "task": "da",
+        "epoch": 2,
+        "macro_mae": 39.84013832303629,
+        "checkpoint": "data/checkpoints/global_ercot_eventweight_da_mae_v1/da_inner_seed0/candidate_epoch_002.pt",
+        "checkpoint_sha256": "5c93fff5acd8e4b886c9becbec72430cac988e6f8e7d9db1d208b675fe8089f1"
+      }
+    ],
+    "rt_at_da": [
+      {
+        "task": "rt_at_da",
+        "epoch": 5,
+        "macro_mae": 44.96276365921772,
+        "checkpoint": "data/checkpoints/global_ercot_eventweight_rt_at_da_pseudohuber_v1/rt_at_da_inner_seed0/candidate_epoch_005.pt",
+        "checkpoint_sha256": "47efcfa9f624a88e256fbcc175339903f12db618e7816d3bddda42ad7e51844f"
+      },
+      {
+        "task": "rt_at_da",
+        "epoch": 3,
+        "macro_mae": 51.81673125391675,
+        "checkpoint": "data/checkpoints/global_ercot_eventweight_rt_at_da_pseudohuber_v1/rt_at_da_inner_seed0/candidate_epoch_003.pt",
+        "checkpoint_sha256": "eabe25ddf9a12309e2e17251fc39409cc60a969e36795589d7efc9ac39c4b739"
+      }
+    ],
+    "rt": [
+      {
+        "task": "rt",
+        "epoch": 12,
+        "macro_mae": 32.86789101658651,
+        "checkpoint": "data/checkpoints/global_ercot_eventweight_rt_mae_v1/rt_inner_seed0/candidate_epoch_012.pt",
+        "checkpoint_sha256": "e1887bac0698eb68d27866df68e4982e1a16bcf04120a1d0abb1bc96b2ae86e5"
+      },
+      {
+        "task": "rt",
+        "epoch": 8,
+        "macro_mae": 33.31472062708717,
+        "checkpoint": "data/checkpoints/global_ercot_eventweight_rt_mae_v1/rt_inner_seed0/candidate_epoch_008.pt",
+        "checkpoint_sha256": "0ee5d0369d614ae466ac9af20f875e773de968be9fe9759e4de67dbf09ac9739"
+      }
+    ]
+  },
+  "families": {
+    "eventweight0": {
+      "da": "data/checkpoints/global_ercot_eventweight_da_mae_v1/da_inner_seed0/candidate_epoch_003.pt",
+      "rt_at_da": "data/checkpoints/global_ercot_eventweight_rt_at_da_pseudohuber_v1/rt_at_da_inner_seed0/candidate_epoch_005.pt",
+      "rt": "data/checkpoints/global_ercot_eventweight_rt_mae_v1/rt_inner_seed0/candidate_epoch_012.pt"
+    },
+    "eventweight1": {
+      "da": "data/checkpoints/global_ercot_eventweight_da_mae_v1/da_inner_seed0/candidate_epoch_002.pt",
+      "rt_at_da": "data/checkpoints/global_ercot_eventweight_rt_at_da_pseudohuber_v1/rt_at_da_inner_seed0/candidate_epoch_003.pt",
+      "rt": "data/checkpoints/global_ercot_eventweight_rt_mae_v1/rt_inner_seed0/candidate_epoch_008.pt"
+    }
+  }
+}

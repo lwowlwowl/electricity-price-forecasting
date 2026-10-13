@@ -1,0 +1,498 @@
+{
+  "task": "rt_at_da",
+  "market": "PJM",
+  "configured_market": "PJM",
+  "da_issue_hour_local": 11,
+  "market_contract_smoke_only": false,
+  "phase": "inner",
+  "smoke_only": false,
+  "nodes": [
+    "HUB:AEP GEN HUB",
+    "HUB:AEP-DAYTON HUB",
+    "HUB:ATSI GEN HUB",
+    "HUB:CHICAGO GEN HUB",
+    "HUB:CHICAGO HUB",
+    "HUB:DOMINION HUB",
+    "HUB:EASTERN HUB",
+    "HUB:N ILLINOIS HUB",
+    "HUB:NEW JERSEY HUB",
+    "HUB:OHIO HUB",
+    "HUB:WEST INT HUB",
+    "HUB:WESTERN HUB",
+    "ZONE:AECO",
+    "ZONE:AEP",
+    "ZONE:APS",
+    "ZONE:ATSI",
+    "ZONE:BGE",
+    "ZONE:COMED",
+    "ZONE:DAY",
+    "ZONE:DEOK",
+    "ZONE:DOM",
+    "ZONE:DPL",
+    "ZONE:DUQ",
+    "ZONE:EKPC",
+    "ZONE:JCPL",
+    "ZONE:METED",
+    "ZONE:MID-ATL/APS",
+    "ZONE:OVEC",
+    "ZONE:PECO",
+    "ZONE:PENELEC",
+    "ZONE:PEPCO",
+    "ZONE:PJM-RTO",
+    "ZONE:PPL",
+    "ZONE:PSEG",
+    "ZONE:RECO"
+  ],
+  "contract_hash": "0c5956fb9fd24b5774b6fbdb066a202b17572fa57d012c67bf7354ce7c7d8dd6",
+  "entity_mapping_hash": "6d6814aa00342f37b19c4219f6cda0ad30fd81ddf61ce72f0e91e67905d3c24e",
+  "models": {
+    "seasonal": {
+      "macro_mae": 12.996756114709177,
+      "macro_rmse": 27.527426486907967,
+      "node_count": 35,
+      "nodes": {
+        "HUB:AEP GEN HUB": {
+          "mae": 11.047608697901525,
+          "rmse": 22.447463420581812,
+          "samples": 363
+        },
+        "HUB:AEP-DAYTON HUB": {
+          "mae": 11.346519759863861,
+          "rmse": 22.814353380816776,
+          "samples": 363
+        },
+        "HUB:ATSI GEN HUB": {
+          "mae": 11.36911080915847,
+          "rmse": 23.49748443001993,
+          "samples": 363
+        },
+        "HUB:CHICAGO GEN HUB": {
+          "mae": 12.504470491470535,
+          "rmse": 21.629083572856455,
+          "samples": 363
+        },
+        "HUB:CHICAGO HUB": {
+          "mae": 12.626748519086709,
+          "rmse": 21.975879080381837,
+          "samples": 363
+        },
+        "HUB:DOMINION HUB": {
+          "mae": 15.265607572898707,
+          "rmse": 33.386712699541505,
+          "samples": 363
+        },
+        "HUB:EASTERN HUB": {
+          "mae": 18.26430693425108,
+          "rmse": 48.02118214114637,
+          "samples": 363
+        },
+        "HUB:N ILLINOIS HUB": {
+          "mae": 12.787119898847171,
+          "rmse": 22.359353594750292,
+          "samples": 363
+        },
+        "HUB:NEW JERSEY HUB": {
+          "mae": 10.854667344150245,
+          "rmse": 23.53675704895474,
+          "samples": 363
+        },
+        "HUB:OHIO HUB": {
+          "mae": 11.311182205807297,
+          "rmse": 22.607135749653416,
+          "samples": 363
+        },
+        "HUB:WEST INT HUB": {
+          "mae": 12.85648295379101,
+          "rmse": 26.862883171271697,
+          "samples": 363
+        },
+        "HUB:WESTERN HUB": {
+          "mae": 14.097527205451462,
+          "rmse": 29.352716716765126,
+          "samples": 363
+        },
+        "ZONE:AECO": {
+          "mae": 11.246936150004657,
+          "rmse": 23.793241091117988,
+          "samples": 363
+        },
+        "ZONE:AEP": {
+          "mae": 11.643198581492824,
+          "rmse": 23.708645209996163,
+          "samples": 363
+        },
+        "ZONE:APS": {
+          "mae": 13.333135940456083,
+          "rmse": 27.833025114392992,
+          "samples": 363
+        },
+        "ZONE:ATSI": {
+          "mae": 11.766483297142225,
+          "rmse": 24.42565478953182,
+          "samples": 363
+        },
+        "ZONE:BGE": {
+          "mae": 18.42637705233263,
+          "rmse": 39.172575636451896,
+          "samples": 363
+        },
+        "ZONE:COMED": {
+          "mae": 12.738708113477744,
+          "rmse": 22.205470817952996,
+          "samples": 363
+        },
+        "ZONE:DAY": {
+          "mae": 12.064218671525477,
+          "rmse": 24.26354024487551,
+          "samples": 363
+        },
+        "ZONE:DEOK": {
+          "mae": 11.928481718397009,
+          "rmse": 24.14121941770545,
+          "samples": 363
+        },
+        "ZONE:DOM": {
+          "mae": 19.066373292900643,
+          "rmse": 44.53949488279954,
+          "samples": 363
+        },
+        "ZONE:DPL": {
+          "mae": 19.61324609352391,
+          "rmse": 53.24706207358545,
+          "samples": 363
+        },
+        "ZONE:DUQ": {
+          "mae": 12.70646658556192,
+          "rmse": 28.96179903719747,
+          "samples": 363
+        },
+        "ZONE:EKPC": {
+          "mae": 11.873665633061481,
+          "rmse": 23.947527127947218,
+          "samples": 363
+        },
+        "ZONE:JCPL": {
+          "mae": 10.900178720909484,
+          "rmse": 24.20278785262676,
+          "samples": 363
+        },
+        "ZONE:METED": {
+          "mae": 12.848575726969045,
+          "rmse": 27.68998670184444,
+          "samples": 363
+        },
+        "ZONE:MID-ATL/APS": {
+          "mae": 11.708400849140052,
+          "rmse": 25.048624702112694,
+          "samples": 363
+        },
+        "ZONE:OVEC": {
+          "mae": 11.464978591538111,
+          "rmse": 23.3417482799009,
+          "samples": 363
+        },
+        "ZONE:PECO": {
+          "mae": 11.485893332456726,
+          "rmse": 23.134551321743437,
+          "samples": 363
+        },
+        "ZONE:PENELEC": {
+          "mae": 13.053821703236075,
+          "rmse": 27.13229426007077,
+          "samples": 363
+        },
+        "ZONE:PEPCO": {
+          "mae": 16.760187508994193,
+          "rmse": 36.08763947340566,
+          "samples": 363
+        },
+        "ZONE:PJM-RTO": {
+          "mae": 12.151377122346362,
+          "rmse": 25.009608331438145,
+          "samples": 363
+        },
+        "ZONE:PPL": {
+          "mae": 11.118201820202055,
+          "rmse": 23.58876261906828,
+          "samples": 363
+        },
+        "ZONE:PSEG": {
+          "mae": 10.88378871772079,
+          "rmse": 23.673703886673223,
+          "samples": 363
+        },
+        "ZONE:RECO": {
+          "mae": 11.772416398753613,
+          "rmse": 25.819959162599908,
+          "samples": 363
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 5.075393499999336,
+      "last_run_elapsed_seconds": 5.075393499999336,
+      "last_run_computed_nodes": [
+        "HUB:CHICAGO GEN HUB",
+        "HUB:ATSI GEN HUB",
+        "HUB:AEP-DAYTON HUB",
+        "HUB:CHICAGO HUB",
+        "HUB:DOMINION HUB",
+        "HUB:AEP GEN HUB",
+        "HUB:N ILLINOIS HUB",
+        "HUB:EASTERN HUB",
+        "HUB:NEW JERSEY HUB",
+        "HUB:WEST INT HUB",
+        "HUB:OHIO HUB",
+        "HUB:WESTERN HUB",
+        "ZONE:AECO",
+        "ZONE:APS",
+        "ZONE:ATSI",
+        "ZONE:BGE",
+        "ZONE:AEP",
+        "ZONE:COMED",
+        "ZONE:DAY",
+        "ZONE:DOM",
+        "ZONE:DUQ",
+        "ZONE:DEOK",
+        "ZONE:DPL",
+        "ZONE:EKPC",
+        "ZONE:JCPL",
+        "ZONE:MID-ATL/APS",
+        "ZONE:METED",
+        "ZONE:PECO",
+        "ZONE:OVEC",
+        "ZONE:PENELEC",
+        "ZONE:PEPCO",
+        "ZONE:PJM-RTO",
+        "ZONE:PPL",
+        "ZONE:RECO",
+        "ZONE:PSEG"
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "weekly_lag_168"
+    },
+    "xgboost_pseudohuber": {
+      "macro_mae": 3592.7323536529852,
+      "macro_rmse": 5086.371853484856,
+      "node_count": 35,
+      "nodes": {
+        "HUB:AEP GEN HUB": {
+          "mae": 4930.401706536816,
+          "rmse": 6666.329133045638,
+          "samples": 363
+        },
+        "HUB:AEP-DAYTON HUB": {
+          "mae": 5758.827045245494,
+          "rmse": 7764.9894333803295,
+          "samples": 363
+        },
+        "HUB:ATSI GEN HUB": {
+          "mae": 4397.613960838816,
+          "rmse": 6316.989576454437,
+          "samples": 363
+        },
+        "HUB:CHICAGO GEN HUB": {
+          "mae": 41.61219646814737,
+          "rmse": 143.33250974245956,
+          "samples": 363
+        },
+        "HUB:CHICAGO HUB": {
+          "mae": 311.6070113832583,
+          "rmse": 840.6703774650334,
+          "samples": 363
+        },
+        "HUB:DOMINION HUB": {
+          "mae": 5471.582395121909,
+          "rmse": 7677.0915754033285,
+          "samples": 363
+        },
+        "HUB:EASTERN HUB": {
+          "mae": 843.2653707316431,
+          "rmse": 1958.3198942578003,
+          "samples": 363
+        },
+        "HUB:N ILLINOIS HUB": {
+          "mae": 246.12923424689316,
+          "rmse": 710.5751810804609,
+          "samples": 363
+        },
+        "HUB:NEW JERSEY HUB": {
+          "mae": 1772.5230022065402,
+          "rmse": 2886.0993209192948,
+          "samples": 363
+        },
+        "HUB:OHIO HUB": {
+          "mae": 5908.414993909779,
+          "rmse": 7773.756808865412,
+          "samples": 363
+        },
+        "HUB:WEST INT HUB": {
+          "mae": 5671.290524270498,
+          "rmse": 7523.198671624122,
+          "samples": 363
+        },
+        "HUB:WESTERN HUB": {
+          "mae": 5410.883432129909,
+          "rmse": 7173.746373545642,
+          "samples": 363
+        },
+        "ZONE:AECO": {
+          "mae": 502.9853470360533,
+          "rmse": 1342.7407828129208,
+          "samples": 363
+        },
+        "ZONE:AEP": {
+          "mae": 6382.417582095955,
+          "rmse": 8287.993862319518,
+          "samples": 363
+        },
+        "ZONE:APS": {
+          "mae": 5937.397352247076,
+          "rmse": 7758.24071022869,
+          "samples": 363
+        },
+        "ZONE:ATSI": {
+          "mae": 4693.8532348501785,
+          "rmse": 6761.059863063541,
+          "samples": 363
+        },
+        "ZONE:BGE": {
+          "mae": 6678.971826925695,
+          "rmse": 9284.724515778744,
+          "samples": 363
+        },
+        "ZONE:COMED": {
+          "mae": 272.25014895156085,
+          "rmse": 722.3645635571228,
+          "samples": 363
+        },
+        "ZONE:DAY": {
+          "mae": 8048.717886007357,
+          "rmse": 10235.442377787926,
+          "samples": 363
+        },
+        "ZONE:DEOK": {
+          "mae": 6480.917160427275,
+          "rmse": 8413.399487061124,
+          "samples": 363
+        },
+        "ZONE:DOM": {
+          "mae": 6689.940130690707,
+          "rmse": 8821.520463844032,
+          "samples": 363
+        },
+        "ZONE:DPL": {
+          "mae": 409.012425063485,
+          "rmse": 1329.3929043322526,
+          "samples": 363
+        },
+        "ZONE:DUQ": {
+          "mae": 5741.238906184545,
+          "rmse": 7519.401349317032,
+          "samples": 363
+        },
+        "ZONE:EKPC": {
+          "mae": 5927.1970690191065,
+          "rmse": 7936.365922813971,
+          "samples": 363
+        },
+        "ZONE:JCPL": {
+          "mae": 706.6503287065566,
+          "rmse": 1586.8663316267541,
+          "samples": 363
+        },
+        "ZONE:METED": {
+          "mae": 1177.5422814915382,
+          "rmse": 2283.5309907148053,
+          "samples": 363
+        },
+        "ZONE:MID-ATL/APS": {
+          "mae": 4395.227725931545,
+          "rmse": 5986.365462011014,
+          "samples": 363
+        },
+        "ZONE:OVEC": {
+          "mae": 3989.4541692885173,
+          "rmse": 5863.757901398985,
+          "samples": 363
+        },
+        "ZONE:PECO": {
+          "mae": 425.1453802441311,
+          "rmse": 1185.0578930490765,
+          "samples": 363
+        },
+        "ZONE:PENELEC": {
+          "mae": 2494.5573763816974,
+          "rmse": 3850.129982302196,
+          "samples": 363
+        },
+        "ZONE:PEPCO": {
+          "mae": 3771.8980077344295,
+          "rmse": 6165.117952502776,
+          "samples": 363
+        },
+        "ZONE:PJM-RTO": {
+          "mae": 5673.4340010719825,
+          "rmse": 7512.780433918004,
+          "samples": 363
+        },
+        "ZONE:PPL": {
+          "mae": 916.8493530263113,
+          "rmse": 1939.6930334395677,
+          "samples": 363
+        },
+        "ZONE:PSEG": {
+          "mae": 2101.766981562574,
+          "rmse": 3133.094151518329,
+          "samples": 363
+        },
+        "ZONE:RECO": {
+          "mae": 1564.0568298265027,
+          "rmse": 2668.875080787602,
+          "samples": 363
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 159.71590149999975,
+      "last_run_elapsed_seconds": 159.71590149999975,
+      "last_run_computed_nodes": [
+        "HUB:DOMINION HUB",
+        "HUB:AEP GEN HUB",
+        "HUB:AEP-DAYTON HUB",
+        "HUB:ATSI GEN HUB",
+        "HUB:OHIO HUB",
+        "HUB:NEW JERSEY HUB",
+        "HUB:CHICAGO HUB",
+        "HUB:CHICAGO GEN HUB",
+        "HUB:EASTERN HUB",
+        "HUB:WEST INT HUB",
+        "HUB:WESTERN HUB",
+        "HUB:N ILLINOIS HUB",
+        "ZONE:AEP",
+        "ZONE:APS",
+        "ZONE:ATSI",
+        "ZONE:BGE",
+        "ZONE:DAY",
+        "ZONE:DEOK",
+        "ZONE:AECO",
+        "ZONE:DOM",
+        "ZONE:EKPC",
+        "ZONE:DUQ",
+        "ZONE:DPL",
+        "ZONE:COMED",
+        "ZONE:JCPL",
+        "ZONE:METED",
+        "ZONE:MID-ATL/APS",
+        "ZONE:OVEC",
+        "ZONE:PENELEC",
+        "ZONE:PJM-RTO",
+        "ZONE:PEPCO",
+        "ZONE:PSEG",
+        "ZONE:PPL",
+        "ZONE:PECO",
+        "ZONE:RECO"
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "local_per_node_xgboost_pseudohuber"
+    }
+  }
+}

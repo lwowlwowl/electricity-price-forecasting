@@ -218,8 +218,19 @@ class StreamEncoder(nn.Module):
         #     供融合层 concat 时跨流方差一致（也让 C3 删融合输入 norm 安全）。
         self.final_norm = nn.LayerNorm(d_model)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(
+        self, x: torch.Tensor, conditioning: torch.Tensor | None = None
+    ) -> torch.Tensor:
         x = self.proj(x)                                     # [B, T, d]
+        if conditioning is not None:
+            expected = (x.shape[0], x.shape[-1])
+            if tuple(conditioning.shape) != expected:
+                raise ValueError(
+                    f"conditioning形状应为{expected}，实际为{tuple(conditioning.shape)}"
+                )
+            # 在时序/来源编码前注入实体身份，使共享编码器能学习节点特有的
+            # 历史模式；post_fusion旧模式不会走这条路径。
+            x = x + conditioning.unsqueeze(1)
         if self.kind == "transformer":
             for blk in self.blocks:
                 x = blk(x)

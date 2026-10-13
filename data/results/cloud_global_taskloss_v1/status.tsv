@@ -1,0 +1,14 @@
+2026-10-10T15:52:03+08:00	preflight	starting
+2026-10-10T15:52:05+08:00	preflight	complete
+2026-10-10T15:52:29+08:00	preflight	starting
+2026-10-10T15:52:32+08:00	preflight	complete
+2026-10-10T15:52:32+08:00	global_ercot_taskloss_da_mae_v1	starting
+2026-10-10T16:02:23+08:00	global_ercot_taskloss_da_mae_v1	complete
+2026-10-10T16:02:23+08:00	global_ercot_taskloss_rt_at_da_pseudohuber_v1	starting
+2026-10-10T16:19:39+08:00	global_ercot_taskloss_rt_at_da_pseudohuber_v1	complete
+2026-10-10T16:19:39+08:00	global_ercot_taskloss_rt_mae_v1	starting
+2026-10-10T17:10:25+08:00	global_ercot_taskloss_rt_mae_v1	complete
+2026-10-10T17:10:25+08:00	candidates	preparing
+2026-10-10T17:10:25+08:00	predictions	exporting
+2026-10-10T17:13:59+08:00	settlement	running
+2026-10-10T17:17:45+08:00	summary	preparing

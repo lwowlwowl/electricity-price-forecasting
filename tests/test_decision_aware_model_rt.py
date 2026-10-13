@@ -79,6 +79,21 @@ def test_known_da_target_changes_rt_forecast():
     assert not torch.allclose(first, second)
 
 
+def test_rt_lag168_mode_learns_residual_around_historical_anchor():
+    cfg = _config()
+    cfg.global_residual_anchor = "lag168"
+    model = DecisionAwareRTForecaster(cfg).eval()
+    torch.nn.init.zeros_(model.price_head.weight)
+    torch.nn.init.zeros_(model.price_head.bias)
+    batch = _batch()
+    batch["price_rt_lag168"] = torch.tensor(
+        [[-10.0, 0.0, 50.0, 90.0], [-5.0, 5.0, 55.0, 95.0]]
+    )
+
+    output = model(batch)
+    assert torch.allclose(output["p_rt"], batch["price_rt_lag168"], atol=1e-5)
+
+
 @pytest.mark.parametrize(
     ("mode", "expected_memory_steps"),
     [("F0", 16), ("F1", 16), ("F1b", 16), ("F2", 80)],

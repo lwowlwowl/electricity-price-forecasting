@@ -1,0 +1,70 @@
+{
+  "experiment": "global_da_outer_frozen_training_leakage_audit",
+  "status": "passed",
+  "2025_used": false,
+  "records": [
+    {
+      "seed": 0,
+      "expected_final_epoch_from_2023": 10,
+      "evaluated_outer_epochs": [
+        10
+      ],
+      "checks": {
+        "outer_phase": true,
+        "same_seed": true,
+        "final_epoch_matches_inner_best": true,
+        "best_is_final_epoch": true,
+        "history_has_exact_epoch_count": true,
+        "outer_evaluated_only_at_final_epoch": true,
+        "learning_rate_history_matches_inner": true,
+        "plan_hash_matches_inner_checkpoint": true,
+        "metadata_declares_final_only": true
+      },
+      "passed": true,
+      "inner_checkpoint": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed0/latest.pt",
+      "outer_checkpoint": "data/checkpoints/global_ercot_huber_f1_outer_frozen_v1/da_outer_seed0/best.pt"
+    },
+    {
+      "seed": 1,
+      "expected_final_epoch_from_2023": 5,
+      "evaluated_outer_epochs": [
+        5
+      ],
+      "checks": {
+        "outer_phase": true,
+        "same_seed": true,
+        "final_epoch_matches_inner_best": true,
+        "best_is_final_epoch": true,
+        "history_has_exact_epoch_count": true,
+        "outer_evaluated_only_at_final_epoch": true,
+        "learning_rate_history_matches_inner": true,
+        "plan_hash_matches_inner_checkpoint": true,
+        "metadata_declares_final_only": true
+      },
+      "passed": true,
+      "inner_checkpoint": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed1/latest.pt",
+      "outer_checkpoint": "data/checkpoints/global_ercot_huber_f1_outer_frozen_v1/da_outer_seed1/best.pt"
+    },
+    {
+      "seed": 2,
+      "expected_final_epoch_from_2023": 19,
+      "evaluated_outer_epochs": [
+        19
+      ],
+      "checks": {
+        "outer_phase": true,
+        "same_seed": true,
+        "final_epoch_matches_inner_best": true,
+        "best_is_final_epoch": true,
+        "history_has_exact_epoch_count": true,
+        "outer_evaluated_only_at_final_epoch": true,
+        "learning_rate_history_matches_inner": true,
+        "plan_hash_matches_inner_checkpoint": true,
+        "metadata_declares_final_only": true
+      },
+      "passed": true,
+      "inner_checkpoint": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed2/latest.pt",
+      "outer_checkpoint": "data/checkpoints/global_ercot_huber_f1_outer_frozen_v1/da_outer_seed2/best.pt"
+    }
+  ]
+}

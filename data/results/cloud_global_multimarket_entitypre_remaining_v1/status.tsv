@@ -1,0 +1,11 @@
+2026-10-11T13:15:20+08:00	preflight	starting
+2026-10-11T13:17:19+08:00	preflight	starting
+2026-10-11T13:18:42+08:00	preflight	starting
+2026-10-11T13:18:44+08:00	preflight	complete
+2026-10-11T13:19:03+08:00	preflight	starting
+2026-10-11T13:19:05+08:00	preflight	complete
+2026-10-11T13:19:05+08:00	global_multimarket_entitypre_rt_at_da_pseudohuber_v1	starting
+2026-10-11T14:03:12+08:00	global_multimarket_entitypre_rt_at_da_pseudohuber_v1	complete
+2026-10-11T14:03:12+08:00	global_multimarket_entitypre_rt_mae_v1	starting
+2026-10-11T16:57:35+08:00	global_multimarket_entitypre_rt_mae_v1	complete
+2026-10-11T16:57:35+08:00	all	remaining_prediction_training_complete

@@ -85,3 +85,23 @@ def test_future_actual_values_cannot_change_rt_at_da_context():
         np.testing.assert_array_equal(
             before[idx][key].numpy(), changed[changed_idx][key].numpy()
         )
+
+
+def test_event_weighting_exposes_da_truth_only_under_explicit_training_key():
+    cfg = _cfg()
+    cfg.global_use_critical_event_weighting = True
+    dataset = DecisionAwareRTAtDADataset(_frame(), cfg, "train")
+    sample = dataset[0]
+    assert "price_da_tgt" not in sample
+    assert sample["price_da_tgt_weighting_only"].shape == (24,)
+
+
+def test_spread_parameterization_exposes_da_truth_only_as_supervision():
+    cfg = _cfg()
+    cfg.rt_at_da_parameterization = "da_minus_spread"
+    dataset = DecisionAwareRTAtDADataset(_frame(), cfg, "train")
+    sample = dataset[0]
+
+    assert "price_da_tgt" not in sample
+    assert sample["price_da_tgt_spread_only"].shape == (24,)
+    assert sample["price_rt_at_da_tgt"].shape == (24,)

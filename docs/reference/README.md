@@ -429,6 +429,30 @@ Arkadiusz Lipiecki、Rafał Weron，arXiv:2609.00089，2026。
 给本项目的实验：Chronos/Toto/TimesFM即使MAE更好，也必须在统一储能合同下重新排名；
 同时保留市场专用模型和树模型，不预设基础模型一定晋级。
 
+### C9. Multi-Task Decision-Oriented Electricity Price Prediction for Virtual Energy Storage Arbitrage
+
+Haoxuan Chen、Yinliang Xu、Hongbin Sun，IEEE Power & Energy Society General Meeting
+（PESGM），2025。
+DOI：[10.1109/PESGM52009.2025.11225718](https://doi.org/10.1109/PESGM52009.2025.11225718)
+
+为什么要读：论文把与虚拟储能套利有关的决策任务显式放入多任务电价预测，而不是只用单一
+价格误差训练模型。
+
+给本项目的实验：它支持“预测主任务 + 具有明确经济含义的辅助任务”这一研究方向，但不能据此
+证明当前经济状态头必然有效。当前三状态头仍须保持固定阈值，并分别报告四个市场的预测与完整
+结算结果；不能根据测试收益继续调类别权重或阈值。
+
+### C10. Forecasting the Occurrence of Electricity Price Spikes: A Statistical-Economic Investigation Study
+
+Manuel Zamudio López、Hamidreza Zareipour、Mike Quashie，Forecasting，2024，6(1)：115—137。
+DOI：[10.3390/forecast6010007](https://doi.org/10.3390/forecast6010007)
+
+为什么要读：论文把电价尖峰定义、分类预测、可解释规则以及统计和经济评价放在同一个实验中，
+并明确区分统计阈值与经济阈值。
+
+给本项目的实验：经济状态头和尖峰/稀缺状态必须给出可读的物理或经济定义，同时分别报告分类
+质量和储能净收益。不能只因某个状态头提高一次收益，就把它解释成已经学到了可泛化的尖峰规律。
+
 ## 八、下一阶段建议：直接做多节点global，local只作为对照
 
 文献没有要求“先在新节点训练local，再升级到global”。结合本项目已经有4个市场、64条
@@ -444,6 +468,10 @@ Arkadiusz Lipiecki、Rafał Weron，arXiv:2609.00089，2026。
   不同节点的价格历史。
 - 固定每个市场的本地时区、夏令时、DA/RT起报时点、缺失处理、逐节点缩放和节点采样权重。
   不能因为PJM有35个节点就让它在四市场global模型中天然占一半以上权重。
+- 单市场global继续按节点等权；四市场联合训练必须先等权抽市场、再在市场内等权抽节点。
+  验证同时报告节点宏平均和市场宏平均，跨市场checkpoint按市场宏平均选择，防止PJM的35个
+  节点在选模时压过CAISO的3个节点。ERCOT阶段选出的固定架构与损失还应在各市场分别重训
+  并对各自XGBoost比较，不能只用四市场混合均值掩盖某个市场退化。
 - `configs/nodes.yaml`中的旧“代表节点”曾参考2025—2026价格统计选择，因此只能用于开发期
   快速调试，不能作为下一轮最终主结果的抽样依据。正式主表使用预先定义的全部节点，并按
   节点等权汇总，避免挑节点偏差。
@@ -464,8 +492,10 @@ Arkadiusz Lipiecki、Rafał Weron，arXiv:2609.00089，2026。
 
 1. `2020—2022`训练、`2023`内部验证：筛选架构和超参数，可使用Hyperband/BOHB节省算力。
 2. 选出的少量候选在`2020—2023`重训，使用`2024`作外层验证和最终定型。
-3. 冻结全部规则后，只评估一次`2025`完整测试年。
-4. `2026上半年`只能作为补充时期，不用于补选失败模型。
+3. 冻结结构、超参数、训练epoch规则和策略后，用`2020—2024`五年数据重新训练最终权重；
+   这一步不能再根据`2025`表现改变epoch或配置。
+4. 最终权重只评估一次`2025`完整测试年。
+5. `2026上半年`只能作为补充时期，不用于补选失败模型。
 
 最低候选集合为：`Seasonal/LEAR + XGBoost + DLinear/NLinear + 当前F0/F1-global +
 NBEATSx-global`。DA与RT-at-DA再加入`TimeXer-global`；滚动RT只保留轻量直接多步候选，
@@ -524,3 +554,57 @@ NBEATSx-global`。DA与RT-at-DA再加入`TimeXer-global`；滚动RT只保留轻�
 - 不以“必须打败XGBoost”为理由删除负结果。可以把打败强基线设为研究目标，但不能保证
   结果；真正可发表的贡献还包括识别何时复杂模型无效、为什么无效以及怎样修复。
 - 新实现优先复现有正式论文的完整结构，再做单变量改动；避免给已有方法换名后重复造轮子。
+
+## 十、2026-10-09：决策导向训练方法核对
+
+本轮为多节点连续MPC收益微调核对了以下原始论文/官方实现：
+
+- Elmachtoub and Grigas, *Smart Predict, then Optimize (SPO+)*：
+  <https://arxiv.org/abs/1710.08005>。适合预测量线性进入优化目标、可重复调用优化器的场景。
+- Agrawal et al., *Differentiable Convex Optimization Layers*：
+  <https://papers.neurips.cc/paper_files/paper/2019/hash/9ce3c52fc54362e22053399d3181c638-Abstract.html>；
+  官方`cvxpylayers`实现：<https://github.com/cvxpy/cvxpylayers>。适合参数化连续凸问题，
+  但要求实际决策映射能按该形式表达。
+- *Forecasting Electricity Prices With Decision-Focused Learning for Storage Optimization*：
+  <https://pure.tudelft.nl/ws/portalfiles/portal/249940324/Forecasting_Electricity_Prices_With_Decision-Focused_Learning_for_Storage_Optimization.pdf>。
+  直接支持“电价预测不能只看误差，还要检查储能下游决策价值”的研究动机。
+- *Decision-Focused Forecasting for Energy Storage Systems*：
+  <https://arxiv.org/abs/2305.00362>，以及后续Decision-Focused Fine-tuning工作：
+  <https://ojs.aaai.org/index.php/AAAI/article/view/34891/37046>。
+
+本项目当前日前策略先用`DA - RT-at-DA`的硬符号确定充放方向边界，再解连续LP；随后还进行
+逐小时滚动重优化。因此完整映射不能直接宣称为普通SPO+或单个可微凸层。当前实现采用更保守的
+名称“黑盒双点零阶收益微调”，并保留预测损失/源模型约束。若以后取消硬方向门控、把全部参数化
+写成统一凸层，再单独比较SPO+或隐式微分；不能仅因引用论文就给现有方法换名。
+
+## 十一、2026-10-11：多市场官方规则索引
+
+论文只能说明方法动机，不能代替各市场的正式结算规则。CAISO、NYISO和PJM的逐条审计、当前
+可以确认的事实和仍缺少的决定量，统一记录在
+[CAISO、NYISO、PJM结算合同审计工作底稿](../progress/45_CAISO_NYISO_PJM结算合同审计工作底稿.md)。
+
+### CAISO
+
+- [CAISO当前Tariff Sections索引](https://www.caiso.com/library/tariff-sections)
+- [Tariff Section 11：Settlements and Billing](https://www.caiso.com/documents/section-11-california-iso-settlements-and-billing-as-of-jul-22-2026.pdf)
+- [Settlements and Billing BPM入口](https://bpmcm.caiso.com/Pages/SnBBPMDetails.aspx?BPM=Settlements+and+Billing)
+
+### NYISO
+
+- [Market Services Tariff 4.5：Real-Time Market Settlements](https://www.nyiso.com/documents/20142/39257338/MST%204.5%20FID1688%20rev1.pdf/b14a24e6-d399-34ae-d360-996df2e090cd)
+- [Accounting and Billing Manual](https://www.nyiso.com/documents/20142/2923231/acctbillmnl.pdf)
+- [Energy Storage Resource onboarding appendix](https://www.nyiso.com/documents/20142/1389407/12-Onboarding-of-New-ESRs-Resource-Appendix.pdf/00320cb5-11d9-0fd5-f448-07ff39ec5dc7)
+
+### PJM
+
+- [PJM Manual 28：Operating Agreement Accounting](https://www.pjm.com/-/media/DotCom/documents/manuals/m28.ashx)
+- [PJM Guide to Billing](https://www.pjm.com/markets-and-operations/billing-settlements-and-credit/guide-to-billing)
+- [Order 841 and Hybrid Resources FAQ](https://www.pjm.com/-/media/DotCom/committees-groups/committees/mic/20190206/20190206-item-07c-faq-for-order-841-and-hybrids.ashx)
+
+### ERCOT与使用边界
+
+- [ERCOT Nodal Protocols](https://www.ercot.com/mktrules/nprotocols)目前用于核对DAM时间线等市场合同；
+  当前项目的ERCOT连续MPC结算口径仍须与代码中的冻结研究合同一起阅读，不能只凭网页标题推断。
+- 在CAISO、NYISO和PJM缺少ISO调度量、meter/dispatch状态或uplift账单决定量时，只能先比较
+  价格预测；不得复制ERCOT偏差罚金后声称得到真实的跨市场盈利排名。
+- 正式实验应保存所用规则版本、访问日期和文件哈希。规则更新后先做差异审计，不能静默替换。

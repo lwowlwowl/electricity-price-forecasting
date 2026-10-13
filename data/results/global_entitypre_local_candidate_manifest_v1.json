@@ -1,0 +1,81 @@
+{
+  "experiment": "global_ercot_entitylocal_v1_candidates",
+  "phase": "inner",
+  "seed": 0,
+  "2024_used": false,
+  "2025_used": false,
+  "selection_rule": "train each task from scratch without lag168; retain top-K epochs by 2023 node-equal macro MAE; select only among the resulting Cartesian triplets using the frozen full settlement",
+  "losses": {
+    "da": "mae",
+    "rt_at_da": "pseudo_huber",
+    "rt": "mae"
+  },
+  "selected_by_task": {
+    "da": [
+      {
+        "task": "da",
+        "epoch": 2,
+        "macro_mae": 36.89992965062459,
+        "selection_score": 36.89992965062459,
+        "checkpoint": "data/checkpoints/cloud_taskloss_20261010/global_ercot_taskloss_da_mae_v1/da_inner_seed0/candidate_epoch_002.pt",
+        "checkpoint_sha256": "c713cb477ebd39d380dbde98ac011aea33dae87e9514e46cd7f4810a64447524"
+      },
+      {
+        "task": "da",
+        "epoch": 5,
+        "macro_mae": 37.703969628620406,
+        "selection_score": 37.703969628620406,
+        "checkpoint": "data/checkpoints/cloud_taskloss_20261010/global_ercot_taskloss_da_mae_v1/da_inner_seed0/candidate_epoch_005.pt",
+        "checkpoint_sha256": "f1244505d1e30d5f5dc7e5fdc5439c9a4f0d2184de5af05b695ae8f1d1ae4041"
+      }
+    ],
+    "rt_at_da": [
+      {
+        "task": "rt_at_da",
+        "epoch": 8,
+        "macro_mae": 46.64883158753543,
+        "selection_score": 46.64883158753543,
+        "checkpoint": "data/checkpoints/global_ercot_entitypre_rt_at_da_pseudohuber_v1/rt_at_da_inner_seed0/candidate_epoch_008.pt",
+        "checkpoint_sha256": "e00b879c5d9ac43b270b8b59ec2d655d73ade47b11fe45edd9612227b3d8e997"
+      },
+      {
+        "task": "rt_at_da",
+        "epoch": 10,
+        "macro_mae": 51.590764650613984,
+        "selection_score": 51.590764650613984,
+        "checkpoint": "data/checkpoints/global_ercot_entitypre_rt_at_da_pseudohuber_v1/rt_at_da_inner_seed0/candidate_epoch_010.pt",
+        "checkpoint_sha256": "444b4bc764a4639e1ecff4786fdbe0093f99c919ba817f6bccf4d5fcc45d9592"
+      }
+    ],
+    "rt": [
+      {
+        "task": "rt",
+        "epoch": 5,
+        "macro_mae": 29.107238753239454,
+        "selection_score": 29.107238753239454,
+        "checkpoint": "data/checkpoints/cloud_taskloss_20261010/global_ercot_taskloss_rt_mae_v1/rt_inner_seed0/candidate_epoch_005.pt",
+        "checkpoint_sha256": "1370493fde7c37829158f198d59968f589f972a78ad199d73224333698de41e4"
+      },
+      {
+        "task": "rt",
+        "epoch": 10,
+        "macro_mae": 29.832975748628996,
+        "selection_score": 29.832975748628996,
+        "checkpoint": "data/checkpoints/cloud_taskloss_20261010/global_ercot_taskloss_rt_mae_v1/rt_inner_seed0/candidate_epoch_010.pt",
+        "checkpoint_sha256": "ffef490625d383d8a29f392cf07811da80995ba6c6cda69ef6f2da2bea0b043b"
+      }
+    ]
+  },
+  "families": {
+    "entitylocal0": {
+      "da": "data/checkpoints/cloud_taskloss_20261010/global_ercot_taskloss_da_mae_v1/da_inner_seed0/candidate_epoch_002.pt",
+      "rt_at_da": "data/checkpoints/global_ercot_entitypre_rt_at_da_pseudohuber_v1/rt_at_da_inner_seed0/candidate_epoch_008.pt",
+      "rt": "data/checkpoints/cloud_taskloss_20261010/global_ercot_taskloss_rt_mae_v1/rt_inner_seed0/candidate_epoch_005.pt"
+    },
+    "entitylocal1": {
+      "da": "data/checkpoints/cloud_taskloss_20261010/global_ercot_taskloss_da_mae_v1/da_inner_seed0/candidate_epoch_005.pt",
+      "rt_at_da": "data/checkpoints/global_ercot_entitypre_rt_at_da_pseudohuber_v1/rt_at_da_inner_seed0/candidate_epoch_010.pt",
+      "rt": "data/checkpoints/cloud_taskloss_20261010/global_ercot_taskloss_rt_mae_v1/rt_inner_seed0/candidate_epoch_010.pt"
+    }
+  }
+}

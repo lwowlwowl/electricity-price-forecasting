@@ -1,0 +1,114 @@
+{
+  "experiment": "global_ercot_taskloss_small_mixed_diagnosis_v1",
+  "status": "inner_validation_candidate_not_final",
+  "2024_used": false,
+  "2025_used": false,
+  "searched_triplets": 27,
+  "best_triplet_using_at_least_one_new_task": "da_new1__rt_at_da_stable0__rt_new0",
+  "best_economics": {
+    "macro_mean_daily_revenue": 241.69667518521283,
+    "macro_positive_day_rate": 0.5524861878453039,
+    "macro_min_daily_revenue": -95.01999938964846,
+    "macro_maximum_drawdown_usd": 145.92789080507566,
+    "macro_mean_daily_deviation_penalty": 2.885480115811759,
+    "macro_mean_daily_degradation_cost": 11.808603540338039,
+    "macro_mean_daily_revenue_without_top_5_days": 167.17080635542226,
+    "top_5_days_total_revenue_share": 0.31789786851213453
+  },
+  "stable0_economics": {
+    "macro_mean_daily_revenue": 190.69828504252206,
+    "macro_positive_day_rate": 0.5441988950276243,
+    "macro_min_daily_revenue": -646.9852300668646,
+    "macro_maximum_drawdown_usd": 1035.3743925377057,
+    "macro_mean_daily_deviation_penalty": 15.761579817149542,
+    "macro_mean_daily_degradation_cost": 14.891783208044309,
+    "macro_mean_daily_revenue_without_top_5_days": 115.28151927257203,
+    "top_5_days_total_revenue_share": 0.40382666226167907
+  },
+  "xgboost_robust_economics": {
+    "macro_mean_daily_revenue": 292.28926467730673,
+    "macro_positive_day_rate": 0.7928176795580111,
+    "macro_min_daily_revenue": -206.06570119255625,
+    "macro_maximum_drawdown_usd": 206.0657011925564,
+    "macro_mean_daily_deviation_penalty": 9.86639666923426,
+    "macro_mean_daily_degradation_cost": 30.07155213044128,
+    "macro_mean_daily_revenue_without_top_5_days": 210.50885820605225,
+    "top_5_days_total_revenue_share": 0.2897403278878542
+  },
+  "paired_best_vs_stable0": {
+    "mean_daily_revenue_difference": 50.998390142690816,
+    "7day_block_bootstrap_95ci": [
+      18.79740528728783,
+      95.48896737729524
+    ]
+  },
+  "paired_best_vs_xgboost": {
+    "mean_daily_revenue_difference": -50.59258949209382,
+    "7day_block_bootstrap_95ci": [
+      -81.73483752406572,
+      -24.571366590210708
+    ]
+  },
+  "single_task_replacements": {
+    "da": {
+      "triplet": "da_new1__rt_at_da_stable0__rt_stable0",
+      "economics": {
+        "macro_mean_daily_revenue": 229.65623565220255,
+        "macro_positive_day_rate": 0.48342541436464087,
+        "macro_min_daily_revenue": -606.5084965533498,
+        "macro_maximum_drawdown_usd": 1207.8476104542933,
+        "macro_mean_daily_deviation_penalty": 13.59060842419248,
+        "macro_mean_daily_degradation_cost": 11.95171584448646,
+        "macro_mean_daily_revenue_without_top_5_days": 154.7874278557743,
+        "top_5_days_total_revenue_share": 0.3353131495702548
+      },
+      "paired_vs_stable0": {
+        "mean_daily_revenue_difference": 38.9579506096805,
+        "7day_block_bootstrap_95ci": [
+          9.78000560411497,
+          82.46900787951094
+        ]
+      }
+    },
+    "rt_at_da": {
+      "triplet": "da_stable0__rt_at_da_new1__rt_stable0",
+      "economics": {
+        "macro_mean_daily_revenue": 229.32353768059644,
+        "macro_positive_day_rate": 0.5662983425414365,
+        "macro_min_daily_revenue": -149.54025462656747,
+        "macro_maximum_drawdown_usd": 439.08555253936834,
+        "macro_mean_daily_deviation_penalty": 8.572500532805357,
+        "macro_mean_daily_degradation_cost": 19.20372049886922,
+        "macro_mean_daily_revenue_without_top_5_days": 161.85183097318364,
+        "top_5_days_total_revenue_share": 0.3039689250379325
+      },
+      "paired_vs_stable0": {
+        "mean_daily_revenue_difference": 38.625252638074386,
+        "7day_block_bootstrap_95ci": [
+          -27.460644449878505,
+          105.13997666078647
+        ]
+      }
+    },
+    "rt": {
+      "triplet": "da_stable0__rt_at_da_stable0__rt_new1",
+      "economics": {
+        "macro_mean_daily_revenue": 204.3949366768201,
+        "macro_positive_day_rate": 0.6022099447513812,
+        "macro_min_daily_revenue": -62.75322424086403,
+        "macro_maximum_drawdown_usd": 174.66489333553875,
+        "macro_mean_daily_deviation_penalty": 3.0369427530854267,
+        "macro_mean_daily_degradation_cost": 14.674878349601947,
+        "macro_mean_daily_revenue_without_top_5_days": 129.24112732926233,
+        "top_5_days_total_revenue_share": 0.3764227678153516
+      },
+      "paired_vs_stable0": {
+        "mean_daily_revenue_difference": 13.696651634298076,
+        "7day_block_bootstrap_95ci": [
+          5.407671891901536,
+          28.02845170328199
+        ]
+      }
+    }
+  }
+}

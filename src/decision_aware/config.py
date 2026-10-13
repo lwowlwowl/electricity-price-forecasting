@@ -60,6 +60,9 @@ class PilotConfig:
     context_len: int = 168
     horizon_da: int = 24
     da_issue_hour_local: int = 10  # ERCOT正常DAM提交截止：D-1日10:00 CPT
+    # 跨市场训练必须显式写出每个ISO的本地DA起报时刻；
+    # 单市场旧配置继续使用da_issue_hour_local，保持checkpoint兼容。
+    da_issue_hour_local_by_market: dict[str, int] = field(default_factory=dict)
     horizon_rt: int = 4            # w10 §2: 实时滚动预测 H=4
     train_stride: int = 1
     eval_stride: int = 24           # test 用（保持独立日窗口，DM/GW 检验 i.i.d. 前提）
@@ -92,6 +95,35 @@ class PilotConfig:
     da_fusion_mode: str = "source_attention"
     rt_at_da_fusion_mode: str = "source_attention"
     rt_fusion_mode: str = "source_attention"
+    # direct_price保持既有RT-at-DA行为；da_minus_spread把第二套模型显式
+    # 参数化为“上游DA预测 - 预测价差”。后者让模型直接学习调度使用的
+    # DA-RT信号，同时仍输出完整RT价格，且不需要任何未来价格作为输入。
+    # economic_regime在冻结基础价格上学习三类经济状态：中性、DA>RT可交易、
+    # RT>DA可交易；类别边界固定为BESS的κ/η，不从验证结果选择。
+    rt_at_da_parameterization: str = "direct_price"
+    # da_minus_spread模式使用同一信息时点的冻结DA模型输出作为上游预测。
+    # 路径写入配置与checkpoint元数据，禁止静默更换DA来源。
+    rt_at_da_upstream_da_checkpoint: str = ""
+
+    # ── 多节点Global身份 ────────────────────────────────────────────────────
+    # 默认关闭以保持旧单节点checkpoint结构不变。正式global入口必须开启，
+    # 并从冻结的EntityMappings填写精确节点数和市场数。
+    global_use_entity_embeddings: bool = False
+    global_num_nodes: int = 0
+    global_num_markets: int = 0
+    # post_fusion保持现有checkpoint兼容；pre_encoder让节点/市场身份在每条
+    # 历史流的特征抽取前生效，并继续条件化未来query。
+    global_entity_conditioning_mode: str = "post_fusion"
+    # training_entity复用每个已知节点训练期的固定scaler；context_robust只使用
+    # 当前样本起报时可见的历史窗口计算中位数/MAD，不依赖节点或市场身份，
+    # 因而可把同一checkpoint直接用于训练中从未出现的新市场。
+    global_normalization_mode: str = "training_entity"
+    # 单市场配置留空时使用market字段。跨市场训练必须显式列出市场，并使用
+    # market_node_balanced，防止节点最多的PJM主导训练batch和checkpoint选择。
+    global_training_markets: list[str] = field(default_factory=list)
+    global_sampling_mode: str = "node_balanced"
+    global_samples_per_market: int = 0
+    global_validation_aggregation: str = "node_macro"
 
     # ── BESS 模拟器（w10 第7节规范值）──────────────────────────────────────
     bess_power_mw: float = 1.0
@@ -145,6 +177,42 @@ class PilotConfig:
     monitor: str = "regret"
     num_workers: int = 0
     grad_accum_steps: int = 1
+    # global-Huber训练额外保留若干个预测候选，供三模型完整结算选模。
+    # ReduceLROnPlateau只读取验证期macro MAE，不接触外层/最终测试。
+    global_keep_top_k_checkpoints: int = 2
+    global_use_lr_scheduler: bool = False
+    global_lr_scheduler_factor: float = 0.5
+    global_lr_scheduler_patience: int = 2
+    global_min_lr: float = 1.0e-5
+    # global预测训练损失。smooth_l1保持历史结果；mae用于对尖峰更稳健的
+    # Transformer候选，并仍按冻结的验证期macro MAE选择checkpoint。
+    global_training_loss: str = "smooth_l1"
+    global_loss_delta: float = 1.0
+    # 仅使用训练期标签拟合逐节点阈值，对价格上下尾与绝对DA-RT价差较大的
+    # 元素提高预测损失权重。默认关闭以严格复现既有checkpoint；权重使用
+    # 加权均值且显式封顶，避免少数ERCOT尖峰支配整个epoch。
+    global_use_critical_event_weighting: bool = False
+    global_event_price_lower_quantile: float = 0.025
+    global_event_price_upper_quantile: float = 0.975
+    global_event_spread_quantile: float = 0.90
+    global_event_price_weight: float = 1.0
+    global_event_spread_weight: float = 1.0
+    global_event_sign_reversal_weight: float = 0.5
+    global_event_rt_first_step_weight: float = 0.5
+    global_event_max_weight: float = 4.0
+    # none保持历史直接预测；lag168让网络在“168小时前同一UTC交付小时”
+    # 的合法已知价格上学习残差。该锚点只来自起报时之前，不读取未来真值。
+    # 三个任务分别使用自己的DA或RT历史价格，XGBoost不进入模型。
+    global_residual_anchor: str = "none"
+    # direct保持现有单头价格预测；physical_scarcity_residual把输出拆成
+    # “基础价格 + 物理压力门控 × 稀缺残差”。门控只读取起报时已知的
+    # 历史净负荷压力与目标日历，且对压力保持单调，便于跨市场解释和审计。
+    global_output_decomposition: str = "direct"
+    # all保持历史训练；decoder_head/price_head用于从强checkpoint稳健微调，
+    # 避免少量新梯度破坏已经学好的时序与跨来源表示。
+    # scarcity_residual只训练零初始化的稀缺残差与物理门控，严格冻结基础模型；
+    # economic_regime只训练三类经济状态线性头。
+    global_trainable_scope: str = "all"
 
     # 融合消融使用的冻结完整系统。普通训练入口不会读取这些字段。
     # RT-at-DA消融同时对三个冻结DA-F1 seed计分，避免结论依赖单个DA seed。
@@ -255,6 +323,31 @@ class PilotConfig:
     @property
     def price_col(self) -> str:
         return f"price__{self.node}"
+
+    def resolved_da_issue_hour_local(
+        self,
+        market: str | None = None,
+        *,
+        require_explicit: bool = False,
+    ) -> int:
+        """返回指定市场的本地DA起报小时。
+
+        跨市场训练不允许把主配置的标量时刻静默复制给其他ISO。
+        """
+        target = str(market or self.market).upper()
+        normalized = {
+            str(name).upper(): value
+            for name, value in self.da_issue_hour_local_by_market.items()
+        }
+        if target in normalized:
+            hour = normalized[target]
+        elif require_explicit:
+            raise ValueError(f"跨市场配置缺少{target}的DA本地起报时刻")
+        else:
+            hour = self.da_issue_hour_local
+        if isinstance(hour, bool) or not isinstance(hour, int) or not 0 <= hour <= 23:
+            raise ValueError(f"{target}的DA本地起报小时必须是0—23整数，实际为{hour!r}")
+        return int(hour)
 
     def split_bounds(self, split: str) -> Tuple[str, str]:
         if self.data_version == "v3":

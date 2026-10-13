@@ -1,0 +1,43 @@
+{
+  "task": "da",
+  "market": "PJM",
+  "configured_market": "PJM",
+  "da_issue_hour_local": 11,
+  "market_contract_smoke_only": false,
+  "phase": "inner",
+  "smoke_only": true,
+  "nodes": [
+    "HUB:AEP GEN HUB",
+    "HUB:AEP-DAYTON HUB"
+  ],
+  "contract_hash": "0c5956fb9fd24b5774b6fbdb066a202b17572fa57d012c67bf7354ce7c7d8dd6",
+  "entity_mapping_hash": "6d6814aa00342f37b19c4219f6cda0ad30fd81ddf61ce72f0e91e67905d3c24e",
+  "models": {
+    "seasonal": {
+      "macro_mae": 226.93657757176294,
+      "macro_rmse": 243.13971118874738,
+      "node_count": 2,
+      "nodes": {
+        "HUB:AEP GEN HUB": {
+          "mae": 226.52168114980063,
+          "rmse": 243.0717498697279,
+          "samples": 3
+        },
+        "HUB:AEP-DAYTON HUB": {
+          "mae": 227.35147399372525,
+          "rmse": 243.20767250776686,
+          "samples": 3
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 0.20151529999566264,
+      "last_run_elapsed_seconds": 0.20151529999566264,
+      "last_run_computed_nodes": [
+        "HUB:AEP GEN HUB",
+        "HUB:AEP-DAYTON HUB"
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "weekly_lag_168"
+    }
+  }
+}

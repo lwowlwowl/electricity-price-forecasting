@@ -1,0 +1,19 @@
+{
+  "experiment": "self_model_direction_magnitude_factorization_v1",
+  "2024_used": false,
+  "2025_used": false,
+  "formula": "RT = DA_center - sign(DA_center - explicit_spread_RT) * abs(DA_center - base_RT)",
+  "xgboost_used": false,
+  "tuned_thresholds_or_weights": false,
+  "all_spread_direction_accuracy": 0.5741199877563514,
+  "important_spread_direction_accuracy": 0.6135524611398964,
+  "predicted_abs_spread_mean": 17.91687701692047,
+  "base_predicted_abs_spread_mean": 17.91687701692047,
+  "true_abs_spread_mean": 34.79938909801104,
+  "provenance_sha256": {
+    "da": "3fb0922fd90f49bf203ccc5b1fc2dfd1756fe272aec82d94afab15bf1cabb513",
+    "base_rt_at_da": "72aaf4d80b9df89840dabfc64996852cbd8602882c9049d393bbd05176ede39b",
+    "rt": "e5d6f438f3c1c2be854bc2a801cd164638d549fce5c231a0f2433e6e6fb59887",
+    "direction_rt_at_da": "38606f062a1a7495db3e439031393cc11a5865cfa59fa1f0c5b4e65dab7ea670"
+  }
+}

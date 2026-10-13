@@ -1,0 +1,12 @@
+2026-10-13T19:41:28+08:00	preflight	starting
+2026-10-13T19:41:32+08:00	preflight	complete
+2026-10-13T19:42:04+08:00	preflight	starting
+2026-10-13T19:42:07+08:00	preflight	complete
+2026-10-13T19:42:08+08:00	da	inference_starting
+2026-10-13T19:42:22+08:00	da	inference_complete
+2026-10-13T19:42:22+08:00	rt_at_da	inference_starting
+2026-10-13T19:42:36+08:00	rt_at_da	inference_complete
+2026-10-13T19:42:36+08:00	rt	inference_starting
+2026-10-13T19:44:47+08:00	rt	inference_complete
+2026-10-13T19:44:47+08:00	settlement	starting
+2026-10-13T19:46:04+08:00	pipeline	complete

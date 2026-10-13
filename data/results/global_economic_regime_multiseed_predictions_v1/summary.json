@@ -1,0 +1,32 @@
+{
+  "experiment": "global_economic_regime_three_seed_direction_vote_v1",
+  "2024_used": false,
+  "2025_used": false,
+  "xgboost_used": false,
+  "tuned_thresholds_or_weights": false,
+  "economic_spread_threshold_usd_per_mwh": 6.000000000000001,
+  "economic_spread_threshold_source": "battery contract kappa/eta",
+  "seed_families": [
+    "regimeseed0",
+    "regimeseed1",
+    "regimeseed2"
+  ],
+  "vote_family": "regimevote",
+  "unanimous_family": "regimeunanimous",
+  "unanimous_seed_direction_rate": 0.9712962962962963,
+  "unanimous_intervention_rate": 0.1351163146617692,
+  "all_spread_direction_accuracy": 0.5154423018059382,
+  "important_spread_direction_accuracy": 0.5628504946682961,
+  "provenance_sha256": {
+    "fixed": {
+      "da": "3fb0922fd90f49bf203ccc5b1fc2dfd1756fe272aec82d94afab15bf1cabb513",
+      "base_rt_at_da": "72aaf4d80b9df89840dabfc64996852cbd8602882c9049d393bbd05176ede39b",
+      "rt": "e5d6f438f3c1c2be854bc2a801cd164638d549fce5c231a0f2433e6e6fb59887"
+    },
+    "seed_rt_at_da": {
+      "regimeseed0": "3cbd3a2aa17e124f26223d8314bee4769284ec6e2e38b5aa5bf00188bab597ad",
+      "regimeseed1": "bb349ef576b73a30d053b8311f44af858c1bef253dab465dc71329f5e8eea769",
+      "regimeseed2": "e73cb9ae3ad8be92b90209116635c9d974d261d53fad84fd3ccba6d47b934090"
+    }
+  }
+}

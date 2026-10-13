@@ -1,0 +1,53 @@
+{
+  "protocol": "leave_one_market_out_zero_shot",
+  "task": "rt_at_da",
+  "holdout_market": "ERCOT",
+  "training_markets": [
+    "CAISO",
+    "NYISO",
+    "PJM"
+  ],
+  "uses_node_id_for_prediction": false,
+  "uses_market_id_for_prediction": false,
+  "normalization_mode": "context_robust",
+  "checkpoint": "data/checkpoints/universal_lomo_holdout_ercot_rt_at_da_v1/rt_at_da_inner_seed0/best.pt",
+  "checkpoint_sha256": "105bdb0c2b660e2f4a08247f38b691b83969e8d0ffde6f8cb6da6072b3df263e",
+  "node_macro_mae": 34.80049629211426,
+  "node_macro_rmse": 228.44743754069012,
+  "per_node_mae": {
+    "HB_BUSAVG": 32.62366485595703,
+    "HB_HOUSTON": 32.9874382019043,
+    "HB_HUBAVG": 33.06325912475586,
+    "HB_NORTH": 33.2052116394043,
+    "HB_PAN": 37.083465576171875,
+    "HB_SOUTH": 30.211769104003906,
+    "HB_WEST": 38.06328582763672,
+    "LZ_AEN": 37.10280990600586,
+    "LZ_CPS": 33.81826400756836,
+    "LZ_HOUSTON": 33.09086608886719,
+    "LZ_LCRA": 36.04536437988281,
+    "LZ_NORTH": 33.596282958984375,
+    "LZ_RAYBN": 33.8120002746582,
+    "LZ_SOUTH": 29.6002140045166,
+    "LZ_WEST": 47.703548431396484
+  },
+  "per_node_rmse": {
+    "HB_BUSAVG": 225.98056030273438,
+    "HB_HOUSTON": 229.83291625976562,
+    "HB_HUBAVG": 224.70228576660156,
+    "HB_NORTH": 232.2172088623047,
+    "HB_PAN": 230.62716674804688,
+    "HB_SOUTH": 208.72506713867188,
+    "HB_WEST": 231.28488159179688,
+    "LZ_AEN": 244.08763122558594,
+    "LZ_CPS": 233.48756408691406,
+    "LZ_HOUSTON": 229.25350952148438,
+    "LZ_LCRA": 240.46035766601562,
+    "LZ_NORTH": 232.82830810546875,
+    "LZ_RAYBN": 233.8228302001953,
+    "LZ_SOUTH": 192.2996368408203,
+    "LZ_WEST": 237.1016387939453
+  },
+  "final_profit_claim_allowed": false,
+  "note": "单任务留出市场筛选；完整盈利必须等待通用DA/RT-at-DA/RT三模型。"
+}

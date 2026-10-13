@@ -1,0 +1,28 @@
+{
+  "experiment": "global_da_f1_multiseed_export",
+  "status": "2023_inner_validation_candidate_not_final",
+  "families": {
+    "globalseed1": {
+      "da": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed1/best.pt"
+    },
+    "globalseed2": {
+      "da": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed2/best.pt"
+    }
+  },
+  "selected": [
+    {
+      "family": "globalseed1",
+      "seed": 1,
+      "checkpoint": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed1/best.pt",
+      "best_epoch": 5,
+      "best_macro_mae": 43.05984102347812
+    },
+    {
+      "family": "globalseed2",
+      "seed": 2,
+      "checkpoint": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed2/best.pt",
+      "best_epoch": 19,
+      "best_macro_mae": 40.60109080926774
+    }
+  ]
+}

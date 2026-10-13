@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 
 from .config import PilotConfig
+from .entity_conditioning import EntityConditioner
 from .model import QueryDecoder, StreamEncoder
 from .model_da import (
     DA_STREAM_DIMS,
@@ -13,6 +14,12 @@ from .model_da import (
     SourceAttentionConcatFusion,
     SourceInteractionFusion,
     canonical_da_fusion_mode,
+    canonical_residual_anchor,
+    anchored_normalized_price,
+)
+from .scarcity_decomposition import (
+    PhysicalScarcityResidual,
+    canonical_output_decomposition,
 )
 
 
@@ -28,6 +35,19 @@ class DecisionAwareRTForecaster(nn.Module):
         d = cfg.d_model
         n_layers = max(1, cfg.n_layers_enc)
         self.cfg = cfg
+        self.entity_conditioning_mode = str(
+            getattr(cfg, "global_entity_conditioning_mode", "post_fusion")
+        ).lower()
+        if self.entity_conditioning_mode not in {"post_fusion", "pre_encoder"}:
+            raise ValueError(
+                "global_entity_conditioning_mode必须是post_fusion或pre_encoder"
+            )
+        self.residual_anchor = canonical_residual_anchor(
+            getattr(cfg, "global_residual_anchor", "none")
+        )
+        self.output_decomposition = canonical_output_decomposition(
+            getattr(cfg, "global_output_decomposition", "direct")
+        )
         self.fusion_mode = canonical_da_fusion_mode(
             getattr(cfg, "rt_fusion_mode", "source_attention")
         )
@@ -70,6 +90,23 @@ class DecisionAwareRTForecaster(nn.Module):
             cfg.horizon_rt, use_memory_context=False,
         )
         self.price_head = nn.Linear(d, 1)
+        self.scarcity_residual = (
+            PhysicalScarcityResidual(d)
+            if self.output_decomposition == "physical_scarcity_residual"
+            else None
+        )
+        if self.residual_anchor == "lag168":
+            nn.init.normal_(self.price_head.weight, std=1.0e-3)
+            nn.init.zeros_(self.price_head.bias)
+        self.entity_conditioner = (
+            EntityConditioner(
+                d_model=d,
+                num_nodes=cfg.global_num_nodes,
+                num_markets=cfg.global_num_markets,
+            )
+            if cfg.global_use_entity_embeddings
+            else None
+        )
 
     @staticmethod
     def _as_3d(value, name):
@@ -87,22 +124,67 @@ class DecisionAwareRTForecaster(nn.Module):
             "system": self._as_3d(batch["system_ctx"], "system_ctx"),
             "cal": self._as_3d(batch["cal_ctx"], "cal_ctx"),
         }
-        encoded = {name: self.encoders[name](inputs[name]) for name in self.stream_names}
+        identity = None
+        if (
+            self.entity_conditioner is not None
+            and self.entity_conditioning_mode == "pre_encoder"
+        ):
+            identity = self.entity_conditioner.identity(
+                batch, inputs["price_da"].shape[0], inputs["price_da"].device
+            )
+        encoded = {
+            name: self.encoders[name](inputs[name], conditioning=identity)
+            for name in self.stream_names
+        }
         memory, source_weights = self.fusion(encoded)
         known_future = torch.cat([
             batch["price_da_tgt_known"].unsqueeze(-1), batch["cal_tgt"]
         ], dim=-1)
         query_context = self.target_context(known_future)
+        if self.entity_conditioner is not None:
+            if self.entity_conditioning_mode == "post_fusion":
+                memory, query_context = self.entity_conditioner(
+                    batch, memory, query_context
+                )
+            else:
+                query_context = query_context + identity.unsqueeze(1)
         representation = self.decoder(memory, query_context=query_context)
-        normalized = self.price_head(representation).squeeze(-1)
+        normalized_residual = self.price_head(representation).squeeze(-1)
+        base_normalized = anchored_normalized_price(
+            normalized_residual,
+            batch,
+            anchor_mode=self.residual_anchor,
+            anchor_key="price_rt_lag168",
+            mean_key="price_rt_mean",
+            std_key="price_rt_std",
+        )
+        scarcity = None
+        normalized = base_normalized
+        if self.scarcity_residual is not None:
+            scarcity = self.scarcity_residual(representation, batch)
+            normalized = base_normalized + scarcity["normalized_residual"]
         price = normalized * batch["price_rt_std"].reshape(-1, 1)
         price = price + batch["price_rt_mean"].reshape(-1, 1)
         lo, hi = self.cfg.pred_clamp
         price = price.clamp(float(lo), float(hi))
-        return {
+        result = {
             "p_rt": price,
             "p_rt_normalized": normalized,
+            "p_rt_normalized_residual": normalized_residual,
             "rep": representation,
             "memory": memory,
             "source_weights": source_weights,
         }
+        if scarcity is not None:
+            result.update({
+                "p_rt_base_normalized": base_normalized,
+                "p_rt_scarcity_normalized_residual": scarcity[
+                    "normalized_residual"
+                ],
+                "scarcity_gate": scarcity["gate"],
+                "scarcity_pressure_features": scarcity["pressure_features"],
+                "scarcity_monotone_pressure_weights": scarcity[
+                    "monotone_pressure_weights"
+                ],
+            })
+        return result

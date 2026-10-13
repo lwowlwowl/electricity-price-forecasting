@@ -1,0 +1,63 @@
+{
+  "experiment": "global_spread_gate_candidates_v1",
+  "phase": "inner",
+  "truth_used_for_gate": false,
+  "families": {
+    "gate_blend50": {
+      "da": "seasonal/stable gate archive",
+      "rt_at_da": "seasonal/stable gate archive",
+      "rt": "frozen stable Global RT archive"
+    },
+    "gate_blend75": {
+      "da": "seasonal/stable gate archive",
+      "rt_at_da": "seasonal/stable gate archive",
+      "rt": "frozen stable Global RT archive"
+    },
+    "gate_blend90": {
+      "da": "seasonal/stable gate archive",
+      "rt_at_da": "seasonal/stable gate archive",
+      "rt": "frozen stable Global RT archive"
+    },
+    "gate_agree": {
+      "da": "seasonal/stable gate archive",
+      "rt_at_da": "seasonal/stable gate archive",
+      "rt": "frozen stable Global RT archive"
+    },
+    "gate_agreeblend": {
+      "da": "seasonal/stable gate archive",
+      "rt_at_da": "seasonal/stable gate archive",
+      "rt": "frozen stable Global RT archive"
+    },
+    "gate_extreme50": {
+      "da": "seasonal/stable gate archive",
+      "rt_at_da": "seasonal/stable gate archive",
+      "rt": "frozen stable Global RT archive"
+    },
+    "gate_clip50": {
+      "da": "seasonal/stable gate archive",
+      "rt_at_da": "seasonal/stable gate archive",
+      "rt": "frozen stable Global RT archive"
+    },
+    "gate_extreme100": {
+      "da": "seasonal/stable gate archive",
+      "rt_at_da": "seasonal/stable gate archive",
+      "rt": "frozen stable Global RT archive"
+    },
+    "gate_clip100": {
+      "da": "seasonal/stable gate archive",
+      "rt_at_da": "seasonal/stable gate archive",
+      "rt": "frozen stable Global RT archive"
+    },
+    "gate_extreme200": {
+      "da": "seasonal/stable gate archive",
+      "rt_at_da": "seasonal/stable gate archive",
+      "rt": "frozen stable Global RT archive"
+    },
+    "gate_clip200": {
+      "da": "seasonal/stable gate archive",
+      "rt_at_da": "seasonal/stable gate archive",
+      "rt": "frozen stable Global RT archive"
+    }
+  },
+  "prediction_dir": "data/results/global_lag168_predictions_v1"
+}

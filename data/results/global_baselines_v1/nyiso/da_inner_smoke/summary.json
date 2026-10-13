@@ -1,0 +1,43 @@
+{
+  "task": "da",
+  "market": "NYISO",
+  "configured_market": "NYISO",
+  "da_issue_hour_local": 5,
+  "market_contract_smoke_only": false,
+  "phase": "inner",
+  "smoke_only": true,
+  "nodes": [
+    "CAPITL",
+    "CENTRL"
+  ],
+  "contract_hash": "0c5956fb9fd24b5774b6fbdb066a202b17572fa57d012c67bf7354ce7c7d8dd6",
+  "entity_mapping_hash": "baad31de9bf8345f2fa59aaae89d1574cfc9d0f3441859ee2dd653d66c491af9",
+  "models": {
+    "seasonal": {
+      "macro_mae": 216.27312477429706,
+      "macro_rmse": 223.2713199089735,
+      "node_count": 2,
+      "nodes": {
+        "CAPITL": {
+          "mae": 246.15833322207132,
+          "rmse": 251.679544796288,
+          "samples": 3
+        },
+        "CENTRL": {
+          "mae": 186.38791632652283,
+          "rmse": 194.86309502165898,
+          "samples": 3
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 0.20286360000318382,
+      "last_run_elapsed_seconds": 0.20286360000318382,
+      "last_run_computed_nodes": [
+        "CENTRL",
+        "CAPITL"
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "weekly_lag_168"
+    }
+  }
+}

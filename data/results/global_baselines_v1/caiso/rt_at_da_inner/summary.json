@@ -1,0 +1,82 @@
+{
+  "task": "rt_at_da",
+  "market": "CAISO",
+  "configured_market": "CAISO",
+  "da_issue_hour_local": 10,
+  "market_contract_smoke_only": false,
+  "phase": "inner",
+  "smoke_only": false,
+  "nodes": [
+    "TH_NP15_GEN-APND",
+    "TH_SP15_GEN-APND",
+    "TH_ZP26_GEN-APND"
+  ],
+  "contract_hash": "0c5956fb9fd24b5774b6fbdb066a202b17572fa57d012c67bf7354ce7c7d8dd6",
+  "entity_mapping_hash": "08538e8961b0f1e482fa8b8083f0e6337c6f938afe87083d168972e904fdaafc",
+  "models": {
+    "seasonal": {
+      "macro_mae": 23.282842549753756,
+      "macro_rmse": 42.60017354906848,
+      "node_count": 3,
+      "nodes": {
+        "TH_NP15_GEN-APND": {
+          "mae": 23.28977238270692,
+          "rmse": 40.96933723180085,
+          "samples": 363
+        },
+        "TH_SP15_GEN-APND": {
+          "mae": 23.801464848292948,
+          "rmse": 46.590462481274805,
+          "samples": 363
+        },
+        "TH_ZP26_GEN-APND": {
+          "mae": 22.7572904182614,
+          "rmse": 40.24072093412979,
+          "samples": 363
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 0.32833519999985583,
+      "last_run_elapsed_seconds": 0.32833519999985583,
+      "last_run_computed_nodes": [
+        "TH_SP15_GEN-APND",
+        "TH_ZP26_GEN-APND",
+        "TH_NP15_GEN-APND"
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "weekly_lag_168"
+    },
+    "xgboost_pseudohuber": {
+      "macro_mae": 9392.250803337402,
+      "macro_rmse": 16293.374762393549,
+      "node_count": 3,
+      "nodes": {
+        "TH_NP15_GEN-APND": {
+          "mae": 9441.203631936816,
+          "rmse": 16698.70881125869,
+          "samples": 363
+        },
+        "TH_SP15_GEN-APND": {
+          "mae": 10930.45134050776,
+          "rmse": 18186.409970182456,
+          "samples": 363
+        },
+        "TH_ZP26_GEN-APND": {
+          "mae": 7805.097437567626,
+          "rmse": 13995.005505739504,
+          "samples": 363
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 32.48282879999897,
+      "last_run_elapsed_seconds": 32.48282879999897,
+      "last_run_computed_nodes": [
+        "TH_SP15_GEN-APND",
+        "TH_NP15_GEN-APND",
+        "TH_ZP26_GEN-APND"
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "local_per_node_xgboost_pseudohuber"
+    }
+  }
+}

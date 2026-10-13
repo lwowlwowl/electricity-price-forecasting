@@ -1,0 +1,2152 @@
+{
+  "audit_version": 1,
+  "scope": "read-only four-market global data contract audit",
+  "source_nodes_config": "configs/nodes.yaml",
+  "markets": {
+    "CAISO": {
+      "path": "data/markets/CAISO/CAISO_统一小时数据_20200101_20260601.parquet",
+      "sha256": "8766a56c0557e8222334a9cfe88886101c2c0791eab46efb6120adb3ca469031",
+      "rows": 168765,
+      "columns": [
+        "timestamp_local",
+        "timestamp_utc",
+        "node",
+        "actual_load_mw",
+        "day_ahead_price_usd_mwh",
+        "real_time_price_usd_mwh",
+        "wind_actual_mw",
+        "solar_actual_mw",
+        "hour_local",
+        "day_of_week",
+        "month",
+        "is_weekend",
+        "is_holiday",
+        "holiday_name",
+        "actual_temperature_2m_c",
+        "actual_relative_humidity_2m_pct",
+        "actual_dew_point_2m_c",
+        "actual_surface_pressure_hpa",
+        "actual_cloud_cover_pct",
+        "actual_precipitation_mm",
+        "actual_wind_speed_10m_ms",
+        "actual_wind_gusts_10m_ms",
+        "actual_shortwave_radiation_wm2",
+        "forecast_temperature_2m_c",
+        "forecast_relative_humidity_2m_pct",
+        "forecast_dew_point_2m_c",
+        "forecast_cloud_cover_pct",
+        "forecast_precipitation_mm",
+        "forecast_wind_speed_10m_ms",
+        "forecast_wind_gust_10m_ms",
+        "forecast_shortwave_radiation_wm2"
+      ],
+      "node_count": 3,
+      "nodes": [
+        "TH_NP15_GEN-APND",
+        "TH_SP15_GEN-APND",
+        "TH_ZP26_GEN-APND"
+      ],
+      "expected_nodes": [
+        "TH_NP15_GEN-APND",
+        "TH_SP15_GEN-APND",
+        "TH_ZP26_GEN-APND"
+      ],
+      "node_set_matches_configs_nodes_yaml": true,
+      "missing_expected_nodes": [],
+      "unexpected_nodes": [],
+      "utc_start": "2020-01-01T08:00:00+00:00",
+      "utc_end": "2026-06-02T06:00:00+00:00",
+      "unique_utc_timestamps": 56255,
+      "rectangular_panel_expected_rows": 168765,
+      "is_rectangular_panel": true,
+      "duplicate_node_timestamp_rows": 0,
+      "missing_rates_nonzero": {},
+      "timestamp_local_matches_market_timezone": true,
+      "hour_local_matches_timestamp_local": true,
+      "node_time_ranges_and_gaps": {
+        "TH_NP15_GEN-APND": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T08:00:00+00:00",
+          "utc_end": "2026-06-02T06:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-08:00",
+          "local_end": "2026-06-01T23:00:00-07:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 57.85006807405718,
+            "day_ahead_std": 58.59552471259385,
+            "day_ahead_min": -10.33477,
+            "day_ahead_max": 1262.8491,
+            "real_time_mean": 52.416270607892336,
+            "real_time_std": 64.20354074193676,
+            "real_time_min": -31.736716666666663,
+            "real_time_max": 1928.6013166666664
+          }
+        },
+        "TH_SP15_GEN-APND": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T08:00:00+00:00",
+          "utc_end": "2026-06-02T06:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-08:00",
+          "local_end": "2026-06-01T23:00:00-07:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 56.22009496122262,
+            "day_ahead_std": 66.31491560736568,
+            "day_ahead_min": -45.45909,
+            "day_ahead_max": 1514.7186,
+            "real_time_mean": 48.99575288552439,
+            "real_time_std": 66.0329000720494,
+            "real_time_min": -120.94971,
+            "real_time_max": 1891.343275
+          }
+        },
+        "TH_ZP26_GEN-APND": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T08:00:00+00:00",
+          "utc_end": "2026-06-02T06:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-08:00",
+          "local_end": "2026-06-01T23:00:00-07:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 53.88849353520377,
+            "day_ahead_std": 57.696985445767865,
+            "day_ahead_min": -14.78179,
+            "day_ahead_max": 1251.5905,
+            "real_time_mean": 47.04902640963986,
+            "real_time_std": 59.99515482821034,
+            "real_time_min": -61.58074583333334,
+            "real_time_max": 1907.1298166666663
+          }
+        }
+      },
+      "feature_repetition_across_nodes": {
+        "actual_load_mw": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "wind_actual_mw": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "solar_actual_mw": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_temperature_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_relative_humidity_2m_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_dew_point_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_surface_pressure_hpa": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_cloud_cover_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_precipitation_mm": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_wind_speed_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_wind_gusts_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_shortwave_radiation_wm2": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_temperature_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_relative_humidity_2m_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_dew_point_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_cloud_cover_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_precipitation_mm": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_wind_speed_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_wind_gust_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_shortwave_radiation_wm2": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        }
+      }
+    },
+    "ERCOT": {
+      "path": "data/markets/ERCOT/ERCOT_统一小时数据_20200101_20260601.parquet",
+      "sha256": "43c2eb4b4c5c8ce467113f67744d9784ccb591e1febe0423642f363e7369c19d",
+      "rows": 843825,
+      "columns": [
+        "timestamp_local",
+        "timestamp_utc",
+        "node",
+        "actual_load_mw",
+        "day_ahead_price_usd_mwh",
+        "real_time_price_usd_mwh",
+        "wind_actual_mw",
+        "solar_actual_mw",
+        "hour_local",
+        "day_of_week",
+        "month",
+        "is_weekend",
+        "is_holiday",
+        "holiday_name",
+        "actual_temperature_2m_c",
+        "actual_relative_humidity_2m_pct",
+        "actual_dew_point_2m_c",
+        "actual_surface_pressure_hpa",
+        "actual_cloud_cover_pct",
+        "actual_precipitation_mm",
+        "actual_wind_speed_10m_ms",
+        "actual_wind_gusts_10m_ms",
+        "actual_shortwave_radiation_wm2",
+        "forecast_temperature_2m_c",
+        "forecast_relative_humidity_2m_pct",
+        "forecast_dew_point_2m_c",
+        "forecast_cloud_cover_pct",
+        "forecast_precipitation_mm",
+        "forecast_wind_speed_10m_ms",
+        "forecast_wind_gust_10m_ms",
+        "forecast_shortwave_radiation_wm2"
+      ],
+      "node_count": 15,
+      "nodes": [
+        "HB_BUSAVG",
+        "HB_HOUSTON",
+        "HB_HUBAVG",
+        "HB_NORTH",
+        "HB_PAN",
+        "HB_SOUTH",
+        "HB_WEST",
+        "LZ_AEN",
+        "LZ_CPS",
+        "LZ_HOUSTON",
+        "LZ_LCRA",
+        "LZ_NORTH",
+        "LZ_RAYBN",
+        "LZ_SOUTH",
+        "LZ_WEST"
+      ],
+      "expected_nodes": [
+        "HB_BUSAVG",
+        "HB_HOUSTON",
+        "HB_HUBAVG",
+        "HB_NORTH",
+        "HB_PAN",
+        "HB_SOUTH",
+        "HB_WEST",
+        "LZ_AEN",
+        "LZ_CPS",
+        "LZ_HOUSTON",
+        "LZ_LCRA",
+        "LZ_NORTH",
+        "LZ_RAYBN",
+        "LZ_SOUTH",
+        "LZ_WEST"
+      ],
+      "node_set_matches_configs_nodes_yaml": true,
+      "missing_expected_nodes": [],
+      "unexpected_nodes": [],
+      "utc_start": "2020-01-01T06:00:00+00:00",
+      "utc_end": "2026-06-02T04:00:00+00:00",
+      "unique_utc_timestamps": 56255,
+      "rectangular_panel_expected_rows": 843825,
+      "is_rectangular_panel": true,
+      "duplicate_node_timestamp_rows": 0,
+      "missing_rates_nonzero": {},
+      "timestamp_local_matches_market_timezone": true,
+      "hour_local_matches_timestamp_local": true,
+      "node_time_ranges_and_gaps": {
+        "HB_BUSAVG": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T06:00:00+00:00",
+          "utc_end": "2026-06-02T04:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-06:00",
+          "local_end": "2026-06-01T23:00:00-05:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 77.40679630474453,
+            "day_ahead_std": 520.1792378546488,
+            "day_ahead_min": -0.12,
+            "day_ahead_max": 8995.71,
+            "real_time_mean": 77.3563812538017,
+            "real_time_std": 563.911206134864,
+            "real_time_min": -173.1825,
+            "real_time_max": 9061.2175
+          }
+        },
+        "HB_HOUSTON": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T06:00:00+00:00",
+          "utc_end": "2026-06-02T04:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-06:00",
+          "local_end": "2026-06-01T23:00:00-05:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 80.29699817518247,
+            "day_ahead_std": 520.1230956267087,
+            "day_ahead_min": 0.06,
+            "day_ahead_max": 8995.11,
+            "real_time_mean": 80.67779045012166,
+            "real_time_std": 563.9764322168871,
+            "real_time_min": -31.655,
+            "real_time_max": 9062.5425
+          }
+        },
+        "HB_HUBAVG": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T06:00:00+00:00",
+          "utc_end": "2026-06-02T04:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-06:00",
+          "local_end": "2026-06-01T23:00:00-05:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 77.18589986313869,
+            "day_ahead_std": 520.0711138444184,
+            "day_ahead_min": -0.25,
+            "day_ahead_max": 8995.26,
+            "real_time_mean": 77.17321491027981,
+            "real_time_std": 563.3937628526469,
+            "real_time_min": -34.825,
+            "real_time_max": 9024.0625
+          }
+        },
+        "HB_NORTH": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T06:00:00+00:00",
+          "utc_end": "2026-06-02T04:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-06:00",
+          "local_end": "2026-06-01T23:00:00-05:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 77.70660888077857,
+            "day_ahead_std": 520.674616511351,
+            "day_ahead_min": 0.0,
+            "day_ahead_max": 8998.99,
+            "real_time_mean": 77.6781695749696,
+            "real_time_std": 565.8850880835068,
+            "real_time_min": -228.74,
+            "real_time_max": 9203.575
+          }
+        },
+        "HB_PAN": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T06:00:00+00:00",
+          "utc_end": "2026-06-02T04:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-06:00",
+          "local_end": "2026-06-01T23:00:00-05:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 68.6849532390511,
+            "day_ahead_std": 521.6560870219968,
+            "day_ahead_min": -34.4,
+            "day_ahead_max": 9000.99,
+            "real_time_mean": 68.0090338921837,
+            "real_time_std": 566.3157008556616,
+            "real_time_min": -35.0375,
+            "real_time_max": 9200.755
+          }
+        },
+        "HB_SOUTH": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T06:00:00+00:00",
+          "utc_end": "2026-06-02T04:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-06:00",
+          "local_end": "2026-06-01T23:00:00-05:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 76.62088123479319,
+            "day_ahead_std": 518.820145590645,
+            "day_ahead_min": -8.5,
+            "day_ahead_max": 8987.66,
+            "real_time_mean": 76.18188764066302,
+            "real_time_std": 559.510597656145,
+            "real_time_min": -31.655,
+            "real_time_max": 9003.8725
+          }
+        },
+        "HB_WEST": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T06:00:00+00:00",
+          "utc_end": "2026-06-02T04:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-06:00",
+          "local_end": "2026-06-01T23:00:00-05:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 74.11909595498784,
+            "day_ahead_std": 520.839486906031,
+            "day_ahead_min": -13.41,
+            "day_ahead_max": 9000.01,
+            "real_time_mean": 74.15500959930048,
+            "real_time_std": 566.4981555448635,
+            "real_time_min": -37.8475,
+            "real_time_max": 9199.0475
+          }
+        },
+        "LZ_AEN": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T06:00:00+00:00",
+          "utc_end": "2026-06-02T04:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-06:00",
+          "local_end": "2026-06-01T23:00:00-05:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 79.30372110705595,
+            "day_ahead_std": 523.2084227930969,
+            "day_ahead_min": -3.81,
+            "day_ahead_max": 9052.53,
+            "real_time_mean": 80.00881301322993,
+            "real_time_std": 576.0653104832772,
+            "real_time_min": -31.655,
+            "real_time_max": 9714.465
+          }
+        },
+        "LZ_CPS": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T06:00:00+00:00",
+          "utc_end": "2026-06-02T04:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-06:00",
+          "local_end": "2026-06-01T23:00:00-05:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 78.76624961982968,
+            "day_ahead_std": 519.9905649641322,
+            "day_ahead_min": -6.99,
+            "day_ahead_max": 9008.71,
+            "real_time_mean": 79.09040640206814,
+            "real_time_std": 569.6215362236271,
+            "real_time_min": -31.655,
+            "real_time_max": 10101.07
+          }
+        },
+        "LZ_HOUSTON": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T06:00:00+00:00",
+          "utc_end": "2026-06-02T04:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-06:00",
+          "local_end": "2026-06-01T23:00:00-05:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 80.80881348844281,
+            "day_ahead_std": 520.0588881205656,
+            "day_ahead_min": 0.06,
+            "day_ahead_max": 8994.63,
+            "real_time_mean": 81.37221962439173,
+            "real_time_std": 564.2753756088621,
+            "real_time_min": -31.655,
+            "real_time_max": 9131.2275
+          }
+        },
+        "LZ_LCRA": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T06:00:00+00:00",
+          "utc_end": "2026-06-02T04:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-06:00",
+          "local_end": "2026-06-01T23:00:00-05:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 79.15819609184915,
+            "day_ahead_std": 522.3204971229873,
+            "day_ahead_min": -4.16,
+            "day_ahead_max": 9010.41,
+            "real_time_mean": 79.73607141499392,
+            "real_time_std": 574.9482752162855,
+            "real_time_min": -31.655,
+            "real_time_max": 9770.1475
+          }
+        },
+        "LZ_NORTH": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T06:00:00+00:00",
+          "utc_end": "2026-06-02T04:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-06:00",
+          "local_end": "2026-06-01T23:00:00-05:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 78.25238861009733,
+            "day_ahead_std": 521.1397348397178,
+            "day_ahead_min": 0.0,
+            "day_ahead_max": 9011.25,
+            "real_time_mean": 78.40105411724453,
+            "real_time_std": 567.5636177697733,
+            "real_time_min": -31.655,
+            "real_time_max": 9202.8
+          }
+        },
+        "LZ_RAYBN": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T06:00:00+00:00",
+          "utc_end": "2026-06-02T04:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-06:00",
+          "local_end": "2026-06-01T23:00:00-05:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 78.64318924878346,
+            "day_ahead_std": 521.1899947464581,
+            "day_ahead_min": -0.01,
+            "day_ahead_max": 8999.53,
+            "real_time_mean": 78.48331042807177,
+            "real_time_std": 566.1090179788702,
+            "real_time_min": -45.8175,
+            "real_time_max": 9199.6475
+          }
+        },
+        "LZ_SOUTH": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T06:00:00+00:00",
+          "utc_end": "2026-06-02T04:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-06:00",
+          "local_end": "2026-06-01T23:00:00-05:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 78.20338769768857,
+            "day_ahead_std": 518.8021635514684,
+            "day_ahead_min": -12.39,
+            "day_ahead_max": 8998.93,
+            "real_time_mean": 77.54298433698297,
+            "real_time_std": 559.371831103782,
+            "real_time_min": -31.8225,
+            "real_time_max": 9233.645
+          }
+        },
+        "LZ_WEST": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T06:00:00+00:00",
+          "utc_end": "2026-06-02T04:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-06:00",
+          "local_end": "2026-06-01T23:00:00-05:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 79.64378991788321,
+            "day_ahead_std": 521.7297260944608,
+            "day_ahead_min": -10.94,
+            "day_ahead_max": 9026.99,
+            "real_time_mean": 80.33074779501217,
+            "real_time_std": 568.2767032636892,
+            "real_time_min": -31.655,
+            "real_time_max": 9199.1225
+          }
+        }
+      },
+      "feature_repetition_across_nodes": {
+        "actual_load_mw": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "wind_actual_mw": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "solar_actual_mw": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_temperature_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_relative_humidity_2m_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_dew_point_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_surface_pressure_hpa": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_cloud_cover_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_precipitation_mm": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_wind_speed_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_wind_gusts_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_shortwave_radiation_wm2": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_temperature_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_relative_humidity_2m_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_dew_point_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_cloud_cover_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_precipitation_mm": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_wind_speed_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_wind_gust_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_shortwave_radiation_wm2": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        }
+      }
+    },
+    "NYISO": {
+      "path": "data/markets/NYISO/NYISO_统一小时数据_20200101_20260601.parquet",
+      "sha256": "dfb4eb2c1863250afbd2509dc93e2aab637668d2df83527549773c13261c722b",
+      "rows": 618805,
+      "columns": [
+        "timestamp_local",
+        "timestamp_utc",
+        "node",
+        "actual_load_mw",
+        "day_ahead_price_usd_mwh",
+        "real_time_price_usd_mwh",
+        "wind_actual_mw",
+        "solar_actual_mw",
+        "hour_local",
+        "day_of_week",
+        "month",
+        "is_weekend",
+        "is_holiday",
+        "holiday_name",
+        "actual_temperature_2m_c",
+        "actual_relative_humidity_2m_pct",
+        "actual_dew_point_2m_c",
+        "actual_surface_pressure_hpa",
+        "actual_cloud_cover_pct",
+        "actual_precipitation_mm",
+        "actual_wind_speed_10m_ms",
+        "actual_wind_gusts_10m_ms",
+        "actual_shortwave_radiation_wm2",
+        "forecast_temperature_2m_c",
+        "forecast_relative_humidity_2m_pct",
+        "forecast_dew_point_2m_c",
+        "forecast_cloud_cover_pct",
+        "forecast_precipitation_mm",
+        "forecast_wind_speed_10m_ms",
+        "forecast_wind_gust_10m_ms",
+        "forecast_shortwave_radiation_wm2"
+      ],
+      "node_count": 11,
+      "nodes": [
+        "CAPITL",
+        "CENTRL",
+        "DUNWOD",
+        "GENESE",
+        "HUD VL",
+        "LONGIL",
+        "MHK VL",
+        "MILLWD",
+        "N.Y.C.",
+        "NORTH",
+        "WEST"
+      ],
+      "expected_nodes": [
+        "CAPITL",
+        "CENTRL",
+        "DUNWOD",
+        "GENESE",
+        "HUD VL",
+        "LONGIL",
+        "MHK VL",
+        "MILLWD",
+        "N.Y.C.",
+        "NORTH",
+        "WEST"
+      ],
+      "node_set_matches_configs_nodes_yaml": true,
+      "missing_expected_nodes": [],
+      "unexpected_nodes": [],
+      "utc_start": "2020-01-01T05:00:00+00:00",
+      "utc_end": "2026-06-02T03:00:00+00:00",
+      "unique_utc_timestamps": 56255,
+      "rectangular_panel_expected_rows": 618805,
+      "is_rectangular_panel": true,
+      "duplicate_node_timestamp_rows": 0,
+      "missing_rates_nonzero": {},
+      "timestamp_local_matches_market_timezone": true,
+      "hour_local_matches_timestamp_local": true,
+      "node_time_ranges_and_gaps": {
+        "CAPITL": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 53.4512336526764,
+            "day_ahead_std": 44.7580234786314,
+            "day_ahead_min": 5.89,
+            "day_ahead_max": 522.77,
+            "real_time_mean": 54.13418352088403,
+            "real_time_std": 71.83128077041943,
+            "real_time_min": -80.05333333333333,
+            "real_time_max": 3000.915833333333
+          }
+        },
+        "CENTRL": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 34.63467153284671,
+            "day_ahead_std": 29.500171761799454,
+            "day_ahead_min": 1.97,
+            "day_ahead_max": 362.47,
+            "real_time_mean": 35.21671879752129,
+            "real_time_std": 48.899640944038936,
+            "real_time_min": -607.3958333333334,
+            "real_time_max": 2877.5675
+          }
+        },
+        "DUNWOD": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 48.55201832420925,
+            "day_ahead_std": 37.345208992502016,
+            "day_ahead_min": 6.07,
+            "day_ahead_max": 398.16,
+            "real_time_mean": 49.42166714187956,
+            "real_time_std": 61.40709519289171,
+            "real_time_min": -81.69416666666667,
+            "real_time_max": 3051.601666666667
+          }
+        },
+        "GENESE": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 33.43313298357664,
+            "day_ahead_std": 28.65063682232402,
+            "day_ahead_min": 1.67,
+            "day_ahead_max": 350.32,
+            "real_time_mean": 33.90958358678021,
+            "real_time_std": 45.99225282046795,
+            "real_time_min": -644.475,
+            "real_time_max": 2475.3166666666666
+          }
+        },
+        "HUD VL": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 47.727973692214114,
+            "day_ahead_std": 36.71511643215074,
+            "day_ahead_min": 5.81,
+            "day_ahead_max": 394.83,
+            "real_time_mean": 48.275572837464516,
+            "real_time_std": 59.974345788689455,
+            "real_time_min": -80.94749999999999,
+            "real_time_max": 3021.67
+          }
+        },
+        "LONGIL": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 59.073772810218976,
+            "day_ahead_std": 44.63372100076311,
+            "day_ahead_min": 9.08,
+            "day_ahead_max": 569.81,
+            "real_time_mean": 60.06012260492701,
+            "real_time_std": 77.31587526371261,
+            "real_time_min": -1086.2133333333334,
+            "real_time_max": 3029.0533333333333
+          }
+        },
+        "MHK VL": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 35.235719282238435,
+            "day_ahead_std": 30.656265057176668,
+            "day_ahead_min": 2.0,
+            "day_ahead_max": 385.64,
+            "real_time_mean": 35.770807751039136,
+            "real_time_std": 49.69353463226823,
+            "real_time_min": -604.4741666666666,
+            "real_time_max": 2841.339166666666
+          }
+        },
+        "MILLWD": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 48.491563640510954,
+            "day_ahead_std": 37.30489043029924,
+            "day_ahead_min": 6.04,
+            "day_ahead_max": 396.7,
+            "real_time_mean": 49.52571559141828,
+            "real_time_std": 61.85397338758274,
+            "real_time_min": -81.38416666666667,
+            "real_time_max": 3051.42
+          }
+        },
+        "N.Y.C.": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 49.42644502737227,
+            "day_ahead_std": 37.959400379320144,
+            "day_ahead_min": 6.11,
+            "day_ahead_max": 400.72,
+            "real_time_mean": 50.494845730053726,
+            "real_time_std": 61.90235983368299,
+            "real_time_min": -82.14916666666666,
+            "real_time_max": 3067.063333333333
+          }
+        },
+        "NORTH": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 27.52051094890511,
+            "day_ahead_std": 28.406374095164203,
+            "day_ahead_min": -1.37,
+            "day_ahead_max": 373.13,
+            "real_time_mean": 28.493590439350164,
+            "real_time_std": 49.36374322973041,
+            "real_time_min": -733.1791666666667,
+            "real_time_max": 2594.9908333333333
+          }
+        },
+        "WEST": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 35.33298623783455,
+            "day_ahead_std": 30.610039022029987,
+            "day_ahead_min": 2.09,
+            "day_ahead_max": 653.41,
+            "real_time_mean": 35.02446643096107,
+            "real_time_std": 44.52774713045816,
+            "real_time_min": -620.7908333333334,
+            "real_time_max": 2302.85
+          }
+        }
+      },
+      "feature_repetition_across_nodes": {
+        "actual_load_mw": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 0,
+          "all_nodes_identical_fraction": 0.0,
+          "max_distinct_node_values_same_timestamp": 11,
+          "classification": "node_varying_or_partially_repeated"
+        },
+        "wind_actual_mw": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "solar_actual_mw": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_temperature_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_relative_humidity_2m_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_dew_point_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_surface_pressure_hpa": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_cloud_cover_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_precipitation_mm": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_wind_speed_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_wind_gusts_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_shortwave_radiation_wm2": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_temperature_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_relative_humidity_2m_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_dew_point_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_cloud_cover_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_precipitation_mm": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_wind_speed_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_wind_gust_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_shortwave_radiation_wm2": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        }
+      }
+    },
+    "PJM": {
+      "path": "data/markets/PJM/PJM_统一小时数据_20200101_20260601.parquet",
+      "sha256": "d7a27f9453f18f99c464b7fb34bab52af154dbdc357241d4bc196ccda84628db",
+      "rows": 1968925,
+      "columns": [
+        "timestamp_local",
+        "timestamp_utc",
+        "node",
+        "actual_load_mw",
+        "day_ahead_price_usd_mwh",
+        "real_time_price_usd_mwh",
+        "wind_actual_mw",
+        "solar_actual_mw",
+        "hour_local",
+        "day_of_week",
+        "month",
+        "is_weekend",
+        "is_holiday",
+        "holiday_name",
+        "actual_temperature_2m_c",
+        "actual_relative_humidity_2m_pct",
+        "actual_dew_point_2m_c",
+        "actual_surface_pressure_hpa",
+        "actual_cloud_cover_pct",
+        "actual_precipitation_mm",
+        "actual_wind_speed_10m_ms",
+        "actual_wind_gusts_10m_ms",
+        "actual_shortwave_radiation_wm2",
+        "forecast_temperature_2m_c",
+        "forecast_relative_humidity_2m_pct",
+        "forecast_dew_point_2m_c",
+        "forecast_cloud_cover_pct",
+        "forecast_precipitation_mm",
+        "forecast_wind_speed_10m_ms",
+        "forecast_wind_gust_10m_ms",
+        "forecast_shortwave_radiation_wm2"
+      ],
+      "node_count": 35,
+      "nodes": [
+        "HUB:AEP GEN HUB",
+        "HUB:AEP-DAYTON HUB",
+        "HUB:ATSI GEN HUB",
+        "HUB:CHICAGO GEN HUB",
+        "HUB:CHICAGO HUB",
+        "HUB:DOMINION HUB",
+        "HUB:EASTERN HUB",
+        "HUB:N ILLINOIS HUB",
+        "HUB:NEW JERSEY HUB",
+        "HUB:OHIO HUB",
+        "HUB:WEST INT HUB",
+        "HUB:WESTERN HUB",
+        "ZONE:AECO",
+        "ZONE:AEP",
+        "ZONE:APS",
+        "ZONE:ATSI",
+        "ZONE:BGE",
+        "ZONE:COMED",
+        "ZONE:DAY",
+        "ZONE:DEOK",
+        "ZONE:DOM",
+        "ZONE:DPL",
+        "ZONE:DUQ",
+        "ZONE:EKPC",
+        "ZONE:JCPL",
+        "ZONE:METED",
+        "ZONE:MID-ATL/APS",
+        "ZONE:OVEC",
+        "ZONE:PECO",
+        "ZONE:PENELEC",
+        "ZONE:PEPCO",
+        "ZONE:PJM-RTO",
+        "ZONE:PPL",
+        "ZONE:PSEG",
+        "ZONE:RECO"
+      ],
+      "expected_nodes": [
+        "HUB:AEP GEN HUB",
+        "HUB:AEP-DAYTON HUB",
+        "HUB:ATSI GEN HUB",
+        "HUB:CHICAGO GEN HUB",
+        "HUB:CHICAGO HUB",
+        "HUB:DOMINION HUB",
+        "HUB:EASTERN HUB",
+        "HUB:N ILLINOIS HUB",
+        "HUB:NEW JERSEY HUB",
+        "HUB:OHIO HUB",
+        "HUB:WEST INT HUB",
+        "HUB:WESTERN HUB",
+        "ZONE:AECO",
+        "ZONE:AEP",
+        "ZONE:APS",
+        "ZONE:ATSI",
+        "ZONE:BGE",
+        "ZONE:COMED",
+        "ZONE:DAY",
+        "ZONE:DEOK",
+        "ZONE:DOM",
+        "ZONE:DPL",
+        "ZONE:DUQ",
+        "ZONE:EKPC",
+        "ZONE:JCPL",
+        "ZONE:METED",
+        "ZONE:MID-ATL/APS",
+        "ZONE:OVEC",
+        "ZONE:PECO",
+        "ZONE:PENELEC",
+        "ZONE:PEPCO",
+        "ZONE:PJM-RTO",
+        "ZONE:PPL",
+        "ZONE:PSEG",
+        "ZONE:RECO"
+      ],
+      "node_set_matches_configs_nodes_yaml": true,
+      "missing_expected_nodes": [],
+      "unexpected_nodes": [],
+      "utc_start": "2020-01-01T05:00:00+00:00",
+      "utc_end": "2026-06-02T03:00:00+00:00",
+      "unique_utc_timestamps": 56255,
+      "rectangular_panel_expected_rows": 1968925,
+      "is_rectangular_panel": true,
+      "duplicate_node_timestamp_rows": 0,
+      "missing_rates_nonzero": {},
+      "timestamp_local_matches_market_timezone": true,
+      "hour_local_matches_timestamp_local": true,
+      "node_time_ranges_and_gaps": {
+        "HUB:AEP GEN HUB": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 41.88432940769464,
+            "day_ahead_std": 30.39231434098844,
+            "day_ahead_min": 6.422105,
+            "day_ahead_max": 444.927368,
+            "real_time_mean": 42.33737193970498,
+            "real_time_std": 66.74685260582426,
+            "real_time_min": -19.722325,
+            "real_time_max": 3761.41375
+          }
+        },
+        "HUB:AEP-DAYTON HUB": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 42.88657961910736,
+            "day_ahead_std": 31.162293588276516,
+            "day_ahead_min": 6.152009,
+            "day_ahead_max": 446.203767,
+            "real_time_mean": 43.47364806029501,
+            "real_time_std": 68.1817225860206,
+            "real_time_min": -20.08034,
+            "real_time_max": 3873.899303
+          }
+        },
+        "HUB:ATSI GEN HUB": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 42.08980141164842,
+            "day_ahead_std": 30.52328943415409,
+            "day_ahead_min": 6.853182,
+            "day_ahead_max": 537.530227,
+            "real_time_mean": 42.26755946605079,
+            "real_time_std": 66.69288168573752,
+            "real_time_min": -28.32161,
+            "real_time_max": 3604.353485
+          }
+        },
+        "HUB:CHICAGO GEN HUB": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 37.413247760948906,
+            "day_ahead_std": 27.62561331645502,
+            "day_ahead_min": 0.437692,
+            "day_ahead_max": 359.268308,
+            "real_time_mean": 37.59344091799726,
+            "real_time_std": 55.34334278950307,
+            "real_time_min": -39.481891,
+            "real_time_max": 3372.683686
+          }
+        },
+        "HUB:CHICAGO HUB": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 38.20466257322081,
+            "day_ahead_std": 28.27340479410493,
+            "day_ahead_min": 0.038548,
+            "day_ahead_max": 364.792586,
+            "real_time_mean": 38.47437329862378,
+            "real_time_std": 56.87045389187565,
+            "real_time_min": -42.983792,
+            "real_time_max": 3462.095312
+          }
+        },
+        "HUB:DOMINION HUB": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 45.94511592335767,
+            "day_ahead_std": 35.27407264271314,
+            "day_ahead_min": 6.539189,
+            "day_ahead_max": 474.687309,
+            "real_time_mean": 47.44998949213047,
+            "real_time_std": 83.20335026034937,
+            "real_time_min": -20.411606,
+            "real_time_max": 4360.850238
+          }
+        },
+        "HUB:EASTERN HUB": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 41.06757316381539,
+            "day_ahead_std": 34.48522043894677,
+            "day_ahead_min": 4.851482,
+            "day_ahead_max": 488.082823,
+            "real_time_mean": 42.780811594320255,
+            "real_time_std": 76.31544227352472,
+            "real_time_min": -39.174846,
+            "real_time_max": 3709.92584
+          }
+        },
+        "HUB:N ILLINOIS HUB": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 37.91791574840328,
+            "day_ahead_std": 27.999712623189005,
+            "day_ahead_min": 0.1474,
+            "day_ahead_max": 362.318435,
+            "real_time_mean": 38.21279590491941,
+            "real_time_std": 56.362269517930194,
+            "real_time_min": -42.390031,
+            "real_time_max": 3429.548073
+          }
+        },
+        "HUB:NEW JERSEY HUB": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 38.41513010933698,
+            "day_ahead_std": 29.62946222348899,
+            "day_ahead_min": 5.229145,
+            "day_ahead_max": 468.592665,
+            "real_time_mean": 39.733473334169716,
+            "real_time_std": 67.53674941954063,
+            "real_time_min": -22.870253,
+            "real_time_max": 3536.475448
+          }
+        },
+        "HUB:OHIO HUB": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 42.84285051459853,
+            "day_ahead_std": 31.1704879707418,
+            "day_ahead_min": 5.963443,
+            "day_ahead_max": 442.553919,
+            "real_time_mean": 43.42589227512926,
+            "real_time_std": 67.61754636009539,
+            "real_time_min": -20.108297,
+            "real_time_max": 3851.010975
+          }
+        },
+        "HUB:WEST INT HUB": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 43.43724608557634,
+            "day_ahead_std": 32.14229744607155,
+            "day_ahead_min": 6.866111,
+            "day_ahead_max": 508.974547,
+            "real_time_mean": 44.044605793339414,
+            "real_time_std": 72.0876734800305,
+            "real_time_min": -20.016018,
+            "real_time_max": 3801.598536
+          }
+        },
+        "HUB:WESTERN HUB": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 44.29581694624391,
+            "day_ahead_std": 32.985845117424816,
+            "day_ahead_min": 6.799792,
+            "day_ahead_max": 469.098724,
+            "real_time_mean": 44.66212468069495,
+            "real_time_std": 74.01793341303207,
+            "real_time_min": -20.295399,
+            "real_time_max": 3794.431329
+          }
+        },
+        "ZONE:AECO": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 37.605216146251514,
+            "day_ahead_std": 29.693560647089846,
+            "day_ahead_min": -18.763534,
+            "day_ahead_max": 477.184079,
+            "real_time_mean": 38.708273369335465,
+            "real_time_std": 67.96200355676427,
+            "real_time_min": -92.245039,
+            "real_time_max": 3593.427146
+          }
+        },
+        "ZONE:AEP": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 43.1451823475517,
+            "day_ahead_std": 31.522023272074893,
+            "day_ahead_min": 6.398401,
+            "day_ahead_max": 456.973823,
+            "real_time_mean": 44.01478088963656,
+            "real_time_std": 72.68939393271215,
+            "real_time_min": -20.141004,
+            "real_time_max": 3954.143025
+          }
+        },
+        "ZONE:APS": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 43.5872632486694,
+            "day_ahead_std": 31.89862207757595,
+            "day_ahead_min": 6.856062,
+            "day_ahead_max": 469.994344,
+            "real_time_mean": 44.41383526391424,
+            "real_time_std": 73.99243246928357,
+            "real_time_min": -20.266394,
+            "real_time_max": 3904.448999
+          }
+        },
+        "ZONE:ATSI": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 42.849426217115266,
+            "day_ahead_std": 31.318338827033923,
+            "day_ahead_min": 7.055146,
+            "day_ahead_max": 551.927483,
+            "real_time_mean": 43.24283900638686,
+            "real_time_std": 69.67265421996967,
+            "real_time_min": -20.028708,
+            "real_time_max": 3792.35962
+          }
+        },
+        "ZONE:BGE": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 49.62149449467761,
+            "day_ahead_std": 38.89179043323206,
+            "day_ahead_min": 6.881669,
+            "day_ahead_max": 492.520754,
+            "real_time_mean": 50.73095195111009,
+            "real_time_std": 87.8665809230865,
+            "real_time_min": -20.646773,
+            "real_time_max": 4331.891613
+          }
+        },
+        "ZONE:COMED": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 38.02169755706357,
+            "day_ahead_std": 28.1452952884318,
+            "day_ahead_min": -0.124778,
+            "day_ahead_max": 363.779081,
+            "real_time_mean": 38.302622891879565,
+            "real_time_std": 56.67330944765921,
+            "real_time_min": -44.297946,
+            "real_time_max": 3449.102093
+          }
+        },
+        "ZONE:DAY": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 45.088058355687345,
+            "day_ahead_std": 32.74746747813428,
+            "day_ahead_min": 7.463664,
+            "day_ahead_max": 472.521303,
+            "real_time_mean": 45.7394244301247,
+            "real_time_std": 73.57665415240524,
+            "real_time_min": -20.351467,
+            "real_time_max": 4202.160831
+          }
+        },
+        "ZONE:DEOK": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 44.09569371741941,
+            "day_ahead_std": 32.46937270750346,
+            "day_ahead_min": 6.763119,
+            "day_ahead_max": 460.939437,
+            "real_time_mean": 44.52403256862075,
+            "real_time_std": 72.5845473012467,
+            "real_time_min": -19.77599,
+            "real_time_max": 4099.998221
+          }
+        },
+        "ZONE:DOM": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 48.89806986884125,
+            "day_ahead_std": 42.079318077306326,
+            "day_ahead_min": 6.640822,
+            "day_ahead_max": 500.00032,
+            "real_time_mean": 51.27406658987226,
+            "real_time_std": 90.52171563034368,
+            "real_time_min": -20.659629,
+            "real_time_max": 4392.119704
+          }
+        },
+        "ZONE:DPL": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 41.209279772087896,
+            "day_ahead_std": 35.40094956606704,
+            "day_ahead_min": 3.233838,
+            "day_ahead_max": 490.331277,
+            "real_time_mean": 43.34265620304897,
+            "real_time_std": 79.94482344767992,
+            "real_time_min": -48.741764,
+            "real_time_max": 3761.805594
+          }
+        },
+        "ZONE:DUQ": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 42.28264917613291,
+            "day_ahead_std": 30.699793916431545,
+            "day_ahead_min": 6.967236,
+            "day_ahead_max": 477.095166,
+            "real_time_mean": 42.82847304588656,
+            "real_time_std": 69.85198279211951,
+            "real_time_min": -19.893212,
+            "real_time_max": 3808.865972
+          }
+        },
+        "ZONE:EKPC": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 43.32302736439324,
+            "day_ahead_std": 31.834720489983766,
+            "day_ahead_min": 7.172447,
+            "day_ahead_max": 462.333885,
+            "real_time_mean": 44.38208668183546,
+            "real_time_std": 76.05978101368714,
+            "real_time_min": -19.599765,
+            "real_time_max": 4228.125791
+          }
+        },
+        "ZONE:JCPL": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 38.29915470795316,
+            "day_ahead_std": 29.595432269815202,
+            "day_ahead_min": 5.155587,
+            "day_ahead_max": 471.205186,
+            "real_time_mean": 39.476645405983874,
+            "real_time_std": 68.12034366107152,
+            "real_time_min": -63.213123,
+            "real_time_max": 3570.518098
+          }
+        },
+        "ZONE:METED": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 43.26636358991028,
+            "day_ahead_std": 36.84383945247204,
+            "day_ahead_min": 4.787885,
+            "day_ahead_max": 472.509702,
+            "real_time_mean": 44.2212496218826,
+            "real_time_std": 77.80937741117977,
+            "real_time_min": -21.242171,
+            "real_time_max": 3762.614288
+          }
+        },
+        "ZONE:MID-ATL/APS": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 46.510653751634734,
+            "day_ahead_std": 36.20939692850603,
+            "day_ahead_min": 6.814717,
+            "day_ahead_max": 491.764005,
+            "real_time_mean": 42.96421690282846,
+            "real_time_std": 72.27389994580888,
+            "real_time_min": -20.239394,
+            "real_time_max": 3718.847996
+          }
+        },
+        "ZONE:OVEC": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 42.26718902068127,
+            "day_ahead_std": 30.607409004202026,
+            "day_ahead_min": 5.4,
+            "day_ahead_max": 446.92,
+            "real_time_mean": 42.9309790317569,
+            "real_time_std": 68.29279223931118,
+            "real_time_min": -237.4625,
+            "real_time_max": 3861.271667
+          }
+        },
+        "ZONE:PECO": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 37.105571324209244,
+            "day_ahead_std": 29.537419535478204,
+            "day_ahead_min": 4.696569,
+            "day_ahead_max": 467.751183,
+            "real_time_mean": 38.188522086602795,
+            "real_time_std": 67.17976658504216,
+            "real_time_min": -43.437045,
+            "real_time_max": 3538.087616
+          }
+        },
+        "ZONE:PENELEC": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 41.882387316073604,
+            "day_ahead_std": 30.11570593083164,
+            "day_ahead_min": 6.852072,
+            "day_ahead_max": 448.205426,
+            "real_time_mean": 41.97566112587439,
+            "real_time_std": 65.84870679159326,
+            "real_time_min": -69.366609,
+            "real_time_max": 3350.531725
+          }
+        },
+        "ZONE:PEPCO": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 47.64360284679137,
+            "day_ahead_std": 37.2740560036655,
+            "day_ahead_min": 6.79796,
+            "day_ahead_max": 492.956176,
+            "real_time_mean": 48.81559188724148,
+            "real_time_std": 85.28903664354185,
+            "real_time_min": -20.607186,
+            "real_time_max": 4263.134601
+          }
+        },
+        "ZONE:PJM-RTO": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 43.926360413777374,
+            "day_ahead_std": 33.07444978795657,
+            "day_ahead_min": 5.179381,
+            "day_ahead_max": 470.189057,
+            "real_time_mean": 44.09393403991788,
+            "real_time_std": 72.2868190648053,
+            "real_time_min": -20.187838,
+            "real_time_max": 3705.838676
+          }
+        },
+        "ZONE:PPL": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 40.0120079874924,
+            "day_ahead_std": 32.05960477009502,
+            "day_ahead_min": 4.943733,
+            "day_ahead_max": 455.813682,
+            "real_time_mean": 40.877261478786494,
+            "real_time_std": 71.56789008878913,
+            "real_time_min": -223.569618,
+            "real_time_max": 3660.816283
+          }
+        },
+        "ZONE:PSEG": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 38.82965410880474,
+            "day_ahead_std": 29.778280103851735,
+            "day_ahead_min": 5.64541,
+            "day_ahead_max": 464.683957,
+            "real_time_mean": 40.33105365575578,
+            "real_time_std": 67.65862162322848,
+            "real_time_min": -20.950529,
+            "real_time_max": 3502.71185
+          }
+        },
+        "ZONE:RECO": {
+          "rows": 56255,
+          "utc_start": "2020-01-01T05:00:00+00:00",
+          "utc_end": "2026-06-02T03:00:00+00:00",
+          "local_start": "2020-01-01T00:00:00-05:00",
+          "local_end": "2026-06-01T23:00:00-04:00",
+          "non_hourly_gap_count": 0,
+          "largest_gap_hours": 1.0,
+          "internal_train_2020_2022_price_stats": {
+            "day_ahead_mean": 40.45841401494069,
+            "day_ahead_std": 30.47608274726271,
+            "day_ahead_min": 4.38886,
+            "day_ahead_max": 446.901137,
+            "real_time_mean": 41.97723064936891,
+            "real_time_std": 67.60439496900341,
+            "real_time_min": -64.079358,
+            "real_time_max": 3303.113309
+          }
+        }
+      },
+      "feature_repetition_across_nodes": {
+        "actual_load_mw": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "wind_actual_mw": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "solar_actual_mw": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_temperature_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_relative_humidity_2m_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_dew_point_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_surface_pressure_hpa": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_cloud_cover_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_precipitation_mm": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_wind_speed_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_wind_gusts_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "actual_shortwave_radiation_wm2": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_temperature_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_relative_humidity_2m_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_dew_point_2m_c": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_cloud_cover_pct": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_precipitation_mm": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_wind_speed_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_wind_gust_10m_ms": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        },
+        "forecast_shortwave_radiation_wm2": {
+          "timestamps": 56255,
+          "all_nodes_identical_timestamps": 56255,
+          "all_nodes_identical_fraction": 1.0,
+          "max_distinct_node_values_same_timestamp": 1,
+          "classification": "market_level_repeated"
+        }
+      }
+    }
+  },
+  "totals": {
+    "markets": 4,
+    "nodes": 64,
+    "rows": 3600320
+  }
+}

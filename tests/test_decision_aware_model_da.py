@@ -79,6 +79,20 @@ def test_two_da_models_do_not_share_parameters():
     assert first_parameter.data_ptr() != second_parameter.data_ptr()
 
 
+def test_da_lag168_mode_learns_residual_around_historical_anchor():
+    cfg = _config()
+    cfg.global_residual_anchor = "lag168"
+    model = DecisionAwareDAForecaster(cfg).eval()
+    torch.nn.init.zeros_(model.price_head.weight)
+    torch.nn.init.zeros_(model.price_head.bias)
+    batch = _batch()
+    batch["price_da_lag168"] = torch.linspace(10.0, 90.0, 24).repeat(2, 1)
+
+    output = model(batch)
+    assert torch.allclose(output["p_da"], batch["price_da_lag168"], atol=1e-5)
+    assert torch.count_nonzero(output["p_da_normalized_residual"]) == 0
+
+
 @pytest.mark.parametrize(
     ("mode", "expected_memory_steps"),
     [("F0", 16), ("F1", 16), ("F2", 80)],

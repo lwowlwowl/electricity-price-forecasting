@@ -1,0 +1,130 @@
+{
+  "task": "da",
+  "phase": "outer",
+  "smoke_only": false,
+  "nodes": [
+    "HB_BUSAVG",
+    "HB_HOUSTON",
+    "HB_HUBAVG",
+    "HB_NORTH",
+    "HB_PAN",
+    "HB_SOUTH",
+    "HB_WEST",
+    "LZ_AEN",
+    "LZ_CPS",
+    "LZ_HOUSTON",
+    "LZ_LCRA",
+    "LZ_NORTH",
+    "LZ_RAYBN",
+    "LZ_SOUTH",
+    "LZ_WEST"
+  ],
+  "contract_hash": "0c5956fb9fd24b5774b6fbdb066a202b17572fa57d012c67bf7354ce7c7d8dd6",
+  "entity_mapping_hash": "2dca4b8cfae5d7d8f88d9d0a23d328aaeea7ba4ea6685b27336d1d01389160e9",
+  "models": {
+    "xgboost_absolute": {
+      "macro_mae": 19.32033353858603,
+      "macro_rmse": 64.35610652390979,
+      "node_count": 15,
+      "nodes": {
+        "HB_BUSAVG": {
+          "mae": 17.75628487138042,
+          "rmse": 61.91655996596361,
+          "samples": 364
+        },
+        "HB_HOUSTON": {
+          "mae": 17.25509547002165,
+          "rmse": 60.489408152743216,
+          "samples": 364
+        },
+        "HB_HUBAVG": {
+          "mae": 18.00921791145491,
+          "rmse": 61.96009898003559,
+          "samples": 364
+        },
+        "HB_NORTH": {
+          "mae": 18.268114518839653,
+          "rmse": 63.88996391247581,
+          "samples": 364
+        },
+        "HB_PAN": {
+          "mae": 23.6864197418173,
+          "rmse": 68.02124095237461,
+          "samples": 364
+        },
+        "HB_SOUTH": {
+          "mae": 18.047435639666833,
+          "rmse": 60.61158205570573,
+          "samples": 364
+        },
+        "HB_WEST": {
+          "mae": 21.888089098634996,
+          "rmse": 67.00250390868337,
+          "samples": 364
+        },
+        "LZ_AEN": {
+          "mae": 18.918498619640374,
+          "rmse": 66.1625300004668,
+          "samples": 364
+        },
+        "LZ_CPS": {
+          "mae": 18.94547653473204,
+          "rmse": 68.00971612996833,
+          "samples": 364
+        },
+        "LZ_HOUSTON": {
+          "mae": 17.048557852908512,
+          "rmse": 60.172978476734436,
+          "samples": 364
+        },
+        "LZ_LCRA": {
+          "mae": 18.938282336558697,
+          "rmse": 68.28350527140425,
+          "samples": 364
+        },
+        "LZ_NORTH": {
+          "mae": 18.431910540173195,
+          "rmse": 64.55850010150692,
+          "samples": 364
+        },
+        "LZ_RAYBN": {
+          "mae": 18.664181006464027,
+          "rmse": 64.57315783280391,
+          "samples": 364
+        },
+        "LZ_SOUTH": {
+          "mae": 17.940226487974012,
+          "rmse": 59.4780293900343,
+          "samples": 364
+        },
+        "LZ_WEST": {
+          "mae": 26.00721244852382,
+          "rmse": 70.21182272774602,
+          "samples": 364
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 267.76230059999943,
+      "last_run_elapsed_seconds": 267.76230059999943,
+      "last_run_computed_nodes": [
+        "HB_HUBAVG",
+        "HB_BUSAVG",
+        "HB_HOUSTON",
+        "HB_NORTH",
+        "HB_PAN",
+        "HB_WEST",
+        "HB_SOUTH",
+        "LZ_AEN",
+        "LZ_CPS",
+        "LZ_HOUSTON",
+        "LZ_LCRA",
+        "LZ_NORTH",
+        "LZ_RAYBN",
+        "LZ_SOUTH",
+        "LZ_WEST"
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "local_per_node_xgboost_absolute_error"
+    }
+  }
+}

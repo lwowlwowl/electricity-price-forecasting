@@ -1,0 +1,104 @@
+{
+  "experiment": "global_ercot_taskloss_v1_summary",
+  "status": "inner_validation_candidate_not_final",
+  "split": "2023 inner validation only",
+  "2024_used": false,
+  "2025_used": false,
+  "candidate_family_prefix": "taskloss",
+  "best_candidate_triplet": "da_taskloss1__rt_at_da_taskloss1__rt_taskloss0",
+  "best_candidate_mapping": {
+    "da": "taskloss1",
+    "rt_at_da": "taskloss1",
+    "rt": "taskloss0"
+  },
+  "forecast_diagnostics": {
+    "taskloss": {
+      "nodes": 15,
+      "common_days": 362,
+      "da_mae": 37.787532806396484,
+      "rt_at_da_mae": 55.348243713378906,
+      "rt_first_step_mae": 27.763328552246094,
+      "da_peak_hour_accuracy": 0.2699815837937385,
+      "rt_at_da_peak_hour_accuracy": 0.12173112338858195,
+      "da_true_price_q95": 136.30999755859375,
+      "da_q95_peak_mae": 486.17645263671875,
+      "rt_true_price_q95": 88.64761352539062,
+      "rt_at_da_q95_peak_mae": 487.720458984375,
+      "rt_first_step_q95_peak_mae": 386.7669677734375,
+      "predicted_spread_abs_mean": 26.982818603515625,
+      "predicted_spread_abs_q95": 55.7060432434082,
+      "predicted_spread_abs_q99": 233.79803466796875,
+      "true_spread_abs_mean": 34.886436462402344,
+      "true_spread_abs_q95": 101.68022918701172,
+      "true_spread_abs_q99": 721.264892578125,
+      "spread_pearson_correlation": 0.03773348872809684,
+      "spread_direction_accuracy": 0.46917587476979744,
+      "important_spread_abs_true_threshold": 6.0,
+      "important_spread_fraction": 0.45821823204419887,
+      "important_spread_direction_accuracy": 0.4776521811940049
+    },
+    "xgboost_robust": {
+      "nodes": 15,
+      "common_days": 362,
+      "da_mae": 35.571983337402344,
+      "rt_at_da_mae": 35.301063537597656,
+      "rt_first_step_mae": 22.997037887573242,
+      "da_peak_hour_accuracy": 0.35027624309392263,
+      "rt_at_da_peak_hour_accuracy": 0.16114180478821363,
+      "da_true_price_q95": 136.30999755859375,
+      "da_q95_peak_mae": 499.9159851074219,
+      "rt_true_price_q95": 88.64761352539062,
+      "rt_at_da_q95_peak_mae": 499.9653015136719,
+      "rt_first_step_q95_peak_mae": 365.9139404296875,
+      "predicted_spread_abs_mean": 12.018596649169922,
+      "predicted_spread_abs_q95": 46.863380432128906,
+      "predicted_spread_abs_q99": 125.84207153320312,
+      "true_spread_abs_mean": 34.886436462402344,
+      "true_spread_abs_q95": 101.68022918701172,
+      "true_spread_abs_q99": 721.264892578125,
+      "spread_pearson_correlation": 0.15362354447606852,
+      "spread_direction_accuracy": 0.5944597912829958,
+      "important_spread_abs_true_threshold": 6.0,
+      "important_spread_fraction": 0.45821823204419887,
+      "important_spread_direction_accuracy": 0.6523486561165537
+    }
+  },
+  "economic_diagnostics": {
+    "taskloss": {
+      "macro_mean_daily_revenue": 234.18644508000637,
+      "macro_positive_day_rate": 0.5359116022099447,
+      "macro_min_daily_revenue": -117.16902691088225,
+      "macro_maximum_drawdown_usd": 177.68350042661768,
+      "macro_mean_daily_deviation_penalty": 2.0545323027924356,
+      "macro_mean_daily_degradation_cost": 14.281398629879758,
+      "macro_mean_daily_revenue_without_top_5_days": 152.72805774879077,
+      "top_5_days_total_revenue_share": 0.3568434153510976
+    },
+    "xgboost_robust": {
+      "macro_mean_daily_revenue": 292.28926467730673,
+      "macro_positive_day_rate": 0.7928176795580111,
+      "macro_min_daily_revenue": -206.06570119255625,
+      "macro_maximum_drawdown_usd": 206.0657011925564,
+      "macro_mean_daily_deviation_penalty": 9.86639666923426,
+      "macro_mean_daily_degradation_cost": 30.07155213044128,
+      "macro_mean_daily_revenue_without_top_5_days": 210.50885820605225,
+      "top_5_days_total_revenue_share": 0.2897403278878542
+    },
+    "paired_taskloss_minus_xgboost": {
+      "mean_daily_revenue_difference": -58.102819597300325,
+      "7day_block_bootstrap_95ci": [
+        -109.92246532155701,
+        -20.51338482306167
+      ]
+    }
+  },
+  "promotion_gates": {
+    "revenue_point_estimate_beats_xgboost": false,
+    "paired_95ci_lower_bound_above_zero": false,
+    "maximum_drawdown_no_worse_than_xgboost": true,
+    "da_mae_no_worse_than_xgboost": false,
+    "rt_at_da_mae_no_worse_than_xgboost": false,
+    "rt_mae_no_worse_than_xgboost": false
+  },
+  "ready_for_multiseed": false
+}

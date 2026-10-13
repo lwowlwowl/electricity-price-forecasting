@@ -25,6 +25,16 @@ src/archive/data_raw_legacy/，不再由当前包导入。
 """
 
 from .config import PilotConfig
+from .contracts import (FORMAL_EXPERIMENT_CONTRACT, AnnualSplitContract,
+                        AnnualStage,
+                        ExperimentContract, SettlementContract,
+                        formal_checkpoint_metadata)
+from .global_data import (EntityMappings, MultiNodeDataset,
+                          MarketNodeBalancedSampler, NodeBalancedSampler,
+                          RTDeliveryDayDataset,
+                          build_global_task_datasets,
+                          flatten_rt_delivery_day_batch,
+                          global_checkpoint_metadata, load_formal_entity_mappings)
 from .model import DecisionAwareTSFM
 from .model_da import DecisionAwareDAForecaster
 from .model_rt import DecisionAwareRTForecaster
@@ -40,9 +50,23 @@ from .loss import total_loss, total_loss_zo, anneal_alpha_beta
 from .loss_da import da_decision_aware_loss
 from .zero_order import (estimate_zo_gradient, estimate_zo_gradient_dual,
                          compute_l_proxy, compute_epsilon)
+from .backtest_dual import locked_dual_backtest_by_node
+from .continuous_mpc import (
+    locked_continuous_mpc_backtest,
+    locked_continuous_mpc_backtest_by_node,
+    solve_fixed_da_penalty_lp_window,
+    solve_predicted_da_penalty_lp_day,
+)
 
 __all__ = [
-    "PilotConfig", "DecisionAwareTSFM", "DecisionAwareDAForecaster",
+    "PilotConfig", "FORMAL_EXPERIMENT_CONTRACT", "AnnualSplitContract",
+    "AnnualStage",
+    "ExperimentContract", "SettlementContract", "formal_checkpoint_metadata",
+    "EntityMappings", "MultiNodeDataset", "NodeBalancedSampler",
+    "MarketNodeBalancedSampler", "build_global_task_datasets",
+    "RTDeliveryDayDataset", "flatten_rt_delivery_day_batch",
+    "global_checkpoint_metadata", "load_formal_entity_mappings",
+    "DecisionAwareTSFM", "DecisionAwareDAForecaster",
     "DecisionAwareRTForecaster",
     "BESSSimulator", "LookaheadMPCPolicy", "STEPolicy", "TopKPolicy", "HardTopKPolicy",
     "greedy_hindsight_revenue", "lp_oracle_revenue", "lp_oracle_revenue_dual",
@@ -53,4 +77,9 @@ __all__ = [
     "total_loss", "total_loss_zo", "anneal_alpha_beta", "da_decision_aware_loss",
     "estimate_zo_gradient", "estimate_zo_gradient_dual",
     "compute_l_proxy", "compute_epsilon",
+    "locked_dual_backtest_by_node",
+    "locked_continuous_mpc_backtest",
+    "locked_continuous_mpc_backtest_by_node",
+    "solve_fixed_da_penalty_lp_window",
+    "solve_predicted_da_penalty_lp_day",
 ]

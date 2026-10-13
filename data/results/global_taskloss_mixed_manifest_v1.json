@@ -1,0 +1,24 @@
+{
+  "experiment": "global_ercot_taskloss_small_mixed_diagnosis_v1",
+  "phase": "inner",
+  "2024_used": false,
+  "2025_used": false,
+  "selection_scope": "three full families only: two task-specific-loss ranks and the single best pre-existing stable Global family; 3^3=27 triplets",
+  "families": {
+    "new0": {
+      "da": "data/checkpoints/global_ercot_taskloss_da_mae_v1/da_inner_seed0/candidate_epoch_002.pt",
+      "rt_at_da": "data/checkpoints/global_ercot_taskloss_rt_at_da_pseudohuber_v1/rt_at_da_inner_seed0/candidate_epoch_010.pt",
+      "rt": "data/checkpoints/global_ercot_taskloss_rt_mae_v1/rt_inner_seed0/candidate_epoch_005.pt"
+    },
+    "new1": {
+      "da": "data/checkpoints/global_ercot_taskloss_da_mae_v1/da_inner_seed0/candidate_epoch_005.pt",
+      "rt_at_da": "data/checkpoints/global_ercot_taskloss_rt_at_da_pseudohuber_v1/rt_at_da_inner_seed0/candidate_epoch_012.pt",
+      "rt": "data/checkpoints/global_ercot_taskloss_rt_mae_v1/rt_inner_seed0/candidate_epoch_010.pt"
+    },
+    "stable0": {
+      "da": "data/checkpoints/global_ercot_huber_f1_stable_v2/da_inner_seed0/candidate_epoch_010.pt",
+      "rt_at_da": "data/checkpoints/global_ercot_huber_f1_stable_v2/rt_at_da_inner_seed0/candidate_epoch_004.pt",
+      "rt": "data/checkpoints/global_ercot_huber_f1_stable_v2/rt_inner_seed0/candidate_epoch_008.pt"
+    }
+  }
+}

@@ -70,3 +70,25 @@ def test_rt_stride_is_applied_per_split():
     val = DecisionAwareRTDataset(frame, cfg, "val", train.norm_stats)
     starts = [window.issue_position for window in val.windows]
     assert all((right - left) == 3 for left, right in zip(starts, starts[1:]))
+
+
+def test_rt_lag168_anchor_is_available_before_issue():
+    cfg = PilotConfig(
+        context_len=168,
+        horizon_rt=4,
+        train_stride=1,
+        val_stride=1,
+        global_residual_anchor="lag168",
+    )
+    frame = _frame()
+    train = DecisionAwareRTDataset(frame, cfg, "train")
+    val = DecisionAwareRTDataset(frame, cfg, "val", train.norm_stats)
+    window = val.windows[0]
+    sample = val[0]
+
+    assert window.lag168_positions is not None
+    assert np.all(window.lag168_positions < window.issue_position)
+    np.testing.assert_array_equal(
+        sample["price_rt_lag168"].numpy(),
+        frame["price_rt"].to_numpy()[window.target_positions - 168],
+    )
