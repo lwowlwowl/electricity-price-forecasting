@@ -157,6 +157,60 @@ def xgboost_feature(sample: dict, task: str, history_steps: int = 24) -> np.ndar
     return np.concatenate(values).astype(np.float32)
 
 
+def portable_xgboost_target(
+    sample: dict,
+    task: str,
+) -> tuple[np.ndarray, float, float]:
+    """把监督目标变成仅依赖当前起报历史的可迁移尺度。
+
+    ``context_robust`` 数据集把价格历史按当前168小时窗口的中位数/MAD
+    标准化，同时把该窗口的中心和尺度随样本返回。pooled LOMO XGBoost
+    必须沿用同一合同；若直接拟合美元价格，树模型会把源市场的绝对价格
+    分布当成隐式市场身份，并且难以迁移到价格尺度不同的留出市场。
+
+    节点和市场ID即使存在于 ``sample`` 中也不会在这里被读取。
+    """
+    target_key = {
+        "da": "price_da_tgt",
+        "rt_at_da": "price_rt_at_da_tgt",
+        "rt": "price_rt_tgt",
+    }.get(task)
+    if target_key is None:
+        raise ValueError(f"未知任务: {task}")
+    price_prefix = "price_da" if task == "da" else "price_rt"
+    target = sample[target_key].detach().cpu().numpy().astype(np.float32)
+    center = float(sample[f"{price_prefix}_mean"].detach().cpu().item())
+    scale = float(sample[f"{price_prefix}_std"].detach().cpu().item())
+    if not np.isfinite(center) or not np.isfinite(scale) or scale <= 0:
+        raise ValueError("XGBoost样本的历史价格中心/尺度必须有限且尺度为正")
+    normalized = ((target - center) / scale).astype(np.float32)
+    return normalized, center, scale
+
+
+def restore_portable_xgboost_prediction(
+    normalized_prediction: np.ndarray,
+    centers: np.ndarray,
+    scales: np.ndarray,
+) -> np.ndarray:
+    """把pooled LOMO XGBoost输出还原为美元/MWh。"""
+    prediction = np.asarray(normalized_prediction, dtype=np.float32)
+    center_array = np.asarray(centers, dtype=np.float32)
+    scale_array = np.asarray(scales, dtype=np.float32)
+    if prediction.ndim != 2:
+        raise ValueError("XGBoost标准化预测必须为[样本, 时距]")
+    if center_array.shape != (prediction.shape[0],):
+        raise ValueError("历史价格中心数量与预测样本数不一致")
+    if scale_array.shape != (prediction.shape[0],):
+        raise ValueError("历史价格尺度数量与预测样本数不一致")
+    if np.any(~np.isfinite(center_array)) or np.any(~np.isfinite(scale_array)):
+        raise ValueError("历史价格中心/尺度包含非有限值")
+    if np.any(scale_array <= 0):
+        raise ValueError("历史价格尺度必须为正")
+    return (
+        prediction * scale_array[:, None] + center_array[:, None]
+    ).astype(np.float32)
+
+
 @dataclass(frozen=True)
 class NodeMetrics:
     mae: float
@@ -268,6 +322,9 @@ def fit_xgboost_multioutput(
     seed: int = 0,
     n_estimators: int = 180,
     objective: str = "reg:squarederror",
+    device: str = "cpu",
+    n_jobs: int = 1,
+    output_jobs: int = 1,
 ):
     """真实XGBoost；缺包时明确失败，绝不回退为其他算法。"""
     try:
@@ -276,6 +333,13 @@ def fit_xgboost_multioutput(
         raise RuntimeError(
             "当前解释器未安装xgboost；请按requirements.txt准备环境"
         ) from exc
+    device = str(device).lower()
+    if device not in {"cpu", "cuda"}:
+        raise ValueError("XGBoost device必须是cpu或cuda")
+    if int(n_jobs) == 0 or int(n_jobs) < -1:
+        raise ValueError("XGBoost n_jobs必须是-1或正整数")
+    if int(output_jobs) == 0 or int(output_jobs) < -1:
+        raise ValueError("XGBoost output_jobs必须是-1或正整数")
     base = XGBRegressor(
         objective=objective,
         n_estimators=n_estimators,
@@ -284,9 +348,11 @@ def fit_xgboost_multioutput(
         subsample=0.8,
         colsample_bytree=0.7,
         reg_lambda=1.0,
-        n_jobs=1,
+        n_jobs=int(n_jobs),
         random_state=seed,
+        tree_method="hist",
+        device=device,
     )
-    model = MultiOutputRegressor(base, n_jobs=1)
+    model = MultiOutputRegressor(base, n_jobs=int(output_jobs))
     model.fit(features, targets)
     return model

@@ -23,15 +23,29 @@ def _require_equal(left: np.ndarray, right: np.ndarray, label: str) -> None:
         raise ValueError(f"{label}不一致")
 
 
-def prepare(source_root: Path, template_root: Path, output_root: Path, *, phase: str = "inner") -> None:
+def prepare(
+    source_root: Path,
+    template_root: Path,
+    output_root: Path,
+    *,
+    phase: str = "inner",
+    family: str = "universal",
+    seed: int = 0,
+    source_paths: dict[str, Path] | None = None,
+) -> None:
     if phase not in ("inner", "outer"):
         raise ValueError("phase必须为inner或outer")
     suffix = "_outer_frozen" if phase == "outer" else ""
     template_family = "outertemplate" if phase == "outer" else "c0"
-    source_paths = {
-        task: source_root / f"universal_lomo_{task}{suffix}_v1" / f"ercot_{task}_v1.npz"
-        for task in TASKS
-    }
+    if not family or any(character.isspace() for character in family):
+        raise ValueError("family必须是非空且不含空白的标识")
+    if source_paths is None:
+        source_paths = {
+            task: source_root / f"universal_lomo_{task}{suffix}_v1" / f"ercot_{task}_v1.npz"
+            for task in TASKS
+        }
+    if set(source_paths) != set(TASKS):
+        raise ValueError("source_paths必须恰好包含da、rt_at_da和rt")
     source = {
         task: _load(source_paths[task])
         for task in TASKS
@@ -67,7 +81,7 @@ def prepare(source_root: Path, template_root: Path, output_root: Path, *, phase:
             "target_rt": target_rt if task != "rt" else source[task]["target"],
             "metadata": json.dumps(
                 {
-                    "family": "universal",
+                    "family": family,
                     "task": task,
                     "phase": phase,
                     "source_metadata": json.loads(str(source[task]["metadata"])),
@@ -89,7 +103,7 @@ def prepare(source_root: Path, template_root: Path, output_root: Path, *, phase:
             arrays["executed_timestamps"] = template["rt"]["executed_timestamps"]
             arrays["timezone"] = template["rt"]["timezone"]
         np.savez_compressed(
-            output_root / f"universal_{task}_{phase}_seed0.npz", **arrays
+            output_root / f"{family}_{task}_{phase}_seed{seed}.npz", **arrays
         )
 
 
@@ -103,8 +117,32 @@ def main() -> None:
     parser.add_argument(
         "--output-root", default="data/results/universal_lomo_ercot_profit_predictions_v1"
     )
+    parser.add_argument("--family", default="universal")
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--source-da", default="")
+    parser.add_argument("--source-rt-at-da", default="")
+    parser.add_argument("--source-rt", default="")
     args = parser.parse_args()
-    prepare(ROOT / args.source_root, ROOT / args.template_root, ROOT / args.output_root, phase=args.phase)
+    explicit = {
+        "da": args.source_da,
+        "rt_at_da": args.source_rt_at_da,
+        "rt": args.source_rt,
+    }
+    if any(explicit.values()) and not all(explicit.values()):
+        raise ValueError("三个--source-*必须同时提供或同时省略")
+    source_paths = (
+        {task: ROOT / path for task, path in explicit.items()}
+        if all(explicit.values()) else None
+    )
+    prepare(
+        ROOT / args.source_root,
+        ROOT / args.template_root,
+        ROOT / args.output_root,
+        phase=args.phase,
+        family=args.family,
+        seed=args.seed,
+        source_paths=source_paths,
+    )
     print(json.dumps({"event": "universal_lomo_profit_archives_ready"}))
 
 

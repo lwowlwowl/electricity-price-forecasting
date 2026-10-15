@@ -1,6 +1,6 @@
 # 基础模型 worker 子进程协议
 
-三个基础模型（TimesFM / Chronos-2 / Toto）各自装在独立 venv 里，**依赖互相冲突，
+三个基础模型（TimesFM-3 / Chronos-2 / Toto）各自装在独立 venv 里，**依赖互相冲突，
 无法在同一个 Python 进程里 import**。因此采用「子进程 worker」模式：
 
 ```
@@ -32,9 +32,8 @@
 
 > 多节点（n_series>1）行为由 `multivariate` 旋钮控制：
 > - `multivariate=0`（默认）：所有 worker 逐列单变量预测，节点之间相互独立。
-> - `multivariate=1`：支持联合建模的模型（Toto / Chronos-2）把多节点作为一个
->   多变量序列联合预测；TimesFM 不支持联合，自动降级为逐列，并在结果里如实
->   标记 `multivariate_used=False`。
+> - `multivariate=1`：支持联合建模的模型（TimesFM-3 / Toto / Chronos-2）把多节点
+>   作为一个多变量序列联合预测。
 > - 协变量与多变量同时开启时，Chronos-2 本轮仍按逐列+协变量处理以保证稳定。
 
 ## response.npz 格式
@@ -47,6 +46,8 @@
 | `q10__{i}` | (horizon, n_series) | 10% 分位 |
 | `q90__{i}` | (horizon, n_series) | 90% 分位 |
 | `ok` | 标量 int | 1=成功 |
+| `model_id` | 标量字符串（可选） | worker 实际加载的官方 checkpoint |
+| `model_version` | 标量字符串（可选） | 模型主版本 |
 
 ## 调用方式
 
@@ -54,4 +55,7 @@
 {venv_python} worker_xxx.py  {request.npz}  {response.npz}
 ```
 
-worker 全程不联网（HF_HOME 指向本地 hf_cache）。
+worker 全程不联网（HF_HOME 指向本地 hf_cache）。当前 TimesFM worker 固定为
+`google/timesfm-3.0-pytorch`，允许负电价，并在单变量/多变量两种模式下支持合法的
+过去+未来协变量。TimesFM-3 代码采用 Apache-2.0；官方 3.0 权重另受
+`timesfm-non-commercial-license-v1.0` 约束，本项目只将其用于非商业科研对照。

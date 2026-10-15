@@ -60,6 +60,28 @@ def test_outer_conversion_preserves_frozen_provenance_and_predictions(outer_file
         np.testing.assert_array_equal(archive["prediction"], np.ones((1, 2, 24)))
 
 
+def test_conversion_accepts_explicit_triplet_family_and_seed(outer_files):
+    sources, templates, output = outer_files
+    paths = {
+        task: sources / f"universal_lomo_{task}_outer_frozen_v1/ercot_{task}_v1.npz"
+        for task in ("da", "rt_at_da", "rt")
+    }
+    prepare(
+        sources,
+        templates,
+        output,
+        phase="outer",
+        family="all_f0",
+        seed=2,
+        source_paths=paths,
+    )
+    path = output / "all_f0_da_outer_seed2.npz"
+    assert path.exists()
+    with np.load(path) as archive:
+        metadata = json.loads(str(archive["metadata"]))
+        assert metadata["family"] == "all_f0"
+
+
 def test_outer_conversion_refuses_shifted_dates(outer_files):
     sources, templates, output = outer_files
     path = sources / "universal_lomo_da_outer_frozen_v1/ercot_da_v1.npz"

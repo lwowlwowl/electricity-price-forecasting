@@ -1,7 +1,7 @@
 """
 基础模型适配器 foundation.py
 =============================
-把四个时序基础模型（TimesFM-2.5 / Chronos-2 / Toto-1.0 / Toto-2.0）统一封装成 Forecaster，
+把四个时序基础模型（TimesFM-3 / Chronos-2 / Toto-1.0 / Toto-2.0）统一封装成 Forecaster，
 使其能与基线在同一回测里公平对比。
 
 ★ 核心难点：三个模型装在各自独立 venv 里，依赖互相冲突，**不能在同一个
@@ -291,20 +291,17 @@ class FoundationForecaster(Forecaster):
 
 # ── 三个具体适配器 ───────────────────────────────────────────────────────────
 class TimesFMForecaster(FoundationForecaster):
-    """TimesFM-2.5：decoder-only 单序列模型。
+    """Frozen TimesFM-3（官方 ``google/timesfm-3.0-pytorch``）。
 
-    架构上是单变量预测器，**不原生支持多变量联合建模**——多节点只能逐列独立
-    预测（节点间互不影响）。因此 supports_multivariate=False：当上层要求多变量
-    时会如实降级为逐列，并在结果里标记 multivariate_used=False（手册 §3.3 能力诚实）。
-
-    协变量：TimesFM-2.5 通过 XReg 原生支持外生协变量，但本期 worker 尚未接入
-    该路径，故 supports_covariates=False（暂不喂协变量，也不冒充支持）。
+    TimesFM-3 原生支持跨变量注意力以及过去/未来协变量。关闭 ``multivariate``
+    时 worker 仍逐节点独立预测，作为单变量零样本对照；开启时同一任务的节点
+    联合预测。电价任务显式关闭非负截断，因此允许预测负电价。
     """
-    name = "TimesFM"
+    name = "TimesFM3"
     kind = "timesfm"
     needs_training = False
-    supports_covariates = False        # XReg 原生支持，但本期 worker 未接入
-    supports_multivariate = False      # decoder-only 单序列，不支持联合建模
+    supports_covariates = True
+    supports_multivariate = True
 
 
 class Chronos2Forecaster(FoundationForecaster):
@@ -359,7 +356,8 @@ class Toto2Forecaster(FoundationForecaster):
 
 # ── 注册表：名字 → 构造器 ─────────────────────────────────────────────────────
 FOUNDATION_REGISTRY = {
-    "TimesFM":  lambda **kw: TimesFMForecaster(),
+    "TimesFM3": lambda **kw: TimesFMForecaster(),
+    "TimesFM":  lambda **kw: TimesFMForecaster(),  # 兼容旧配置；结果名仍明确为 TimesFM3
     "Chronos2": lambda **kw: Chronos2Forecaster(),
     "Toto":     lambda **kw: TotoForecaster(),
     "Toto2":    lambda **kw: Toto2Forecaster(),

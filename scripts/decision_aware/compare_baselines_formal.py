@@ -130,7 +130,8 @@ def run_foundations(cfg, origins, model_names):
         price_only.append(c[[price_col]])
 
     out = {}
-    FC = {"timesfm": F.TimesFMForecaster, "chronos2": F.Chronos2Forecaster,
+    FC = {"timesfm3": F.TimesFMForecaster, "timesfm": F.TimesFMForecaster,
+          "chronos2": F.Chronos2Forecaster,
           "toto": F.TotoForecaster, "toto2": F.Toto2Forecaster}
     for name in model_names:
         t0 = time.time()
@@ -151,7 +152,7 @@ def main():
     ap.add_argument("--config", default="configs/decision_aware/formal_ercot_v4.yaml")
     ap.add_argument("--n-origins", type=int, default=30)
     ap.add_argument("--ckpt", default="best")
-    ap.add_argument("--models", default="timesfm,chronos2")
+    ap.add_argument("--models", default="timesfm3,chronos2")
     ap.add_argument("--ckpt-dir", default=None, help="覆盖 yaml 的 checkpoint_dir")
     args = ap.parse_args()
 

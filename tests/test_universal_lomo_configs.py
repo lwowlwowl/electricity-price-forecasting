@@ -44,3 +44,37 @@ def test_universal_lomo_da_rt_configs_use_frozen_mae_contract():
         assert cfg.global_training_loss == "mae"
         assert cfg.da_fusion_mode == "F1"
         assert cfg.rt_fusion_mode == "F1"
+
+
+def test_ercot_universal_ablation_configs_change_only_requested_fusion_family():
+    current_mae = PilotConfig.from_yaml(str(ROOT / (
+        "configs/decision_aware/universal_lomo_holdout_ercot_mae_v1.yaml"
+    )))
+    all_f0 = PilotConfig.from_yaml(str(ROOT / (
+        "configs/decision_aware/"
+        "universal_lomo_holdout_ercot_ablation_all_f0_mae_v1.yaml"
+    )))
+    assert all_f0.da_fusion_mode == "F0"
+    assert all_f0.rt_fusion_mode == "F0"
+    assert all_f0.global_training_loss == current_mae.global_training_loss == "mae"
+    assert all_f0.global_training_markets == current_mae.global_training_markets
+    assert all_f0.global_samples_per_market == current_mae.global_samples_per_market
+    assert all_f0.seed == current_mae.seed == 0
+
+    current_rt_at_da = PilotConfig.from_yaml(str(ROOT / (
+        "configs/decision_aware/"
+        "universal_lomo_holdout_ercot_rt_at_da_v1.yaml"
+    )))
+    all_f1 = PilotConfig.from_yaml(str(ROOT / (
+        "configs/decision_aware/"
+        "universal_lomo_holdout_ercot_ablation_all_f1_rt_at_da_v1.yaml"
+    )))
+    assert all_f1.rt_at_da_fusion_mode == "F1"
+    assert (
+        all_f1.global_training_loss
+        == current_rt_at_da.global_training_loss
+        == "pseudo_huber"
+    )
+    assert all_f1.global_training_markets == current_rt_at_da.global_training_markets
+    assert all_f1.global_samples_per_market == current_rt_at_da.global_samples_per_market
+    assert all_f1.seed == current_rt_at_da.seed == 0
