@@ -141,6 +141,38 @@
       ],
       "last_run_reused_nodes": [],
       "protocol": "local_per_node_xgboost_pseudohuber"
+    },
+    "lear": {
+      "macro_mae": 10.875164405721831,
+      "macro_rmse": 24.861298232586034,
+      "node_count": 3,
+      "nodes": {
+        "TH_NP15_GEN-APND": {
+          "mae": 10.009625305509315,
+          "rmse": 23.5010030639229,
+          "samples": 363
+        },
+        "TH_SP15_GEN-APND": {
+          "mae": 11.76069453482393,
+          "rmse": 26.94643948999569,
+          "samples": 363
+        },
+        "TH_ZP26_GEN-APND": {
+          "mae": 10.855173376832248,
+          "rmse": 24.136452143839502,
+          "samples": 363
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 1538.9228246999992,
+      "last_run_elapsed_seconds": 0.03630909999628784,
+      "last_run_computed_nodes": [],
+      "last_run_reused_nodes": [
+        "TH_NP15_GEN-APND",
+        "TH_SP15_GEN-APND",
+        "TH_ZP26_GEN-APND"
+      ],
+      "protocol": "cutoff_safe_lear_daily_recalibration"
     }
   }
 }

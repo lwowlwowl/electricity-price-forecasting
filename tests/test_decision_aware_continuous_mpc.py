@@ -117,3 +117,46 @@ def test_backtest_decisions_do_not_use_realized_prices():
         "da_joint_penalty_lp": 1,
         "rt_lp": 24,
     }
+    assert first["solver_timing_seconds"]["da_joint_penalty_lp"] >= 0.0
+    assert first["solver_timing_seconds"]["rt_lp"] >= 0.0
+    assert first["solver_timing_seconds"]["total"] == pytest.approx(
+        first["solver_timing_seconds"]["da_joint_penalty_lp"]
+        + first["solver_timing_seconds"]["rt_lp"]
+    )
+    assert first["solver_timing_seconds"]["da_mean_per_call"] == pytest.approx(
+        first["solver_timing_seconds"]["da_joint_penalty_lp"]
+    )
+    assert first["solver_timing_seconds"]["rt_mean_per_call"] == pytest.approx(
+        first["solver_timing_seconds"]["rt_lp"] / 24
+    )
+
+
+def test_backtest_optional_hourly_ledger_reconstructs_daily_revenue():
+    delivery_date = date(2023, 1, 3)
+    timestamps = pd.date_range(
+        "2023-01-03 00:00", periods=24, freq="h", tz="America/Chicago"
+    )
+    result = locked_continuous_mpc_backtest(
+        {delivery_date: np.linspace(-20.0, 100.0, 24)},
+        {delivery_date: np.linspace(10.0, 40.0, 24)},
+        np.tile(np.asarray([10.0, 15.0, 20.0, 25.0]), (24, 1)),
+        np.linspace(-30.0, 120.0, 24),
+        np.linspace(-10.0, 90.0, 24),
+        timestamps,
+        _cfg(),
+        include_hourly_details=True,
+    )
+    assert len(result["hourly"]) == 24
+    assert sum(row["net_revenue"] for row in result["hourly"]) == pytest.approx(
+        result["daily"][str(delivery_date)]["net_revenue"]
+    )
+    assert result["hourly"][0]["timestamp_local"].endswith("-06:00")
+    assert "hourly" not in locked_continuous_mpc_backtest(
+        {delivery_date: np.linspace(-20.0, 100.0, 24)},
+        {delivery_date: np.linspace(10.0, 40.0, 24)},
+        np.tile(np.asarray([10.0, 15.0, 20.0, 25.0]), (24, 1)),
+        np.linspace(-30.0, 120.0, 24),
+        np.linspace(-10.0, 90.0, 24),
+        timestamps,
+        _cfg(),
+    )

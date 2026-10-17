@@ -1,0 +1,207 @@
+{
+  "experiment": "fair_pooled_lomo_xgboost_comparison_v1",
+  "status": "2023_inner_zero_shot_same_training_markets_and_years",
+  "test_2025_read": false,
+  "forecast_rows": [
+    {
+      "market": "CAISO",
+      "task": "da",
+      "transformer_mae": 18.199809919157605,
+      "pooled_lomo_xgboost_mae": 19.953149971372312,
+      "winner": "transformer",
+      "transformer_relative_improvement_pct": 8.787284487563635
+    },
+    {
+      "market": "CAISO",
+      "task": "rt_at_da",
+      "transformer_mae": 21.03158958475475,
+      "pooled_lomo_xgboost_mae": 23.723865769117072,
+      "winner": "transformer",
+      "transformer_relative_improvement_pct": 11.34838736049095
+    },
+    {
+      "market": "CAISO",
+      "task": "rt",
+      "transformer_mae": 9.746615875303048,
+      "pooled_lomo_xgboost_mae": 9.865648780260498,
+      "winner": "transformer",
+      "transformer_relative_improvement_pct": 1.2065390488623
+    },
+    {
+      "market": "ERCOT",
+      "task": "da",
+      "transformer_mae": 37.2706529911821,
+      "pooled_lomo_xgboost_mae": 35.900006275748666,
+      "winner": "xgboost",
+      "transformer_relative_improvement_pct": -3.8179567571812263
+    },
+    {
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "transformer_mae": 34.800496071091224,
+      "pooled_lomo_xgboost_mae": 35.99452383287609,
+      "winner": "transformer",
+      "transformer_relative_improvement_pct": 3.3172483884737067
+    },
+    {
+      "market": "ERCOT",
+      "task": "rt",
+      "transformer_mae": 28.857232488099257,
+      "pooled_lomo_xgboost_mae": 29.10967073020314,
+      "winner": "transformer",
+      "transformer_relative_improvement_pct": 0.8671971745869347
+    },
+    {
+      "market": "NYISO",
+      "task": "da",
+      "transformer_mae": 8.553133333691962,
+      "pooled_lomo_xgboost_mae": 10.825796112586106,
+      "winner": "transformer",
+      "transformer_relative_improvement_pct": 20.993031415508916
+    },
+    {
+      "market": "NYISO",
+      "task": "rt_at_da",
+      "transformer_mae": 10.730053088580805,
+      "pooled_lomo_xgboost_mae": 14.736562977854005,
+      "winner": "transformer",
+      "transformer_relative_improvement_pct": 27.187546345061282
+    },
+    {
+      "market": "NYISO",
+      "task": "rt",
+      "transformer_mae": 7.134279825406656,
+      "pooled_lomo_xgboost_mae": 6.760634036586574,
+      "winner": "xgboost",
+      "transformer_relative_improvement_pct": -5.526786197833223
+    },
+    {
+      "market": "PJM",
+      "task": "da",
+      "transformer_mae": 6.196589762302963,
+      "pooled_lomo_xgboost_mae": 7.2548611381478345,
+      "winner": "transformer",
+      "transformer_relative_improvement_pct": 14.587065909231832
+    },
+    {
+      "market": "PJM",
+      "task": "rt_at_da",
+      "transformer_mae": 8.960945526940808,
+      "pooled_lomo_xgboost_mae": 10.211344409609003,
+      "winner": "transformer",
+      "transformer_relative_improvement_pct": 12.245193507444073
+    },
+    {
+      "market": "PJM",
+      "task": "rt",
+      "transformer_mae": 6.567866777939003,
+      "pooled_lomo_xgboost_mae": 6.4912398493208014,
+      "winner": "xgboost",
+      "transformer_relative_improvement_pct": -1.1804667582298578
+    }
+  ],
+  "transformer_wins": 9,
+  "xgboost_wins": 3,
+  "profit_rows": [
+    {
+      "system": "transformer",
+      "label": "无ID Transformer（seed 0）",
+      "ercot_2023_mean_daily_net_revenue": 377.8381252155746,
+      "paired_vs_pooled_lomo_xgboost": {
+        "mean_daily_difference": -40.22673807081092,
+        "seven_day_block_bootstrap_95ci": [
+          -61.43731982901894,
+          -21.95179706617467
+        ]
+      },
+      "risk": {
+        "positive_day_rate": 0.7292817679558011,
+        "maximum_drawdown_usd_per_node": 195.0050847657736,
+        "mean_without_top_5_days": 251.42562944221305,
+        "mean_without_top_10_days": 174.4424007159165,
+        "first_half_mean": 62.06220911123106,
+        "second_half_mean": 693.6140413199181,
+        "worst_node_mean_daily_revenue": 316.0202698190324,
+        "node_bootstrap_mean_95ci": [
+          363.63090321685956,
+          390.2384957223524
+        ]
+      }
+    },
+    {
+      "system": "transformer_ensemble",
+      "label": "无ID Transformer（固定三seed等权集成）",
+      "ercot_2023_mean_daily_net_revenue": 407.166707634525,
+      "paired_vs_pooled_lomo_xgboost": {
+        "mean_daily_difference": -10.898155651860508,
+        "seven_day_block_bootstrap_95ci": [
+          -28.07289369534834,
+          7.431316122388041
+        ]
+      },
+      "risk": {
+        "positive_day_rate": 0.7817679558011049,
+        "maximum_drawdown_usd_per_node": 88.43046867833874,
+        "mean_without_top_5_days": 279.11931630902825,
+        "mean_without_top_10_days": 199.5091508453819,
+        "first_half_mean": 101.65638187606721,
+        "second_half_mean": 712.6770333929828,
+        "worst_node_mean_daily_revenue": 350.73711723441596,
+        "node_bootstrap_mean_95ci": [
+          394.8382971478962,
+          417.7881307610932
+        ]
+      }
+    },
+    {
+      "system": "xgboost_pooled",
+      "label": "pooled LOMO XGBoost（同数据公平基线）",
+      "ercot_2023_mean_daily_net_revenue": 418.0648632863855,
+      "paired_vs_pooled_lomo_xgboost": {
+        "mean_daily_difference": 0.0,
+        "seven_day_block_bootstrap_95ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "risk": {
+        "positive_day_rate": 0.7762430939226519,
+        "maximum_drawdown_usd_per_node": 220.57211147757118,
+        "mean_without_top_5_days": 289.93718037579714,
+        "mean_without_top_10_days": 207.69382343028636,
+        "first_half_mean": 96.87489464853017,
+        "second_half_mean": 739.2548319242409,
+        "worst_node_mean_daily_revenue": 376.11106025368156,
+        "node_bootstrap_mean_95ci": [
+          407.55684608578224,
+          427.7933063508101
+        ]
+      }
+    },
+    {
+      "system": "xgboost_local",
+      "label": "逐节点本地XGBoost（目标市场监督上界）",
+      "ercot_2023_mean_daily_net_revenue": 292.2892646773067,
+      "paired_vs_pooled_lomo_xgboost": {
+        "mean_daily_difference": -125.77559860907887,
+        "seven_day_block_bootstrap_95ci": [
+          -254.49214158074375,
+          -25.832693440867338
+        ]
+      },
+      "risk": {
+        "positive_day_rate": 0.7928176795580111,
+        "maximum_drawdown_usd_per_node": 206.0657011925564,
+        "mean_without_top_5_days": 210.50885820605225,
+        "mean_without_top_10_days": 159.4596447296287,
+        "first_half_mean": 120.22738321617852,
+        "second_half_mean": 464.3511461384348,
+        "worst_node_mean_daily_revenue": 244.43682846654835,
+        "node_bootstrap_mean_95ci": [
+          281.6186682683804,
+          301.702766903516
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,459 @@
+{
+  "audit": "paper_gap_cloud_artifacts_v1",
+  "passed": true,
+  "locked_2025_opened": false,
+  "expected": {
+    "multiseed_archives": 6,
+    "pooled_lomo_xgboost_archives": 12,
+    "ablation_new_archives": 3
+  },
+  "multiseed": [
+    {
+      "path": "data/results/universal_lomo_multiseed_v1/ercot_da_inner_seed1.npz",
+      "exists": true,
+      "sha256": "790ee2c519e92f14bc4d43bc655c883259dd57d1bdf343e24b7fcb84bd6af270",
+      "holdout": "ERCOT",
+      "task": "da",
+      "node_count": 15,
+      "dates": 363,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 36.70350646972656,
+      "node_macro_mae_declared": 36.70350875854492,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "72e9d33f4349d64a4af9dcb54c0376d0ccf1ffcc08873980650f346e0a4215f0",
+      "seed": 1
+    },
+    {
+      "path": "data/results/universal_lomo_multiseed_v1/ercot_da_inner_seed2.npz",
+      "exists": true,
+      "sha256": "54f58a2637008201a84665b3bbc906b041aa35bb41c9bdb0ac3ca047bf0cfd33",
+      "holdout": "ERCOT",
+      "task": "da",
+      "node_count": 15,
+      "dates": 363,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 37.33638381958008,
+      "node_macro_mae_declared": 37.336387379964194,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "3bb42e9f58d685215d0ab49f84a81b2eef8dfaba74eccdc0c793f106084d1678",
+      "seed": 2
+    },
+    {
+      "path": "data/results/universal_lomo_multiseed_v1/ercot_rt_at_da_inner_seed1.npz",
+      "exists": true,
+      "sha256": "88d0e3115a54a612efab169982b09dfe16d7842bdb4e636176614f15d5bdc302",
+      "holdout": "ERCOT",
+      "task": "rt_at_da",
+      "node_count": 15,
+      "dates": 363,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 34.77200698852539,
+      "node_macro_mae_declared": 34.77200622558594,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "219ef7f0b198a00576672837e383416758e7b55e91e20683e2b1ceb6bea3b64b",
+      "seed": 1
+    },
+    {
+      "path": "data/results/universal_lomo_multiseed_v1/ercot_rt_at_da_inner_seed2.npz",
+      "exists": true,
+      "sha256": "84e5f9c3bdb9208103ac4170c7523a39de44276d98a02e848d6d16199e18192e",
+      "holdout": "ERCOT",
+      "task": "rt_at_da",
+      "node_count": 15,
+      "dates": 363,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 34.888240814208984,
+      "node_macro_mae_declared": 34.88824144999186,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "a3254338c296d80b70ae3c57ce87be1a12010ed763efc41a548813146d66a991",
+      "seed": 2
+    },
+    {
+      "path": "data/results/universal_lomo_multiseed_v1/ercot_rt_inner_seed1.npz",
+      "exists": true,
+      "sha256": "e67b4a5604e72bf7ab66b5761f38850cc1407aed7f11f0336feddf228b3d67e8",
+      "holdout": "ERCOT",
+      "task": "rt",
+      "node_count": 15,
+      "dates": 362,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 28.986143112182617,
+      "node_macro_mae_declared": 28.986142857869467,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "ab8194008ed657fc85d118d376725e1392a06cfeb47d31bcccb00112354a985c",
+      "seed": 1
+    },
+    {
+      "path": "data/results/universal_lomo_multiseed_v1/ercot_rt_inner_seed2.npz",
+      "exists": true,
+      "sha256": "ab2fb9258e168bc85f30b2f39f3c42ed5a68311f827a05a03409f0a6a0503629",
+      "holdout": "ERCOT",
+      "task": "rt",
+      "node_count": 15,
+      "dates": 362,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 29.034000396728516,
+      "node_macro_mae_declared": 29.034000651041666,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "b3161aa187ebfd35ef6b9fbd19eca645e0dadb1645e9dc9c14d3ddaa191a878c",
+      "seed": 2
+    }
+  ],
+  "pooled_lomo_xgboost": [
+    {
+      "path": "data/results/universal_lomo_xgboost_v1/holdout_caiso_da_inner_seed0.npz",
+      "exists": true,
+      "sha256": "2fcce6bd5d944fd13a73411f72f223fcdd495087b5b8e15414d018416f0955cb",
+      "holdout": "CAISO",
+      "task": "da",
+      "node_count": 3,
+      "dates": 363,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 19.953149795532227,
+      "node_macro_mae_declared": 19.953149971372312,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "c168baeafa8652abef011e2daf98874ae06ab0bc870bced5540100807f8601bd"
+    },
+    {
+      "path": "data/results/universal_lomo_xgboost_v1/holdout_caiso_rt_at_da_inner_seed0.npz",
+      "exists": true,
+      "sha256": "e140cd8179d60701745ea0fce5ee060302f41054864a02fcb9e53db4b92089c0",
+      "holdout": "CAISO",
+      "task": "rt_at_da",
+      "node_count": 3,
+      "dates": 363,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 23.723867416381836,
+      "node_macro_mae_declared": 23.723865769117072,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "c3a1bd41a97ca64ff702b198c516c33078bdd7ebaab203949e29e21d2174f567"
+    },
+    {
+      "path": "data/results/universal_lomo_xgboost_v1/holdout_caiso_rt_inner_seed0.npz",
+      "exists": true,
+      "sha256": "f9e7d3e167b9fb5793db9a346f5bf6ff0f19d6d1c8f57ba3756159ff0179d725",
+      "holdout": "CAISO",
+      "task": "rt",
+      "node_count": 3,
+      "dates": 362,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 9.865649223327637,
+      "node_macro_mae_declared": 9.865648780260498,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "812b39dd9d18e935291346ea4a92231e598bb043a6cc51361342e687c649523f"
+    },
+    {
+      "path": "data/results/universal_lomo_xgboost_v1/holdout_ercot_da_inner_seed0.npz",
+      "exists": true,
+      "sha256": "45b33ac53481d10e5df011065def3b78adf0486dbbb090298d20d8e49a806268",
+      "holdout": "ERCOT",
+      "task": "da",
+      "node_count": 15,
+      "dates": 363,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 35.90000534057617,
+      "node_macro_mae_declared": 35.900006275748666,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "796cb752ae37010594d479059b481dfbf18bd955eebf70baca87d3e956e5d4f4"
+    },
+    {
+      "path": "data/results/universal_lomo_xgboost_v1/holdout_ercot_rt_at_da_inner_seed0.npz",
+      "exists": true,
+      "sha256": "ecce98e6bf621b55f3b754212a4c13b0f3a0cff50005488dfaa1d941703a3016",
+      "holdout": "ERCOT",
+      "task": "rt_at_da",
+      "node_count": 15,
+      "dates": 363,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 35.99452209472656,
+      "node_macro_mae_declared": 35.99452383287609,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "04083919ad09978e692a9dc7d3ed2a41562ee6e3b735f45cfde49d31564ff8e3"
+    },
+    {
+      "path": "data/results/universal_lomo_xgboost_v1/holdout_ercot_rt_inner_seed0.npz",
+      "exists": true,
+      "sha256": "7ffec90d88468a96056547316580f26a07ec328825fd7a320b4a7a5cfb208d2c",
+      "holdout": "ERCOT",
+      "task": "rt",
+      "node_count": 15,
+      "dates": 362,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 29.109670639038086,
+      "node_macro_mae_declared": 29.10967073020314,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "dbb148ae9c1f3de4c1c84605df722732b99d54c4a1d6e12104d5e261f33d981d"
+    },
+    {
+      "path": "data/results/universal_lomo_xgboost_v1/holdout_nyiso_da_inner_seed0.npz",
+      "exists": true,
+      "sha256": "2cc39420d9e5320905834a9c294a0dba5eec98eb2f8782f7e71d53c0b7f8c075",
+      "holdout": "NYISO",
+      "task": "da",
+      "node_count": 11,
+      "dates": 363,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 10.825796127319336,
+      "node_macro_mae_declared": 10.825796112586106,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "4c42860de3fda21834afe0cad08639f691a7754c2a4dba5aa0f0bb6152924420"
+    },
+    {
+      "path": "data/results/universal_lomo_xgboost_v1/holdout_nyiso_rt_at_da_inner_seed0.npz",
+      "exists": true,
+      "sha256": "40be260cbac5328dbc783abc8cb1308afdae74d08294782011ab4eeef148110b",
+      "holdout": "NYISO",
+      "task": "rt_at_da",
+      "node_count": 11,
+      "dates": 363,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 14.736562728881836,
+      "node_macro_mae_declared": 14.736562977854005,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "0ef91571ba38980fd6fa958ad6ba6173837cf77929b3288ab860cbd9d1b42c06"
+    },
+    {
+      "path": "data/results/universal_lomo_xgboost_v1/holdout_nyiso_rt_inner_seed0.npz",
+      "exists": true,
+      "sha256": "62ddd8540d813b3cbf668236c323556e8c3126c093001b58dc476afa3a41e496",
+      "holdout": "NYISO",
+      "task": "rt",
+      "node_count": 11,
+      "dates": 362,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 6.760633945465088,
+      "node_macro_mae_declared": 6.760634036586574,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "1b168ca8cb9ae7f532d95ee6b1a915c580bd9121f76f4514bbc0aebc5d38b36d"
+    },
+    {
+      "path": "data/results/universal_lomo_xgboost_v1/holdout_pjm_da_inner_seed0.npz",
+      "exists": true,
+      "sha256": "23b34b80999bf70308ea88038082176acc6a6efd8b720d70d4900433c93bc438",
+      "holdout": "PJM",
+      "task": "da",
+      "node_count": 35,
+      "dates": 363,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 7.2548604011535645,
+      "node_macro_mae_declared": 7.2548611381478345,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "09038dcb84378dbdbc81713ccb243447bde4dd11482d2d45f1386369e95d27ba"
+    },
+    {
+      "path": "data/results/universal_lomo_xgboost_v1/holdout_pjm_rt_at_da_inner_seed0.npz",
+      "exists": true,
+      "sha256": "806f62b4d557328e7e08049fd5ce77a6ba0dcbbf3b836f6fec5445ceda102f7b",
+      "holdout": "PJM",
+      "task": "rt_at_da",
+      "node_count": 35,
+      "dates": 363,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 10.211344718933105,
+      "node_macro_mae_declared": 10.211344409609003,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "f4cce707ecf6db7abb79cf6a5a8a4905cf81a1ff8f3372a6414f7b09ee33a0fa"
+    },
+    {
+      "path": "data/results/universal_lomo_xgboost_v1/holdout_pjm_rt_inner_seed0.npz",
+      "exists": true,
+      "sha256": "39dfe3c8e7a22daef7859297ddb50b8b0065fed5c55cf41cef84f5d19bc8961b",
+      "holdout": "PJM",
+      "task": "rt",
+      "node_count": 35,
+      "dates": 362,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 6.49124002456665,
+      "node_macro_mae_declared": 6.4912398493208014,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "70eab697109ccde3a5792470958d2ae506d784f830b1f2a18c8e7608dff3642c"
+    }
+  ],
+  "ablation": [
+    {
+      "path": "data/results/universal_lomo_ercot_ablation_predictions_v1/all_f0_da_inner_seed0.npz",
+      "exists": true,
+      "sha256": "ba3a68a6390c96e1692d6089a015648cd311501d80ae1184c14261e9f10375ec",
+      "holdout": "ERCOT",
+      "task": "da",
+      "node_count": 15,
+      "dates": 363,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 37.210304260253906,
+      "node_macro_mae_declared": 37.2103022257487,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "ea52368b1c14194462054eec2422f8104c087e19c6e791ecdca9b19902129a36",
+      "family": "all_f0"
+    },
+    {
+      "path": "data/results/universal_lomo_ercot_ablation_predictions_v1/all_f0_rt_inner_seed0.npz",
+      "exists": true,
+      "sha256": "34ec133c420b69f132d3398121d8e0ca32d9649fb1028d4635f6aa6e7dc1d5b6",
+      "holdout": "ERCOT",
+      "task": "rt",
+      "node_count": 15,
+      "dates": 362,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 29.32071304321289,
+      "node_macro_mae_declared": 29.32071418762207,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "bd5a934afcc88cd4aeb2eae217aecdc61864e123fc29f4b020091e8901f1621b",
+      "family": "all_f0"
+    },
+    {
+      "path": "data/results/universal_lomo_ercot_ablation_predictions_v1/all_f1_rt_at_da_inner_seed0.npz",
+      "exists": true,
+      "sha256": "197ee1e6967c3762beaeff82056497dbd2b0b57c8c41fd813a934e17e632f7d8",
+      "holdout": "ERCOT",
+      "task": "rt_at_da",
+      "node_count": 15,
+      "dates": 363,
+      "years": [
+        "2023"
+      ],
+      "node_macro_mae_recomputed": 35.135074615478516,
+      "node_macro_mae_declared": 35.135075124104816,
+      "checkpoint_hash_ok": true,
+      "sidecar_sha256": "b96aa8259aab1af6ffa9e2bbdc08a0ec93f51814fa09435d069a44ffed391c10",
+      "family": "all_f1"
+    }
+  ],
+  "settlement": {
+    "multiseed": {
+      "path": "data/results/universal_lomo_ercot_multiseed_continuous_mpc_v1.json",
+      "exists": true,
+      "sha256": "7300f89a0027f302be57eeeb469deeae4d64af4c4aa3e4cfeb859c4f94b2d750",
+      "split": "2023 inner validation only",
+      "contract_hash": "0c5956fb9fd24b5774b6fbdb066a202b17572fa57d012c67bf7354ce7c7d8dd6",
+      "selected_systems": {
+        "seed0": {
+          "label": "da_seed0__rt_at_da_seed0__rt_seed0",
+          "macro_mean_daily_revenue": 377.8381252155746,
+          "bootstrap_95ci": [
+            151.12783273330467,
+            657.7054872329755
+          ],
+          "worst_node_mean_daily_revenue": 316.0202698190324,
+          "node_count": 15,
+          "days": 362
+        },
+        "seed1": {
+          "label": "da_seed1__rt_at_da_seed1__rt_seed1",
+          "macro_mean_daily_revenue": 266.1546694302914,
+          "bootstrap_95ci": [
+            117.85154135408847,
+            452.897553448223
+          ],
+          "worst_node_mean_daily_revenue": 186.80374691308376,
+          "node_count": 15,
+          "days": 362
+        },
+        "seed2": {
+          "label": "da_seed2__rt_at_da_seed2__rt_seed2",
+          "macro_mean_daily_revenue": 403.0974114333497,
+          "bootstrap_95ci": [
+            176.4763056125236,
+            681.9443137899766
+          ],
+          "worst_node_mean_daily_revenue": 374.888753798264,
+          "node_count": 15,
+          "days": 362
+        },
+        "ensemble": {
+          "label": "da_ensemble__rt_at_da_ensemble__rt_ensemble",
+          "macro_mean_daily_revenue": 407.166707634525,
+          "bootstrap_95ci": [
+            174.85922669313166,
+            693.1729548319751
+          ],
+          "worst_node_mean_daily_revenue": 350.73711723441596,
+          "node_count": 15,
+          "days": 362
+        }
+      }
+    },
+    "ablation": {
+      "path": "data/results/universal_lomo_ercot_ablation_continuous_mpc_v1.json",
+      "exists": true,
+      "sha256": "b2ec8285d7d095d3540ed83f656650511ebfc22cec93dde0242ced61027941b1",
+      "split": "2023 inner validation only",
+      "contract_hash": "0c5956fb9fd24b5774b6fbdb066a202b17572fa57d012c67bf7354ce7c7d8dd6",
+      "selected_systems": {
+        "current": {
+          "label": "da_current__rt_at_da_current__rt_current",
+          "macro_mean_daily_revenue": 377.8381252155746,
+          "bootstrap_95ci": [
+            151.12783273330467,
+            657.7054872329755
+          ],
+          "worst_node_mean_daily_revenue": 316.0202698190324,
+          "node_count": 15,
+          "days": 362
+        },
+        "all_f0": {
+          "label": "da_all_f0__rt_at_da_all_f0__rt_all_f0",
+          "macro_mean_daily_revenue": 291.2374316687672,
+          "bootstrap_95ci": [
+            122.80727637009203,
+            493.94690810091896
+          ],
+          "worst_node_mean_daily_revenue": 211.66135382036734,
+          "node_count": 15,
+          "days": 362
+        },
+        "all_f1": {
+          "label": "da_all_f1__rt_at_da_all_f1__rt_all_f1",
+          "macro_mean_daily_revenue": 344.2810774952493,
+          "bootstrap_95ci": [
+            132.13356010986996,
+            608.0569340344562
+          ],
+          "worst_node_mean_daily_revenue": 309.33138389773404,
+          "node_count": 15,
+          "days": 362
+        }
+      }
+    }
+  },
+  "errors": []
+}

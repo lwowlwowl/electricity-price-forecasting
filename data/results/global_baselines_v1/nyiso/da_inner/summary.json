@@ -341,6 +341,86 @@
       ],
       "last_run_reused_nodes": [],
       "protocol": "local_per_node_xgboost_pseudohuber"
+    },
+    "lear": {
+      "macro_mae": 6.9839875747051385,
+      "macro_rmse": 17.70521475240872,
+      "node_count": 11,
+      "nodes": {
+        "CAPITL": {
+          "mae": 9.380387154766131,
+          "rmse": 29.744225046862095,
+          "samples": 363
+        },
+        "CENTRL": {
+          "mae": 6.143671282867262,
+          "rmse": 14.98961470828989,
+          "samples": 363
+        },
+        "DUNWOD": {
+          "mae": 6.675063665138679,
+          "rmse": 18.137465853423866,
+          "samples": 363
+        },
+        "GENESE": {
+          "mae": 5.929060747510864,
+          "rmse": 13.768229202030959,
+          "samples": 363
+        },
+        "HUD VL": {
+          "mae": 6.688976312827582,
+          "rmse": 18.67881470534656,
+          "samples": 363
+        },
+        "LONGIL": {
+          "mae": 9.51848836936214,
+          "rmse": 20.72561549485292,
+          "samples": 363
+        },
+        "MHK VL": {
+          "mae": 6.309713946776832,
+          "rmse": 15.318047679300586,
+          "samples": 363
+        },
+        "MILLWD": {
+          "mae": 6.694676180187993,
+          "rmse": 18.334022411034553,
+          "samples": 363
+        },
+        "N.Y.C.": {
+          "mae": 6.860731370329748,
+          "rmse": 18.143190105569143,
+          "samples": 363
+        },
+        "NORTH": {
+          "mae": 6.685767531349953,
+          "rmse": 14.571691359634226,
+          "samples": 363
+        },
+        "WEST": {
+          "mae": 5.937326760639336,
+          "rmse": 12.346445710151091,
+          "samples": 363
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 4892.4571688,
+      "last_run_elapsed_seconds": 4892.4571688,
+      "last_run_computed_nodes": [
+        "LONGIL",
+        "GENESE",
+        "CENTRL",
+        "CAPITL",
+        "DUNWOD",
+        "HUD VL",
+        "MHK VL",
+        "NORTH",
+        "WEST",
+        "MILLWD",
+        "N.Y.C."
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "cutoff_safe_lear_daily_recalibration"
     }
   }
 }

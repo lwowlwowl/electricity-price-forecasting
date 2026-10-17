@@ -15,6 +15,7 @@ from scipy.stats import median_abs_deviation
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.linear_model import Lasso, LassoLarsIC
 from sklearn.multioutput import MultiOutputRegressor
+from threadpoolctl import threadpool_limits
 
 from .baselines_joint import weekly_seasonal_task_predictions
 from .global_data import MultiNodeDataset, RTDeliveryDayDataset
@@ -286,17 +287,20 @@ def rolling_cutoff_safe_lear_predictions(
     history_y = [row.copy() for row in train_y]
     predictions: list[np.ndarray] = []
     model: CutoffSafeLEAR24 | None = None
-    for day_index, (features, realized) in enumerate(
-        zip(validation_x, validation_y)
-    ):
-        if model is None or day_index % refit_every_days == 0:
-            fit_x = np.stack(history_x[-calibration_window:])
-            fit_y = np.stack(history_y[-calibration_window:])
-            model = CutoffSafeLEAR24().fit(fit_x, fit_y)
-        predictions.append(model.predict(features[None, :])[0])
-        # 严格在当天预测完成后，才允许真实价格进入下一天重估样本。
-        history_x.append(features.copy())
-        history_y.append(realized.copy())
+    # 节点层已经由调用方并行。若每个节点再让OpenBLAS使用全部CPU，会形成
+    # workers×BLAS_threads的严重过度并发；限制底层BLAS不改变任何数值合同。
+    with threadpool_limits(limits=1, user_api="blas"):
+        for day_index, (features, realized) in enumerate(
+            zip(validation_x, validation_y)
+        ):
+            if model is None or day_index % refit_every_days == 0:
+                fit_x = np.stack(history_x[-calibration_window:])
+                fit_y = np.stack(history_y[-calibration_window:])
+                model = CutoffSafeLEAR24().fit(fit_x, fit_y)
+            predictions.append(model.predict(features[None, :])[0])
+            # 严格在当天预测完成后，才允许真实价格进入下一天重估样本。
+            history_x.append(features.copy())
+            history_y.append(realized.copy())
     return np.stack(predictions), validation_y
 
 

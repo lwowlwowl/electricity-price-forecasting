@@ -1,0 +1,48 @@
+{
+  "protocol_version": "allmarket_final_2025_baselines_v1",
+  "frozen_at_local_date": "2026-10-17",
+  "parent_protocol": "data/results/allmarket_final_2025_preregistration_v1/protocol.json",
+  "parent_protocol_sha256": "a5849bd8f062d80c2077e12a17f354825fe5335819f23bfae4107166bf96bbb8",
+  "training_years": [
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "locked_test_year": 2025,
+  "selection_uses_2025": false,
+  "baselines": {
+    "timesfm3": "official_frozen_no_project_finetuning",
+    "timesfm25": "all_market_lora_seed0_fixed_epochs",
+    "pooled_xgboost": "all_market_no_id_fair_training_data",
+    "per_node_xgboost": "target_market_node_specific_supervised_upper_baseline",
+    "lear": "target_market_cutoff_safe_daily_refit_da_and_rt_at_da",
+    "dlinear": "all_market_price_history_only_seed0_fixed_epochs",
+    "seasonal": "weekly_lag_168",
+    "oracle": "same_battery_contract_perfect_price_upper_bound"
+  },
+  "evaluation": {
+    "same_information_cutoff": true,
+    "same_prediction_horizons": true,
+    "same_ercot_lp_mpc_contract": true,
+    "report_without_reselection": true
+  },
+  "file_sha256": {
+    "configs/decision_aware/allmarket_final_baselines_v1.yaml": "4cc21859dbbc116961f8e11c95fea0544e77eae3ef449c5f361e2332920c523b",
+    "src/decision_aware/dlinear.py": "4fd52e577d121a47a691c849548d97a82dbb8cb6def0dc4260b1d6b31f16c845",
+    "src/decision_aware/baselines_global.py": "211df5689348cf6bbd187221b0bbe4e704b699ddc1372d08c32c817c4c851469",
+    "scripts/decision_aware/run_allmarket_final_xgboost.py": "70df703d4c035765b3c2bc6a7a567afc1c0526daab2ef07beb6e325eecb566f8",
+    "scripts/decision_aware/run_allmarket_final_timesfm25_lora.py": "8550c249cb8ec323c2f3b1e338c5b836bcd4fe3d686a75e2f6b77d81e312558a",
+    "scripts/decision_aware/run_allmarket_final_dlinear.py": "d444a5d1abe4cc1bcede9a96f0f14508d02516f47383065523ace579a24ee389",
+    "scripts/decision_aware/run_global_baselines.py": "4dd4a307bce8903faf50dac8547d104342db9885d319035b073a5c6a168aa363",
+    "scripts/decision_aware/run_universal_lomo_timesfm3.py": "b7035b39e65eee51fbb78f35a5fd4677b598e891d7e4b4b4d5a568435319cd6d",
+    "scripts/decision_aware/prepare_locked_baseline_profit_archives.py": "df9aa47fbe054afc4fde278e67afd0ad7e2dbf908d6aef1bbd8efb9ca8ba6092",
+    "scripts/decision_aware/summarize_allmarket_locked_2025.py": "1212e4cf27cac4343035f495148924e2ada47cf159a20458adef3b398992bafe",
+    "scripts/decision_aware/audit_allmarket_final_baselines.py": "bec8b73eb836dac4a0bbe68586be8ee100180aecdab6f0dbb48da44fc295b1b2",
+    "scripts/decision_aware/audit_allmarket_locked_2025_outputs.py": "7ec835a4fc6bbf27b31950894e401766dfd3488eda0df75288fad818bc138908",
+    "scripts/decision_aware/run_cloud_allmarket_final_baselines_v1.sh": "4084989499abcc0c5cfa8e3d34aeeb905428b6b63ce3207df1ac504ead140ab4",
+    "scripts/decision_aware/run_local_allmarket_final_xgboost_v1.ps1": "32192c1ca674d0e805aed969dc8f82fcda2e8c490204b405481c258111718ec3",
+    "scripts/decision_aware/run_cloud_allmarket_locked_2025_v2.sh": "8a49297e4c0074f9130d438eb173376e264850c3c2ec301c7bb64eed653d44cc"
+  }
+}

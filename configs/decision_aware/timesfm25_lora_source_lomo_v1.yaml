@@ -1,0 +1,86 @@
+# TimesFM-2.5 official Transformers/PEFT LoRA baseline protocol.
+# This is a protocol manifest, not a PilotConfig consumed by the custom Transformer.
+status: pre_registered_runtime_pending
+model:
+  name: TimesFM-2.5 source-market supervised LoRA
+  model_id: google/timesfm-2.5-200m-transformers
+  implementation: huggingface_transformers_peft
+  license: Apache-2.0
+  frozen_zero_shot: false
+
+data:
+  markets: [CAISO, ERCOT, NYISO, PJM]
+  folds:
+    - holdout: CAISO
+      sources: [ERCOT, NYISO, PJM]
+    - holdout: ERCOT
+      sources: [CAISO, NYISO, PJM]
+    - holdout: NYISO
+      sources: [CAISO, ERCOT, PJM]
+    - holdout: PJM
+      sources: [CAISO, ERCOT, NYISO]
+  train_years: [2020, 2021, 2022]
+  internal_validation_year: 2023
+  target_test_year: 2023
+  context_hours: 168
+  target_mode: per_node_univariate
+  input_features: [target_price_history]
+  uses_node_id: false
+  uses_market_id: false
+  uses_holdout_labels_for_training: false
+  uses_future_true_price_load_wind_solar: false
+  capability_note: >-
+    The official Transformers LoRA path is univariate. It does not consume the
+    custom model's five streams, future calendar projection, or published DA
+    covariate. This capability difference must be disclosed in every table.
+
+tasks:
+  da:
+    horizon: 24
+    target: day_ahead_price
+    loss: mae_on_mean_prediction
+  rt_at_da:
+    horizon: 24
+    target: real_time_price_at_day_ahead_issue
+    loss: pseudo_huber_on_mean_prediction
+    pseudo_huber_delta: 1.0
+  rt:
+    horizon: 4
+    target: rolling_real_time_price
+    loss: mae_on_mean_prediction
+
+adapter:
+  method: lora
+  target_modules: all-linear
+  rank: 4
+  alpha: 8
+  dropout: 0.05
+  bias: none
+
+training:
+  seed: 0
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  batch_size: 16
+  samples_per_market: 2048
+  validation_windows_per_node: 2
+  max_epochs: 20
+  early_stopping_patience: 7
+  gradient_clip_norm: 1.0
+  market_balanced_sampling: true
+  selection_metric: source_market_node_macro_loss
+  decision_profit_backpropagation: false
+  note: >-
+    Values are the pre-registered starting protocol. A source-only smoke test
+    may reduce batch size for memory, but formal folds must use one frozen
+    configuration and may not tune against the holdout market.
+
+evaluation:
+  prediction_contract: same_node_hour_npz_as_universal_lomo
+  report_market_separately: true
+  metrics: [mae, rmse, bias, tail_slices, spread_direction]
+  ercot_same_lp_mpc_settlement: true
+  compare_against:
+    - TimesFM-3 frozen
+    - current identity-free Transformer
+    - pooled LOMO XGBoost

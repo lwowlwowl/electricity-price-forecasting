@@ -15,6 +15,7 @@ from scripts.decision_aware.run_global_baselines import (  # noqa: E402
     _cached_predictions,
     _portable_node_key,
     _save_predictions,
+    _summary_metadata_matches,
 )
 
 
@@ -97,3 +98,24 @@ def test_portable_node_key_preserves_safe_names_and_encodes_pjm_separators():
     assert zone == "ZONE%3AMID-ATL%2FAPS"
     assert not any(character in hub for character in '<>:"/\\|?*')
     assert not any(character in zone for character in '<>:"/\\|?*')
+
+
+def test_legacy_ercot_summary_accepts_missing_new_schema_fields_only_when_contract_matches():
+    legacy = {
+        "task": "da", "phase": "inner", "smoke_only": False,
+        "contract_hash": "contract", "entity_mapping_hash": "mapping",
+        "nodes": ["N"], "models": {"seasonal": {"complete": True}},
+    }
+    kwargs = {
+        "task": "da", "market": "ERCOT", "phase": "inner",
+        "smoke_only": False, "configured_market": "ERCOT",
+        "da_issue_hour_local": 10, "contract_hash": "contract",
+        "entity_mapping_hash": "mapping", "nodes": ["N"],
+    }
+    assert _summary_metadata_matches(legacy, **kwargs)
+    assert not _summary_metadata_matches(
+        legacy, **{**kwargs, "contract_hash": "changed"}
+    )
+    assert not _summary_metadata_matches(
+        legacy, **{**kwargs, "market": "NYISO"}
+    )

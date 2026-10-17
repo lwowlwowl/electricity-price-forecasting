@@ -1,0 +1,14 @@
+2026-10-16T23:39:11+08:00	preflight	starting
+2026-10-16T23:41:02+08:00	preflight	starting
+2026-10-16T23:41:09+08:00	preflight	complete
+2026-10-16T23:41:28+08:00	preflight	starting
+2026-10-16T23:41:35+08:00	preflight	complete
+2026-10-16T23:41:35+08:00	da_tail_price	training_starting
+2026-10-17T00:10:32+08:00	da_tail_price	training_complete
+2026-10-17T00:10:32+08:00	da_tail_price	holdout_starting
+2026-10-17T00:10:53+08:00	da_tail_price	holdout_complete
+2026-10-17T00:10:55+08:00	settlement	starting
+2026-10-17T00:12:40+08:00	settlement	complete
+2026-10-17T00:12:40+08:00	summary	starting
+2026-10-17T00:12:44+08:00	summary	complete
+2026-10-17T00:12:44+08:00	package	starting

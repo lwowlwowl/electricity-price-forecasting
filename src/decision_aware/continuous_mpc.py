@@ -9,6 +9,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
+from time import perf_counter
 from typing import Mapping, Sequence
 
 import numpy as np
@@ -398,6 +399,7 @@ def locked_continuous_mpc_backtest(
     cfg,
     *,
     terminal_value_weight: float = 1.0,
+    include_hourly_details: bool = False,
 ) -> dict:
     """以严格信息边界运行连续DA-LP与每小时RT-LP回测。"""
     rt_forecasts = np.asarray(rt_price_forecasts, dtype=np.float64)
@@ -444,6 +446,7 @@ def locked_continuous_mpc_backtest(
     plan_segment_finals: list[float] = []
     previous_last = None
     da_solver_calls = 0
+    da_solver_seconds = 0.0
     for delivery_date in ordered_dates:
         positions = eligible[delivery_date]
         starts_segment = previous_last is None or utc[positions[0]] - previous_last != one_hour
@@ -452,6 +455,7 @@ def locked_continuous_mpc_backtest(
                 plan_segment_finals.append(plan_soc)
             segment_starts.append(str(delivery_date))
             plan_soc = initial_soc
+        solver_started = perf_counter()
         solved = solve_predicted_da_penalty_lp_day(
             da_price_forecasts[delivery_date],
             rt_at_da_price_forecasts[delivery_date],
@@ -460,6 +464,7 @@ def locked_continuous_mpc_backtest(
             initial_plan_soc_mwh=plan_soc,
             initial_actual_soc_mwh=plan_soc,
         )
+        da_solver_seconds += perf_counter() - solver_started
         plan = solved.dispatch.da_discharge_mwh - solved.dispatch.da_charge_mwh
         da_plans[delivery_date] = plan
         plan_soc = float(solved.dispatch.da_soc_path_mwh[-1])
@@ -475,7 +480,9 @@ def locked_continuous_mpc_backtest(
     daily = {}
     all_actions: list[float] = []
     all_plans: list[float] = []
+    hourly_details: list[dict] = []
     rt_solver_calls = 0
+    rt_solver_seconds = 0.0
     soc_violation_count = 0
     for delivery_date in ordered_dates:
         positions = eligible[delivery_date]
@@ -513,6 +520,7 @@ def locked_continuous_mpc_backtest(
                 )
                 for step in range(valid)
             ])
+            solver_started = perf_counter()
             solved = solve_fixed_da_penalty_lp_window(
                 rt_forecasts[position, :valid],
                 future_da,
@@ -523,6 +531,7 @@ def locked_continuous_mpc_backtest(
                 terminal_value_weight=terminal_value_weight,
                 sample_index=rt_solver_calls,
             )
+            rt_solver_seconds += perf_counter() - solver_started
             actual_net = float(solved.net_mwh[0])
             actual_discharge = float(solved.discharge_mwh[0])
             actual_charge = float(solved.charge_mwh[0])
@@ -545,6 +554,39 @@ def locked_continuous_mpc_backtest(
             components["actual_throughput_mwh"] += actual_discharge + actual_charge
             all_actions.append(actual_net / cfg.bess_power_mw)
             all_plans.append(da_net / cfg.bess_power_mw)
+            if include_hourly_details:
+                da_leg = da_net * p_da
+                rt_leg = (actual_net - da_net) * p_rt
+                degradation = cfg.bess_kappa * (
+                    actual_discharge + actual_charge
+                )
+                penalty = 2.0 * abs(p_rt) * excess
+                hourly_details.append({
+                    "timestamp_local": timestamps[position].isoformat(),
+                    "delivery_date": str(delivery_date),
+                    "hour_local": int(timestamps[position].hour),
+                    "predicted_da_price": float(
+                        da_price_forecasts[delivery_date][hour]
+                    ),
+                    "predicted_rt_at_da_price": float(
+                        rt_at_da_price_forecasts[delivery_date][hour]
+                    ),
+                    "predicted_rt_price": float(rt_forecasts[position, 0]),
+                    "realized_da_price": p_da,
+                    "realized_rt_price": p_rt,
+                    "da_plan_mwh": da_net,
+                    "actual_dispatch_mwh": actual_net,
+                    "actual_discharge_mwh": actual_discharge,
+                    "actual_charge_mwh": actual_charge,
+                    "deviation_mwh": actual_net - da_net,
+                    "excess_deviation_mwh": excess,
+                    "da_leg": da_leg,
+                    "rt_deviation_leg": rt_leg,
+                    "degradation_cost": degradation,
+                    "deviation_penalty": penalty,
+                    "net_revenue": da_leg + rt_leg - degradation - penalty,
+                    "actual_soc_end_mwh": actual_soc,
+                })
             rt_solver_calls += 1
         net = (
             components["da_leg"] + components["rt_deviation_leg"]
@@ -566,13 +608,20 @@ def locked_continuous_mpc_backtest(
     total_degradation = sum(row["degradation_cost"] for row in values)
     total_penalty = sum(row["deviation_penalty"] for row in values)
     total = total_da + total_rt - total_degradation - total_penalty
-    return {
+    result = {
         "contract": "predicted spread-direction continuous DA LP + hourly rolling RT LP/MPC",
         "information_boundary": "forecasts_only_for_decisions; truth_only_after_action",
         "coordination": {"mode": "continuous_penalty_mpc"},
         "solver_calls": {
             "da_joint_penalty_lp": da_solver_calls,
             "rt_lp": rt_solver_calls,
+        },
+        "solver_timing_seconds": {
+            "da_joint_penalty_lp": da_solver_seconds,
+            "rt_lp": rt_solver_seconds,
+            "total": da_solver_seconds + rt_solver_seconds,
+            "da_mean_per_call": da_solver_seconds / da_solver_calls,
+            "rt_mean_per_call": rt_solver_seconds / rt_solver_calls,
         },
         "days": len(values),
         "hours": 24 * len(values),
@@ -610,6 +659,9 @@ def locked_continuous_mpc_backtest(
         },
         "daily": daily,
     }
+    if include_hourly_details:
+        result["hourly"] = hourly_details
+    return result
 
 
 def locked_continuous_mpc_backtest_by_node(

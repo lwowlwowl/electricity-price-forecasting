@@ -17,6 +17,7 @@ from torch.utils.data import DataLoader, Subset
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT))
 
 from decision_aware.config import PilotConfig  # noqa: E402
 from decision_aware.contracts import AnnualStage, FORMAL_EXPERIMENT_CONTRACT  # noqa: E402
@@ -29,6 +30,9 @@ from decision_aware.model_da import DecisionAwareDAForecaster  # noqa: E402
 from decision_aware.model_rt import DecisionAwareRTForecaster  # noqa: E402
 from decision_aware.model_rt_da import DecisionAwareRTAtDAForecaster  # noqa: E402
 from decision_aware.loader_v2 import market_timezone  # noqa: E402
+from scripts.decision_aware.export_global_f0_f1_predictions import (  # noqa: E402
+    _dates_and_timestamps,
+)
 
 
 TASKS = {
@@ -58,15 +62,6 @@ def _checkpoint_config(checkpoint: dict) -> PilotConfig:
     })
 
 
-def _dates(node_dataset, task: str) -> np.ndarray:
-    if task == "rt":
-        return np.asarray([str(day) for day, _ in node_dataset.days])
-    return np.asarray([
-        str(node_dataset.sample_time_contract(index)["delivery_date"])
-        for index in range(len(node_dataset))
-    ])
-
-
 @torch.no_grad()
 def main() -> None:
     parser = argparse.ArgumentParser()
@@ -78,7 +73,11 @@ def main() -> None:
     parser.add_argument("--output", required=True)
     parser.add_argument("--device", default="auto")
     parser.add_argument("--batch-size", type=int, default=32)
-    parser.add_argument("--evaluation-stage", choices=("inner", "outer_frozen"), default="inner")
+    parser.add_argument(
+        "--evaluation-stage",
+        choices=("inner", "outer_frozen", "locked_2025"),
+        default="inner",
+    )
     args = parser.parse_args()
 
     checkpoint_path = ROOT / args.checkpoint
@@ -90,7 +89,16 @@ def main() -> None:
     if args.evaluation_stage == "outer_frozen" and checkpoint.get("phase") != "inner":
         raise ValueError("冻结2024检查必须使用原inner checkpoint，不得替换为重训模型")
     training_markets = tuple(checkpoint.get("global_training_markets", ()))
-    if args.holdout_market in training_markets:
+    locked_2025 = args.evaluation_stage == "locked_2025"
+    if locked_2025:
+        if checkpoint.get("phase") != "final":
+            raise ValueError("锁定2025评价只能使用phase=final的checkpoint")
+        if set(training_markets) != {"CAISO", "ERCOT", "NYISO", "PJM"}:
+            raise ValueError("锁定2025 checkpoint必须使用四市场共同训练")
+        final_metadata = checkpoint.get("locked_final_training", {})
+        if final_metadata.get("locked_2025_read") is not False:
+            raise ValueError("最终训练checkpoint未明确声明2025未读取")
+    elif args.holdout_market in training_markets:
         raise ValueError("留出市场出现在checkpoint训练市场中，不能称为零样本验证")
     if cfg.global_use_entity_embeddings:
         raise ValueError("通用留出市场评价禁止node_id/market_id embedding")
@@ -117,8 +125,14 @@ def main() -> None:
     # 复用统一builder的窗口合同，实际预测只读取每个起报点以前的历史。
     evaluation_cfg = replace(cfg, global_use_critical_event_weighting=True)
     validation_stage = (
-        AnnualStage.OUTER_VALIDATION if args.evaluation_stage == "outer_frozen"
-        else AnnualStage.INNER_VALIDATION
+        AnnualStage.LOCKED_RETROSPECTIVE_TEST
+        if locked_2025 else
+        AnnualStage.OUTER_VALIDATION
+        if args.evaluation_stage == "outer_frozen" else
+        AnnualStage.INNER_VALIDATION
+    )
+    train_stage = (
+        AnnualStage.FINAL_TRAIN if locked_2025 else AnnualStage.INNER_TRAIN
     )
     evaluation_end = FORMAL_EXPERIMENT_CONTRACT.annual_split.range_for(validation_stage).end
     read_end_utc = (
@@ -130,7 +144,7 @@ def main() -> None:
         args.task,
         entities,
         mappings,
-        train_stage=AnnualStage.INNER_TRAIN,
+        train_stage=train_stage,
         validation_stage=validation_stage,
         read_end_utc=read_end_utc,
     )
@@ -139,6 +153,7 @@ def main() -> None:
     node_targets: list[np.ndarray] = []
     node_target_da: list[np.ndarray] = []
     common_dates: np.ndarray | None = None
+    common_timestamps: np.ndarray | None = None
     per_node_mae: dict[str, float] = {}
     per_node_rmse: dict[str, float] = {}
     for entity_index, ((market, node), node_dataset) in enumerate(
@@ -180,11 +195,16 @@ def main() -> None:
             predictions.append(prediction)
         node_prediction = np.concatenate(predictions).astype(np.float32)
         node_target = np.concatenate(targets).astype(np.float32)
-        dates = _dates(node_dataset, args.task)
+        dates, executed_timestamps = _dates_and_timestamps(node_dataset, args.task)
         if common_dates is None:
             common_dates = dates
+            common_timestamps = executed_timestamps
         elif not np.array_equal(common_dates, dates):
             raise ValueError(f"留出市场各节点日期不一致，首次冲突节点={node}")
+        elif args.task == "rt" and not np.array_equal(
+            common_timestamps, executed_timestamps
+        ):
+            raise ValueError(f"留出市场各节点执行时刻不一致，首次冲突节点={node}")
         error = node_prediction - node_target
         per_node_mae[node] = float(np.mean(np.abs(error)))
         per_node_rmse[node] = float(np.sqrt(np.mean(np.square(error))))
@@ -200,14 +220,18 @@ def main() -> None:
         }, ensure_ascii=False), flush=True)
 
     summary = {
-        "protocol": "leave_one_market_out_zero_shot",
+        "protocol": (
+            "all_market_locked_2025" if locked_2025
+            else "leave_one_market_out_zero_shot"
+        ),
         "evaluation_stage": args.evaluation_stage,
         "checkpoint_phase": checkpoint.get("phase"),
         "retrained": False,
         "selection_allowed": args.evaluation_stage == "inner",
         "data_read_end_utc_exclusive": read_end_utc,
         "task": args.task,
-        "holdout_market": args.holdout_market,
+        "holdout_market": None if locked_2025 else args.holdout_market,
+        "evaluation_market": args.holdout_market,
         "training_markets": list(training_markets),
         "uses_node_id_for_prediction": False,
         "uses_market_id_for_prediction": False,
@@ -219,7 +243,11 @@ def main() -> None:
         "per_node_mae": per_node_mae,
         "per_node_rmse": per_node_rmse,
         "final_profit_claim_allowed": False,
-        "note": "单任务留出市场筛选；完整盈利必须等待通用DA/RT-at-DA/RT三模型。",
+        "note": (
+            "锁定2025单任务预测；完整盈利必须由预注册三任务固定seed系统统一结算。"
+            if locked_2025 else
+            "单任务留出市场筛选；完整盈利必须等待通用DA/RT-at-DA/RT三模型。"
+        ),
     }
     output = ROOT / args.output
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -232,6 +260,9 @@ def main() -> None:
     }
     if node_target_da:
         arrays["target_da"] = np.stack(node_target_da)
+    if args.task == "rt":
+        arrays["executed_timestamps"] = common_timestamps
+        arrays["timezone"] = np.asarray(market_timezone(args.holdout_market))
     np.savez_compressed(output, **arrays)
     summary_path = output.with_suffix(".json")
     summary_path.write_text(

@@ -1,0 +1,63 @@
+{
+  "model": "TimesFM-3 frozen",
+  "model_id": "google/timesfm-3.0-pytorch",
+  "task": "rt",
+  "holdout_market": "CAISO",
+  "context_hours": 168,
+  "horizon": 4,
+  "target_mode": "per_node_univariate",
+  "future_covariates": [
+    "hour_sin",
+    "hour_cos",
+    "dow_sin",
+    "dow_cos",
+    "month_sin",
+    "month_cos",
+    "is_weekend",
+    "is_holiday",
+    "published_da_price"
+  ],
+  "project_supervised_training": false,
+  "test_2025": false,
+  "protocol": "frozen_foundation_model_same_information_contract",
+  "evaluation_stage": "inner",
+  "selection_allowed": true,
+  "project_training_markets": [],
+  "external_pretraining_data_disclosure": "unknown_beyond_model_card",
+  "uses_node_id_for_prediction": false,
+  "uses_market_id_for_prediction": false,
+  "uses_future_true_price": false,
+  "uses_future_true_load_wind_solar": false,
+  "uses_published_future_da_for_rt": true,
+  "config": "configs/decision_aware/universal_lomo_holdout_caiso_mae_v1.yaml",
+  "config_sha256": "3d0595ebdf6cf2ac483e9b7f8c01ffea790dc23c80c0938722d43cbb01acb243",
+  "worker_sha256": "1d925a709f3e3945e4ac49d71b097f86a4411af81b40a545b7116347f54aadf8",
+  "data_read_end_utc_exclusive": "2024-01-01T08:00:00+00:00",
+  "nodes": 3,
+  "days": 362,
+  "node_macro_mae": 9.343453822675402,
+  "node_macro_rmse": 24.311442263238956,
+  "node_macro_bias": -0.07080256074068737,
+  "central_80_coverage": 0.7743535144260283,
+  "per_node": {
+    "TH_NP15_GEN-APND": {
+      "mae": 9.253502591194026,
+      "rmse": 22.782890756463136,
+      "bias": -0.061324423999217094
+    },
+    "TH_SP15_GEN-APND": {
+      "mae": 9.662711187237253,
+      "rmse": 27.735731403114283,
+      "bias": -0.2027633411092966
+    },
+    "TH_ZP26_GEN-APND": {
+      "mae": 9.114147689594928,
+      "rmse": 22.415704630139437,
+      "bias": 0.05168008288645163
+    }
+  },
+  "wall_seconds": 125.57381588220596,
+  "smoke": false,
+  "final_profit_claim_allowed": false,
+  "note": "预测层结果；ERCOT盈利需将三个任务共同送入同一LP/MPC。"
+}

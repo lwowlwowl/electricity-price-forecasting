@@ -1,0 +1,184 @@
+{
+  "model_id": "google/timesfm-2.5-200m-transformers",
+  "folds": 4,
+  "tasks": {
+    "da": 24,
+    "rt_at_da": 24,
+    "rt": 4
+  },
+  "context_hours": 168,
+  "input_features": [
+    "raw_target_price_history"
+  ],
+  "lora_rank": 4,
+  "lora_target_modules": "all-linear",
+  "status": "pre_registered_runtime_pending",
+  "task": "rt",
+  "holdout_market": "NYISO",
+  "training_markets": [
+    "CAISO",
+    "ERCOT",
+    "PJM"
+  ],
+  "seed": 0,
+  "uses_holdout_labels_for_training": false,
+  "uses_node_or_market_id_for_prediction": false,
+  "uses_future_covariates": false,
+  "test_2025": false,
+  "protocol": "timesfm25_source_market_supervised_lora_target_market_zero_shot",
+  "model_source": "/root/autodl-tmp/electricity-price-forecasting/hf_cache/hub/models--google--timesfm-2.5-200m-transformers/snapshots/5a9806b9b291fad9233b5249d88263f1846304d3",
+  "horizon": 4,
+  "source_train_years": [
+    2020,
+    2021,
+    2022
+  ],
+  "source_validation_year": 2023,
+  "holdout_test_year": 2023,
+  "selection_uses_holdout": false,
+  "loss": "mae",
+  "samples_per_source_market_per_epoch": 2048,
+  "rt_sampling_unit": "one_deterministic_issue_hour_per_balanced_draw",
+  "batch_size": 16,
+  "epochs_completed": 13,
+  "best_source_node_macro_validation_loss": 6.7741313520467505,
+  "history": [
+    {
+      "epoch": 0,
+      "train_loss": 14.276975054914752,
+      "source_node_macro_validation_loss": 6.95726565594943
+    },
+    {
+      "epoch": 1,
+      "train_loss": 11.05121223690609,
+      "source_node_macro_validation_loss": 6.844739473090981
+    },
+    {
+      "epoch": 2,
+      "train_loss": 11.499049346894026,
+      "source_node_macro_validation_loss": 6.810989840975347
+    },
+    {
+      "epoch": 3,
+      "train_loss": 12.834344647203883,
+      "source_node_macro_validation_loss": 6.8465097512838975
+    },
+    {
+      "epoch": 4,
+      "train_loss": 11.44992500046889,
+      "source_node_macro_validation_loss": 6.908821364618698
+    },
+    {
+      "epoch": 5,
+      "train_loss": 11.33729250356555,
+      "source_node_macro_validation_loss": 6.7741313520467505
+    },
+    {
+      "epoch": 6,
+      "train_loss": 12.448231870308518,
+      "source_node_macro_validation_loss": 6.863600182083418
+    },
+    {
+      "epoch": 7,
+      "train_loss": 12.821969911456108,
+      "source_node_macro_validation_loss": 7.02827731168495
+    },
+    {
+      "epoch": 8,
+      "train_loss": 10.832587661221623,
+      "source_node_macro_validation_loss": 6.991157041405732
+    },
+    {
+      "epoch": 9,
+      "train_loss": 11.529590140407285,
+      "source_node_macro_validation_loss": 6.968067670768162
+    },
+    {
+      "epoch": 10,
+      "train_loss": 11.905130630359054,
+      "source_node_macro_validation_loss": 7.0002413155897605
+    },
+    {
+      "epoch": 11,
+      "train_loss": 13.931283976261815,
+      "source_node_macro_validation_loss": 6.971010736699374
+    },
+    {
+      "epoch": 12,
+      "train_loss": 10.529917193576694,
+      "source_node_macro_validation_loss": 7.036118927991615
+    }
+  ],
+  "total_parameters": 232672192,
+  "trainable_parameters": 1382912,
+  "adapter_dir": "data/checkpoints/universal_lomo_timesfm25_lora_v1/holdout_nyiso_rt_inner_seed0",
+  "adapter_sha256": "43d0245301940096ff6aca63935e28b4f0094424e312b16ace55e4711051a6e9",
+  "protocol_config_sha256": "4d5c37bfcfe97d488af0a09dfc80483859afd4fdd00fe4020d67d08a28580f66",
+  "data_config": "configs/decision_aware/universal_lomo_holdout_nyiso_mae_v1.yaml",
+  "data_read_end_utc_exclusive": "2024-01-01T05:00:00+00:00",
+  "nodes": 11,
+  "days": 362,
+  "node_macro_mae": 7.006472371826996,
+  "node_macro_rmse": 23.67610856271509,
+  "node_macro_bias": -2.4690019407472614,
+  "per_node": {
+    "CAPITL": {
+      "mae": 7.841259215032239,
+      "rmse": 26.31395867396492,
+      "bias": -3.3989129892222816
+    },
+    "CENTRL": {
+      "mae": 6.028308790038703,
+      "rmse": 20.015616049682436,
+      "bias": -1.6734154356134
+    },
+    "DUNWOD": {
+      "mae": 6.338769701880644,
+      "rmse": 21.802331799232977,
+      "bias": -2.5522954456823745
+    },
+    "GENESE": {
+      "mae": 5.870594416851399,
+      "rmse": 19.382092061265798,
+      "bias": -1.5108804937231146
+    },
+    "HUD VL": {
+      "mae": 6.224560083883161,
+      "rmse": 21.598360822972662,
+      "bias": -2.3637124488497254
+    },
+    "LONGIL": {
+      "mae": 12.361723950143018,
+      "rmse": 36.28738918629722,
+      "bias": -6.010189974780022
+    },
+    "MHK VL": {
+      "mae": 6.023484038998601,
+      "rmse": 20.656616738291763,
+      "bias": -1.6754855520073084
+    },
+    "MILLWD": {
+      "mae": 6.385878464546652,
+      "rmse": 22.17231861259941,
+      "bias": -2.5881811822756
+    },
+    "N.Y.C.": {
+      "mae": 6.86934703832036,
+      "rmse": 27.86777859751771,
+      "bias": -2.9758675648705624
+    },
+    "NORTH": {
+      "mae": 7.558313429914624,
+      "rmse": 25.553994722996272,
+      "bias": -0.8946063951677604
+    },
+    "WEST": {
+      "mae": 5.568956960487573,
+      "rmse": 18.786736925044803,
+      "bias": -1.5154738660277258
+    }
+  },
+  "wall_seconds": 1442.1396988108754,
+  "smoke_only": false,
+  "final_profit_claim_allowed": false
+}

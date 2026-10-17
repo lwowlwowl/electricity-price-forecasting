@@ -164,6 +164,16 @@ def _configure_trainable_scope(
 PHASES = {
     "inner": (AnnualStage.INNER_TRAIN, AnnualStage.INNER_VALIDATION),
     "outer": (AnnualStage.OUTER_TRAIN, AnnualStage.OUTER_VALIDATION),
+    # 最终部署训练使用2020—2024。2024诊断只在固定末轮记录一次，
+    # 不参与epoch、学习率、checkpoint或结构选择；训练器绝不构造2025数据集。
+    "final": (AnnualStage.FINAL_TRAIN, AnnualStage.OUTER_VALIDATION),
+}
+
+FINAL_TRAIN_READ_END_UTC = {
+    "CAISO": "2025-01-01T08:00:00+00:00",
+    "ERCOT": "2025-01-01T06:00:00+00:00",
+    "NYISO": "2025-01-01T05:00:00+00:00",
+    "PJM": "2025-01-01T05:00:00+00:00",
 }
 
 
@@ -669,8 +679,8 @@ def main() -> None:
         "--frozen-training-plan-from",
         default="",
         help=(
-            "仅用于outer：从同seed的inner checkpoint冻结最终epoch和每轮学习率轨迹；"
-            "outer validation只在最终epoch评估一次，不参与早停、调度或checkpoint选择"
+            "用于outer/final：从同seed的inner checkpoint冻结最终epoch和每轮学习率轨迹；"
+            "诊断集只在最终epoch评估一次，不参与早停、调度或checkpoint选择"
         ),
     )
     parser.add_argument(
@@ -687,8 +697,8 @@ def main() -> None:
     frozen_plan = None
     frozen_plan_path = None
     if args.frozen_training_plan_from:
-        if args.phase != "outer":
-            raise ValueError("--frozen-training-plan-from只能用于outer阶段")
+        if args.phase not in {"outer", "final"}:
+            raise ValueError("--frozen-training-plan-from只能用于outer或final阶段")
         if args.resume and args.epochs is not None:
             raise ValueError("冻结训练计划续训时不能另行覆盖--epochs")
         frozen_plan_path = ROOT / args.frozen_training_plan_from
@@ -739,6 +749,8 @@ def main() -> None:
         batch_size=cfg.batch_size if args.batch_size is None else args.batch_size,
     )
     FORMAL_EXPERIMENT_CONTRACT.validate_pilot_config(cfg)
+    if args.phase == "final" and frozen_plan is None and not args.smoke:
+        raise ValueError("final阶段必须使用预先冻结的同seed inner训练计划")
     training_markets = tuple(cfg.global_training_markets) or (cfg.market,)
     if len(set(training_markets)) != len(training_markets):
         raise ValueError("global_training_markets不能包含重复市场")
@@ -791,6 +803,7 @@ def main() -> None:
         mappings,
         train_stage=train_stage,
         validation_stage=validation_stage,
+        read_end_utc=(FINAL_TRAIN_READ_END_UTC if args.phase == "final" else None),
     )
     metadata = global_checkpoint_metadata(
         cfg,
@@ -977,8 +990,21 @@ def main() -> None:
             "source": args.frozen_training_plan_from,
             "sha256": _sha256(frozen_plan_path),
             "final_epoch": frozen_plan["epochs"],
-            "outer_validation_usage": "final_epoch_evaluation_only",
+            "diagnostic_usage": (
+                "2024_training_overlap_diagnostic_at_final_epoch_only"
+                if args.phase == "final"
+                else "outer_validation_at_final_epoch_only"
+            ),
             "learning_rate_source": "inner_history",
+        }
+    if args.phase == "final":
+        metadata["locked_final_training"] = {
+            "train_stage": AnnualStage.FINAL_TRAIN.value,
+            "training_years": [2020, 2021, 2022, 2023, 2024],
+            "read_end_utc_exclusive_by_market": FINAL_TRAIN_READ_END_UTC,
+            "locked_2025_read": False,
+            "checkpoint_selection": "fixed_final_epoch_from_same_seed_inner_plan",
+            "diagnostic_selection_allowed": False,
         }
     optimizer = torch.optim.AdamW(
         trainable_parameters, lr=cfg.lr, weight_decay=cfg.weight_decay
@@ -1210,7 +1236,8 @@ def main() -> None:
         "candidate_checkpoints": candidate_manifest,
         "checkpoint_selection_rule": (
             "use the final epoch and learning-rate trajectory frozen from the "
-            "same-seed inner checkpoint; outer validation is evaluated once"
+            "same-seed inner checkpoint; the diagnostic split is evaluated "
+            "once and cannot select the checkpoint"
             if frozen_plan is not None
             else "retain top-K by inner-validation "
             f"{cfg.global_validation_aggregation} MAE; select the final "

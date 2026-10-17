@@ -1,0 +1,74 @@
+{
+  "experiment": "universal_lomo_ercot_structure_ablation_summary_v1",
+  "status": "2023_inner_ercot_seed0_current_protocol",
+  "test_2025_read": false,
+  "pure_structures": {
+    "当前结构 F1/F0/F1": {
+      "system": "da_current__rt_at_da_current__rt_current",
+      "macro_mean_daily_revenue": 377.8381252155746,
+      "seven_day_block_bootstrap_95ci": [
+        151.12783273330467,
+        657.7054872329755
+      ]
+    },
+    "全F0": {
+      "system": "da_all_f0__rt_at_da_all_f0__rt_all_f0",
+      "macro_mean_daily_revenue": 291.2374316687672,
+      "seven_day_block_bootstrap_95ci": [
+        122.80727637009203,
+        493.94690810091896
+      ]
+    },
+    "全F1": {
+      "system": "da_all_f1__rt_at_da_all_f1__rt_all_f1",
+      "macro_mean_daily_revenue": 344.2810774952493,
+      "seven_day_block_bootstrap_95ci": [
+        132.13356010986996,
+        608.0569340344562
+      ]
+    }
+  },
+  "single_task_replacements": {
+    "仅DA改为F0": {
+      "system": "da_all_f0__rt_at_da_current__rt_current",
+      "macro_mean_daily_revenue": 288.2095743151021,
+      "paired_vs_current": {
+        "mean_daily_difference": -89.6285509004725,
+        "median_daily_difference": -3.045187897986927,
+        "positive_difference_day_rate": 0.3756906077348066,
+        "seven_day_block_bootstrap_95ci": [
+          -202.11066728550418,
+          -3.4848244163225055
+        ]
+      }
+    },
+    "仅RT-at-DA改为F1": {
+      "system": "da_current__rt_at_da_all_f1__rt_current",
+      "macro_mean_daily_revenue": 344.2810774952493,
+      "paired_vs_current": {
+        "mean_daily_difference": -33.5570477203253,
+        "median_daily_difference": -0.5965269398617719,
+        "positive_difference_day_rate": 0.43922651933701656,
+        "seven_day_block_bootstrap_95ci": [
+          -74.6902644198049,
+          1.1159096396101054
+        ]
+      }
+    },
+    "仅滚动RT改为F0": {
+      "system": "da_current__rt_at_da_current__rt_all_f0",
+      "macro_mean_daily_revenue": 378.8100468200497,
+      "paired_vs_current": {
+        "mean_daily_difference": 0.9719216044751227,
+        "median_daily_difference": 0.0,
+        "positive_difference_day_rate": 0.46408839779005523,
+        "seven_day_block_bootstrap_95ci": [
+          -0.6539378896540281,
+          2.7390693684902305
+        ]
+      }
+    }
+  },
+  "conclusion": "当前F1/F0/F1明显优于全F0和全F1；仅把滚动RT换为F0的点估计提高不足1 USD/节点·日且配对区间跨0，不构成稳定替换证据。",
+  "source_path": "data/results/universal_lomo_ercot_ablation_continuous_mpc_v1.json"
+}

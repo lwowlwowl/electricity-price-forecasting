@@ -1,0 +1,1607 @@
+{
+  "protocol": "allmarket_final_baseline_artifact_audit_v1",
+  "training_years": [
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "locked_2025_read": false,
+  "complete": true,
+  "artifact_count": 201,
+  "missing_count": 0,
+  "missing": [],
+  "artifacts": [
+    {
+      "kind": "pooled_xgboost",
+      "task": "da",
+      "path": "data/checkpoints/allmarket_final_baselines_v1/pooled_xgboost/da_seed0.joblib",
+      "sha256": "57d03ba2e494a9abf4de5e0593a234911290bdcec7aa4e57e3b2e10b16fd693e"
+    },
+    {
+      "kind": "dlinear",
+      "task": "da",
+      "path": "data/checkpoints/allmarket_final_baselines_v1/dlinear/da_seed0.pt",
+      "sha256": "6cb9ec40303b8db7ccbb2640819fd3fd94be5ccbfb2fb84aeaaf632e546960dd"
+    },
+    {
+      "kind": "timesfm25_lora",
+      "task": "da",
+      "path": "data/checkpoints/allmarket_final_baselines_v1/timesfm25/da_seed0/adapter_model.safetensors",
+      "sha256": "e53ba3c2d9b7d50999fe9190a0270a456ce55865cc78373a1dd38b3ac811979c"
+    },
+    {
+      "kind": "pooled_xgboost",
+      "task": "rt_at_da",
+      "path": "data/checkpoints/allmarket_final_baselines_v1/pooled_xgboost/rt_at_da_seed0.joblib",
+      "sha256": "7f6c111d539688e0733ee1ab5d05ab0a24161fb5ba8dd8200b533d90aeff582f"
+    },
+    {
+      "kind": "dlinear",
+      "task": "rt_at_da",
+      "path": "data/checkpoints/allmarket_final_baselines_v1/dlinear/rt_at_da_seed0.pt",
+      "sha256": "a75aab5657f7ce3d414cef101ec163239caa7181c2724499c03cbb5c4ebb81b2"
+    },
+    {
+      "kind": "timesfm25_lora",
+      "task": "rt_at_da",
+      "path": "data/checkpoints/allmarket_final_baselines_v1/timesfm25/rt_at_da_seed0/adapter_model.safetensors",
+      "sha256": "abd778033dac6bdf908d9ac1bef7df7000b662e086686e5f7d62db431571ca71"
+    },
+    {
+      "kind": "pooled_xgboost",
+      "task": "rt",
+      "path": "data/checkpoints/allmarket_final_baselines_v1/pooled_xgboost/rt_seed0.joblib",
+      "sha256": "1501c2a972d01b6db8fd0a46afc8ff597014c80f21b8e8ec54d9a624f12f04d8"
+    },
+    {
+      "kind": "dlinear",
+      "task": "rt",
+      "path": "data/checkpoints/allmarket_final_baselines_v1/dlinear/rt_seed0.pt",
+      "sha256": "cac9b0a96dc1bdbc06ec45977fd70b4b5fac0a7d7b2a348e4248f84d15aeb589"
+    },
+    {
+      "kind": "timesfm25_lora",
+      "task": "rt",
+      "path": "data/checkpoints/allmarket_final_baselines_v1/timesfm25/rt_seed0/adapter_model.safetensors",
+      "sha256": "bc44163f84abe6f90f333507276b6d9cd9e990f58906b981ccd8d0060360932f"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "CAISO",
+      "task": "da",
+      "node": "TH_NP15_GEN-APND",
+      "path": "data/checkpoints/global_baselines_v1/caiso/da_final/xgboost_absolute_TH_NP15_GEN-APND_seed0.joblib",
+      "sha256": "773305e4396ff46919d7ee4383414df623b27cbf3be5349ae5f799f9c80dd5a5"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "CAISO",
+      "task": "da",
+      "node": "TH_SP15_GEN-APND",
+      "path": "data/checkpoints/global_baselines_v1/caiso/da_final/xgboost_absolute_TH_SP15_GEN-APND_seed0.joblib",
+      "sha256": "4fa2a4b18a3175c340f07c9edc4224c344d94dde36303318adb9c2468cd34a43"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "CAISO",
+      "task": "da",
+      "node": "TH_ZP26_GEN-APND",
+      "path": "data/checkpoints/global_baselines_v1/caiso/da_final/xgboost_absolute_TH_ZP26_GEN-APND_seed0.joblib",
+      "sha256": "83b51759fc44346880c122559fee064a65dbdea69cd21ced7f2db378a6346c8d"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "CAISO",
+      "task": "rt_at_da",
+      "node": "TH_NP15_GEN-APND",
+      "path": "data/checkpoints/global_baselines_v1/caiso/rt_at_da_final/xgboost_absolute_TH_NP15_GEN-APND_seed0.joblib",
+      "sha256": "b6c7e412184521431960fa47c298904685d8144d25bd9f83634b5c85d87dbcdc"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "CAISO",
+      "task": "rt_at_da",
+      "node": "TH_SP15_GEN-APND",
+      "path": "data/checkpoints/global_baselines_v1/caiso/rt_at_da_final/xgboost_absolute_TH_SP15_GEN-APND_seed0.joblib",
+      "sha256": "b629a9f2935804138e5ca3f5ce43bf82e287eaf34f2895fca08acec46884381d"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "CAISO",
+      "task": "rt_at_da",
+      "node": "TH_ZP26_GEN-APND",
+      "path": "data/checkpoints/global_baselines_v1/caiso/rt_at_da_final/xgboost_absolute_TH_ZP26_GEN-APND_seed0.joblib",
+      "sha256": "a4989b03d3369c0cd4db2f4c15382317fd1b85bb1130c47c2e62e5949a579fbd"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "CAISO",
+      "task": "rt",
+      "node": "TH_NP15_GEN-APND",
+      "path": "data/checkpoints/global_baselines_v1/caiso/rt_final/xgboost_absolute_TH_NP15_GEN-APND_seed0.joblib",
+      "sha256": "c724cdd5421b34dda2297ec2c0afc5198d7e22b050e80fbaec9c6c25246ee1ca"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "CAISO",
+      "task": "rt",
+      "node": "TH_SP15_GEN-APND",
+      "path": "data/checkpoints/global_baselines_v1/caiso/rt_final/xgboost_absolute_TH_SP15_GEN-APND_seed0.joblib",
+      "sha256": "3c2f91df5dfc070c2d5d17720248a9653a16c067fc4fa795f268bac3821e0501"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "CAISO",
+      "task": "rt",
+      "node": "TH_ZP26_GEN-APND",
+      "path": "data/checkpoints/global_baselines_v1/caiso/rt_final/xgboost_absolute_TH_ZP26_GEN-APND_seed0.joblib",
+      "sha256": "98501a83a8a5d17c57faf307e4c4cb2a4cd4d38254bd2dcd728ce102b0611f06"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "da",
+      "node": "HB_BUSAVG",
+      "path": "data/checkpoints/global_baselines_v1/da_final/xgboost_absolute_HB_BUSAVG_seed0.joblib",
+      "sha256": "293872740c2995d504fe4d6ea6d270a92fcea6fd70dee7bd5718350fe225f1a5"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "da",
+      "node": "HB_HOUSTON",
+      "path": "data/checkpoints/global_baselines_v1/da_final/xgboost_absolute_HB_HOUSTON_seed0.joblib",
+      "sha256": "81765d3044b4ae8f3f1a3ea4ab5c951dbaac9f49093c2acf5017288e99f816b1"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "da",
+      "node": "HB_HUBAVG",
+      "path": "data/checkpoints/global_baselines_v1/da_final/xgboost_absolute_HB_HUBAVG_seed0.joblib",
+      "sha256": "cfbc964f60abdbd3c43ee242c848a7b19c0a707b1e30c2730f6e1db5572df87e"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "da",
+      "node": "HB_NORTH",
+      "path": "data/checkpoints/global_baselines_v1/da_final/xgboost_absolute_HB_NORTH_seed0.joblib",
+      "sha256": "3d30c763308ba1860855c803dc6d1659f29f6772125eeccf7e549592f0a1a0ae"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "da",
+      "node": "HB_PAN",
+      "path": "data/checkpoints/global_baselines_v1/da_final/xgboost_absolute_HB_PAN_seed0.joblib",
+      "sha256": "985be67750821bcedef464acd67e06368a898df9543445bc939f5314dc78748b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "da",
+      "node": "HB_SOUTH",
+      "path": "data/checkpoints/global_baselines_v1/da_final/xgboost_absolute_HB_SOUTH_seed0.joblib",
+      "sha256": "3734026a776e9f90f0ae74be6bb32307bc8f591d6cb6773e68fdc7f07f467835"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "da",
+      "node": "HB_WEST",
+      "path": "data/checkpoints/global_baselines_v1/da_final/xgboost_absolute_HB_WEST_seed0.joblib",
+      "sha256": "d8a2cf6556a01bb1dea40ef75d0c4de55662dfb5edf268552902311aa1d0b8d9"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "da",
+      "node": "LZ_AEN",
+      "path": "data/checkpoints/global_baselines_v1/da_final/xgboost_absolute_LZ_AEN_seed0.joblib",
+      "sha256": "13d8ad02de9bd2f00d60fb1cd3f9e39bf20ca5eb1f37a2e790edb9eb08cbed27"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "da",
+      "node": "LZ_CPS",
+      "path": "data/checkpoints/global_baselines_v1/da_final/xgboost_absolute_LZ_CPS_seed0.joblib",
+      "sha256": "976dc2117ae3a07cbe635f8507a282f76b799f88ec299becd405ddd82d1ac717"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "da",
+      "node": "LZ_HOUSTON",
+      "path": "data/checkpoints/global_baselines_v1/da_final/xgboost_absolute_LZ_HOUSTON_seed0.joblib",
+      "sha256": "7ca83dab98bb6da9625711160093dca432275aba71721a6f15803f131e5efa3b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "da",
+      "node": "LZ_LCRA",
+      "path": "data/checkpoints/global_baselines_v1/da_final/xgboost_absolute_LZ_LCRA_seed0.joblib",
+      "sha256": "a762c58124199713362eee4d160fe058715fcaf58c361f7ebaf1435d664cb1ca"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "da",
+      "node": "LZ_NORTH",
+      "path": "data/checkpoints/global_baselines_v1/da_final/xgboost_absolute_LZ_NORTH_seed0.joblib",
+      "sha256": "84d67ea343aa5eeec536f7b3777347b77bf02d6756f4ca014ff41537824b6126"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "da",
+      "node": "LZ_RAYBN",
+      "path": "data/checkpoints/global_baselines_v1/da_final/xgboost_absolute_LZ_RAYBN_seed0.joblib",
+      "sha256": "6cc17044adc76ab04b3840b13a75d221318a63afc9a1b4557428ecf0e6f354bc"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "da",
+      "node": "LZ_SOUTH",
+      "path": "data/checkpoints/global_baselines_v1/da_final/xgboost_absolute_LZ_SOUTH_seed0.joblib",
+      "sha256": "3c1875b244ef95dd525e74cc2cf41798e273e52231e550dbe028bd436d485e95"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "da",
+      "node": "LZ_WEST",
+      "path": "data/checkpoints/global_baselines_v1/da_final/xgboost_absolute_LZ_WEST_seed0.joblib",
+      "sha256": "3015e34b4b24226f8b34a6047153f626212d2c284d2cd9e5dad7030736e01d0b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "node": "HB_BUSAVG",
+      "path": "data/checkpoints/global_baselines_v1/rt_at_da_final/xgboost_absolute_HB_BUSAVG_seed0.joblib",
+      "sha256": "2c39c91720504eafea931fa7d51ea5d35928d5fa7b3e7c06a76e492aca29f816"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "node": "HB_HOUSTON",
+      "path": "data/checkpoints/global_baselines_v1/rt_at_da_final/xgboost_absolute_HB_HOUSTON_seed0.joblib",
+      "sha256": "4bdb79445d89b3190ad8e252267f84aa9e32f5965faebcb640a3daee82c749c7"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "node": "HB_HUBAVG",
+      "path": "data/checkpoints/global_baselines_v1/rt_at_da_final/xgboost_absolute_HB_HUBAVG_seed0.joblib",
+      "sha256": "cd34748e22c6b2a3294310fae7a716f9ee778eeb454184a57b10f26ee6d5cece"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "node": "HB_NORTH",
+      "path": "data/checkpoints/global_baselines_v1/rt_at_da_final/xgboost_absolute_HB_NORTH_seed0.joblib",
+      "sha256": "85e7f68e4d5e65c012bdab7cf3da8f45fe2986c2012fcf1b2e9c7b81a600635b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "node": "HB_PAN",
+      "path": "data/checkpoints/global_baselines_v1/rt_at_da_final/xgboost_absolute_HB_PAN_seed0.joblib",
+      "sha256": "7aa8ff390735d3d6b64148fdb8d9309a0c8c4dc69cf7e5a0f322b169f9d93fe4"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "node": "HB_SOUTH",
+      "path": "data/checkpoints/global_baselines_v1/rt_at_da_final/xgboost_absolute_HB_SOUTH_seed0.joblib",
+      "sha256": "72f53e6556aa1136dca626b915b0b7cfa11a70fe8ac9c9f59f54156fc6bd0357"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "node": "HB_WEST",
+      "path": "data/checkpoints/global_baselines_v1/rt_at_da_final/xgboost_absolute_HB_WEST_seed0.joblib",
+      "sha256": "cde6378b06254c0ed933800f29d3b8178766608db9daa0f12b5b914856406784"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "node": "LZ_AEN",
+      "path": "data/checkpoints/global_baselines_v1/rt_at_da_final/xgboost_absolute_LZ_AEN_seed0.joblib",
+      "sha256": "3b15d5bb2c74d4ffbeb0d7de52f18e8e1c7052424bd9cba5df5d35afef3c6f82"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "node": "LZ_CPS",
+      "path": "data/checkpoints/global_baselines_v1/rt_at_da_final/xgboost_absolute_LZ_CPS_seed0.joblib",
+      "sha256": "aabf5aacca4c166270a150564951601e22519388aa3c1495cac773a600a22be2"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "node": "LZ_HOUSTON",
+      "path": "data/checkpoints/global_baselines_v1/rt_at_da_final/xgboost_absolute_LZ_HOUSTON_seed0.joblib",
+      "sha256": "ef1be225543325898e7e6e614fe231c9f3fa1e27134fc8f7ee2a1c81b8573eba"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "node": "LZ_LCRA",
+      "path": "data/checkpoints/global_baselines_v1/rt_at_da_final/xgboost_absolute_LZ_LCRA_seed0.joblib",
+      "sha256": "384a06ba85821138991ce2baf06dcacb7f76c4c2c3166b86639852d247c4ea08"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "node": "LZ_NORTH",
+      "path": "data/checkpoints/global_baselines_v1/rt_at_da_final/xgboost_absolute_LZ_NORTH_seed0.joblib",
+      "sha256": "9df713a7902a36c77152efb4eb2ade4c8ded8e02bdc610f62200cc83037222e0"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "node": "LZ_RAYBN",
+      "path": "data/checkpoints/global_baselines_v1/rt_at_da_final/xgboost_absolute_LZ_RAYBN_seed0.joblib",
+      "sha256": "0656c14e763ee800107e1a03fba3f87ea66159407e9d9a2ca7abf8bd064b66fe"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "node": "LZ_SOUTH",
+      "path": "data/checkpoints/global_baselines_v1/rt_at_da_final/xgboost_absolute_LZ_SOUTH_seed0.joblib",
+      "sha256": "60fc5779c800970ee25962f593d61e70649c9f121f0cc46972274bc0b61698e5"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "node": "LZ_WEST",
+      "path": "data/checkpoints/global_baselines_v1/rt_at_da_final/xgboost_absolute_LZ_WEST_seed0.joblib",
+      "sha256": "9ce28540dd7dfa277f42eaaaf73799e9a72a90681518846bc5746fa945b79dbb"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt",
+      "node": "HB_BUSAVG",
+      "path": "data/checkpoints/global_baselines_v1/rt_final/xgboost_absolute_HB_BUSAVG_seed0.joblib",
+      "sha256": "3c59cd7431d56b5979592634bb1a05240da91cc2535f61883a23177114b96d18"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt",
+      "node": "HB_HOUSTON",
+      "path": "data/checkpoints/global_baselines_v1/rt_final/xgboost_absolute_HB_HOUSTON_seed0.joblib",
+      "sha256": "6c9fb0e61127d416d5c05228faa0411328871233489166cf672a5bee8310e77a"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt",
+      "node": "HB_HUBAVG",
+      "path": "data/checkpoints/global_baselines_v1/rt_final/xgboost_absolute_HB_HUBAVG_seed0.joblib",
+      "sha256": "fc546795bd1f63c8bf145e30f9d6c07cf24442506c1d8d31eaee7424fe87894b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt",
+      "node": "HB_NORTH",
+      "path": "data/checkpoints/global_baselines_v1/rt_final/xgboost_absolute_HB_NORTH_seed0.joblib",
+      "sha256": "426599c77cfac9990c33ebb75fcd791a43a5ad674965bf077bf16d4327b046e3"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt",
+      "node": "HB_PAN",
+      "path": "data/checkpoints/global_baselines_v1/rt_final/xgboost_absolute_HB_PAN_seed0.joblib",
+      "sha256": "2d5e142b0e5f248a661d17fa4fb469004b70332ed6ec253f29a4453b8ba95c96"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt",
+      "node": "HB_SOUTH",
+      "path": "data/checkpoints/global_baselines_v1/rt_final/xgboost_absolute_HB_SOUTH_seed0.joblib",
+      "sha256": "f388572be0977173fb5019cc57b62086c950920238f94922a95b82441bbf7c05"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt",
+      "node": "HB_WEST",
+      "path": "data/checkpoints/global_baselines_v1/rt_final/xgboost_absolute_HB_WEST_seed0.joblib",
+      "sha256": "00215045247599dced3b6b2bd5899742672806edcb328fa6d0123851d909ed5d"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt",
+      "node": "LZ_AEN",
+      "path": "data/checkpoints/global_baselines_v1/rt_final/xgboost_absolute_LZ_AEN_seed0.joblib",
+      "sha256": "6c736fe37cecad4670fca6f9cfcc2a716a74275ecf1442cab32c9f4aa06dd90a"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt",
+      "node": "LZ_CPS",
+      "path": "data/checkpoints/global_baselines_v1/rt_final/xgboost_absolute_LZ_CPS_seed0.joblib",
+      "sha256": "490ddb7658e95354e703a3174e25ac16add3666be9ede8c1ed59c4f6a0d4ad97"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt",
+      "node": "LZ_HOUSTON",
+      "path": "data/checkpoints/global_baselines_v1/rt_final/xgboost_absolute_LZ_HOUSTON_seed0.joblib",
+      "sha256": "27f4d5e831f628f253726e79de177ba02527567cfa18aa40cc7c9518ec31f830"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt",
+      "node": "LZ_LCRA",
+      "path": "data/checkpoints/global_baselines_v1/rt_final/xgboost_absolute_LZ_LCRA_seed0.joblib",
+      "sha256": "7c7fa62027867a84bd156d4e25d93a7b875d344ca1e6aa9387899cd68722f7cf"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt",
+      "node": "LZ_NORTH",
+      "path": "data/checkpoints/global_baselines_v1/rt_final/xgboost_absolute_LZ_NORTH_seed0.joblib",
+      "sha256": "a257b8e0a9151a491ac0b09f20fc2e269e5e0f29bb0d9d13f41842203f3282e9"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt",
+      "node": "LZ_RAYBN",
+      "path": "data/checkpoints/global_baselines_v1/rt_final/xgboost_absolute_LZ_RAYBN_seed0.joblib",
+      "sha256": "f1e740dbfc00ccd6a609937158cd8bb35dc741f34f912e42c8eccc4c9af3af0b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt",
+      "node": "LZ_SOUTH",
+      "path": "data/checkpoints/global_baselines_v1/rt_final/xgboost_absolute_LZ_SOUTH_seed0.joblib",
+      "sha256": "a56cd79e277395be664ba0d935213b38e9d2d95fa5c949676967555ebd672bc5"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "ERCOT",
+      "task": "rt",
+      "node": "LZ_WEST",
+      "path": "data/checkpoints/global_baselines_v1/rt_final/xgboost_absolute_LZ_WEST_seed0.joblib",
+      "sha256": "ea3ac5bf2085d5b718f4ee729b7d403276599a11ab2e9992b27580c762914b9f"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "da",
+      "node": "CAPITL",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/da_final/xgboost_absolute_CAPITL_seed0.joblib",
+      "sha256": "5ef74372959e073334860fc175853c6b8140e591806ab471da139db727719f54"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "da",
+      "node": "CENTRL",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/da_final/xgboost_absolute_CENTRL_seed0.joblib",
+      "sha256": "e685f29d2afd45a432c39a3343caf0d7b4d06af6cfe23b93d23190f511bc065a"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "da",
+      "node": "DUNWOD",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/da_final/xgboost_absolute_DUNWOD_seed0.joblib",
+      "sha256": "867b829615e8ef417ccf7998454b50f50d3e409bc185815a3c22b304d674b397"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "da",
+      "node": "GENESE",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/da_final/xgboost_absolute_GENESE_seed0.joblib",
+      "sha256": "91abec98b65462909d103b7cd0ff707c506791f2ac736cedebe3b242593224f7"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "da",
+      "node": "HUD VL",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/da_final/xgboost_absolute_HUD VL_seed0.joblib",
+      "sha256": "23ce167d956fcb6cd750553de351a2baeb760af1d63513fdab6724dff57a28ec"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "da",
+      "node": "LONGIL",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/da_final/xgboost_absolute_LONGIL_seed0.joblib",
+      "sha256": "f72f161abbbf60bfd817ee1d6045690ed08e93c16b8bd8eb3326de74317d5a85"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "da",
+      "node": "MHK VL",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/da_final/xgboost_absolute_MHK VL_seed0.joblib",
+      "sha256": "7ee7d7fe797a129e30b562c4658c81ee4f4c978640405a457577d68f04c42582"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "da",
+      "node": "MILLWD",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/da_final/xgboost_absolute_MILLWD_seed0.joblib",
+      "sha256": "5a96bb5f6104653a3bf7fb731b03b049a4c1ca92678db1e3fe9ec690d557d42a"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "da",
+      "node": "N.Y.C.",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/da_final/xgboost_absolute_node_87a9a8b1a98fc6a1_seed0.joblib",
+      "sha256": "f027bb61829f91311ea5a13bb66b808d6b9159f431549cb75f123c30e5d904da"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "da",
+      "node": "NORTH",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/da_final/xgboost_absolute_NORTH_seed0.joblib",
+      "sha256": "f00c0efc8e25077147aea2197fab0b8842527506c70aec9d77ff10132933c40b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "da",
+      "node": "WEST",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/da_final/xgboost_absolute_WEST_seed0.joblib",
+      "sha256": "2645b2244c0f93d41989704ba6538f2a434281c1e3818433adbd73b8c608fb32"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt_at_da",
+      "node": "CAPITL",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_at_da_final/xgboost_absolute_CAPITL_seed0.joblib",
+      "sha256": "4da46c13d536e3d6c856499d0b900516878fcbb3e6501509b8bbdec778f20d0e"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt_at_da",
+      "node": "CENTRL",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_at_da_final/xgboost_absolute_CENTRL_seed0.joblib",
+      "sha256": "95621a84412854ad5202f150d518ff0975248f3060a855807327316b651f059f"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt_at_da",
+      "node": "DUNWOD",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_at_da_final/xgboost_absolute_DUNWOD_seed0.joblib",
+      "sha256": "9261e9791047e477ff1a0517209a07cbe72d29186db7d80dd5298158cbf44558"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt_at_da",
+      "node": "GENESE",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_at_da_final/xgboost_absolute_GENESE_seed0.joblib",
+      "sha256": "86fb98937fe4d0cc553769f251673d97c6553b7d0b7c663cc80c86f208424463"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt_at_da",
+      "node": "HUD VL",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_at_da_final/xgboost_absolute_HUD VL_seed0.joblib",
+      "sha256": "9d7009b686697a8c6db1e88b51f94c4d67306b6059f0aa04ef2715a7255d9df3"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt_at_da",
+      "node": "LONGIL",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_at_da_final/xgboost_absolute_LONGIL_seed0.joblib",
+      "sha256": "a53125fbfc340061e13bd9f5b2222764cfa5303ffd873047ee0f5450e844d9b7"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt_at_da",
+      "node": "MHK VL",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_at_da_final/xgboost_absolute_MHK VL_seed0.joblib",
+      "sha256": "5872762635831119084b604a9b02633b6b86f21c38637482fd148ad97e865392"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt_at_da",
+      "node": "MILLWD",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_at_da_final/xgboost_absolute_MILLWD_seed0.joblib",
+      "sha256": "f6600c2f91488d15e9627ba1fb6ee49b67587b0d0b18ff5ff7a9df1a57529209"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt_at_da",
+      "node": "N.Y.C.",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_at_da_final/xgboost_absolute_node_87a9a8b1a98fc6a1_seed0.joblib",
+      "sha256": "38606915a65a1a68ee9acf86a9a37b4c3988b3b225092e65f03040fbb007c64a"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt_at_da",
+      "node": "NORTH",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_at_da_final/xgboost_absolute_NORTH_seed0.joblib",
+      "sha256": "9c14734065c34ff1718b43365a5fb63ec680bea7cdfcc3a28cbe54056fe0ac40"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt_at_da",
+      "node": "WEST",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_at_da_final/xgboost_absolute_WEST_seed0.joblib",
+      "sha256": "81dfd70587eb48f933a8c6c589fd995bfdaf72c0e17cdf367655cd74fe73af0c"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt",
+      "node": "CAPITL",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_final/xgboost_absolute_CAPITL_seed0.joblib",
+      "sha256": "259f5d060b6b0f6db059c85c5819d5bd9fdf03b776ea3675d115666491c6b9fc"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt",
+      "node": "CENTRL",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_final/xgboost_absolute_CENTRL_seed0.joblib",
+      "sha256": "79f19fab5e65202cce9dd4e54dd91b0e3ae872331d1d75c629b029b9657f516c"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt",
+      "node": "DUNWOD",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_final/xgboost_absolute_DUNWOD_seed0.joblib",
+      "sha256": "4a52916269afceb9b484b843cf9c2adb44f4497ccea0f5a40fcd5c02cf3eaa30"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt",
+      "node": "GENESE",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_final/xgboost_absolute_GENESE_seed0.joblib",
+      "sha256": "d03ba09dbe7827a69303409bcb8f7ab8abce16682d8e56156fc001f27db09afe"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt",
+      "node": "HUD VL",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_final/xgboost_absolute_HUD VL_seed0.joblib",
+      "sha256": "d0fd0ade45ad74b7f64c0dbff3e0923838e68abf0413292f75941d33a3705328"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt",
+      "node": "LONGIL",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_final/xgboost_absolute_LONGIL_seed0.joblib",
+      "sha256": "b119e94a39675924c39d34cb071a6e706be7a94f7624431cafcbda14f2adc2d4"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt",
+      "node": "MHK VL",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_final/xgboost_absolute_MHK VL_seed0.joblib",
+      "sha256": "7bb714a2c2e3323321e362068952be8333e077d0d25082730c801ff4d2195fac"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt",
+      "node": "MILLWD",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_final/xgboost_absolute_MILLWD_seed0.joblib",
+      "sha256": "813e6315071caf40795dae16a5dbf4456e588da5ac40f2c2eb5be85c6ad2a72b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt",
+      "node": "N.Y.C.",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_final/xgboost_absolute_node_87a9a8b1a98fc6a1_seed0.joblib",
+      "sha256": "5fa0f57143457b65524d367f6f7a409bd7c8ead2e9cf7c1d289e290b0fe6529b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt",
+      "node": "NORTH",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_final/xgboost_absolute_NORTH_seed0.joblib",
+      "sha256": "587ea8907d630bb7e43e862c7f7485714fb5d4760886f3ed7c4d33b0204b530a"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "NYISO",
+      "task": "rt",
+      "node": "WEST",
+      "path": "data/checkpoints/global_baselines_v1/nyiso/rt_final/xgboost_absolute_WEST_seed0.joblib",
+      "sha256": "c8e4e9980411271c38a43fb26be91d958f4cb1dce4c512c81dd7c48c708c9b29"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "HUB:AEP GEN HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_HUB%3AAEP GEN HUB_seed0.joblib",
+      "sha256": "82314f018e005e26b3702d87e19b41a807d670af9f4f50cd010bbdacdc936a20"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "HUB:AEP-DAYTON HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_HUB%3AAEP-DAYTON HUB_seed0.joblib",
+      "sha256": "806183d9e9c002684a7296dc28e805e5031abb391c9abed1cbdb8f9b84ae1b0f"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "HUB:ATSI GEN HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_HUB%3AATSI GEN HUB_seed0.joblib",
+      "sha256": "10d5daddbf6eb3fda08e75a093307f811749936bb74261f7d1f7f24bd111286a"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "HUB:CHICAGO GEN HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_HUB%3ACHICAGO GEN HUB_seed0.joblib",
+      "sha256": "459f5a96d31ef87852bfdb4dfb45d78c34572a2df6bb67e6576ae13172e7c65e"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "HUB:CHICAGO HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_HUB%3ACHICAGO HUB_seed0.joblib",
+      "sha256": "0c8841cebe87ecb903bd06a8fab255de4c77a7624a1cd107e31beffa419da5f6"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "HUB:DOMINION HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_HUB%3ADOMINION HUB_seed0.joblib",
+      "sha256": "1bf324881bfdf12ac9972cc0b02b567e4e07042efa2cc7edd284c86e9dc7bf11"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "HUB:EASTERN HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_HUB%3AEASTERN HUB_seed0.joblib",
+      "sha256": "a9d1c25daa4449773558c9a23ee7955162db29dde955eeb4cef8d959a41f2609"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "HUB:N ILLINOIS HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_HUB%3AN ILLINOIS HUB_seed0.joblib",
+      "sha256": "3c91fd04b93953cea732627e24af58f5a3d64e0c4b979c097a1f82c0a83b1bdb"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "HUB:NEW JERSEY HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_HUB%3ANEW JERSEY HUB_seed0.joblib",
+      "sha256": "ba5b79d58df6f9f7e083dadabd84373d1059f9e9933c0f94dd687b5e1909e15b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "HUB:OHIO HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_HUB%3AOHIO HUB_seed0.joblib",
+      "sha256": "17cf3506b1e642c76b96426be482a023db45ffea4dfc6e27d94f783aa22cb426"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "HUB:WEST INT HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_HUB%3AWEST INT HUB_seed0.joblib",
+      "sha256": "56e41617660c459770e39488424dee960ef5e2a1e2a0e0f670f49127b5fb9ecd"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "HUB:WESTERN HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_HUB%3AWESTERN HUB_seed0.joblib",
+      "sha256": "c8b9e3d06fbe3fb2322d0401063b49715647656be219505fe16b334926d76364"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:AECO",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3AAECO_seed0.joblib",
+      "sha256": "418f8847150c3d3d113988c6e2b56c97ed2a83a5bdf364ac53707f3098b4141e"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:AEP",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3AAEP_seed0.joblib",
+      "sha256": "df48fc7ef3ab5bfe1372c857d3463c3d65d8833aff8bb997bfdea4bd8951f965"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:APS",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3AAPS_seed0.joblib",
+      "sha256": "a731eaecc82fd4a37cdde4286d2fb9fda508033cac7cfb94da00346f1d72bc9f"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:ATSI",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3AATSI_seed0.joblib",
+      "sha256": "189cc284739f14674b8e471bfac0dcf02a38d42daf94ded563ed104895570fef"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:BGE",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3ABGE_seed0.joblib",
+      "sha256": "9d3f67432a34ad651cf56918ef2ee6b65f2c3396e716031cb99c1849100e9677"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:COMED",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3ACOMED_seed0.joblib",
+      "sha256": "556e63c352985acac82ae096284f8dc8be58f735b301fab6dd9eefafae78cecf"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:DAY",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3ADAY_seed0.joblib",
+      "sha256": "4665c62e1fdf25a0986cb66a9fe83a2563ee744741508edf92db9f94bd74e47b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:DEOK",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3ADEOK_seed0.joblib",
+      "sha256": "9a5f90e890968e6e5dbe8e90bed3fe6e7ce31d51d3eedeb24bd2aa2fa17e515e"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:DOM",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3ADOM_seed0.joblib",
+      "sha256": "49520e58b4f4360ec92838a82476c76974379358da8c33f698481388ff976ae6"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:DPL",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3ADPL_seed0.joblib",
+      "sha256": "58da7280161ba7f7f9088d2022f245099a77b9860e12e7cac282d9042850b747"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:DUQ",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3ADUQ_seed0.joblib",
+      "sha256": "43c94c3b1052502a2619d30efdf9c848b4cc7e831f8123bcaace5bce714ec874"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:EKPC",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3AEKPC_seed0.joblib",
+      "sha256": "bc663f989069d7d1f046c885e9a108aafcd4686c227bf7b7b8f657f9d596ccc8"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:JCPL",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3AJCPL_seed0.joblib",
+      "sha256": "4e5cc4be87415c13dd401329544b0408e73af9daa87e91468d66075be5bd46c1"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:METED",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3AMETED_seed0.joblib",
+      "sha256": "6e3ba773885aafdd0aaa395ca72aa513afd85a53b56cea9edda47ea2e974db88"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:MID-ATL/APS",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3AMID-ATL%2FAPS_seed0.joblib",
+      "sha256": "a71f4e9cf9df12fae18b7e5c9183f6816e77045c770df4db253f6b0bb83032f5"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:OVEC",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3AOVEC_seed0.joblib",
+      "sha256": "cb1c02ad177215d23b5bb469508913a130ccfaa90f15222a4e35f0b799f9800c"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:PECO",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3APECO_seed0.joblib",
+      "sha256": "12c3828b9cec1856fe8cebeb8d801cc584a08ba19391974a19d6613cec7a493a"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:PENELEC",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3APENELEC_seed0.joblib",
+      "sha256": "dd2b6fc583eb3d4bb49438972259ac4aa9fc0918e43070e049f6ec11ecae346b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:PEPCO",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3APEPCO_seed0.joblib",
+      "sha256": "3331961996c8fa7bf0279a3f7a3970a3b3ce8be85ce2bb3c607e23054cad31fc"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:PJM-RTO",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3APJM-RTO_seed0.joblib",
+      "sha256": "ea8ee6eb5cabf4576a2c28dff4b26cfbda2dbf3ae7c635df6bb91513fb297c65"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:PPL",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3APPL_seed0.joblib",
+      "sha256": "96459bae2e7a1157cb919b74259ebcf9e158aac4b261aad676d009f39bbd7c4f"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:PSEG",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3APSEG_seed0.joblib",
+      "sha256": "380dd2203dd36a1ba92f207bd5ca07e7026c64a64937df85d38160abffef8b28"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "da",
+      "node": "ZONE:RECO",
+      "path": "data/checkpoints/global_baselines_v1/pjm/da_final/xgboost_absolute_ZONE%3ARECO_seed0.joblib",
+      "sha256": "b4d53dc8dbfeec0a84a454e82cd5e1121fa3ecb974eb3d9d43169720f8d6c5a0"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "HUB:AEP GEN HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_HUB%3AAEP GEN HUB_seed0.joblib",
+      "sha256": "32a2d8b4442c6a809efbb46feb2ec23f652730a0b5fa52060d5ced14d657a30d"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "HUB:AEP-DAYTON HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_HUB%3AAEP-DAYTON HUB_seed0.joblib",
+      "sha256": "f3d19c445fec67570bb527886bab1f6bd1f6eee4d3b9abe36b61435d9deced09"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "HUB:ATSI GEN HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_HUB%3AATSI GEN HUB_seed0.joblib",
+      "sha256": "df073e1cdcee3d9d1a67c02befc62000a687763c6ae3a049ba3db98284d4f78a"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "HUB:CHICAGO GEN HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_HUB%3ACHICAGO GEN HUB_seed0.joblib",
+      "sha256": "5171849efafbcb2b886464201c76b1d5c3095ec16236bb1aab481926e79180c7"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "HUB:CHICAGO HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_HUB%3ACHICAGO HUB_seed0.joblib",
+      "sha256": "f7958f5886cb620ba6705c81196486c5c8ecc63a9e15751f0d457219d340317e"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "HUB:DOMINION HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_HUB%3ADOMINION HUB_seed0.joblib",
+      "sha256": "e936ead5a751abf93fe7fb7a8680b1ee5902cda754d8073ff8513536c7d743d6"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "HUB:EASTERN HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_HUB%3AEASTERN HUB_seed0.joblib",
+      "sha256": "aac8a9790013488e870497bcf218fc002d91012ec73b30d9126e0d6da3e2f841"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "HUB:N ILLINOIS HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_HUB%3AN ILLINOIS HUB_seed0.joblib",
+      "sha256": "364eabbd9ab34d1bf227de4c62e68568f07d26bc5d60e1eca5afd93f57468c1c"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "HUB:NEW JERSEY HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_HUB%3ANEW JERSEY HUB_seed0.joblib",
+      "sha256": "0a18dc92aaf00e58d6be6f6a3ce029521dded7187b621501fed3562a610fbb86"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "HUB:OHIO HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_HUB%3AOHIO HUB_seed0.joblib",
+      "sha256": "833812ca9b3dacb9f3fe9a1d10894ccceaae7a16cf746f739a3dd4f63ad25489"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "HUB:WEST INT HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_HUB%3AWEST INT HUB_seed0.joblib",
+      "sha256": "03f3f5b2898b991b937328d90c5d057fbbf2ec901e80bef085ac26653d53dff9"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "HUB:WESTERN HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_HUB%3AWESTERN HUB_seed0.joblib",
+      "sha256": "99ba743a439bb73b907f6b0a3660bfc7f8349ac84bbf013f231913a48bf6a19c"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:AECO",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3AAECO_seed0.joblib",
+      "sha256": "b0f243129697f2113a5f3c263825049d8d48fa4b8da00d9b0988725392b90863"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:AEP",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3AAEP_seed0.joblib",
+      "sha256": "af2216c8cb146e96ff81b3dfeae3fa0ce572e58256e4ab71d4cc944a30739dae"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:APS",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3AAPS_seed0.joblib",
+      "sha256": "64ab445ade02171c28acb9ed96e7ba2a4fa2f391736943ed2805196eb01f8b55"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:ATSI",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3AATSI_seed0.joblib",
+      "sha256": "00e6151c651057b2c89053c577b8337d2e482155e840fbd52e69878bc0f41e0e"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:BGE",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3ABGE_seed0.joblib",
+      "sha256": "e1af3f92156100239d2b9e07dd2aaf6c2448596473620f149c9319c4f90b6e4a"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:COMED",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3ACOMED_seed0.joblib",
+      "sha256": "c1be51fa9b83cf6fd22ddb36bff5164190cc3650e3ad9cb4f559057a6caf96f8"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:DAY",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3ADAY_seed0.joblib",
+      "sha256": "78fb16be101158b428396d896b7ff3e6df9efc26300339b179e3805bb2bcb097"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:DEOK",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3ADEOK_seed0.joblib",
+      "sha256": "dda010a24105eaf2b1b4f3658fdda5c8eec63966a5d109c7493872d9fa69597e"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:DOM",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3ADOM_seed0.joblib",
+      "sha256": "527fa3598ea83173986000c10d7f0a0ea026d96b9475912ce3e0f7bfa4aa409a"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:DPL",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3ADPL_seed0.joblib",
+      "sha256": "66e61e5e9b71123858e049f1290cc3e639fcb7f7a1a853d1b826a50024d567a5"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:DUQ",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3ADUQ_seed0.joblib",
+      "sha256": "c136141b4aaaceaa7767f77be52a5845cb3a242ea3fbafa12cbb176259d6af11"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:EKPC",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3AEKPC_seed0.joblib",
+      "sha256": "354f036cf577e0f8c526039941b910ad4673ec5510f632e8ccb04868b8c81c24"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:JCPL",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3AJCPL_seed0.joblib",
+      "sha256": "dfa2f01f79edcd66a6802361b1c3a7ac94e790e8305f8da94e4628570c24413d"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:METED",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3AMETED_seed0.joblib",
+      "sha256": "90794184836e6cd28fca9cbcdce4f6704358ca68b2bbf7a42f264fb6d38093b2"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:MID-ATL/APS",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3AMID-ATL%2FAPS_seed0.joblib",
+      "sha256": "be82d5346604b48653e5f66d7547bd110e74fedb276dc337c4f9fc261237b3b4"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:OVEC",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3AOVEC_seed0.joblib",
+      "sha256": "b7a88d7c0d3a1ae54d54e881fd82316a7e3cb2fa79ead81daa76353bfafc9d51"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:PECO",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3APECO_seed0.joblib",
+      "sha256": "35a6fa88363440457e70c95a802ea0aa61853d45a816525f38b3f97bda512504"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:PENELEC",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3APENELEC_seed0.joblib",
+      "sha256": "32d6cc778dd83494156d8f9656fa037b16c1cb43fd9cb31b0732f0277c78c01b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:PEPCO",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3APEPCO_seed0.joblib",
+      "sha256": "ad6ae7369acca6c7c8baf3eb5608ccdfdd7938346c586cd835753cafb099fcc4"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:PJM-RTO",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3APJM-RTO_seed0.joblib",
+      "sha256": "c62e3340d899ea49971560d2e863d91de2c0f18468054c55e7ed754dc01ba0c9"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:PPL",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3APPL_seed0.joblib",
+      "sha256": "d7a31192677bf16ac24d6c8b0cc639f1a207d07d918948a35a6fcbc28d30e241"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:PSEG",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3APSEG_seed0.joblib",
+      "sha256": "1909632d44884ce913bfbbf285e802b11c43e38438a9e2bacc875d3c696acb08"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt_at_da",
+      "node": "ZONE:RECO",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_at_da_final/xgboost_absolute_ZONE%3ARECO_seed0.joblib",
+      "sha256": "a5f1004409966f257105ebcff7e89e6c659e739209aab863d3830aecf4a5ee80"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "HUB:AEP GEN HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_HUB%3AAEP GEN HUB_seed0.joblib",
+      "sha256": "864ba4b436ba7b3b3aec6b5b89c6dda81c7c9bee4ce5a49eac13dc9e5929c5be"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "HUB:AEP-DAYTON HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_HUB%3AAEP-DAYTON HUB_seed0.joblib",
+      "sha256": "b2bb4c510851fbba3913ed2a76ba7ccd55cf751490311208faacbe807b5bb0fa"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "HUB:ATSI GEN HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_HUB%3AATSI GEN HUB_seed0.joblib",
+      "sha256": "8c2b9ca5b5e523b2e6625265a524d3a95da0335a63f602b0f7e647e9050bc4bd"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "HUB:CHICAGO GEN HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_HUB%3ACHICAGO GEN HUB_seed0.joblib",
+      "sha256": "ae589c001c5f047467b95991cb679ff059ce6cfdd50cfe8ab76dbcdf1a2c7d5b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "HUB:CHICAGO HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_HUB%3ACHICAGO HUB_seed0.joblib",
+      "sha256": "4b4ddf3d590ed600de9612b321168ba5c49fbd10cad633cae9b80a5af3f2219f"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "HUB:DOMINION HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_HUB%3ADOMINION HUB_seed0.joblib",
+      "sha256": "2e58daad98e421be86dff32cedcc5cb23a03d0e659133200ba6f80e89d7c9cc5"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "HUB:EASTERN HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_HUB%3AEASTERN HUB_seed0.joblib",
+      "sha256": "5bb3f5ea0b92344602ac9b0be6f7abfc167f972ef312c4685cb3b435ea26ac55"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "HUB:N ILLINOIS HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_HUB%3AN ILLINOIS HUB_seed0.joblib",
+      "sha256": "5ae5a5723dcae4db3f4834d23cfd6609ca209c08de86b05fa638e1962af97e9d"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "HUB:NEW JERSEY HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_HUB%3ANEW JERSEY HUB_seed0.joblib",
+      "sha256": "023e6d3989110191d89f1aa257917f1077e0c1bede743eafa3e0e332a0bcac90"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "HUB:OHIO HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_HUB%3AOHIO HUB_seed0.joblib",
+      "sha256": "848a4d3f1d71445ec1bd6243ef8fabe76b20ee5ea7fdd82130362e93fb54fd7b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "HUB:WEST INT HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_HUB%3AWEST INT HUB_seed0.joblib",
+      "sha256": "83dc2857c2cba29165aaf766c98ff28d471cfbea091f6e1a87dd66375a822934"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "HUB:WESTERN HUB",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_HUB%3AWESTERN HUB_seed0.joblib",
+      "sha256": "470bfde0429a55b8373e4b92de77169f428e198acd55e4edf815d227a50a902e"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:AECO",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3AAECO_seed0.joblib",
+      "sha256": "f5e272eed5a9fada8af328edabfae345d3e61d7584babae341821b1859479cac"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:AEP",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3AAEP_seed0.joblib",
+      "sha256": "8e0e64f1bb8f648e77c84f9a23f0b12bf8bd24066f3fc4fa6e4356bbfa366632"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:APS",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3AAPS_seed0.joblib",
+      "sha256": "b1f308dba22b845b2b6b03f5d91f244cc7d0278742c2b42f244360ebeb77dc10"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:ATSI",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3AATSI_seed0.joblib",
+      "sha256": "179303bd68e21cb5ca5e58371e380ef20259c383aacaee71a29b47fbffa6e24c"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:BGE",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3ABGE_seed0.joblib",
+      "sha256": "2e584f3e6ea799fa6a856dc02709014ff0653355e5287292bc828af2a75e3da3"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:COMED",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3ACOMED_seed0.joblib",
+      "sha256": "fc9ee4b58a125adffe9375b206aa93d78683f640b6783a62ad23fa8dcb2f4676"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:DAY",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3ADAY_seed0.joblib",
+      "sha256": "9f3ca0fed66c60b05ac2054e585f10b8474f8a0956bd982f778389d4019e8513"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:DEOK",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3ADEOK_seed0.joblib",
+      "sha256": "55de9d783d94c193148695e7694eb2da6f0bf60d4733bd4b6ebb17f272fa9695"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:DOM",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3ADOM_seed0.joblib",
+      "sha256": "e0140183854d08c84f0dbf526ba943658d5d556b7a3d539b04dc8d9fad5e7eb9"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:DPL",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3ADPL_seed0.joblib",
+      "sha256": "62d8066b5b0365f7c49f8d2c3c2914f5c411e0c7cf44a2a5542785787d715180"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:DUQ",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3ADUQ_seed0.joblib",
+      "sha256": "b5a0264a6c2da313f7fc9de43da347b44bcf3b8b073ac2e39588bff6f02d0549"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:EKPC",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3AEKPC_seed0.joblib",
+      "sha256": "ad70f5f3a3e7a15d696a84886554416d1ff649c17a4c32ac832b3bdff57fbff9"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:JCPL",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3AJCPL_seed0.joblib",
+      "sha256": "763a30ff3672d0c4d9d4e8425300b56af60dd3233c454bed005a8db0a2d973b8"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:METED",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3AMETED_seed0.joblib",
+      "sha256": "7c9b3382027db694d2f880d848f0b8729a2cc26e44993251b5e033e50684dbfe"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:MID-ATL/APS",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3AMID-ATL%2FAPS_seed0.joblib",
+      "sha256": "2bc974dfc4e26356ce6b7a2371d0dae72d8a8eb41730b93e4fd9891b96523826"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:OVEC",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3AOVEC_seed0.joblib",
+      "sha256": "31bf1054922eb7942628fbe4b568a68014da42e4fbb979ea4ebfa5f82a79ac36"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:PECO",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3APECO_seed0.joblib",
+      "sha256": "6a9f4f6e16c54001ecdfd5819522a1c1464a31c31dc77bbb854e970f9d37a757"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:PENELEC",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3APENELEC_seed0.joblib",
+      "sha256": "bb73d6d5837c98f5d2decba43811a7af6dfad7e38b4e58708096d6824fd9e550"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:PEPCO",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3APEPCO_seed0.joblib",
+      "sha256": "fd9d8ec8e2806893459ffaef0400917d8535553040a287833623fb12fe7f6919"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:PJM-RTO",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3APJM-RTO_seed0.joblib",
+      "sha256": "9d6d9fadb6da39d6fd6f5f0a64b8e85779150436287979f146270912e121908b"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:PPL",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3APPL_seed0.joblib",
+      "sha256": "12d8f3ac5e87b72058b7b1a415ac056abf5c7fc4ed0e43ab50d2b615c52ddc83"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:PSEG",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3APSEG_seed0.joblib",
+      "sha256": "fcfae96680d9982661fdd17006823fb9ce9cf5c7745e17a63ca2dfcd9f686e42"
+    },
+    {
+      "kind": "per_node_xgboost",
+      "market": "PJM",
+      "task": "rt",
+      "node": "ZONE:RECO",
+      "path": "data/checkpoints/global_baselines_v1/pjm/rt_final/xgboost_absolute_ZONE%3ARECO_seed0.joblib",
+      "sha256": "0188b16a59dc44d5d498d1c49779fa907674531d34f5a5856d9c949e9b0798b8"
+    }
+  ]
+}

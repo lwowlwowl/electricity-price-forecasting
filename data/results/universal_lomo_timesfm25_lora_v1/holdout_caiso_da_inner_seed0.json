@@ -1,0 +1,119 @@
+{
+  "model_id": "google/timesfm-2.5-200m-transformers",
+  "folds": 4,
+  "tasks": {
+    "da": 24,
+    "rt_at_da": 24,
+    "rt": 4
+  },
+  "context_hours": 168,
+  "input_features": [
+    "raw_target_price_history"
+  ],
+  "lora_rank": 4,
+  "lora_target_modules": "all-linear",
+  "status": "pre_registered_runtime_pending",
+  "task": "da",
+  "holdout_market": "CAISO",
+  "training_markets": [
+    "ERCOT",
+    "NYISO",
+    "PJM"
+  ],
+  "seed": 0,
+  "uses_holdout_labels_for_training": false,
+  "uses_node_or_market_id_for_prediction": false,
+  "uses_future_covariates": false,
+  "test_2025": false,
+  "protocol": "timesfm25_source_market_supervised_lora_target_market_zero_shot",
+  "model_source": "/root/autodl-tmp/electricity-price-forecasting/hf_cache/hub/models--google--timesfm-2.5-200m-transformers/snapshots/5a9806b9b291fad9233b5249d88263f1846304d3",
+  "horizon": 24,
+  "source_train_years": [
+    2020,
+    2021,
+    2022
+  ],
+  "source_validation_year": 2023,
+  "holdout_test_year": 2023,
+  "selection_uses_holdout": false,
+  "loss": "mae",
+  "samples_per_source_market_per_epoch": 2048,
+  "rt_sampling_unit": "one_delivery_day_window",
+  "batch_size": 16,
+  "epochs_completed": 8,
+  "best_source_node_macro_validation_loss": 3.1404469619031814,
+  "history": [
+    {
+      "epoch": 0,
+      "train_loss": 18.895648560176294,
+      "source_node_macro_validation_loss": 3.1404469619031814
+    },
+    {
+      "epoch": 1,
+      "train_loss": 13.589855970193943,
+      "source_node_macro_validation_loss": 3.164144676239764
+    },
+    {
+      "epoch": 2,
+      "train_loss": 12.938392574588457,
+      "source_node_macro_validation_loss": 3.3572940738474735
+    },
+    {
+      "epoch": 3,
+      "train_loss": 11.87120376713574,
+      "source_node_macro_validation_loss": 3.2763473064195914
+    },
+    {
+      "epoch": 4,
+      "train_loss": 11.354074517264962,
+      "source_node_macro_validation_loss": 3.3669610902911327
+    },
+    {
+      "epoch": 5,
+      "train_loss": 9.810723912591735,
+      "source_node_macro_validation_loss": 3.3381578541192853
+    },
+    {
+      "epoch": 6,
+      "train_loss": 9.182842216144005,
+      "source_node_macro_validation_loss": 3.1693673505157722
+    },
+    {
+      "epoch": 7,
+      "train_loss": 9.608827790866295,
+      "source_node_macro_validation_loss": 3.522763786745853
+    }
+  ],
+  "total_parameters": 232672192,
+  "trainable_parameters": 1382912,
+  "adapter_dir": "data/checkpoints/universal_lomo_timesfm25_lora_v1/holdout_caiso_da_inner_seed0",
+  "adapter_sha256": "b97d82ba8c3fcc0f4ef1ee7639ba12fa9be801595889ac937313d363e5bf1bf3",
+  "protocol_config_sha256": "4d5c37bfcfe97d488af0a09dfc80483859afd4fdd00fe4020d67d08a28580f66",
+  "data_config": "configs/decision_aware/universal_lomo_holdout_caiso_mae_v1.yaml",
+  "data_read_end_utc_exclusive": "2024-01-01T08:00:00+00:00",
+  "nodes": 3,
+  "days": 363,
+  "node_macro_mae": 21.35475283433583,
+  "node_macro_rmse": 35.75329211875214,
+  "node_macro_bias": -5.06052911727179,
+  "per_node": {
+    "TH_NP15_GEN-APND": {
+      "mae": 16.71497230851622,
+      "rmse": 30.85915185607936,
+      "bias": -3.8480421852036035
+    },
+    "TH_SP15_GEN-APND": {
+      "mae": 24.564330706600295,
+      "rmse": 40.59708094795575,
+      "bias": -6.175116841003168
+    },
+    "TH_ZP26_GEN-APND": {
+      "mae": 22.784955487890986,
+      "rmse": 35.80364355222131,
+      "bias": -5.158428325608598
+    }
+  },
+  "wall_seconds": 716.7510006576777,
+  "smoke_only": false,
+  "final_profit_claim_allowed": false
+}

@@ -181,6 +181,86 @@
       ],
       "last_run_reused_nodes": [],
       "protocol": "local_per_node_xgboost_pseudohuber"
+    },
+    "lear": {
+      "macro_mae": 10.644629503302305,
+      "macro_rmse": 28.06333437349043,
+      "node_count": 11,
+      "nodes": {
+        "CAPITL": {
+          "mae": 12.174840654249074,
+          "rmse": 31.196056009125385,
+          "samples": 363
+        },
+        "CENTRL": {
+          "mae": 9.089686681743286,
+          "rmse": 24.785116813428523,
+          "samples": 363
+        },
+        "DUNWOD": {
+          "mae": 10.03741531466759,
+          "rmse": 26.221800963527325,
+          "samples": 363
+        },
+        "GENESE": {
+          "mae": 8.723854343454374,
+          "rmse": 23.303021462042302,
+          "samples": 363
+        },
+        "HUD VL": {
+          "mae": 9.712848732489118,
+          "rmse": 25.6747845957965,
+          "samples": 363
+        },
+        "LONGIL": {
+          "mae": 18.354547604521663,
+          "rmse": 42.16267739169666,
+          "samples": 363
+        },
+        "MHK VL": {
+          "mae": 9.055415006484443,
+          "rmse": 25.129876451325927,
+          "samples": 363
+        },
+        "MILLWD": {
+          "mae": 10.103287528369052,
+          "rmse": 26.616639483229484,
+          "samples": 363
+        },
+        "N.Y.C.": {
+          "mae": 10.660048876221131,
+          "rmse": 31.53147044806107,
+          "samples": 363
+        },
+        "NORTH": {
+          "mae": 10.816551906012819,
+          "rmse": 30.505618927232792,
+          "samples": 363
+        },
+        "WEST": {
+          "mae": 8.362427888112805,
+          "rmse": 21.569615562928806,
+          "samples": 363
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 4029.863449000004,
+      "last_run_elapsed_seconds": 0.07062389999919105,
+      "last_run_computed_nodes": [],
+      "last_run_reused_nodes": [
+        "DUNWOD",
+        "HUD VL",
+        "CENTRL",
+        "CAPITL",
+        "N.Y.C.",
+        "GENESE",
+        "LONGIL",
+        "WEST",
+        "MILLWD",
+        "MHK VL",
+        "NORTH"
+      ],
+      "protocol": "cutoff_safe_lear_daily_recalibration"
     }
   }
 }

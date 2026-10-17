@@ -1,0 +1,56 @@
+{
+  "protocol": "pooled_lomo_xgboost_equal_training_years",
+  "model": "pooled_lomo_xgboost",
+  "task": "rt",
+  "holdout_market": "CAISO",
+  "training_markets": [
+    "ERCOT",
+    "NYISO",
+    "PJM"
+  ],
+  "train_stage": "inner_train",
+  "evaluation_stage": "inner",
+  "data_read_end_utc_exclusive": "2024-01-01T08:00:00+00:00",
+  "uses_target_market_training_labels": false,
+  "uses_node_id_for_prediction": false,
+  "uses_market_id_for_prediction": false,
+  "identity_used_only_for_balanced_sampling": true,
+  "normalization_mode": "context_robust",
+  "target_parameterization": "history_centered_scaled_then_inverse",
+  "history_steps_in_features": 24,
+  "samples_per_source_market": 16350,
+  "rt_sampling_unit": "one_random_issue_hour_per_balanced_draw",
+  "objective": "reg:absoluteerror",
+  "n_estimators": 180,
+  "device_requested": "cpu",
+  "devices_actual": [
+    "cpu"
+  ],
+  "n_jobs": 1,
+  "output_jobs": 16,
+  "seed": 0,
+  "feature_count": 348,
+  "training_sample_count": 49050,
+  "fit_seconds": 351.7657995671034,
+  "node_macro_mae": 9.865648780260498,
+  "node_macro_rmse": 23.506387308635308,
+  "per_node_mae": {
+    "TH_NP15_GEN-APND": 9.327325732105894,
+    "TH_SP15_GEN-APND": 10.311632736817579,
+    "TH_ZP26_GEN-APND": 9.957987871858021
+  },
+  "per_node_rmse": {
+    "TH_NP15_GEN-APND": 21.495842680080717,
+    "TH_SP15_GEN-APND": 26.958178271922694,
+    "TH_ZP26_GEN-APND": 22.065140973902505
+  },
+  "contract_hash": "0c5956fb9fd24b5774b6fbdb066a202b17572fa57d012c67bf7354ce7c7d8dd6",
+  "source_entity_mapping_hash": "544f2dae06a85280054ab5c2a588c96b616aefbc42cb099453e239229cb8b09c",
+  "holdout_entity_mapping_hash": "08538e8961b0f1e482fa8b8083f0e6337c6f938afe87083d168972e904fdaafc",
+  "config": "configs/decision_aware/universal_lomo_holdout_caiso_mae_v1.yaml",
+  "smoke_only": false,
+  "selection_allowed": true,
+  "final_profit_claim_allowed": false,
+  "checkpoint": "data/results/universal_lomo_xgboost_v1/holdout_caiso_rt_inner_seed0.joblib",
+  "checkpoint_sha256": "0eed9c8386e13a7d3958c3a7013ea41317d71de9cd1ce5509443a4212b1363e4"
+}

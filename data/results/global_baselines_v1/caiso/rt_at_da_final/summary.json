@@ -1,0 +1,84 @@
+{
+  "task": "rt_at_da",
+  "market": "CAISO",
+  "configured_market": "CAISO",
+  "da_issue_hour_local": 10,
+  "market_contract_smoke_only": false,
+  "phase": "final",
+  "smoke_only": false,
+  "nodes": [
+    "TH_NP15_GEN-APND",
+    "TH_SP15_GEN-APND",
+    "TH_ZP26_GEN-APND"
+  ],
+  "contract_hash": "0c5956fb9fd24b5774b6fbdb066a202b17572fa57d012c67bf7354ce7c7d8dd6",
+  "entity_mapping_hash": "08538e8961b0f1e482fa8b8083f0e6337c6f938afe87083d168972e904fdaafc",
+  "data_read_end_utc_exclusive": "2025-01-01T08:00:00+00:00",
+  "selection_allowed": false,
+  "models": {
+    "xgboost_pseudohuber": {
+      "macro_mae": 6401.3276429214575,
+      "macro_rmse": 14187.979151879641,
+      "node_count": 3,
+      "nodes": {
+        "TH_NP15_GEN-APND": {
+          "mae": 6313.956582404764,
+          "rmse": 14322.72782801104,
+          "samples": 364
+        },
+        "TH_SP15_GEN-APND": {
+          "mae": 7676.255575913869,
+          "rmse": 16180.513766122054,
+          "samples": 364
+        },
+        "TH_ZP26_GEN-APND": {
+          "mae": 5213.770770445741,
+          "rmse": 12060.695861505832,
+          "samples": 364
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 64.93512909999845,
+      "last_run_elapsed_seconds": 64.93512909999845,
+      "last_run_computed_nodes": [
+        "TH_SP15_GEN-APND",
+        "TH_ZP26_GEN-APND",
+        "TH_NP15_GEN-APND"
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "local_per_node_xgboost_pseudohuber"
+    },
+    "xgboost_absolute": {
+      "macro_mae": 7.16567888940401,
+      "macro_rmse": 19.279068994613187,
+      "node_count": 3,
+      "nodes": {
+        "TH_NP15_GEN-APND": {
+          "mae": 7.667175250748047,
+          "rmse": 24.607171254999646,
+          "samples": 364
+        },
+        "TH_SP15_GEN-APND": {
+          "mae": 6.792030245149802,
+          "rmse": 15.89775237396589,
+          "samples": 364
+        },
+        "TH_ZP26_GEN-APND": {
+          "mae": 7.03783117231418,
+          "rmse": 17.332283354874033,
+          "samples": 364
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 98.02183300000252,
+      "last_run_elapsed_seconds": 98.02183300000252,
+      "last_run_computed_nodes": [
+        "TH_NP15_GEN-APND",
+        "TH_ZP26_GEN-APND",
+        "TH_SP15_GEN-APND"
+      ],
+      "last_run_reused_nodes": [],
+      "protocol": "local_per_node_xgboost_absolute_error"
+    }
+  }
+}

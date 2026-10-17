@@ -13,6 +13,7 @@ from time import perf_counter
 
 import joblib
 import numpy as np
+import pandas as pd
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -32,11 +33,17 @@ from decision_aware.global_data import (  # noqa: E402
     build_global_task_datasets,
     load_formal_entity_mappings,
 )
+from decision_aware.loader_v2 import market_timezone  # noqa: E402
 
 
 PHASES = {
     "inner": (AnnualStage.INNER_TRAIN, AnnualStage.INNER_VALIDATION),
     "outer": (AnnualStage.OUTER_TRAIN, AnnualStage.OUTER_VALIDATION),
+    "final": (AnnualStage.FINAL_TRAIN, AnnualStage.OUTER_VALIDATION),
+    "locked_2025": (
+        AnnualStage.FINAL_TRAIN,
+        AnnualStage.LOCKED_RETROSPECTIVE_TEST,
+    ),
 }
 
 
@@ -72,6 +79,34 @@ def _macro(node_reports: dict[str, dict]) -> dict:
         "macro_rmse": float(np.mean([item["rmse"] for item in node_reports.values()])),
         "node_count": len(node_reports),
     }
+
+
+def _summary_metadata_matches(
+    report: dict,
+    *,
+    task: str,
+    market: str,
+    phase: str,
+    smoke_only: bool,
+    configured_market: str,
+    da_issue_hour_local: int,
+    contract_hash: str,
+    entity_mapping_hash: str,
+    nodes: list[str],
+) -> bool:
+    """兼容新增市场字段前已经冻结的ERCOT汇总schema。"""
+    return bool(
+        report.get("task") == task
+        and report.get("market", "ERCOT") == market
+        and report.get("phase") == phase
+        and report.get("smoke_only") == smoke_only
+        and report.get("configured_market", configured_market) == configured_market
+        and report.get("da_issue_hour_local", da_issue_hour_local)
+        == da_issue_hour_local
+        and report.get("contract_hash") == contract_hash
+        and report.get("entity_mapping_hash") == entity_mapping_hash
+        and report.get("nodes") == nodes
+    )
 
 
 def _cached_predictions(
@@ -152,6 +187,91 @@ def _save_predictions(
     )
 
 
+def _save_locked_market_archive(
+    *,
+    output_dir: Path,
+    model_name: str,
+    args: argparse.Namespace,
+    cfg: PilotConfig,
+    mappings,
+    nodes: list[str],
+    validation_by_node: dict,
+) -> Path:
+    """把逐节点锁定结果合并成与Transformer基线一致的市场级档案。"""
+    predictions: list[np.ndarray] = []
+    targets: list[np.ndarray] = []
+    targets_da: list[np.ndarray] = []
+    common_dates: np.ndarray | None = None
+    common_timestamps: np.ndarray | None = None
+    for node in nodes:
+        node_key = _portable_node_key(node)
+        result_path = output_dir / f"{model_name}_{node_key}_seed{args.seed}.npz"
+        with np.load(result_path, allow_pickle=False) as archive:
+            prediction = archive["prediction"].astype(np.float32)
+            target = archive["target"].astype(np.float32)
+        node_dataset = validation_by_node[node]
+        if args.task == "rt":
+            day_count = len(node_dataset.days)
+            prediction = prediction.reshape(day_count, 24, prediction.shape[-1])
+            target = target.reshape(day_count, 24, target.shape[-1])
+            dates = np.asarray([str(day) for day, _ in node_dataset.days])
+            timestamps = np.asarray([
+                [
+                    node_dataset.hourly_dataset.sample_time_contract(index)[
+                        "executed_target"
+                    ].isoformat()
+                    for index in hourly_indices
+                ]
+                for _, hourly_indices in node_dataset.days
+            ])
+        else:
+            dates = np.asarray([
+                str(node_dataset.sample_time_contract(index)["delivery_date"])
+                for index in range(len(node_dataset))
+            ])
+            timestamps = None
+        if common_dates is None:
+            common_dates = dates
+            common_timestamps = timestamps
+        elif not np.array_equal(common_dates, dates):
+            raise ValueError(f"锁定市场档案节点日期不一致: {node}")
+        predictions.append(prediction)
+        targets.append(target)
+        if args.task == "rt_at_da":
+            targets_da.append(np.stack([
+                node_dataset[index]["price_da_tgt_weighting_only"].numpy()
+                for index in range(len(node_dataset))
+            ]).astype(np.float32))
+
+    metadata = {
+        "protocol": "local_per_node_baseline_locked_2025",
+        "model": model_name,
+        "task": args.task,
+        "evaluation_market": args.market,
+        "evaluation_stage": "locked_2025",
+        "selection_allowed": False,
+        "seed": args.seed,
+        "uses_target_market_training_data": model_name != "seasonal",
+        "contract_hash": FORMAL_EXPERIMENT_CONTRACT.contract_hash,
+        "entity_mapping_hash": mappings.mapping_hash,
+    }
+    arrays: dict[str, np.ndarray] = {
+        "nodes": np.asarray(nodes),
+        "dates": common_dates,
+        "prediction": np.stack(predictions),
+        "target": np.stack(targets),
+        "metadata": np.asarray(json.dumps(metadata, ensure_ascii=False, sort_keys=True)),
+    }
+    if targets_da:
+        arrays["target_da"] = np.stack(targets_da)
+    if args.task == "rt":
+        arrays["executed_timestamps"] = common_timestamps
+        arrays["timezone"] = np.asarray(market_timezone(args.market))
+    path = output_dir / f"{model_name}_{args.market.lower()}_{args.task}_locked_2025.npz"
+    np.savez_compressed(path, **arrays)
+    return path
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="configs/decision_aware/global_ercot_huber_v1.yaml")
@@ -182,6 +302,14 @@ def main() -> None:
         action="store_true",
         help="忽略已有的逐节点缓存并重新计算",
     )
+    parser.add_argument(
+        "--evaluate-only",
+        action="store_true",
+        help=(
+            "锁定2025时只加载final阶段逐节点XGBoost，不重新拟合；"
+            "Seasonal和LEAR仍按各自无参数/滚动重估合同运行"
+        ),
+    )
     parser.add_argument("--smoke", action="store_true")
     args = parser.parse_args()
 
@@ -201,6 +329,11 @@ def main() -> None:
         raise ValueError(f"未知基线: {unknown}")
     if args.task == "rt" and "lear" in requested:
         raise ValueError("LEAR是24小时日前模型，不用于4小时滚动RT；请从--models移除lear")
+    if args.phase == "locked_2025":
+        if any(name.startswith("xgboost") for name in requested) and not args.evaluate_only:
+            raise ValueError("锁定2025禁止重新训练XGBoost；必须使用--evaluate-only")
+    elif args.evaluate_only:
+        raise ValueError("--evaluate-only只允许用于locked_2025")
 
     cfg = PilotConfig.from_yaml(args.config)
     configured_market = cfg.market.upper()
@@ -230,6 +363,13 @@ def main() -> None:
         else all_entities
     )
     train_stage, validation_stage = PHASES[args.phase]
+    validation_end = FORMAL_EXPERIMENT_CONTRACT.annual_split.range_for(
+        validation_stage
+    ).end
+    read_end_utc = (
+        pd.Timestamp(validation_end, tz=market_timezone(args.market))
+        + pd.Timedelta(days=1)
+    ).tz_convert("UTC").isoformat()
     train_dataset, validation_dataset = build_global_task_datasets(
         cfg,
         args.task,
@@ -237,6 +377,7 @@ def main() -> None:
         mappings,
         train_stage=train_stage,
         validation_stage=validation_stage,
+        read_end_utc=read_end_utc,
     )
     train_by_node = {
         node: dataset for _, node, dataset in node_datasets(train_dataset)
@@ -264,16 +405,17 @@ def main() -> None:
             report = json.loads(summary_path.read_text(encoding="utf-8"))
         except (OSError, ValueError, TypeError):
             report = {}
-    common_metadata_matches = (
-        report.get("task") == args.task
-        and report.get("market", "ERCOT") == args.market
-        and report.get("phase") == args.phase
-        and report.get("smoke_only") == args.smoke
-        and report.get("configured_market") == configured_market
-        and report.get("da_issue_hour_local") == cfg.da_issue_hour_local
-        and report.get("contract_hash") == FORMAL_EXPERIMENT_CONTRACT.contract_hash
-        and report.get("entity_mapping_hash") == mappings.mapping_hash
-        and report.get("nodes") == [node for _, node in entities]
+    common_metadata_matches = _summary_metadata_matches(
+        report,
+        task=args.task,
+        market=args.market,
+        phase=args.phase,
+        smoke_only=args.smoke,
+        configured_market=configured_market,
+        da_issue_hour_local=cfg.da_issue_hour_local,
+        contract_hash=FORMAL_EXPERIMENT_CONTRACT.contract_hash,
+        entity_mapping_hash=mappings.mapping_hash,
+        nodes=[node for _, node in entities],
     )
     if not common_metadata_matches:
         report = {
@@ -289,8 +431,20 @@ def main() -> None:
             "nodes": [node for _, node in entities],
             "contract_hash": FORMAL_EXPERIMENT_CONTRACT.contract_hash,
             "entity_mapping_hash": mappings.mapping_hash,
+            "data_read_end_utc_exclusive": read_end_utc,
+            "selection_allowed": args.phase in {"inner", "outer"},
             "models": {},
         }
+    else:
+        report.setdefault("market", args.market)
+        report.setdefault("configured_market", configured_market)
+        report.setdefault("da_issue_hour_local", cfg.da_issue_hour_local)
+        report.setdefault(
+            "market_contract_smoke_only",
+            args.smoke and args.market != configured_market,
+        )
+        report.setdefault("data_read_end_utc_exclusive", read_end_utc)
+        report.setdefault("selection_allowed", args.phase in {"inner", "outer"})
 
     for model_name in requested:
         started = perf_counter()
@@ -333,30 +487,80 @@ def main() -> None:
                 )
                 reused = False
             else:
-                train_x, train_y = xgboost_arrays(train_node, args.task)
                 validation_x, validation_y = xgboost_arrays(
                     validation_node, args.task
                 )
                 if args.smoke:
-                    train_x, train_y = train_x[:200], train_y[:200]
                     validation_x, validation_y = validation_x[:4], validation_y[:4]
                 objective = {
                     "xgboost_absolute": "reg:absoluteerror",
                     "xgboost_pseudohuber": "reg:pseudohubererror",
                 }.get(model_name, "reg:squarederror")
-                estimator = fit_xgboost_multioutput(
-                    train_x,
-                    train_y,
-                    seed=args.seed,
-                    n_estimators=5 if args.smoke else 180,
-                    objective=objective,
-                )
+                if args.evaluate_only:
+                    final_checkpoint = (
+                        ROOT / "data" / "checkpoints" / "global_baselines_v1"
+                        / market_subdir / f"{args.task}_final"
+                        / f"{model_name}_{node_key}_seed{args.seed}.joblib"
+                    )
+                    if not final_checkpoint.exists():
+                        raise FileNotFoundError(
+                            f"锁定2025缺少final XGBoost: {final_checkpoint}"
+                        )
+                    payload = joblib.load(final_checkpoint)
+                    if not isinstance(payload, dict) or "estimator" not in payload:
+                        raise ValueError(
+                            f"final XGBoost缺少冻结元数据: {final_checkpoint}"
+                        )
+                    frozen = payload.get("metadata", {})
+                    expected = {
+                        "task": args.task,
+                        "market": args.market,
+                        "node": node,
+                        "model": model_name,
+                        "seed": args.seed,
+                        "phase": "final",
+                        "locked_2025_read": False,
+                    }
+                    mismatches = {
+                        key: (frozen.get(key), value)
+                        for key, value in expected.items()
+                        if frozen.get(key) != value
+                    }
+                    if mismatches:
+                        raise ValueError(
+                            f"final XGBoost冻结元数据不匹配: {mismatches}"
+                        )
+                    estimator = payload["estimator"]
+                else:
+                    train_x, train_y = xgboost_arrays(train_node, args.task)
+                    if args.smoke:
+                        train_x, train_y = train_x[:200], train_y[:200]
+                    estimator = fit_xgboost_multioutput(
+                        train_x,
+                        train_y,
+                        seed=args.seed,
+                        n_estimators=5 if args.smoke else 180,
+                        objective=objective,
+                    )
                 prediction = estimator.predict(validation_x).astype(np.float32)
                 target = validation_y
-                joblib.dump(
-                    estimator,
-                    checkpoint_dir / f"{model_name}_{node_key}_seed{args.seed}.joblib",
-                )
+                if not args.evaluate_only:
+                    joblib.dump({
+                        "estimator": estimator,
+                        "metadata": {
+                            "task": args.task,
+                            "market": args.market,
+                            "node": node,
+                            "model": model_name,
+                            "seed": args.seed,
+                            "phase": args.phase,
+                            "train_stage": train_stage.value,
+                            "locked_2025_read": False,
+                            "read_end_utc_exclusive": read_end_utc,
+                            "contract_hash": FORMAL_EXPERIMENT_CONTRACT.contract_hash,
+                            "entity_mapping_hash": mappings.mapping_hash,
+                        },
+                    }, checkpoint_dir / f"{model_name}_{node_key}_seed{args.seed}.joblib")
                 reused = False
 
             metrics = prediction_metrics(target, prediction)
@@ -420,6 +624,19 @@ def main() -> None:
                 else "local_per_node_xgboost_squared_error"
             ),
         }
+        if args.phase == "locked_2025":
+            archive_path = _save_locked_market_archive(
+                output_dir=output_dir,
+                model_name=model_name,
+                args=args,
+                cfg=cfg,
+                mappings=mappings,
+                nodes=expected_nodes,
+                validation_by_node=validation_by_node,
+            )
+            report["models"][model_name]["market_archive"] = (
+                archive_path.relative_to(ROOT).as_posix()
+            )
         print(json.dumps({model_name: report["models"][model_name]}, ensure_ascii=False))
         summary_path.write_text(
             json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"

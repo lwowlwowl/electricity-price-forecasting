@@ -21,6 +21,7 @@ import pandas as pd
 
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "src" / "models"))
 sys.path.insert(0, str(ROOT / "src" / "models" / "workers"))
@@ -33,6 +34,9 @@ from decision_aware.global_data import (  # noqa: E402
     load_formal_entity_mappings,
 )
 from decision_aware.loader_v2 import market_timezone  # noqa: E402
+from scripts.decision_aware.export_global_f0_f1_predictions import (  # noqa: E402
+    _dates_and_timestamps,
+)
 from foundation import Task, TimesFMForecaster, VENV_PYTHON, WORKER_SCRIPT  # noqa: E402
 from worker_timesfm import MODEL_ID  # noqa: E402
 
@@ -54,7 +58,13 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def validate_protocol(cfg: PilotConfig, task: str, holdout_market: str) -> None:
+def validate_protocol(
+    cfg: PilotConfig,
+    task: str,
+    holdout_market: str,
+    *,
+    locked_2025: bool = False,
+) -> None:
     if task not in TASKS:
         raise ValueError(f"未知任务: {task}")
     if holdout_market not in MARKETS:
@@ -68,7 +78,13 @@ def validate_protocol(cfg: PilotConfig, task: str, holdout_market: str) -> None:
         raise ValueError("TimesFM-3零样本对照禁止项目node/market embedding")
     if str(cfg.global_normalization_mode).lower() != "context_robust":
         raise ValueError("TimesFM-3对照必须复用无ID模型的context_robust窗口合同")
-    if holdout_market in {str(item).upper() for item in cfg.global_training_markets}:
+    training_markets = {
+        str(item).upper() for item in cfg.global_training_markets
+    }
+    if locked_2025:
+        if training_markets != set(MARKETS):
+            raise ValueError("锁定2025对照必须使用四市场最终配置")
+    elif holdout_market in training_markets:
         raise ValueError("留出市场出现在LOMO配置训练市场中")
 
 
@@ -232,7 +248,11 @@ def _node_metrics(target: np.ndarray, prediction: np.ndarray) -> dict[str, float
 
 
 def _default_output(market: str, task: str, stage: str) -> Path:
-    suffix = "_outer_frozen" if stage == "outer_frozen" else ""
+    suffix = (
+        "_locked_2025" if stage == "locked_2025"
+        else "_outer_frozen" if stage == "outer_frozen"
+        else ""
+    )
     return ROOT / "data" / "results" / f"universal_lomo_timesfm3{suffix}_v1" / (
         f"{market.lower()}_{task}_v1.npz"
     )
@@ -243,7 +263,11 @@ def main() -> None:
     parser.add_argument("--config", required=True)
     parser.add_argument("--task", required=True, choices=TASKS)
     parser.add_argument("--holdout-market", required=True, choices=MARKETS)
-    parser.add_argument("--evaluation-stage", choices=("inner", "outer_frozen"), default="inner")
+    parser.add_argument(
+        "--evaluation-stage",
+        choices=("inner", "outer_frozen", "locked_2025"),
+        default="inner",
+    )
     parser.add_argument("--output", default="")
     parser.add_argument("--max-nodes", type=int, default=0)
     parser.add_argument("--max-days", type=int, default=0)
@@ -254,7 +278,13 @@ def main() -> None:
 
     cfg_path = ROOT / args.config
     cfg = PilotConfig.from_yaml(cfg_path)
-    validate_protocol(cfg, args.task, args.holdout_market)
+    locked_2025 = args.evaluation_stage == "locked_2025"
+    validate_protocol(
+        cfg,
+        args.task,
+        args.holdout_market,
+        locked_2025=locked_2025,
+    )
     python_path = Path(VENV_PYTHON["timesfm"])
     worker_path = Path(WORKER_SCRIPT["timesfm"])
     if not python_path.exists() or not worker_path.exists():
@@ -271,7 +301,7 @@ def main() -> None:
             ["published_da_price"] if args.task == "rt" else []
         ),
         "project_supervised_training": False,
-        "test_2025": False,
+        "test_2025": locked_2025,
     }
     if args.preflight_only:
         print(json.dumps(preflight, ensure_ascii=False, indent=2))
@@ -293,9 +323,14 @@ def main() -> None:
         nodes = nodes[:max_nodes]
     entities = [(args.holdout_market, node) for node in nodes]
     validation_stage = (
+        AnnualStage.LOCKED_RETROSPECTIVE_TEST
+        if locked_2025 else
         AnnualStage.OUTER_VALIDATION
         if args.evaluation_stage == "outer_frozen"
         else AnnualStage.INNER_VALIDATION
+    )
+    train_stage = (
+        AnnualStage.FINAL_TRAIN if locked_2025 else AnnualStage.INNER_TRAIN
     )
     evaluation_end = FORMAL_EXPERIMENT_CONTRACT.annual_split.range_for(
         validation_stage
@@ -310,7 +345,7 @@ def main() -> None:
         args.task,
         entities,
         mappings,
-        train_stage=AnnualStage.INNER_TRAIN,
+        train_stage=train_stage,
         validation_stage=validation_stage,
         read_end_utc=read_end_utc,
     )
@@ -323,6 +358,7 @@ def main() -> None:
     targets: list[np.ndarray] = []
     target_da_values: list[np.ndarray] = []
     common_dates: np.ndarray | None = None
+    common_timestamps: np.ndarray | None = None
     per_node: dict[str, dict[str, float]] = {}
     for (market, node), node_dataset in zip(validation.entities, validation.datasets):
         result = predict_node(
@@ -332,8 +368,12 @@ def main() -> None:
             node,
             max_days=max_days or None,
         )
+        _, timestamps = _dates_and_timestamps(node_dataset, args.task)
+        if max_days and timestamps is not None:
+            timestamps = timestamps[:max_days]
         if common_dates is None:
             common_dates = result["dates"]
+            common_timestamps = timestamps
         elif not np.array_equal(common_dates, result["dates"]):
             raise ValueError(f"留出市场各节点日期不一致，首次冲突节点={node}")
         predictions.append(result["prediction"])
@@ -354,9 +394,15 @@ def main() -> None:
     target = np.stack(targets)
     q10 = np.stack(q10_values)
     q90 = np.stack(q90_values)
+    wall_seconds = float(perf_counter() - started)
+    prediction_elements = int(prediction.size)
     summary = {
         **preflight,
-        "protocol": "frozen_foundation_model_same_information_contract",
+        "protocol": (
+            "all_market_locked_2025_frozen_foundation_model"
+            if locked_2025 else
+            "frozen_foundation_model_same_information_contract"
+        ),
         "evaluation_stage": args.evaluation_stage,
         "selection_allowed": args.evaluation_stage == "inner",
         "holdout_market": args.holdout_market,
@@ -378,7 +424,9 @@ def main() -> None:
         "node_macro_bias": float(np.mean([item["bias"] for item in per_node.values()])),
         "central_80_coverage": float(np.mean((target >= q10) & (target <= q90))),
         "per_node": per_node,
-        "wall_seconds": float(perf_counter() - started),
+        "wall_seconds": wall_seconds,
+        "prediction_elements": prediction_elements,
+        "seconds_per_prediction_element": wall_seconds / prediction_elements,
         "smoke": bool(args.smoke),
         "final_profit_claim_allowed": False,
         "note": "预测层结果；ERCOT盈利需将三个任务共同送入同一LP/MPC。",
@@ -394,6 +442,9 @@ def main() -> None:
     }
     if target_da_values:
         arrays["target_da"] = np.stack(target_da_values).astype(np.float32)
+    if args.task == "rt":
+        arrays["executed_timestamps"] = common_timestamps
+        arrays["timezone"] = np.asarray(market_timezone(args.holdout_market))
     np.savez_compressed(output, **arrays)
     output.with_suffix(".json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"

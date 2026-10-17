@@ -1,0 +1,65 @@
+{
+  "protocol": "universal_lomo_fixed_multiseed",
+  "seed_selection_by_profit": false,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "results": {
+    "ercot_da": {
+      "seed_node_macro_mae": {
+        "0": 37.270652770996094,
+        "1": 36.70350646972656,
+        "2": 37.33638381958008
+      },
+      "mean_mae": 37.10351435343424,
+      "sample_std_mae": 0.347972517532939,
+      "worst_seed_mae": 37.33638381958008,
+      "best_seed_mae": 36.70350646972656,
+      "equal_weight_ensemble_mae": 36.738590240478516,
+      "paths": {
+        "0": "data/results/universal_lomo_da_v1/ercot_da_v1.npz",
+        "1": "data/results/universal_lomo_multiseed_v1/ercot_da_inner_seed1.npz",
+        "2": "data/results/universal_lomo_multiseed_v1/ercot_da_inner_seed2.npz"
+      },
+      "equal_weight_ensemble_path": "data/results/universal_lomo_multiseed_v1/ensemble/ercot_da_inner_ensemble.npz"
+    },
+    "ercot_rt_at_da": {
+      "seed_node_macro_mae": {
+        "0": 34.80049514770508,
+        "1": 34.77200698852539,
+        "2": 34.888240814208984
+      },
+      "mean_mae": 34.820247650146484,
+      "sample_std_mae": 0.06058214731077411,
+      "worst_seed_mae": 34.888240814208984,
+      "best_seed_mae": 34.77200698852539,
+      "equal_weight_ensemble_mae": 34.45048141479492,
+      "paths": {
+        "0": "data/results/universal_lomo_rt_at_da_v1/ercot_rt_at_da_v1.npz",
+        "1": "data/results/universal_lomo_multiseed_v1/ercot_rt_at_da_inner_seed1.npz",
+        "2": "data/results/universal_lomo_multiseed_v1/ercot_rt_at_da_inner_seed2.npz"
+      },
+      "equal_weight_ensemble_path": "data/results/universal_lomo_multiseed_v1/ensemble/ercot_rt_at_da_inner_ensemble.npz"
+    },
+    "ercot_rt": {
+      "seed_node_macro_mae": {
+        "0": 28.85723304748535,
+        "1": 28.986143112182617,
+        "2": 29.034000396728516
+      },
+      "mean_mae": 28.959125518798828,
+      "sample_std_mae": 0.09142831456284484,
+      "worst_seed_mae": 29.034000396728516,
+      "best_seed_mae": 28.85723304748535,
+      "equal_weight_ensemble_mae": 28.76732063293457,
+      "paths": {
+        "0": "data/results/universal_lomo_rt_v1/ercot_rt_v1.npz",
+        "1": "data/results/universal_lomo_multiseed_v1/ercot_rt_inner_seed1.npz",
+        "2": "data/results/universal_lomo_multiseed_v1/ercot_rt_inner_seed2.npz"
+      },
+      "equal_weight_ensemble_path": "data/results/universal_lomo_multiseed_v1/ensemble/ercot_rt_inner_ensemble.npz"
+    }
+  }
+}

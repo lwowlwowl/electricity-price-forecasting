@@ -132,6 +132,7 @@ tmp/
 # 11. 测试相关（可选）
 # --------------------------------------------
 .pytest_cache/
+.pytest_tmp/
 .test-tmp/
 .coverage
 htmlcov/
@@ -152,6 +153,11 @@ data/archive/checkpoints/
 # 兜底：任何 .pt/.pth 权重都不入库（需要共享请用 git-lfs 或网盘）
 *.pt
 *.pth
+*.joblib
+*.safetensors
+
+# 长任务GPU遥测体积随运行时间增长，由最终计算成本摘要代替提交。
+data/results/**/gpu_usage.csv
 
 # --------------------------------------------
 # 13. 团队内部资料（按周归档，含个人/同学产出，不适合公开仓库）

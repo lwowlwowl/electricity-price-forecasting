@@ -313,6 +313,115 @@
       ],
       "last_run_reused_nodes": [],
       "protocol": "local_per_node_xgboost_pseudohuber"
+    },
+    "lear": {
+      "macro_mae": 34.38929474234416,
+      "macro_rmse": 224.10395901079488,
+      "node_count": 15,
+      "nodes": {
+        "HB_BUSAVG": {
+          "mae": 32.35254991938704,
+          "rmse": 221.89570389915042,
+          "samples": 363
+        },
+        "HB_HOUSTON": {
+          "mae": 32.96038359876466,
+          "rmse": 225.19220758566203,
+          "samples": 363
+        },
+        "HB_HUBAVG": {
+          "mae": 32.647499244475306,
+          "rmse": 220.6987487896887,
+          "samples": 363
+        },
+        "HB_NORTH": {
+          "mae": 33.08711131283134,
+          "rmse": 227.94604752094398,
+          "samples": 363
+        },
+        "HB_PAN": {
+          "mae": 36.89335614379,
+          "rmse": 226.94142042008343,
+          "samples": 363
+        },
+        "HB_SOUTH": {
+          "mae": 29.857688267872742,
+          "rmse": 205.11240828961078,
+          "samples": 363
+        },
+        "HB_WEST": {
+          "mae": 37.166537315906815,
+          "rmse": 227.56661987070862,
+          "samples": 363
+        },
+        "LZ_AEN": {
+          "mae": 36.68569109260017,
+          "rmse": 238.55454370430493,
+          "samples": 363
+        },
+        "LZ_CPS": {
+          "mae": 33.31256498614079,
+          "rmse": 228.3980363750733,
+          "samples": 363
+        },
+        "LZ_HOUSTON": {
+          "mae": 33.16827294688655,
+          "rmse": 224.68423948278652,
+          "samples": 363
+        },
+        "LZ_LCRA": {
+          "mae": 35.536090989804634,
+          "rmse": 234.99509140062068,
+          "samples": 363
+        },
+        "LZ_NORTH": {
+          "mae": 33.51497420862061,
+          "rmse": 228.3245960691057,
+          "samples": 363
+        },
+        "LZ_RAYBN": {
+          "mae": 33.731659260876974,
+          "rmse": 229.37328771179583,
+          "samples": 363
+        },
+        "LZ_SOUTH": {
+          "mae": 29.02044068691231,
+          "rmse": 188.81007932288165,
+          "samples": 363
+        },
+        "LZ_WEST": {
+          "mae": 45.904601160292444,
+          "rmse": 233.06635471950642,
+          "samples": 363
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 3323.0237130000023,
+      "last_run_elapsed_seconds": 3323.0237130000023,
+      "last_run_computed_nodes": [
+        "LZ_HOUSTON",
+        "HB_WEST",
+        "LZ_AEN",
+        "LZ_CPS",
+        "LZ_NORTH",
+        "LZ_LCRA",
+        "LZ_RAYBN",
+        "LZ_SOUTH",
+        "LZ_WEST"
+      ],
+      "last_run_reused_nodes": [
+        "HB_SOUTH",
+        "HB_BUSAVG",
+        "HB_HUBAVG",
+        "HB_HOUSTON",
+        "HB_PAN",
+        "HB_NORTH"
+      ],
+      "protocol": "cutoff_safe_lear_daily_recalibration"
     }
-  }
+  },
+  "market": "ERCOT",
+  "configured_market": "ERCOT",
+  "da_issue_hour_local": 10,
+  "market_contract_smoke_only": false
 }

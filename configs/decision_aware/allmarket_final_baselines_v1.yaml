@@ -1,0 +1,84 @@
+protocol_version: allmarket_final_baselines_v1
+status: pre_registered_before_2025
+training_years: [2020, 2021, 2022, 2023, 2024]
+locked_test_year: 2025
+markets: [CAISO, ERCOT, NYISO, PJM]
+context_hours: 168
+selection_uses_2025: false
+prediction_clamp: [-500.0, 10000.0]
+
+timesfm3:
+  mode: official_frozen
+  model_id: google/timesfm-3.0-pytorch
+  project_supervised_training: false
+  tasks: [da, rt_at_da, rt]
+
+timesfm25:
+  model_id: google/timesfm-2.5-200m-transformers
+  method: peft_all_linear_lora
+  seed: 0
+  fixed_epochs: {da: 2, rt_at_da: 2, rt: 3}
+  epoch_source: lower_median_of_four_source_only_2023_LOMO_best_epochs
+  rank: 4
+  alpha: 8
+  dropout: 0.05
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  batch_size: 16
+  samples_per_market: 2048
+  tasks: [da, rt_at_da, rt]
+
+pooled_xgboost:
+  compute_device: cpu
+  compute_device_reason: autodl_xgboost_wheel_has_no_cuda_support_pre_2025
+  seed: 0
+  n_estimators: 180
+  max_depth: 5
+  learning_rate: 0.04
+  subsample: 0.8
+  colsample_bytree: 0.7
+  reg_lambda: 1.0
+  samples_per_market: 16350
+  objectives: {da: reg:absoluteerror, rt_at_da: reg:pseudohubererror, rt: reg:absoluteerror}
+  uses_node_or_market_id_as_feature: false
+
+per_node_xgboost:
+  seed: 0
+  n_estimators: 180
+  max_depth: 5
+  learning_rate: 0.04
+  subsample: 0.8
+  colsample_bytree: 0.7
+  reg_lambda: 1.0
+  # 原生Pseudo-Huber在CAISO/NYISO逐节点拟合中出现3万--4.7万美元/MWh病态外推；
+  # 该问题在2025打开前由2023/2024训练期诊断发现，因此逐节点强基线统一使用稳定L1目标。
+  objectives: {da: reg:absoluteerror, rt_at_da: reg:absoluteerror, rt: reg:absoluteerror}
+  objective_freeze_evidence: pre_2025_cross_market_numerical_stability_audit
+  role: target_supervised_local_upper_baseline
+
+lear:
+  tasks: [da, rt_at_da]
+  calibration_days: 1092
+  refit_every_days: 1
+  protocol: cutoff_safe_online_daily_recalibration
+  role: target_supervised_local_strong_baseline
+
+dlinear:
+  enabled: true
+  input: task_target_price_history_only
+  seed: 0
+  moving_average_kernel: 25
+  fixed_epochs: 5
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  batch_size: 256
+  samples_per_market: 16350
+  tasks: [da, rt_at_da, rt]
+
+locked_reporting:
+  forecast_metrics: [mae, rmse, bias]
+  tail_slices: [negative_price, highest_1pct, lowest_1pct, abs_da_rt_spread_top_1pct, abs_da_rt_spread_top_5pct, ordinary]
+  ercot_profit: true
+  ercot_risk: [paired_7day_block_interval, maximum_drawdown, worst_node, remove_top_5_days, remove_top_10_days]
+  oracle: same_battery_contract_perfect_price_upper_bound
+  report_all_results_without_model_reselection: true

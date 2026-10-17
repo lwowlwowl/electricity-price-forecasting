@@ -1,0 +1,52 @@
+{
+  "task": "rt",
+  "market": "CAISO",
+  "configured_market": "CAISO",
+  "da_issue_hour_local": 10,
+  "market_contract_smoke_only": false,
+  "phase": "final",
+  "smoke_only": false,
+  "nodes": [
+    "TH_NP15_GEN-APND",
+    "TH_SP15_GEN-APND",
+    "TH_ZP26_GEN-APND"
+  ],
+  "contract_hash": "0c5956fb9fd24b5774b6fbdb066a202b17572fa57d012c67bf7354ce7c7d8dd6",
+  "entity_mapping_hash": "08538e8961b0f1e482fa8b8083f0e6337c6f938afe87083d168972e904fdaafc",
+  "data_read_end_utc_exclusive": "2025-01-01T08:00:00+00:00",
+  "selection_allowed": false,
+  "models": {
+    "xgboost_absolute": {
+      "macro_mae": 6.279852840147236,
+      "macro_rmse": 17.6936890281072,
+      "node_count": 3,
+      "nodes": {
+        "TH_NP15_GEN-APND": {
+          "mae": 6.60907374541364,
+          "rmse": 22.49128889139127,
+          "samples": 8712
+        },
+        "TH_SP15_GEN-APND": {
+          "mae": 6.054218438852206,
+          "rmse": 14.69828673171556,
+          "samples": 8712
+        },
+        "TH_ZP26_GEN-APND": {
+          "mae": 6.176266336175864,
+          "rmse": 15.891491461214773,
+          "samples": 8712
+        }
+      },
+      "complete": true,
+      "elapsed_seconds": 192.36604230000012,
+      "last_run_elapsed_seconds": 0.04444779999903403,
+      "last_run_computed_nodes": [],
+      "last_run_reused_nodes": [
+        "TH_NP15_GEN-APND",
+        "TH_ZP26_GEN-APND",
+        "TH_SP15_GEN-APND"
+      ],
+      "protocol": "local_per_node_xgboost_absolute_error"
+    }
+  }
+}

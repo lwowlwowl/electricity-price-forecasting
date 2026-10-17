@@ -1,0 +1,90 @@
+{
+  "experiment": "universal_lomo_ercot_multiseed_profit_stability_v1",
+  "status": "2023_inner_frozen_report_only",
+  "test_2025_read": false,
+  "seed_selection_by_profit": false,
+  "seed_macro_mean_daily_revenue": {
+    "0": 377.8381252155746,
+    "1": 266.1546694302914,
+    "2": 403.0974114333497
+  },
+  "across_seed_mean_daily_revenue": 349.0300686930719,
+  "across_seed_sample_std_daily_revenue": 72.87493902077607,
+  "across_seed_min_daily_revenue": 266.1546694302914,
+  "across_seed_max_daily_revenue": 403.0974114333497,
+  "fixed_equal_weight_ensemble": {
+    "macro_mean_daily_revenue": 407.166707634525,
+    "macro_median_daily_revenue": 26.788165293972234,
+    "macro_positive_day_rate": 0.7817679558011049,
+    "macro_mean_daily_revenue_without_top_5_days": 279.11931630902825,
+    "top_5_days_total_revenue_share": 0.3239523959788784,
+    "top_10_days_total_revenue_share": 0.5235419677043577,
+    "worst_node_mean_daily_revenue": 350.73711723441596,
+    "best_node_mean_daily_revenue": 441.70859919431234,
+    "macro_mean_daily_revenue_7day_block_bootstrap_95ci": [
+      174.85922669313166,
+      693.1729548319751
+    ]
+  },
+  "xgboost_local_supervised_upper_baseline": {
+    "macro_mean_daily_revenue": 292.28926467730673,
+    "macro_mean_daily_revenue_7day_block_bootstrap_95ci": [
+      145.99885978192634,
+      469.57736026935436
+    ]
+  },
+  "paired_vs_xgboost": {
+    "seed_0": {
+      "days": 362,
+      "mean_daily_difference": 85.54886053826795,
+      "median_daily_difference": -0.6404132584587003,
+      "positive_difference_day_rate": 0.4889502762430939,
+      "seven_day_block_bootstrap_95ci": [
+        -17.16036497349391,
+        212.7422547548747
+      ]
+    },
+    "seed_1": {
+      "days": 362,
+      "mean_daily_difference": -26.13459524701524,
+      "median_daily_difference": -6.773527699548591,
+      "positive_difference_day_rate": 0.4088397790055249,
+      "seven_day_block_bootstrap_95ci": [
+        -70.67958088892404,
+        16.313175762666518
+      ]
+    },
+    "seed_2": {
+      "days": 362,
+      "mean_daily_difference": 110.80814675604303,
+      "median_daily_difference": 5.549257241060375,
+      "positive_difference_day_rate": 0.6077348066298343,
+      "seven_day_block_bootstrap_95ci": [
+        21.24494964678423,
+        227.20836271861336
+      ]
+    },
+    "across_seed_daily_mean": {
+      "days": 362,
+      "mean_daily_difference": 56.74080401576524,
+      "median_daily_difference": -2.134696712244428,
+      "positive_difference_day_rate": 0.4723756906077348,
+      "seven_day_block_bootstrap_95ci": [
+        -9.901541260395103,
+        141.4122409398437
+      ]
+    },
+    "fixed_equal_weight_ensemble": {
+      "days": 362,
+      "mean_daily_difference": 114.87744295721836,
+      "median_daily_difference": 4.113055148520182,
+      "positive_difference_day_rate": 0.5662983425414365,
+      "seven_day_block_bootstrap_95ci": [
+        15.195843606407555,
+        241.59196281268126
+      ]
+    }
+  },
+  "source": "global_predicted_continuous_da_lp_rt_mpc_v1",
+  "source_path": "data/results/universal_lomo_ercot_multiseed_continuous_mpc_v1.json"
+}

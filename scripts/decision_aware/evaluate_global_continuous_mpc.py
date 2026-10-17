@@ -255,7 +255,7 @@ def main() -> None:
     parser.add_argument("--config", default="configs/decision_aware/global_ercot_huber_v1.yaml")
     parser.add_argument("--prediction-dir", default="data/results/global_f0_f1_predictions_v1")
     parser.add_argument("--families", default="f0,f1")
-    parser.add_argument("--phase", choices=("inner", "outer"), default="inner")
+    parser.add_argument("--phase", choices=("inner", "outer", "final"), default="inner")
     parser.add_argument("--selection-allowed", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--workers", type=int, default=min(16, os.cpu_count() or 1))
     parser.add_argument("--executor", choices=("process", "thread"), default="process")
@@ -453,6 +453,8 @@ def main() -> None:
             "2023 inner validation only"
             if args.phase == "inner"
             else "2024 outer validation only"
+            if args.phase == "outer"
+            else "2025 locked retrospective test only"
         ),
         "nodes": selected_nodes,
         "policy": {

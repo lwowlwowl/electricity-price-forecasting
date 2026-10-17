@@ -1,0 +1,132 @@
+{
+  "experiment": "cutoff_safe_lear_multimarket_incremental_summary_v1",
+  "status": "running_partial",
+  "test_2025_read": false,
+  "complete_rows": 6,
+  "rows": [
+    {
+      "market": "CAISO",
+      "task": "da",
+      "lear": {
+        "status": "complete",
+        "mae": 10.875164405721831,
+        "elapsed_seconds": 1538.9228246999992,
+        "nodes": 3,
+        "cached_nodes": 3,
+        "expected_nodes": 3,
+        "protocol": "cutoff_safe_lear_daily_recalibration"
+      },
+      "transformer_mae": 18.199809919157605,
+      "pooled_lomo_xgboost_mae": 19.953149971372312,
+      "winner_among_available": "lear"
+    },
+    {
+      "market": "CAISO",
+      "task": "rt_at_da",
+      "lear": {
+        "status": "complete",
+        "mae": 14.841859246030117,
+        "elapsed_seconds": 1038.5955220999967,
+        "nodes": 3,
+        "cached_nodes": 3,
+        "expected_nodes": 3,
+        "protocol": "cutoff_safe_lear_daily_recalibration"
+      },
+      "transformer_mae": 21.03158958475475,
+      "pooled_lomo_xgboost_mae": 23.723865769117072,
+      "winner_among_available": "lear"
+    },
+    {
+      "market": "ERCOT",
+      "task": "da",
+      "lear": {
+        "status": "complete",
+        "mae": 34.47613323015063,
+        "elapsed_seconds": 3718.496123099998,
+        "nodes": 15,
+        "cached_nodes": 15,
+        "expected_nodes": 15,
+        "protocol": "cutoff_safe_lear_daily_recalibration"
+      },
+      "transformer_mae": 37.2706529911821,
+      "pooled_lomo_xgboost_mae": 35.900006275748666,
+      "winner_among_available": "lear"
+    },
+    {
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "lear": {
+        "status": "complete",
+        "mae": 34.38929474234416,
+        "elapsed_seconds": 3323.0237130000023,
+        "nodes": 15,
+        "cached_nodes": 15,
+        "expected_nodes": 15,
+        "protocol": "cutoff_safe_lear_daily_recalibration"
+      },
+      "transformer_mae": 34.800496071091224,
+      "pooled_lomo_xgboost_mae": 35.99452383287609,
+      "winner_among_available": "lear"
+    },
+    {
+      "market": "NYISO",
+      "task": "da",
+      "lear": {
+        "status": "complete",
+        "mae": 6.9839875747051385,
+        "elapsed_seconds": 4892.4571688,
+        "nodes": 11,
+        "cached_nodes": 11,
+        "expected_nodes": 11,
+        "protocol": "cutoff_safe_lear_daily_recalibration"
+      },
+      "transformer_mae": 8.553133333691962,
+      "pooled_lomo_xgboost_mae": 10.825796112586106,
+      "winner_among_available": "lear"
+    },
+    {
+      "market": "NYISO",
+      "task": "rt_at_da",
+      "lear": {
+        "status": "complete",
+        "mae": 10.644629503302305,
+        "elapsed_seconds": 4029.863449000004,
+        "nodes": 11,
+        "cached_nodes": 11,
+        "expected_nodes": 11,
+        "protocol": "cutoff_safe_lear_daily_recalibration"
+      },
+      "transformer_mae": 10.730053088580805,
+      "pooled_lomo_xgboost_mae": 14.736562977854005,
+      "winner_among_available": "lear"
+    },
+    {
+      "market": "PJM",
+      "task": "da",
+      "lear": {
+        "status": "pending",
+        "mae": null,
+        "elapsed_seconds": null,
+        "cached_nodes": 5,
+        "expected_nodes": 35
+      },
+      "transformer_mae": 6.196589762302963,
+      "pooled_lomo_xgboost_mae": 7.2548611381478345,
+      "winner_among_available": "transformer"
+    },
+    {
+      "market": "PJM",
+      "task": "rt_at_da",
+      "lear": {
+        "status": "pending",
+        "mae": null,
+        "elapsed_seconds": null,
+        "cached_nodes": 0,
+        "expected_nodes": 35
+      },
+      "transformer_mae": 8.960945526940808,
+      "pooled_lomo_xgboost_mae": 10.211344409609003,
+      "winner_among_available": "transformer"
+    }
+  ]
+}

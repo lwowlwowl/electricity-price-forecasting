@@ -408,7 +408,7 @@ def build_global_task_datasets(
     *,
     train_stage: AnnualStage | str = AnnualStage.INNER_TRAIN,
     validation_stage: AnnualStage | str = AnnualStage.INNER_VALIDATION,
-    read_end_utc: str | None = None,
+    read_end_utc: str | Mapping[str, str] | None = None,
 ) -> tuple[MultiNodeDataset, MultiNodeDataset]:
     """读取多个节点并构造训练/验证 global Dataset。
 
@@ -438,12 +438,22 @@ def build_global_task_datasets(
         mappings.identity(market, node)
         nodes_by_market.setdefault(market, []).append(node)
     for market, nodes in nodes_by_market.items():
+        market_read_end_utc = (
+            read_end_utc.get(market)
+            if isinstance(read_end_utc, Mapping)
+            else read_end_utc
+        )
+        if isinstance(read_end_utc, Mapping) and market_read_end_utc is None:
+            raise ValueError(f"read_end_utc缺少{market}的UTC截止时刻")
         loaded = load_market_unified_nodes(
             market=market,
             nodes=nodes,
             start="2020-01-01",
             end="2026-06-02",
-            **({"read_end_utc": read_end_utc} if read_end_utc is not None else {}),
+            **(
+                {"read_end_utc": market_read_end_utc}
+                if market_read_end_utc is not None else {}
+            ),
         )
         wide_by_entity.update({(market, node): frame for node, frame in loaded.items()})
 

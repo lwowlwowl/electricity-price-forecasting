@@ -1,0 +1,102 @@
+{
+  "model": "TimesFM-3 frozen",
+  "model_id": "google/timesfm-3.0-pytorch",
+  "task": "rt_at_da",
+  "holdout_market": "NYISO",
+  "context_hours": 168,
+  "horizon": 24,
+  "target_mode": "per_node_univariate",
+  "future_covariates": [
+    "hour_sin",
+    "hour_cos",
+    "dow_sin",
+    "dow_cos",
+    "month_sin",
+    "month_cos",
+    "is_weekend",
+    "is_holiday"
+  ],
+  "project_supervised_training": false,
+  "test_2025": false,
+  "protocol": "frozen_foundation_model_same_information_contract",
+  "evaluation_stage": "inner",
+  "selection_allowed": true,
+  "project_training_markets": [],
+  "external_pretraining_data_disclosure": "unknown_beyond_model_card",
+  "uses_node_id_for_prediction": false,
+  "uses_market_id_for_prediction": false,
+  "uses_future_true_price": false,
+  "uses_future_true_load_wind_solar": false,
+  "uses_published_future_da_for_rt": false,
+  "config": "configs/decision_aware/universal_lomo_holdout_nyiso_rt_at_da_v1.yaml",
+  "config_sha256": "defd8beeefee68023f13852eeb81fa489fef3511af1d363515f0441b225fba29",
+  "worker_sha256": "1d925a709f3e3945e4ac49d71b097f86a4411af81b40a545b7116347f54aadf8",
+  "data_read_end_utc_exclusive": "2024-01-01T05:00:00+00:00",
+  "nodes": 11,
+  "days": 363,
+  "node_macro_mae": 11.343960612142883,
+  "node_macro_rmse": 29.968636936533187,
+  "node_macro_bias": -3.8566515599347455,
+  "central_80_coverage": 0.6792929292929293,
+  "per_node": {
+    "CAPITL": {
+      "mae": 12.993307155462048,
+      "rmse": 34.38075210940636,
+      "bias": -4.692045109770692
+    },
+    "CENTRL": {
+      "mae": 9.856338272244267,
+      "rmse": 26.223958557261884,
+      "bias": -3.1276132253974285
+    },
+    "DUNWOD": {
+      "mae": 10.949639639660676,
+      "rmse": 28.554681468401558,
+      "bias": -3.7667205208096624
+    },
+    "GENESE": {
+      "mae": 9.446421385867211,
+      "rmse": 24.63891435374526,
+      "bias": -2.7774504451854587
+    },
+    "HUD VL": {
+      "mae": 10.531587858149855,
+      "rmse": 27.811919454177282,
+      "bias": -3.4938685646857057
+    },
+    "LONGIL": {
+      "mae": 17.990209957648023,
+      "rmse": 44.57208597781246,
+      "bias": -8.864943213507711
+    },
+    "MHK VL": {
+      "mae": 9.881778626931066,
+      "rmse": 26.483364650930586,
+      "bias": -3.1516845906948667
+    },
+    "MILLWD": {
+      "mae": 11.02115443882535,
+      "rmse": 29.00462035962064,
+      "bias": -3.791365932498753
+    },
+    "N.Y.C.": {
+      "mae": 11.572327059785142,
+      "rmse": 33.73769076843277,
+      "bias": -4.222866987647049
+    },
+    "NORTH": {
+      "mae": 11.817850090004578,
+      "rmse": 31.88771619777081,
+      "bias": -1.8237332923672311
+    },
+    "WEST": {
+      "mae": 8.722952248993513,
+      "rmse": 22.359302404305435,
+      "bias": -2.7108752767176343
+    }
+  },
+  "wall_seconds": 69.24329393357038,
+  "smoke": false,
+  "final_profit_claim_allowed": false,
+  "note": "预测层结果；ERCOT盈利需将三个任务共同送入同一LP/MPC。"
+}

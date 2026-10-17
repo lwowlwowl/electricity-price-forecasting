@@ -5,6 +5,10 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+# 节点已由-Workers并行；禁止每个节点再让BLAS占满全部CPU。
+$env:OPENBLAS_NUM_THREADS = '1'
+$env:OMP_NUM_THREADS = '1'
+$env:MKL_NUM_THREADS = '1'
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $pythonExe = Join-Path $projectRoot '.venv\Scripts\python.exe'
 $runner = Join-Path $projectRoot 'scripts\decision_aware\run_global_baselines.py'

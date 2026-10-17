@@ -1,0 +1,31 @@
+{
+  "protocol": {
+    "model_id": "google/timesfm-2.5-200m-transformers",
+    "folds": 4,
+    "tasks": {
+      "da": 24,
+      "rt_at_da": 24,
+      "rt": 4
+    },
+    "context_hours": 168,
+    "input_features": [
+      "target_price_history"
+    ],
+    "lora_rank": 4,
+    "lora_target_modules": "all-linear",
+    "status": "pre_registered_runtime_pending"
+  },
+  "runtime": {
+    "packages": {
+      "torch": true,
+      "transformers": false,
+      "peft": false,
+      "accelerate": false
+    },
+    "checkpoint_cache": "D:\\【科研】\\electricity-price-forecasting\\hf_cache\\hub\\models--google--timesfm-2.5-200m-transformers",
+    "checkpoint_present": false,
+    "ready": false,
+    "downloads_performed": false
+  },
+  "config": "D:/【科研】/electricity-price-forecasting/configs/decision_aware/timesfm25_lora_source_lomo_v1.yaml"
+}

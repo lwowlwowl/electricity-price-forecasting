@@ -1,0 +1,41 @@
+protocol_version: allmarket_locked_2025_profit_analysis_v1
+status: pre_registered_before_2025
+frozen_at_local_date: "2026-10-18"
+locked_test_year: 2025
+selection_uses_2025: false
+
+primary_economic_endpoint:
+  market: ERCOT
+  system: transformer_fixed_seed012_ensemble
+  settlement_label: da_ensemble__rt_at_da_ensemble__rt_ensemble
+  comparator: pooled_allmarket_xgboost
+  comparator_settlement_label: da_pooled_xgboost__rt_at_da_pooled_xgboost__rt_pooled_xgboost
+  metric: macro_mean_daily_net_revenue_usd_per_node_day
+  aggregation: node_equal_daily_mean
+  uncertainty: paired_7day_block_bootstrap_95ci
+  stable_superiority_rule: mean_difference_gt_0_and_ci_lower_gt_0
+  point_estimate_signal_rule: mean_difference_gt_0_and_ci_contains_0
+  no_superiority_rule: mean_difference_lte_0
+
+secondary_economic_diagnostics:
+  - revenue_without_top_5_days
+  - revenue_without_top_10_days
+  - maximum_drawdown_usd
+  - worst_node_mean_daily_revenue
+  - positive_day_rate
+  - fraction_of_restricted_perfect_forecast_oracle
+  - da_leg
+  - rt_deviation_leg
+  - degradation_cost
+  - deviation_penalty
+
+claim_policy:
+  forecast_metrics_role: auxiliary_prediction_and_transfer_diagnostics
+  mae_cannot_override_primary_economic_endpoint: true
+  risk_metrics_are_reported_not_posthoc_selection_gates: true
+  compare_all_complete_systems_descriptively: true
+  per_node_xgboost_role: target_supervised_strong_benchmark_not_mathematical_upper_bound
+  oracle_role: restricted_perfect_forecast_same_policy_benchmark
+  report_regardless_of_outcome: true
+  no_model_or_threshold_change_after_opening: true
+
