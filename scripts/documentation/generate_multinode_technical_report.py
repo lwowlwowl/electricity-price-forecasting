@@ -42,7 +42,7 @@ from reportlab.platypus.tableofcontents import TableOfContents
 
 
 ROOT = Path(__file__).resolve().parents[2]
-OUTPUT = ROOT / "output" / "pdf" / "多节点无ID通用电价预测与储能双结算技术报告_2026-10-13.pdf"
+OUTPUT = ROOT / "output" / "pdf" / "多节点无ID通用电价预测与储能双结算技术报告_2026-10-19.pdf"
 
 NAVY = HexColor("#14213D")
 BLUE = HexColor("#2F6BFF")
@@ -71,7 +71,7 @@ def load_json_if_exists(rel: str) -> dict | None:
 
 
 def locked_2025_comparison_rows(summary: dict) -> list[list[str]]:
-    """把锁定测试汇总转成可直接进入论文的比较表，并加粗每列最佳可部署系统。"""
+    """把锁定测试汇总转成论文表；LEAR只进入其覆盖的两个日级任务。"""
     specs = (
         ("transformer_ensemble", "当前Transformer固定集成", "da_ensemble__rt_at_da_ensemble__rt_ensemble"),
         ("timesfm3", "TimesFM-3 frozen", "da_timesfm3__rt_at_da_timesfm3__rt_timesfm3"),
@@ -99,19 +99,42 @@ def locked_2025_comparison_rows(summary: dict) -> list[list[str]]:
             "revenue": float(settlement["macro_mean_daily_revenue"]),
             "oracle_fraction": settlement["fraction_of_oracle"],
         })
-    best = {task: min(row[task] for row in records) for task in tasks}
-    best_revenue = max(row["revenue"] for row in records)
+    lear_mae = {}
+    for task in ("da", "rt_at_da"):
+        values = [
+            float(summary["markets"][market]["systems"]["lear"][task]["all"]["mae"])
+            for market in ("CAISO", "ERCOT", "NYISO", "PJM")
+        ]
+        lear_mae[task] = sum(values) / len(values)
+    records.insert(1, {
+        "label": "LEAR（日级任务）",
+        "da": lear_mae["da"],
+        "rt_at_da": lear_mae["rt_at_da"],
+        "rt": None,
+        "revenue": None,
+        "oracle_fraction": None,
+    })
+    best = {
+        task: min(row[task] for row in records if row[task] is not None)
+        for task in tasks
+    }
+    best_revenue = max(
+        row["revenue"] for row in records if row["revenue"] is not None
+    )
     rows: list[list[str]] = [[
         "系统", "四市场DA MAE", "四市场RT-at-DA MAE", "四市场滚动RT MAE",
-        "ERCOT日均净收益", "Oracle占比",
+        "ERCOT日均净收益", "相对受限先知参照",
     ]]
     for row in records:
         values = []
         for task in tasks:
+            if row[task] is None:
+                values.append("—")
+                continue
             text = f"{row[task]:.2f}"
             values.append(B(text) if math.isclose(row[task], best[task]) else text)
-        revenue = f"{row['revenue']:.2f}"
-        if math.isclose(row["revenue"], best_revenue):
+        revenue = "—" if row["revenue"] is None else f"{row['revenue']:.2f}"
+        if row["revenue"] is not None and math.isclose(row["revenue"], best_revenue):
             revenue = B(revenue)
         fraction = row["oracle_fraction"]
         rows.append([
@@ -119,7 +142,98 @@ def locked_2025_comparison_rows(summary: dict) -> list[list[str]]:
             "—" if fraction is None else f"{100.0 * float(fraction):.1f}%",
         ])
     oracle = derived["da_oracle__rt_at_da_oracle__rt_oracle"]
-    rows.append(["Oracle（受限先知上界）", "—", "—", "—", f"{oracle['macro_mean_daily_revenue']:.2f}", "100.0%"])
+    rows.append(["受限先知参照（非上界）", "—", "—", "—", f"{oracle['macro_mean_daily_revenue']:.2f}", "100.0%"])
+    return rows
+
+
+def locked_2025_market_task_rows(summary: dict, task: str) -> list[list[str]]:
+    """生成单个任务的四市场完整基线表，并逐列加粗最低MAE。"""
+    specs = [
+        ("transformer_ensemble", "Transformer固定集成"),
+        ("timesfm3", "TimesFM-3 frozen"),
+        ("timesfm25", "TimesFM-2.5 LoRA"),
+        ("pooled_xgboost", "pooled XGBoost"),
+        ("per_node_xgboost", "逐节点XGBoost"),
+        ("dlinear", "DLinear"),
+        ("seasonal", "lag-168"),
+    ]
+    if task in ("da", "rt_at_da"):
+        specs.insert(1, ("lear", "LEAR"))
+
+    markets = ("CAISO", "ERCOT", "NYISO", "PJM")
+    records: list[dict] = []
+    for system, label in specs:
+        values = {
+            market: float(
+                summary["markets"][market]["systems"][system][task]["all"]["mae"]
+            )
+            for market in markets
+        }
+        records.append({
+            "label": label,
+            "values": values,
+            "macro": sum(values.values()) / len(values),
+        })
+
+    best_by_market = {
+        market: min(record["values"][market] for record in records)
+        for market in markets
+    }
+    best_macro = min(record["macro"] for record in records)
+    rows: list[list[str]] = [["系统", *markets, "四市场宏平均"]]
+    for record in records:
+        row = [record["label"]]
+        for market in markets:
+            value = record["values"][market]
+            text = f"{value:.2f}"
+            row.append(B(text) if math.isclose(value, best_by_market[market]) else text)
+        macro = f"{record['macro']:.2f}"
+        row.append(B(macro) if math.isclose(record["macro"], best_macro) else macro)
+        rows.append(row)
+    return rows
+
+
+def locked_2025_profit_component_rows(summary: dict) -> list[list[str]]:
+    """生成ERCOT统一结算下所有完整三任务系统的收益分解。"""
+    specs = [
+        ("Transformer固定集成", "da_ensemble__rt_at_da_ensemble__rt_ensemble"),
+        ("TimesFM-3 frozen", "da_timesfm3__rt_at_da_timesfm3__rt_timesfm3"),
+        ("TimesFM-2.5 LoRA", "da_timesfm25__rt_at_da_timesfm25__rt_timesfm25"),
+        ("pooled XGBoost", "da_pooled_xgboost__rt_at_da_pooled_xgboost__rt_pooled_xgboost"),
+        ("逐节点XGBoost", "da_per_node_xgboost__rt_at_da_per_node_xgboost__rt_per_node_xgboost"),
+        ("DLinear", "da_dlinear__rt_at_da_dlinear__rt_dlinear"),
+        ("lag-168", "da_seasonal__rt_at_da_seasonal__rt_seasonal"),
+    ]
+    systems = summary["ercot_settlement"]["systems"]
+    records = []
+    for label, key in specs:
+        system = systems[key]
+        components = system["macro_mean_daily_revenue_components"]
+        records.append({
+            "label": label,
+            "da": float(components["da_leg"]),
+            "rt": float(components["rt_deviation_leg"]),
+            "degradation": float(components["degradation_cost"]),
+            "penalty": float(components["deviation_penalty"]),
+            "throughput": float(system["macro_mean_daily_actual_throughput_mwh"]),
+            "net": float(system["macro_mean_daily_revenue"]),
+        })
+    best_net = max(record["net"] for record in records)
+    rows: list[list[str]] = [[
+        "系统", "DA计划收益", "RT修正收益", "退化成本", "偏差罚金",
+        "吞吐量(MWh)", "净收益",
+    ]]
+    for record in records:
+        net = f"{record['net']:.2f}"
+        rows.append([
+            record["label"],
+            f"{record['da']:.2f}",
+            f"{record['rt']:.2f}",
+            f"{record['degradation']:.2f}",
+            f"{record['penalty']:.2f}",
+            f"{record['throughput']:.2f}",
+            B(net) if math.isclose(record["net"], best_net) else net,
+        ])
     return rows
 
 
@@ -262,9 +376,9 @@ class ReportDocTemplate(BaseDocTemplate):
         super().__init__(
             filename, pagesize=A4, leftMargin=18 * mm, rightMargin=18 * mm,
             topMargin=18 * mm, bottomMargin=16 * mm,
-            title="多节点无ID通用电价预测与储能双结算技术报告",
+            title="多市场无ID电价预测及其储能双结算价值评估",
             author="Electricity Price Forecasting Project",
-            subject="模型架构、训练、消融、零样本预测与储能盈利评估",
+            subject="跨市场电价预测、储能决策与经济价值评估",
         )
         frame = Frame(
             self.leftMargin, self.bottomMargin, self.width, self.height,
@@ -295,9 +409,9 @@ def page_decor(canvas, doc) -> None:
     canvas.line(18 * mm, A4[1] - 13 * mm, A4[0] - 18 * mm, A4[1] - 13 * mm)
     canvas.setFont("CJK", 7.2)
     canvas.setFillColor(MUTED)
-    canvas.drawString(18 * mm, A4[1] - 10 * mm, "多节点无ID通用电价预测与储能双结算技术报告")
+    canvas.drawString(18 * mm, A4[1] - 10 * mm, "多市场无ID电价预测及其储能双结算价值评估")
     canvas.drawRightString(A4[0] - 18 * mm, 9 * mm, f"{page}")
-    canvas.drawString(18 * mm, 9 * mm, "技术报告 - 2026-10-18")
+    canvas.drawString(18 * mm, 9 * mm, "研究论文 - 2026-10-19")
     canvas.restoreState()
 
 
@@ -516,7 +630,7 @@ def protocol_diagram() -> Drawing:
                  fontSize=12, fillColor=NAVY, textAnchor="middle"))
     d.add(String(250, 52, "四个留出市场 × 三个独立任务 = 12个预测结果，全部不读取node_id/market_id",
                  fontName="CJK", fontSize=7.5, fillColor=INK, textAnchor="middle"))
-    d.add(String(250, 34, "2025保持锁定；CAISO/NYISO/PJM尚未形成ISO级完整盈利结论",
+    d.add(String(250, 34, "LOMO用于2023迁移证据；2025已按独立all-market冻结协议一次性评价",
                  fontName="CJK", fontSize=7.5, fillColor=RED, textAnchor="middle"))
     return d
 
@@ -649,15 +763,30 @@ def build_story() -> list:
         "三个模型独立训练，预测结果先进入日前线性规划（linear programming, LP）确定全天计划，再进入模型预测控制"
         "（model predictive control, MPC）逐小时滚动修正，最终用真实日前与实时价格计算净收益。"
     ))
-    story.append(P(
-        "为检验未见市场上的迁移能力，采用四折留一市场（Leave-One-Market-Out, LOMO）协议：每一折仅用三个市场训练，"
-        "将第4个市场全部留作零样本测试。最终模型不读取节点或市场身份。2023年四个留出市场、三个任务共12项预测的平均绝对误差"
-        "（mean absolute error, MAE）均优于168小时前同小时复制基线。盈利只在结算规则已完整实现的ERCOT上比较："
-        "同训练数据比较中，当前Transformer在12项MAE中的9项优于pooled LOMO XGBoost，也在9项上优于源市场监督的TimesFM-2.5 LoRA；"
-        "frozen TimesFM-3仅在四个滚动RT任务上占优。ERCOT 2023中，当前seed 0收益377.84，固定三seed集成407.17，"
-        "仍未稳定超过同数据pooled XGBoost的418.06；2024冻结检查又落后于目标市场监督XGBoost。"
-        "结果表明跨市场预测迁移已成立，但稳定盈利优势尚未成立。"
-    ))
+    if locked_2025 is None:
+        story.append(P(
+            "为检验未见市场上的迁移能力，采用四折留一市场（Leave-One-Market-Out, LOMO）协议：每一折仅用三个市场训练，"
+            "将第4个市场全部留作零样本测试。最终模型不读取节点或市场身份。2023年四个留出市场、三个任务共12项预测的平均绝对误差"
+            "（mean absolute error, MAE）均优于168小时前同小时复制基线。盈利只在结算规则已完整实现的ERCOT上比较："
+            "同训练数据比较中，当前Transformer在12项MAE中的9项优于pooled LOMO XGBoost，也在9项上优于源市场监督的TimesFM-2.5 LoRA；"
+            "frozen TimesFM-3仅在四个滚动RT任务上占优。ERCOT 2023中，当前seed 0收益377.84，固定三seed集成407.17，"
+            "仍未稳定超过同数据pooled XGBoost的418.06；2024冻结检查又落后于目标市场监督XGBoost。"
+            "结果表明跨市场预测迁移已成立，但稳定盈利优势尚未成立。"
+        ))
+    else:
+        final_profit = locked_2025_profit_evidence(locked_2025)
+        story.append(P(
+            "为检验迁移与部署能力，研究先采用四折留一市场（Leave-One-Market-Out, LOMO）协议，再在不读取2025的前提下冻结结构、"
+            "损失、随机种子、集成方式和比较协议，使用四市场2020—2024数据训练最终部署模型，并对2025只评价一次。"
+            "在四市场×三任务共12项预测中，固定三seed Transformer集成的MAE逐项低于TimesFM-3、TimesFM-2.5 LoRA、"
+            "pooled XGBoost、逐节点XGBoost、DLinear和lag-168这六个完整三任务基线。"
+            "只覆盖DA与RT-at-DA的LEAR在8个市场—任务单元中胜5项，Transformer胜3项，两任务宏平均总体接近。"
+            f"但ERCOT 2025完整结算中，Transformer集成日均净收益为{final_profit['transformer']['macro_mean_daily_revenue']:.2f} USD/节点·日，"
+            f"低于同数据pooled XGBoost的{final_profit['comparator']['macro_mean_daily_revenue']:.2f}；"
+            f"逐日配对差为{final_profit['mean_difference']:.2f}，7日块Bootstrap 95%区间为"
+            f"[{final_profit['ci'][0]:.2f}, {final_profit['ci'][1]:.2f}]。"
+            "因此本文能够支持跨市场预测与最终年度预测精度优势，但不能支持经济收益优势；更低MAE没有稳定转化为更高利润。"
+        ))
     story.append(P(
         "训练阶段出现MAE和Pseudo-Huber，是因为利润并非逐小时可直接监督的标签，而要经过跨时段电量状态、效率、偏差罚金和优化器才形成；"
         "因此价格误差用于稳定训练，净收益始终是最终系统评价指标。结构代号F0/F1、两类损失及其选择依据见第4.1—4.3节，"
@@ -665,13 +794,23 @@ def build_story() -> list:
     ))
     story.append(P("关键词：电价预测；跨市场迁移；储能套利；日前—实时双结算；模型预测控制；LOMO", "small"))
     story.append(Spacer(1, 3 * mm))
-    story.append(styled_table([
-        ["评价层", "评价范围", "自有系统", "XGBoost/基线", "结论"],
-        ["预测", "四市场 × 三任务", B("12/12优于lag-168"), "lag-168", "跨市场预测迁移成立"],
-        ["预测", "同数据零样本", B("9/12优于pooled XGBoost"), "TimesFM-2.5仅胜3/12", "需结合价差与收益"],
-        ["盈利", "ERCOT 2023", B("377.84"), "292.29", "点估计+29.3%，区间跨0"],
-        ["盈利", "ERCOT 2024冻结", "73.38", B("90.69"), "自有系统-19.1%，区间低于0"],
-    ], [24 * mm, 36 * mm, 33 * mm, 33 * mm, 48 * mm]))
+    core_rows = [
+        ["评价层", "评价范围", "自有系统", "主要基线", "结论"],
+        ["预测", "四市场LOMO × 三任务", B("12/12优于lag-168"), "lag-168", "零样本迁移成立"],
+    ]
+    if locked_2025 is None:
+        core_rows.extend([
+            ["预测", "同数据零样本", B("9/12优于pooled XGBoost"), "TimesFM-2.5仅胜3/12", "需结合价差与收益"],
+            ["盈利", "ERCOT 2023", B("377.84"), "292.29", "点估计+29.3%，区间跨0"],
+            ["盈利", "ERCOT 2024冻结", "73.38", B("90.69"), "自有系统-19.1%，区间低于0"],
+        ])
+    else:
+        core_rows.extend([
+            ["预测", "2025四市场 × 三任务", B("12/12低于完整基线"), "6个三任务基线", "LEAR日级8项中胜5项"],
+            ["盈利", "ERCOT 2025锁定", "28.04", B("pooled XGB 44.43"), "差−16.39，95%区间低于0"],
+            ["风险", "去最高10日", "18.98", B("pooled XGB 31.06"), "盈利差并非仅由极少数尖峰造成"],
+        ])
+    story.append(styled_table(core_rows, [24 * mm, 36 * mm, 33 * mm, 33 * mm, 48 * mm]))
     story.append(P("表1  核心预测与盈利结果；加粗表示该比较中的较优结果。", "caption"))
 
     story.append(PageBreak())
@@ -694,7 +833,7 @@ def build_story() -> list:
         ["研究问题", "本文处理方式", "可验证产出"],
         ["不同信息时点如何预测DA与RT价格", "建立DA、RT-at-DA、滚动RT三个独立任务", "三个冻结checkpoint与逐任务预测指标"],
         ["模型能否迁移到未见市场", "移除node_id/market_id并采用四折LOMO", "四市场 × 三任务零样本结果"],
-        ["预测能否转化为经济价值", "连续DA LP + 滚动RT MPC + 双结算账本", "ERCOT 2023/2024净收益与风险指标"],
+        ["预测能否转化为经济价值", "连续DA LP + 滚动RT MPC + 双结算账本", "ERCOT 2023/2024及锁定2025净收益与风险"],
     ], [46 * mm, 70 * mm, 58 * mm]))
     story.append(P("表2  研究问题、技术路线与可验证产出。", "caption"))
     story.append(H2("1.2 系统闭环"))
@@ -799,7 +938,7 @@ def build_story() -> list:
         ["零样本预测", "其他三个市场，2020-2022", "留出市场，2023", "是：内部开发评价", "节点等权MAE、市场宏平均"],
         ["ERCOT盈利", "预测器按各自冻结合同训练", "ERCOT 2023共同日", "是：系统开发验证", "净收益、区间、回撤、收益分解"],
         ["时间外检查", "保持模型和策略不变", "ERCOT 2024共同日", "否：冻结推理", "同口径净收益与配对区间"],
-        ["最终年度", "尚未执行", "2025锁定", "否", "预注册后一次性评价"],
+        ["最终年度", "四市场2020-2024共同训练", "2025一次性锁定测试", "否", "预测、尾部、ERCOT净收益"],
     ], [28 * mm, 53 * mm, 42 * mm, 27 * mm, 24 * mm]))
 
     chapter(story, "3", "预测方法：三任务Transformer",
@@ -844,17 +983,19 @@ def build_story() -> list:
     story.append(H2("3.5 模型数量、随机种子与最终冻结关系"))
     story.append(P(
         "随机种子（seed）控制参数初始化、训练样本顺序等随机过程。多个seed不是多个任务模型，而是对同一配置进行独立重复，"
-        "用于判断结论是否依赖一次偶然初始化。项目在不同阶段使用种子的范围不同，不能把历史三seed误写成当前最终模型已完成三seed。"
+        "用于判断结论是否依赖一次偶然初始化。项目在不同阶段使用种子的范围不同；最终all-market部署版已按预注册完成三seed，"
+        "但早期LOMO四折仍以seed 0为正式迁移证据。"
     ))
     story.append(styled_table([
         ["实验阶段", "模型/配置范围", "重复设置", "用途"],
         ["早期单节点结构消融", "DA、RT-at-DA、滚动RT的F0/F1/F1b/F2候选", "每个候选3 seeds", "选择任务对应的融合结构"],
         ["早期单节点联合微调", "三模型组成的完整双结算系统", "3 seeds", "检查收益导向联合训练的稳定性"],
         ["历史多节点经济状态头", "冻结DA与RT-at-DA骨干，仅训练方向分类头", "3 seeds", "检查方向分类是否稳定"],
-        ["当前无ID LOMO最终系统", "4个留出市场 × 3个任务 = 12个checkpoint", "每折seed 0", "形成当前正式零样本预测与盈利结果"],
+        ["无ID LOMO迁移系统", "4个留出市场 × 3个任务 = 12个checkpoint", "每折seed 0", "形成正式零样本迁移证据"],
+        ["最终all-market部署系统", "3个任务 × 3个seed = 9个checkpoint", "seed 0/1/2固定等权集成", "2025一次性预测与ERCOT盈利评价"],
     ], [39 * mm, 69 * mm, 30 * mm, 36 * mm]))
     story.append(P(
-        "因此，本报告既保留历史多seed证据，也明确把当前无ID系统的多seed复现实验列为待完成项；二者不能互相替代。"
+        "因此，本报告把LOMO seed-0迁移证据与all-market三seed部署证据分开报告；二者承担不同主张，不能互相替代。"
     ))
 
     chapter(story, "4", "训练方法：融合结构、损失与优化",
@@ -930,7 +1071,7 @@ def build_story() -> list:
         ["批量大小", "16", "每次参数更新的样本数"],
         ["最大轮数 / 早停", "20 / 7", "连续7轮无改善则停止"],
         ["梯度与精度", "clip=1.0；AMP", "抑制异常梯度并降低显存"],
-        ["保存策略", "验证最优top-3", "最终LOMO采用seed 0；多seed仍待补"],
+        ["保存策略", "验证最优top-3", "LOMO采用seed 0；最终all-market采用预注册三seed固定等权集成"],
     ], [37 * mm, 58 * mm, 79 * mm]))
 
     chapter(story, "5", "比较方法：XGBoost与其他基线",
@@ -1009,7 +1150,7 @@ def build_story() -> list:
     story.append(styled_table([
         ["方法", "基线类型", "主要用途", "与最终系统的关系"],
         ["lag-168 Seasonal", "周季节复制", "检验模型是否超过最简单的周周期规律", "四市场零样本预测的统一底线"],
-        ["cutoff-safe LEAR", "稀疏线性电价模型", "提供经典统计学习参照", "仅用于适用的日前任务"],
+        ["cutoff-safe LEAR", "稀疏线性电价模型", "提供经典日级统计学习参照", "用于DA/RT-at-DA；不强行扩展滚动RT"],
         ["GRU", "轻量神经序列模型", "区分Transformer收益是否来自注意力结构", "历史单节点对照"],
         ["pooled LOMO XGBoost", "源市场树模型", "同训练数据公平对照", "Transformer胜9/12项MAE，收益未胜"],
         ["逐节点XGBoost", "目标市场监督树模型", "提供实际监督强上界", "15节点共780个任务/时距回归器"],
@@ -1362,8 +1503,16 @@ def build_story() -> list:
         "risk",
     ))
 
-    chapter(story, "11", "结论与后续工作",
-            "多节点阶段可以作为基础设施与验证协议收尾，但科学结论必须保留盈利稳定性和公平对照上的缺口。")
+    chapter(
+        story,
+        "11",
+        "结论与后续工作",
+        (
+            "2025一次性锁定测试已经完成：预测精度优势成立，但预注册盈利主终点未胜出。"
+            if locked_2025 is not None else
+            "多节点阶段可以作为基础设施与验证协议收尾，但科学结论必须保留盈利稳定性和公平对照上的缺口。"
+        ),
+    )
     story.append(H2("11.1 已经完成"))
     story.append(bullets([
         "四市场64节点数据合同、时区、DST、字段完整性和哈希审计。",
@@ -1377,6 +1526,12 @@ def build_story() -> list:
         "五套系统统一尾部诊断：负价、最高/最低1%、极端DA-RT价差及同合同收益分解。",
         "历史单节点、带ID、经济状态头和失败实验均保留，可追溯而未混入最终零样本口径。",
     ]))
+    if locked_2025 is not None:
+        story.append(bullets([
+            "四市场2020—2024最终训练、三seed固定集成和2025一次性未污染测试。",
+            "2025四市场三任务、11套预测系统、ERCOT 11套完整结算系统及受限先知诊断参照。",
+            "129个预测/盈利档案和最终归档逐文件哈希审计；2025结果不再用于模型选择。",
+        ]))
     if locked_2025 is None:
         story.append(H2("11.2 最终闭环状态与剩余环节"))
         story.append(styled_table([
@@ -1408,12 +1563,34 @@ def build_story() -> list:
     else:
         story.append(H2("11.2 2025一次性锁定测试"))
         story.append(P(
-            "下表由锁定汇总JSON自动生成。MAE为四个市场节点宏平均后的市场平均；盈利仅报告具有真实冻结结算合同的ERCOT，"
-            "单位为USD/节点·日。每列最佳可部署系统加粗，Oracle仅作为受限先知上界。"
+            "下表由锁定汇总JSON自动生成。MAE为四个市场节点宏平均后的市场平均。ERCOT是当前唯一具有冻结结算合同的市场；"
+            "收益单位为USD/节点·日。每列在该指标上有结果的方法中，最佳值加粗。受限先知参照只是在相同分层LP/MPC中把价格预测替换为真实价格，"
+            "不是对所有联合DA/RT策略做全时域一次优化，因此不是严格数学上界。"
         ))
         story.append(styled_table(
             locked_2025_comparison_rows(locked_2025),
             [39 * mm, 25 * mm, 29 * mm, 29 * mm, 28 * mm, 24 * mm],
+        ))
+        story.append(P(
+            "LEAR是cutoff-safe日级稀疏线性基线，只覆盖DA与RT-at-DA：8个市场—任务单元中LEAR胜5项、"
+            "Transformer胜3项，两任务宏平均分别为12.83和12.80 USD/MWh。由于LEAR没有逐小时rolling RT，"
+            "本报告不把它与其他模型临时拼成未预注册的三任务盈利系统。‘12/12’只表示Transformer相对六个覆盖"
+            "全部三任务的基线逐项更低，不能扩写为胜过包括LEAR在内的所有基线。"
+        ))
+        final_derived = locked_2025["ercot_settlement_derived"]
+        dlinear_2025 = final_derived["da_dlinear__rt_at_da_dlinear__rt_dlinear"]
+        per_node_2025 = final_derived[
+            "da_per_node_xgboost__rt_at_da_per_node_xgboost__rt_per_node_xgboost"
+        ]
+        timesfm25_2025 = final_derived[
+            "da_timesfm25__rt_at_da_timesfm25__rt_timesfm25"
+        ]
+        story.append(P(
+            f"完整盈利排序与MAE排序不同：DLinear为{dlinear_2025['macro_mean_daily_revenue']:.2f}，"
+            f"逐节点XGBoost为{per_node_2025['macro_mean_daily_revenue']:.2f}，"
+            f"TimesFM-2.5 LoRA为{timesfm25_2025['macro_mean_daily_revenue']:.2f}，"
+            "均高于Transformer固定集成。TimesFM-3虽是大型frozen基础模型，但完整系统收益为负。"
+            "这些结果说明模型规模与平均预测误差均不能替代同合同利润评价。"
         ))
         profit = locked_2025_profit_evidence(locked_2025)
         story.append(H2("11.3 预注册盈利主终点"))
@@ -1452,9 +1629,41 @@ def build_story() -> list:
              f"{pooled_settlement['worst_node_mean_daily_revenue']:.2f}"],
             ["正收益日比例", f"{100 * transformer_settlement['macro_positive_day_rate']:.1f}%",
              f"{100 * pooled_settlement['macro_positive_day_rate']:.1f}%"],
-            ["受限先知收益占比", f"{100 * profit['transformer']['fraction_of_oracle']:.1f}%",
+            ["相对受限先知参照（非上界）", f"{100 * profit['transformer']['fraction_of_oracle']:.1f}%",
              f"{100 * profit['comparator']['fraction_of_oracle']:.1f}%"],
         ], [68 * mm, 53 * mm, 53 * mm]))
+        story.append(callout(
+            "为什么有系统会超过受限先知参照？",
+            "该参照使用完美价格输入，但仍沿用分层DA计划和逐小时RT修正；其DA目标、RT修正和偏差罚金没有被一个全时域联合优化器同时最小化。"
+            "因此它用于诊断预测误差，并不构成净收益上界。pooled XGBoost超过100%不表示超过理论最优。",
+            "info",
+        ))
+
+        ensemble_tail = locked_2025["markets"]["ERCOT"]["systems"]["transformer_ensemble"]
+        pooled_tail = locked_2025["markets"]["ERCOT"]["systems"]["pooled_xgboost"]
+        story.append(H2("11.4 为什么MAE更低但盈利更低"))
+        story.append(styled_table([
+            ["2025 ERCOT诊断", "Transformer固定集成", "pooled XGBoost", "较优方向"],
+            ["DA MAE", f"{ensemble_tail['da']['all']['mae']:.2f}",
+             f"{pooled_tail['da']['all']['mae']:.2f}", "Transformer"],
+            ["RT-at-DA MAE", f"{ensemble_tail['rt_at_da']['all']['mae']:.2f}",
+             f"{pooled_tail['rt_at_da']['all']['mae']:.2f}", "Transformer"],
+            ["滚动RT MAE", f"{ensemble_tail['rt']['all']['mae']:.2f}",
+             f"{pooled_tail['rt']['all']['mae']:.2f}", "Transformer"],
+            ["DA-RT方向准确率", f"{100 * ensemble_tail['da_rt_at_da_spread']['all']['direction_accuracy']:.1f}%",
+             f"{100 * pooled_tail['da_rt_at_da_spread']['all']['direction_accuracy']:.1f}%", "Transformer"],
+            ["极端1%价差幅度保留", f"{100 * ensemble_tail['da_rt_at_da_spread']['abs_spread_top_1pct']['magnitude_ratio']:.2f}%",
+             f"{100 * pooled_tail['da_rt_at_da_spread']['abs_spread_top_1pct']['magnitude_ratio']:.2f}%", "均明显不足"],
+            ["DA计划收益分量", f"{transformer_settlement['macro_mean_daily_revenue_components']['da_leg']:.2f}",
+             f"{pooled_settlement['macro_mean_daily_revenue_components']['da_leg']:.2f}", "pooled XGBoost"],
+            ["最终日均净收益", f"{profit['transformer']['macro_mean_daily_revenue']:.2f}",
+             f"{profit['comparator']['macro_mean_daily_revenue']:.2f}", "pooled XGBoost"],
+        ], [56 * mm, 42 * mm, 42 * mm, 34 * mm]))
+        story.append(P(
+            "Transformer降低了全样本平均价格误差，也略提高了总体价差方向准确率；但两套系统在极端1%价差上都只保留约1.3%的真实幅度。"
+            "盈利差主要出现在DA计划收益分量：Transformer为51.64，pooled XGBoost为72.35 USD/节点·日。"
+            "这说明均匀逐小时MAE没有充分衡量少数高价值时段的排序、幅度和动作后果。该解释只用于理解失败机制，不用于2025后回选模型。"
+        ))
         stability = locked_2025["ercot_transformer_seed_stability"]
         story.append(styled_table([
             ["Transformer盈利稳定性", "seed 0", "seed 1", "seed 2", "均值±样本标准差", "固定集成"],
@@ -1463,7 +1672,7 @@ def build_story() -> list:
              f"{stability['mean']:.2f} ± {stability['sample_std']:.2f}",
              f"{stability['fixed_ensemble']:.2f}"],
         ], [38 * mm, 22 * mm, 22 * mm, 22 * mm, 43 * mm, 27 * mm]))
-        story.append(H2("11.4 最终停止规则"))
+        story.append(H2("11.5 最终停止规则"))
         story.append(callout(
             "实验已经闭环",
             "2025只按预注册协议评价一次，selection_allowed=false。该结果用于确定论文能够支持的主张强度，"
@@ -1499,10 +1708,10 @@ def build_story() -> list:
         ["TimesFM-2.5 LoRA对照", "data/results/universal_lomo_timesfm25_lora_v1/*.json"],
         ["统一尾部与盈利诊断", "data/results/tail_profit_diagnostics_v1/tail_profit_diagnostics.json"],
         ["2025盈利分析预注册", "data/results/allmarket_final_2025_profit_analysis_preregistration_v1/protocol.json"],
-        ["最终2025统一汇总", "data/results/allmarket_locked_2025_summary_v2.json（完成后自动纳入本报告）"],
-        ["最终盈利主张审计", "data/results/allmarket_locked_2025_profit_claim_audit_v1.json（完成后生成）"],
+        ["最终2025统一汇总", "data/results/allmarket_locked_2025_summary_v2.json"],
+        ["最终盈利主张审计", "data/results/allmarket_locked_2025_profit_claim_audit_v1.json"],
         ["历史经济状态头", "data/results/global_economic_regime_multiseed_continuous_mpc_v1.json"],
-        ["最终口径文档", "docs/progress/46_多节点结果口径修订与无ID通用模型路线.md"],
+        ["最终口径文档", "docs/progress/54_2025一次性锁定测试最终结论.md"],
     ], [48 * mm, 126 * mm]))
     story.append(H2("12.3 当前架构图"))
     story.append(P(
@@ -1529,14 +1738,23 @@ def build_story() -> list:
     story.append(styled_table([
         ["表述", "是否允许", "严谨写法"],
         ["模型实现了四市场零样本预测", "允许", "在四折LOMO与当前字段合同下，12/12优于lag-168"],
-        ["模型稳定击败XGBoost", "不允许", "2023点估计领先且区间跨0；2024冻结检查显著落后"],
+        ["模型稳定击败XGBoost", "不允许", (
+            "2025固定集成比pooled XGBoost少16.39 USD/节点·日，配对区间整体低于0"
+            if locked_2025 is not None else
+            "2023点估计领先且区间跨0；2024冻结检查显著落后"
+        )],
         ["经济状态头是最终无ID模型组成", "不允许", "它是历史带ID ERCOT上界实验"],
         ["三模型联合训练", "当前不允许", "当前三模型独立训练，只在LP/MPC决策层联合"],
         ["CAISO/NYISO/PJM盈利领先", "不允许", "三市场目前只有预测层零样本证据"],
         ["2025是最终测试", "允许" if locked_2025 is not None else "尚不允许",
          "已按冻结协议一次性评价且不得回选" if locked_2025 is not None else "2025仍锁定、未评价"],
         ["F1/F0已在四市场完整消融", "不允许", "完整消融来自早期单节点Huber阶段"],
-        ["Transformer全面优于TimesFM", "不允许", "多数DA/RT-at-DA占优；TimesFM-3在四个滚动RT任务上更准"],
+        ["Transformer全面优于TimesFM", "不允许", (
+            "2025的12项MAE逐项更低，但TimesFM-2.5盈利点估计更高；预测与经济结论须分开"
+            if locked_2025 is not None else
+            "多数DA/RT-at-DA占优；TimesFM-3在四个滚动RT任务上更准"
+        )],
+        ["受限先知参照是理论盈利上界", "不允许", "它复用分层LP/MPC，不是全时域联合最优；仅作诊断参照"],
     ], [62 * mm, 28 * mm, 84 * mm]))
 
     chapter(story, "参考文献", "方法来源与实验规范")
@@ -1561,10 +1779,573 @@ def build_story() -> list:
     return story
 
 
+def build_academic_story() -> list:
+    """按学术论文逻辑组织现有证据；旧的逐阶段技术报告保留在build_story中供追溯。"""
+    locked = load_json("data/results/allmarket_locked_2025_summary_v2.json")
+    profit = locked_2025_profit_evidence(locked)
+
+    lomo: dict[tuple[str, str], float] = {}
+    for task_dir, task in (
+        ("universal_lomo_da_v1", "DA"),
+        ("universal_lomo_rt_at_da_v1", "RT-at-DA"),
+        ("universal_lomo_rt_v1", "滚动RT"),
+    ):
+        for path in sorted((ROOT / "data" / "results" / task_dir).glob("*.json")):
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            assert payload["uses_node_id_for_prediction"] is False
+            assert payload["uses_market_id_for_prediction"] is False
+            assert payload["normalization_mode"] == "context_robust"
+            lomo[(payload["holdout_market"], task)] = float(payload["node_macro_mae"])
+
+    seasonal = {
+        ("CAISO", "DA"): 20.20, ("CAISO", "RT-at-DA"): 23.28, ("CAISO", "滚动RT"): 23.30,
+        ("ERCOT", "DA"): 47.99, ("ERCOT", "RT-at-DA"): 50.60, ("ERCOT", "滚动RT"): 50.72,
+        ("NYISO", "DA"): 12.28, ("NYISO", "RT-at-DA"): 16.17, ("NYISO", "滚动RT"): 16.17,
+        ("PJM", "DA"): 10.10, ("PJM", "RT-at-DA"): 13.00, ("PJM", "滚动RT"): 12.99,
+    }
+    profit23 = load_json("data/results/universal_lomo_ercot_profit_continuous_mpc_v1.json")
+    profit24 = load_json("data/results/universal_lomo_ercot_outer_frozen_continuous_mpc_v1.json")
+    key_u = "da_universal__rt_at_da_universal__rt_universal"
+    key_x = "da_xgboost_robust__rt_at_da_xgboost_robust__rt_xgboost_robust"
+    u23, x23 = profit23["systems"][key_u], profit23["systems"][key_x]
+    u24, x24 = profit24["systems"][key_u], profit24["systems"][key_x]
+    final_derived = locked["ercot_settlement_derived"]
+    transformer_label = "da_ensemble__rt_at_da_ensemble__rt_ensemble"
+    pooled_label = "da_pooled_xgboost__rt_at_da_pooled_xgboost__rt_pooled_xgboost"
+    transformer_settlement = locked["ercot_settlement"]["systems"][transformer_label]
+    pooled_settlement = locked["ercot_settlement"]["systems"][pooled_label]
+
+    story: list = []
+
+    # Title page: intentionally restrained, matching an academic manuscript rather than a presentation.
+    story.append(Spacer(1, 45 * mm))
+    story.append(P("多市场无 ID 电价预测<br/>及其储能双结算价值评估", "title"))
+    story.append(Spacer(1, 7 * mm))
+    story.append(HRFlowable(width="48%", thickness=0.8, color=NAVY,
+                            spaceBefore=0, spaceAfter=7 * mm, hAlign="CENTER"))
+    story.append(P("跨市场迁移、预测-优化解耦与一次性时间外检验", "subtitle"))
+    story.append(Spacer(1, 18 * mm))
+    story.append(P("研究论文", "subtitle"))
+    story.append(P("2026年10月19日", "subtitle"))
+    story.append(PageBreak())
+
+    story.append(H1("摘要"))
+    story.append(P(
+        "本文研究多市场电价预测能否在严格信息边界下迁移，并进一步转化为电池储能的日前-实时双结算收益。"
+        "针对日前价格、日前时点实时价格和交付日滚动实时价格，构建三个互不共享参数的无身份Transformer。"
+        "模型使用168小时多流历史与起报时已知日历，不读取node_id或market_id；价格预测随后进入日前线性规划和"
+        "逐小时模型预测控制，真实价格仅用于事后结算。研究先以四折留一市场协议检验零样本迁移，再冻结结构、"
+        "损失、随机种子、集成和比较协议，使用四市场2020-2024数据训练，并对2025只评价一次。"
+    ))
+    story.append(P(
+        "结果显示，相对六个覆盖全部三任务的基线，固定三seed Transformer集成在2025四市场×三任务的12个预测"
+        "单元中均取得更低MAE；但只覆盖DA与RT-at-DA的LEAR在8个日级市场-任务单元中胜5项，Transformer胜3项，"
+        "两任务宏平均总体接近。预注册经济主终点未通过：ERCOT 2025中Transformer日均净收益为28.04 USD/节点·日，"
+        "低于同数据pooled XGBoost的44.43；差值为-16.39，7日块Bootstrap 95%区间为[-23.19, -10.05]。"
+        "进一步分析表明，平均价格误差的下降没有修复极端价差幅度收缩，DA计划收益不足是经济落后的主要来源。"
+        "因此，本文支持无身份统一预测和跨市场迁移的有效性，但不支持其具有更高储能利润。"
+    ))
+    story.append(P(
+        "关键词：电价预测；跨市场迁移；Transformer；时序基础模型；储能套利；模型预测控制；双结算",
+        "small",
+    ))
+    story.append(Spacer(1, 4 * mm))
+    story.append(styled_table([
+        ["研究层面", "主要问题", "核心证据", "结论"],
+        ["迁移", "未见市场是否可预测", "四折LOMO，12项均优于lag-168", B("成立")],
+        ["部署预测", "冻结后是否保持精度", "2025相对六个完整基线12/12更低MAE", B("成立")],
+        ["日级强基线", "是否全面优于LEAR", "LEAR胜5/8，Transformer胜3/8", "总体接近"],
+        ["经济价值", "是否优于公平XGBoost", "28.04 vs 44.43；区间低于0", B("不成立")],
+    ], [30 * mm, 52 * mm, 62 * mm, 30 * mm]))
+    story.append(P("表1  研究问题、证据与最终结论。加粗表示明确成立或不成立的预注册判断。", "caption"))
+
+    story.append(PageBreak())
+    story.append(H1("目录"))
+    toc = TableOfContents()
+    toc.levelStyles = [S["toc1"], S["toc2"]]
+    story.append(toc)
+
+    chapter(story, "1", "引言",
+            "研究重点不是单独降低预测误差，而是检验跨市场预测能否在可执行约束下形成稳定经济价值。")
+    story.append(H2("1.1 研究背景"))
+    story.append(P(
+        "日前与实时电价具有尖峰、负价、制度差异和强时变性，跨市场建模因而同时面临分布漂移与信息可用性约束[1,2]。"
+        "对储能而言，预测误差并不等价于经济损失：同样的MAE可能发生在低价值普通小时，也可能改变尖峰时段的"
+        "充放电方向。若不把预测放入统一的SOC、效率、退化与偏差罚金合同，无法判断模型是否真正改善业务目标。"
+    ))
+    story.append(H2("1.2 研究问题"))
+    story.append(styled_table([
+        ["编号", "研究问题", "验证设计"],
+        ["RQ1", "无节点/市场身份输入的模型能否迁移到完全未见市场？", "四折Leave-One-Market-Out零样本评价"],
+        ["RQ2", "共同训练后能否在冻结年份维持统一预测能力？", "四市场2020-2024训练，2025一次性评价"],
+        ["RQ3", "更低预测误差能否转化为更高储能净收益？", "相同LP/MPC、双结算和配对收益检验"],
+        ["RQ4", "若利润未改善，失败主要发生在哪个预测或决策环节？", "尾部价差、收益分量、跨年与多seed诊断"],
+    ], [20 * mm, 82 * mm, 72 * mm]))
+    story.append(P("表2  本文研究问题与对应验证设计。", "caption"))
+    story.append(H2("1.3 主要贡献"))
+    story.append(bullets([
+        "建立严格区分DA、RT-at-DA与rolling RT信息时点的三任务预测协议，避免未来真实负荷、风光和价格泄漏。",
+        "提出不读取node_id/market_id、只依赖样本历史窗口稳健归一化的多流Transformer，用LOMO检验未见市场迁移。",
+        "同时纳入TimesFM、XGBoost、DLinear、LEAR和lag-168，明确区分同训练数据公平基线、目标市场监督强基线和部分任务基线。",
+        "把所有完整三任务预测送入同一DA LP、rolling RT MPC和双结算账本，以净收益而非MAE作为经济主终点。",
+        "执行预注册的一次性2025时间外检验，并保留经济目标未达成的负结果及其尾部机制解释。",
+    ]))
+    story.append(H2("1.4 论文结构"))
+    story.append(P(
+        "第2节综述相关研究；第3节给出问题定义；第4节说明数据与实验协议；第5节介绍方法；第6节定义比较系统；"
+        "第7节报告主结果；第8节给出消融与稳健性；第9节讨论局限和含义；第10节总结。工程路径、历史路线和节点"
+        "清单移至附录，避免打断主论证。"
+    ))
+
+    chapter(story, "2", "相关工作与研究定位",
+            "本文将电价预测、跨市场迁移与储能决策放在同一个可审计实验框架中。")
+    story.append(H2("2.1 电价预测与跨市场泛化"))
+    story.append(P(
+        "电价预测研究已形成以统计模型、树模型和深度神经网络为代表的技术体系[1,2]。LEAR提供经典稀疏线性日级"
+        "参照，XGBoost通过梯度提升建模非线性交互[5]，Transformer则利用注意力处理长历史依赖[3]。本文关注的"
+        "区别不是单一市场内拟合，而是模型在不读取市场身份、且目标市场完全不参与训练时的迁移能力。"
+    ))
+    story.append(H2("2.2 时序基础模型"))
+    story.append(P(
+        "预训练时序基础模型试图通过大规模序列学习获得通用预测能力[10]。本文同时评价frozen TimesFM-3和源市场"
+        "监督适配的TimesFM-2.5 LoRA，并保持168小时上下文、预测范围和起报边界一致。该比较回答完整系统在统一"
+        "协议下的表现，不把差异简单归因于模型规模或某个单一模块。"
+    ))
+    story.append(H2("2.3 预测与储能决策"))
+    story.append(P(
+        "储能套利必须同时考虑日前计划、实时修正、SOC、效率和循环退化[6-8]。早期项目也测试过零阶利润联合"
+        "训练[9]，但在噪声、非光滑动作和跨时段信用分配下未获得稳定提升。故最终系统采用可审计的模块化"
+        "预测-优化框架：神经网络学习价格，LP/MPC保证动作可行，利润仅作为最终评价。"
+    ))
+    story.append(callout(
+        "研究定位",
+        "本文不主张提出新的通用Transformer算子；贡献在于严格的无ID迁移协议、三任务信息合同、完整基线体系、"
+        "可执行双结算评价，以及对‘预测更准但利润更低’这一负结果的机制分析。",
+        "info",
+    ))
+
+    chapter(story, "3", "问题定义",
+            "三个预测任务对应三个不同的信息集合，并在决策层而不是参数层联合。")
+    story.append(H2("3.1 三个预测任务"))
+    story.append(styled_table([
+        ["任务", "起报时点", "预测输出", "合法附加信息", "决策用途"],
+        ["DA", "交付日前一日", "目标日24小时DA价", "目标日8维日历", "生成日前计划"],
+        ["RT-at-DA", "与DA完全相同", "目标日24小时RT预期", "目标日8维日历", "估计DA-RT价差"],
+        ["rolling RT", "交付日每小时", "未来4小时RT价", "已公布DA价与日历", "逐小时修正动作"],
+    ], [25 * mm, 34 * mm, 39 * mm, 38 * mm, 38 * mm]))
+    story.append(P("表3  三个预测任务的信息集合与决策用途。", "caption"))
+    story.append(H2("3.2 预测-决策-结算链"))
+    story.append(system_architecture())
+    story.append(P("图1  三个独立价格预测器与统一DA LP、RT MPC和双结算层。", "caption"))
+    story.append(P(
+        "三个Transformer不共享参数、优化器或checkpoint。DA与RT-at-DA的24小时预测共同进入日前LP；rolling RT"
+        "每小时进入4小时MPC且只执行第一个动作。最终利润不会反向更新Transformer，因此本文模型不是端到端利润模型。"
+    ))
+    story.append(H2("3.3 电池与双结算目标"))
+    story.append(equation(
+        "R = Σ<sub>t</sub>[p<sup>DA</sup><sub>t</sub>u<sup>DA</sup><sub>t</sub> + "
+        "p<sup>RT</sup><sub>t</sub>(u<sup>RT</sup><sub>t</sub>-u<sup>DA</sup><sub>t</sub>) "
+        "- κ·throughput<sub>t</sub>] - P<sub>dev</sub>"
+    ))
+    story.append(equation(
+        "P<sub>dev</sub> = Σ<sub>t</sub>2|p<sup>RT</sup><sub>t</sub>·max(|u<sup>RT</sup><sub>t</sub>-u<sup>DA</sup><sub>t</sub>| "
+        "- 0.03|u<sup>DA</sup><sub>t</sub>|, 0)"
+    ))
+    story.append(styled_table([
+        ["参数", "冻结值", "参数", "冻结值"],
+        ["功率/容量", "1 MW / 4 MWh", "SOC范围", "0.4-3.6 MWh"],
+        ["初始SOC", "2 MWh", "充/放效率", "0.95 / 0.95"],
+        ["每日放电上限", "4 MWh", "吞吐成本κ", "5.7 USD/MWh"],
+        ["偏差容忍带", "3%×|DA动作|", "超限罚金", "2×|RT价|×超限量"],
+    ], [37 * mm, 50 * mm, 37 * mm, 50 * mm]))
+    story.append(P("表4  ERCOT储能与结算合同。", "caption"))
+    story.append(H2("3.4 评价假设"))
+    story.append(bullets([
+        "预测假设：更低MAE表示更准确的价格估计，但不预设其必然提高利润。",
+        "迁移假设：若LOMO结果稳定优于lag-168，则模型学习到超越身份查找表的跨市场规律。",
+        "经济假设：只有同日配对收益差为正且7日块Bootstrap 95%区间下界大于0，才称稳定盈利胜出。",
+    ]))
+
+    chapter(story, "4", "数据与实验协议",
+            "训练、验证、冻结测试和结算评价在不同层级上回答不同研究问题。")
+    story.append(H2("4.1 数据范围"))
+    story.append(styled_table([
+        ["市场", "节点数", "主要价格", "统一频率", "最终用途"],
+        ["CAISO", "3", "DA / RT", "小时", "训练、LOMO、2025预测"],
+        ["ERCOT", "15", "DA / RT", "小时", "训练、LOMO、2025预测与盈利"],
+        ["NYISO", "11", "DA / RT", "小时", "训练、LOMO、2025预测"],
+        ["PJM", "35", "DA / RT", "小时", "训练、LOMO、2025预测"],
+        ["合计", B("64"), "价格+负荷+风光+日历", "小时", "市场-节点平衡采样"],
+    ], [28 * mm, 23 * mm, 49 * mm, 28 * mm, 46 * mm]))
+    story.append(P("表5  四市场数据范围。", "caption"))
+    story.append(H2("4.2 输入与防泄漏"))
+    story.append(P(
+        "每个样本使用168小时历史DA、RT、负荷、风电、光伏和日历。目标日历包含小时、星期、月份及周期编码，"
+        "它在起报时已知，不含未来价格或负荷。最终网络不读取node_id/market_id；归一化仅使用当前历史窗口的"
+        "中位数和MAD。市场与节点ID只用于平衡采样、结果汇总、SOC隔离和审计。"
+    ))
+    story.append(H2("4.3 两级验证协议"))
+    story.append(protocol_diagram())
+    story.append(P("图2  LOMO迁移验证与all-market 2025锁定测试的关系。", "caption"))
+    story.append(styled_table([
+        ["协议", "训练数据", "评价数据", "回答问题", "是否允许选模"],
+        ["四折LOMO", "3个源市场2020-2022", "第4市场2023", "未见市场迁移", "仅限开发期"],
+        ["ERCOT冻结检查", "保持LOMO checkpoint", "ERCOT 2024", "跨年稳定性", "否"],
+        ["all-market最终测试", "四市场2020-2024", "四市场2025", "最终部署能力", B("否，只评价一次")],
+    ], [35 * mm, 45 * mm, 35 * mm, 36 * mm, 23 * mm]))
+    story.append(P("表6  数据划分和选择边界。", "caption"))
+    story.append(H2("4.4 指标与统计"))
+    story.append(bullets([
+        "预测：节点等权MAE、RMSE、偏差、负价识别、尖峰召回、价差方向与幅度。",
+        "经济：节点等权日均净收益、DA/RT收益分量、退化成本、偏差罚金、最大回撤和最差节点。",
+        "稳健性：三seed、不挑最高seed、去最高5/10日、同日配对7日块Bootstrap。",
+        "主张边界：CAISO、NYISO、PJM未冻结完整结算合同，只报告预测和尾部指标。",
+    ]))
+
+    chapter(story, "5", "方法",
+            "模型负责预测价格，优化器负责生成满足物理与市场约束的动作。")
+    story.append(H2("5.1 无身份多流Transformer"))
+    story.append(model_architecture("da"))
+    story.append(P("图3  以DA为例的无ID多流Transformer；RT-at-DA和rolling RT复用骨干接口但参数独立。", "caption"))
+    story.append(P(
+        "价格、负荷、风光、系统量与日历先独立编码，连续时间流使用两层Transformer和RoPE[3,4]；融合后形成"
+        "168小时Memory，再由24个或4个目标Query读取与目标小时相关的表示。模型宽度为128，注意力头数为4，"
+        "前馈层宽度为512，dropout为0.1。"
+    ))
+    story.append(H2("5.2 任务专属融合与损失"))
+    story.append(styled_table([
+        ["任务", "融合结构", "损失", "选择理由"],
+        ["DA", "F1来源注意力", "MAE", "跨来源关系对日级计划有用"],
+        ["RT-at-DA", "F0残差MLP", "Pseudo-Huber", "结构简单且对尖峰梯度更稳健"],
+        ["rolling RT", "F1来源注意力", "MAE", "滚动窗口需要动态来源交互"],
+    ], [31 * mm, 42 * mm, 36 * mm, 65 * mm]))
+    story.append(P("表7  最终三个预测器的冻结结构与训练损失。", "caption"))
+    story.append(P(
+        "F0先拼接同小时来源表示，再用残差MLP融合；F1用来源注意力学习来源关系。MAE是平均绝对误差；"
+        "Pseudo-Huber在零点附近平滑、对大误差近似线性。二者是价格训练代理，不是利润函数。"
+    ))
+    story.append(H2("5.3 训练与集成"))
+    story.append(styled_table([
+        ["项目", "冻结设置", "项目", "冻结设置"],
+        ["优化器", "AdamW", "初始学习率", "2×10^-4"],
+        ["权重衰减", "0.01", "batch/epoch", "16 / 最多20"],
+        ["早停", "patience=7", "调度器", "ReduceLROnPlateau"],
+        ["选模", "节点MAE→市场宏平均", "随机种子", "0、1、2"],
+        ["最终集成", "三seed逐点等权", "禁止项", "不按2025或利润挑seed"],
+    ], [34 * mm, 53 * mm, 34 * mm, 53 * mm]))
+    story.append(P("表8  最终训练和集成设置。", "caption"))
+    story.append(H2("5.4 DA LP与rolling RT MPC"))
+    story.append(P(
+        "日前LP同时读取DA和RT-at-DA预测，在功率、SOC、效率与日循环约束下确定24小时计划；实时MPC每小时"
+        "读取rolling RT预测、已锁定DA计划和当前SOC，求解4小时窗口并只执行首个动作。真实价格不参与动作生成。"
+        "这种模块化设计便于审计和任务级诊断，也避免把不稳定的求解器梯度和非光滑门控强行传播至预测器。"
+    ))
+
+    chapter(story, "6", "比较方法",
+            "基线按其训练数据、任务覆盖范围和是否能形成完整盈利系统分类。")
+    story.append(H2("6.1 基线体系"))
+    story.append(styled_table([
+        ["方法", "类型", "训练边界", "任务覆盖", "在本文中的作用"],
+        ["lag-168", "周季节复制", "无需训练", "三任务", "最简单周期底线"],
+        ["DLinear", "简单深度模型", "四市场监督", "三任务", "检验复杂注意力必要性"],
+        ["TimesFM-3", "frozen基础模型", "不使用项目标签", "三任务", "检验预训练迁移"],
+        ["TimesFM-2.5", "LoRA基础模型", "源市场监督适配", "三任务", "检验监督适配"],
+        ["pooled XGBoost", "共享树模型", "与Transformer同数据", "三任务", "主要公平对照"],
+        ["逐节点XGBoost", "本地树模型组", "看过目标节点历史", "三任务", "实际监督强基线"],
+        ["LEAR", "稀疏线性模型", "看过目标节点历史", "DA/RT-at-DA", "日级经典强基线"],
+    ], [31 * mm, 31 * mm, 42 * mm, 30 * mm, 40 * mm]))
+    story.append(P("表9  比较方法的角色与覆盖范围。", "caption"))
+    story.append(H2("6.2 XGBoost系统的准确含义"))
+    story.append(P(
+        "逐节点XGBoost不是一个模型，而是由节点、任务和预测时距专属回归器构成的系统；每个回归器内部又包含180棵"
+        "提升树。各节点只调用自己的模型组，再把全节点三任务预测送入同一LP/MPC。pooled XGBoost则在源市场合并"
+        "训练，用于与无ID Transformer做同数据比较。两者不可混称。"
+    ))
+    story.append(H2("6.3 LEAR的比较边界"))
+    story.append(callout(
+        "部分任务基线",
+        "LEAR已完成四市场DA与RT-at-DA共8项，但其标准定义不覆盖逐小时4小时rolling RT。因此LEAR进入日级"
+        "预测表，不计入完整三任务的12项比较，也不与另一模型临时拼成未预注册盈利系统。",
+        "risk",
+    ))
+
+    chapter(story, "7", "实验结果",
+            "主结果依次回答零样本迁移、最终预测性能和预注册经济终点。")
+    story.append(H2("7.1 四折LOMO零样本迁移"))
+    lomo_rows = [["留出市场", "任务", "Transformer MAE", "lag-168 MAE", "相对改善"]]
+    for market in ("CAISO", "ERCOT", "NYISO", "PJM"):
+        for task in ("DA", "RT-at-DA", "滚动RT"):
+            value, base = lomo[(market, task)], seasonal[(market, task)]
+            gain = 100.0 * (base - value) / base
+            lomo_rows.append([market, task, B(f"{value:.2f}"), f"{base:.2f}", f"{gain:+.1f}%"])
+    story.append(styled_table(lomo_rows, [30 * mm, 32 * mm, 40 * mm, 36 * mm, 36 * mm],
+                              alignments={2: "RIGHT", 3: "RIGHT", 4: "RIGHT"}))
+    story.append(P(
+        "表10  2023四折LOMO节点等权MAE（USD/MWh）。每一折完全留出一个市场，12项均优于lag-168。",
+        "caption",
+    ))
+    story.append(P(
+        "LOMO结果说明模型在不读取市场或节点身份时仍学到了可迁移的价格规律，但不能外推为任意市场普适，也不能"
+        "由MAE直接推断利润。最终部署性能必须由独立all-market 2025协议回答。"
+    ))
+    story.append(H2("7.2 2025四市场预测与ERCOT盈利"))
+    story.append(styled_table(
+        locked_2025_comparison_rows(locked),
+        [39 * mm, 25 * mm, 29 * mm, 29 * mm, 28 * mm, 24 * mm],
+    ))
+    story.append(P(
+        "表11  2025四市场宏平均MAE与ERCOT日均净收益。每列在有结果的方法中加粗最优值；受限先知参照不是理论上界。",
+        "caption",
+    ))
+    story.append(P(
+        "相对六个覆盖全部三任务的基线，Transformer在12个市场-任务单元中均取得更低MAE。LEAR只覆盖两个日级"
+        "任务：8项中LEAR胜5项、Transformer胜3项；二者两任务宏平均分别为12.83和12.80 USD/MWh，整体接近。"
+        "完整盈利排序与MAE排序不同，DLinear和逐节点XGBoost的收益均高于Transformer。"
+    ))
+    story.append(H3("7.2.1 各市场预测误差完整比较"))
+    story.append(P(
+        "为避免四市场宏平均掩盖单一市场差异，下列三表给出所有已完成基线的逐市场节点等权MAE。"
+        "每列最低误差加粗；LEAR只出现在其标准协议覆盖的DA与RT-at-DA任务。"
+    ))
+    for task, label, suffix in (
+        ("da", "DA", "A"),
+        ("rt_at_da", "RT-at-DA", "B"),
+        ("rt", "rolling RT", "C"),
+    ):
+        story.append(styled_table(
+            locked_2025_market_task_rows(locked, task),
+            [43 * mm, 24 * mm, 24 * mm, 24 * mm, 24 * mm, 35 * mm],
+            alignments={1: "RIGHT", 2: "RIGHT", 3: "RIGHT", 4: "RIGHT", 5: "RIGHT"},
+        ))
+        story.append(P(
+            f"表11{suffix}  2025四市场{label}节点等权MAE（USD/MWh）；加粗为各列最优值。",
+            "caption",
+        ))
+    story.append(P(
+        "完整逐市场结果表明，Transformer对六个覆盖三任务的基线在12个市场-任务单元中均保持最低MAE；"
+        "但加入只覆盖日级任务的LEAR后，DA与RT-at-DA共8个单元中LEAR胜5项，因此不能表述为全面胜过所有基线。"
+    ))
+    story.append(H2("7.3 预注册经济主终点"))
+    story.append(styled_table([
+        ["主系统", "公平对照", "收益差", "7日块95%区间", "预注册判定"],
+        [f"Transformer {profit['transformer']['macro_mean_daily_revenue']:.2f}",
+         f"pooled XGBoost {profit['comparator']['macro_mean_daily_revenue']:.2f}",
+         f"{profit['mean_difference']:+.2f}",
+         f"[{profit['ci'][0]:.2f}, {profit['ci'][1]:.2f}]", B("未胜出")],
+    ], [39 * mm, 39 * mm, 28 * mm, 40 * mm, 28 * mm]))
+    story.append(P("表12  ERCOT 2025预注册主比较，收益单位为USD/节点·日。", "caption"))
+    story.append(callout(
+        "主结论",
+        "固定三seed Transformer集成未在ERCOT 2025盈利上超过同数据pooled XGBoost。预测精度优势成立，"
+        "经济收益优势不成立；两者必须在摘要、结果和结论中并列陈述。",
+        "risk",
+    ))
+    story.append(H3("7.3.1 所有完整基线的ERCOT收益分解"))
+    story.append(P(
+        "下表中的Transformer与六个完整三任务基线全部进入同一个日前LP、滚动RT MPC和双结算账本。"
+        "每个系统均计算5.7 USD/MWh吞吐退化成本、3%偏差容忍带及超限偏差罚金，不存在某一基线免除成本的情况。"
+    ))
+    story.append(styled_table(
+        locked_2025_profit_component_rows(locked),
+        [42 * mm, 24 * mm, 23 * mm, 21 * mm, 21 * mm, 23 * mm, 20 * mm],
+        alignments={1: "RIGHT", 2: "RIGHT", 3: "RIGHT", 4: "RIGHT", 5: "RIGHT", 6: "RIGHT"},
+    ))
+    story.append(P(
+        "表12A  2025 ERCOT所有完整三任务系统的日均收益分解，单位除吞吐量外均为USD/节点·日。"
+        "净收益最高值加粗；成本与吞吐量是行为解释量，不能脱离收益单独定义胜者。LEAR缺少rolling RT，"
+        "无法构成预注册完整结算系统，故不在此表。",
+        "caption",
+    ))
+    dlinear_settlement = locked["ercot_settlement"]["systems"][
+        "da_dlinear__rt_at_da_dlinear__rt_dlinear"
+    ]
+    dlinear_components = dlinear_settlement["macro_mean_daily_revenue_components"]
+    story.append(P(
+        f"DLinear的净收益为{dlinear_settlement['macro_mean_daily_revenue']:.2f}，并非因为免除了偏差罚金或退化成本。"
+        f"它支付退化成本{dlinear_components['degradation_cost']:.2f}和偏差罚金{dlinear_components['deviation_penalty']:.2f}，"
+        f"但DA计划收益达到{dlinear_components['da_leg']:.2f}，显著高于Transformer的"
+        f"{transformer_settlement['macro_mean_daily_revenue_components']['da_leg']:.2f}。"
+        "这进一步说明，价格MAE更低并不保证预测价差形成更有价值的日前仓位。"
+    ))
+    story.append(H2("7.4 为什么MAE更低但利润更低"))
+    ensemble_tail = locked["markets"]["ERCOT"]["systems"]["transformer_ensemble"]
+    pooled_tail = locked["markets"]["ERCOT"]["systems"]["pooled_xgboost"]
+    story.append(styled_table([
+        ["ERCOT 2025诊断", "Transformer", "pooled XGBoost", "较优/解释"],
+        ["DA MAE", f"{ensemble_tail['da']['all']['mae']:.2f}", f"{pooled_tail['da']['all']['mae']:.2f}", "Transformer"],
+        ["RT-at-DA MAE", f"{ensemble_tail['rt_at_da']['all']['mae']:.2f}", f"{pooled_tail['rt_at_da']['all']['mae']:.2f}", "Transformer"],
+        ["rolling RT MAE", f"{ensemble_tail['rt']['all']['mae']:.2f}", f"{pooled_tail['rt']['all']['mae']:.2f}", "Transformer"],
+        ["价差方向准确率", f"{100*ensemble_tail['da_rt_at_da_spread']['all']['direction_accuracy']:.1f}%",
+         f"{100*pooled_tail['da_rt_at_da_spread']['all']['direction_accuracy']:.1f}%", "Transformer"],
+        ["极端1%价差幅度保留", f"{100*ensemble_tail['da_rt_at_da_spread']['abs_spread_top_1pct']['magnitude_ratio']:.2f}%",
+         f"{100*pooled_tail['da_rt_at_da_spread']['abs_spread_top_1pct']['magnitude_ratio']:.2f}%", "均严重收缩"],
+        ["DA计划收益分量", f"{transformer_settlement['macro_mean_daily_revenue_components']['da_leg']:.2f}",
+         f"{pooled_settlement['macro_mean_daily_revenue_components']['da_leg']:.2f}", "XGBoost"],
+        ["最终净收益", f"{profit['transformer']['macro_mean_daily_revenue']:.2f}",
+         f"{profit['comparator']['macro_mean_daily_revenue']:.2f}", "XGBoost"],
+    ], [57 * mm, 38 * mm, 42 * mm, 37 * mm]))
+    story.append(P("表13  平均误差、极端价差和收益分量的联合诊断。", "caption"))
+    story.append(P(
+        "Transformer改善了全样本平均误差和总体价差方向，但两套系统对最高1%价差都只恢复约1.3%的真实幅度。"
+        "Transformer的DA计划收益分量低20.71 USD/节点·日，说明高价值小时的幅度与排序不足，比普通小时MAE更能"
+        "解释最终利润落后。"
+    ))
+
+    chapter(story, "8", "消融与稳健性分析",
+            "本节区分用于选择最终设计的开发期证据与只用于解释结果的冻结后诊断。")
+    story.append(H2("8.1 结构消融"))
+    story.append(styled_table([
+        ["2023 ERCOT结构", "日均净收益", "与当前差异", "结论"],
+        ["当前F1/F0/F1", "377.84", "基准", B("保留")],
+        ["全F0", "291.24", "-86.60", "退化"],
+        ["全F1", "344.28", "-33.56", "退化"],
+        ["仅rolling RT改F0", B("378.81"), "+0.97", "区间跨0，不更换"],
+    ], [48 * mm, 34 * mm, 34 * mm, 58 * mm]))
+    story.append(P("表14  当前无ID协议下的受控结构替换；点估计不足以触发结构变更。", "caption"))
+    story.append(H2("8.2 随机种子与固定集成"))
+    stability = locked["ercot_transformer_seed_stability"]
+    story.append(styled_table([
+        ["ERCOT 2025", "seed 0", "seed 1", "seed 2", "均值±样本标准差", "固定集成"],
+        ["日均净收益", f"{stability['seed_values']['seed0']:.2f}",
+         f"{stability['seed_values']['seed1']:.2f}", f"{stability['seed_values']['seed2']:.2f}",
+         f"{stability['mean']:.2f} ± {stability['sample_std']:.2f}", f"{stability['fixed_ensemble']:.2f}"],
+    ], [34 * mm, 23 * mm, 23 * mm, 23 * mm, 45 * mm, 26 * mm]))
+    story.append(P("表15  Transformer盈利的三seed稳定性；最终使用事前固定预测等权集成。", "caption"))
+    story.append(H2("8.3 跨年收益与市场机会"))
+    story.append(styled_table([
+        ["年份/协议", "Transformer", "XGBoost", "差值", "统计解释"],
+        ["2023 LOMO开发", f"{u23['macro_mean_daily_revenue']:.2f}", f"{x23['macro_mean_daily_revenue']:.2f}", "+85.55", "95%区间跨0"],
+        ["2024冻结检查", f"{u24['macro_mean_daily_revenue']:.2f}", f"{x24['macro_mean_daily_revenue']:.2f}", "-17.32", "95%区间低于0"],
+        ["2025 all-market最终", "28.04", "44.43（pooled）", "-16.39", "95%区间低于0"],
+    ], [42 * mm, 34 * mm, 40 * mm, 27 * mm, 31 * mm]))
+    story.append(P("表16  三个年度/协议下的ERCOT收益演进，单位USD/节点·日。", "caption"))
+    story.append(P(
+        "2024的DA日内价差和|DA-RT|相对2023分别缩小约58.5%和61.6%，高收益尖峰机会显著减少；但同年XGBoost"
+        "仍领先，故不能把失败完全归因于市场变平。2025的独立结果进一步确认：预测平均误差优势并未形成经济优势。"
+    ))
+    story.append(H2("8.4 已排除的历史路线"))
+    story.append(styled_table([
+        ["历史路线", "目的", "结果", "与最终模型关系"],
+        ["pre-encoder身份条件化", "利用已知节点/市场身份", "已知实体有效", "新市场无身份向量，移除"],
+        ["经济状态方向头", "直接翻转DA-RT方向", "历史带ID点估计较高", "未迁移到无ID最终模型"],
+        ["零阶利润联合训练", "让利润影响网络更新", "噪声大、验证不稳定", "最终不使用"],
+        ["关键事件简单加权", "强调尖峰小时", "收益与回撤退化", "不保留"],
+        ["显式价差回归", "直接预测DA-RT", "幅度仍收缩", "不保留"],
+    ], [43 * mm, 48 * mm, 39 * mm, 44 * mm]))
+    story.append(P("表17  主要历史负结果及其对最终设计的约束。", "caption"))
+
+    chapter(story, "9", "讨论与局限",
+            "结果的科学价值在于明确区分预测成功、经济失败和可推广边界。")
+    story.append(H2("9.1 预测优势的含义"))
+    story.append(P(
+        "无身份模型在LOMO中超越周季节复制，并在all-market 2025中相对六个完整三任务基线取得更低MAE，"
+        "说明共享骨干能够学习跨市场通用的短期价格规律。但LEAR在日级任务上胜5/8，表明复杂模型并未对所有"
+        "预测场景形成绝对优势；日级稀疏线性结构仍是不可省略的强基线。"
+    ))
+    story.append(H2("9.2 预测精度与经济价值的错位"))
+    story.append(P(
+        "盈利由跨时段SOC、DA计划、RT修正、效率、退化和偏差罚金共同决定，不是逐小时误差的线性函数。均匀MAE"
+        "偏重大量普通小时，而利润高度依赖少数高价差时段。本文的最终负结果说明，仅以平均误差选模可能得到"
+        "价格更准但计划价值更低的系统。"
+    ))
+    story.append(H2("9.3 有效性威胁"))
+    story.append(bullets([
+        "外部有效性：四个美国市场不能代表所有电力市场，制度和发布时间差异仍需单独适配。",
+        "经济有效性：只有ERCOT冻结了完整结算合同，其他三市场不能据此声称真实盈利。",
+        "比较边界：LEAR缺少rolling RT，不能参加完整三任务盈利排名；逐节点XGBoost看过目标市场，不是纯架构对照。",
+        "Oracle边界：受限先知参照复用分层LP/MPC，并非全时域联合最优，不构成理论盈利上界。",
+        "尾部建模：当前-500 USD/MWh下界可能截断更低负价；极端价格与价差幅度仍是主要薄弱点。",
+    ]))
+    story.append(H2("9.4 后续研究"))
+    story.append(P(
+        "在不污染本次2025结论的前提下，后续工作可重新预注册尾部分位数预测、风险约束MPC、轻量在线校准或"
+        "可微优化。其他三市场若完成结算合同冻结，可直接复用现有预测补算盈利，无需重训；这些属于扩展研究，"
+        "不改变本文的停止规则。"
+    ))
+
+    chapter(story, "10", "结论",
+            "本文完成了从跨市场预测到可执行储能结算的一次性时间外验证。")
+    story.append(P(
+        "本文构建了DA、RT-at-DA和rolling RT三个独立无ID Transformer，并以严格信息截止时点、LOMO迁移协议、"
+        "多类强基线和统一LP/MPC结算评价其性能。模型在未见市场上表现出可迁移性，并在2025相对六个完整三任务"
+        "基线取得统一MAE优势；然而LEAR在日级任务上仍具有竞争力，且ERCOT预注册盈利主终点明确未胜出。"
+    ))
+    story.append(P(
+        "最重要的结论不是‘模型更准’或‘模型失败’的单一判断，而是：跨市场预测能力已经形成，但它尚未稳定转化为"
+        "经济价值。极端价差幅度压缩和DA计划收益不足是下一阶段最值得研究的机制。2025结果仅用于确定主张强度，"
+        "不再用于追加结构、损失、seed或阈值。"
+    ))
+    story.append(callout(
+        "最终结论边界",
+        "允许表述：预测迁移和相对完整三任务基线的精度优势成立；经济收益优势不成立。禁止表述：全面胜过LEAR、"
+        "稳定击败XGBoost、四市场盈利领先或2025后继续选模。",
+        "good",
+    ))
+
+    chapter(story, "附录A", "实现与复现信息")
+    story.append(H2("A.1 关键代码与结果"))
+    story.append(styled_table([
+        ["内容", "路径"],
+        ["模型实现", "src/decision_aware/model_da.py；model_rt_da.py；model_rt.py"],
+        ["训练入口", "scripts/decision_aware/train_global_forecaster.py"],
+        ["DA LP / RT MPC", "src/decision_aware/continuous_mpc.py"],
+        ["2025统一汇总", "data/results/allmarket_locked_2025_summary_v2.json"],
+        ["盈利审计", "data/results/allmarket_locked_2025_profit_claim_audit_v1.json"],
+        ["最终结论", "docs/progress/54_2025一次性锁定测试最终结论.md"],
+    ], [48 * mm, 126 * mm]))
+    story.append(H2("A.2 完整性与停止规则"))
+    story.append(bullets([
+        "2025归档内327个文件逐项哈希一致；最终审计覆盖129个预测归档、11套ERCOT结算系统和12项市场任务。",
+        "恢复只统一容差内重复真值，预测数组未改变。",
+        "selection_allowed=false；除明确代码错误、文件损坏或新结算合同外，不重开当前实验。",
+    ]))
+
+    chapter(story, "附录B", "64节点与身份变量用途")
+    story.append(P(
+        "market_id稳定映射为CAISO=0、ERCOT=1、NYISO=2、PJM=3；node_id按市场顺序和市场内名称字典序"
+        "编码为0-63。最终模型前向不读取这些ID，它们只用于采样、汇总、SOC隔离和审计。"
+    ))
+    story.append(styled_table([
+        ["市场", "节点数", "node_id范围", "前向是否读取ID"],
+        ["CAISO", "3", "0-2", B("否")],
+        ["ERCOT", "15", "3-17", B("否")],
+        ["NYISO", "11", "18-28", B("否")],
+        ["PJM", "35", "29-63", B("否")],
+    ], [40 * mm, 32 * mm, 48 * mm, 54 * mm]))
+
+    chapter(story, "附录C", "结论边界速查")
+    story.append(styled_table([
+        ["表述", "是否允许", "严谨写法"],
+        ["模型实现未见市场预测", "允许", "四折LOMO下12项均优于lag-168"],
+        ["Transformer胜过所有基线", "不允许", "仅相对六个完整三任务基线12/12；LEAR胜5/8"],
+        ["Transformer盈利优于XGBoost", "不允许", "2025相对pooled XGBoost差-16.39，区间低于0"],
+        ["当前模型是端到端利润模型", "不允许", "三个价格模型独立训练，只在LP/MPC决策层联合"],
+        ["四市场盈利均已验证", "不允许", "仅ERCOT冻结了完整结算合同"],
+        ["受限先知是理论上界", "不允许", "它复用分层优化，只作诊断参照"],
+    ], [62 * mm, 28 * mm, 84 * mm]))
+
+    chapter(story, "参考文献", "")
+    refs = [
+        "[1] J. Lago et al. Forecasting day-ahead electricity prices: A review of state-of-the-art algorithms, best practices and an open-access benchmark. Applied Energy, 2021. DOI: 10.1016/j.apenergy.2021.116983.",
+        "[2] R. Weron. Electricity price forecasting: A review of the state-of-the-art with a look into the future. International Journal of Forecasting, 2014. DOI: 10.1016/j.ijforecast.2014.08.008.",
+        "[3] A. Vaswani et al. Attention Is All You Need. NeurIPS, 2017.",
+        "[4] J. Su et al. RoFormer: Enhanced Transformer with Rotary Position Embedding. Neurocomputing, 2024; arXiv:2104.09864.",
+        "[5] T. Chen and C. Guestrin. XGBoost: A Scalable Tree Boosting System. KDD, 2016. DOI: 10.1145/2939672.2939785.",
+        "[6] D. Krishnamurthy et al. Energy Storage Arbitrage Under Day-Ahead and Real-Time Price Uncertainty. IEEE Transactions on Power Systems, 2018. DOI: 10.1109/TPWRS.2017.2685347.",
+        "[7] B. Xu et al. Factoring the Cycle Aging Cost of Batteries Participating in Electricity Markets. IEEE Transactions on Power Systems, 2018. DOI: 10.1109/TPWRS.2017.2733339.",
+        "[8] Y. Wang et al. Look-Ahead Bidding Strategy for Energy Storage. IEEE Transactions on Sustainable Energy, 2017. DOI: 10.1109/TSTE.2017.2656800.",
+        "[9] Y. Nesterov and V. Spokoiny. Random Gradient-Free Minimization of Convex Functions. Foundations of Computational Mathematics, 2017. DOI: 10.1007/s10208-015-9296-2.",
+        "[10] A. Das, W. Kong, R. Sen, and Y. Zhou. A Decoder-Only Foundation Model for Time-Series Forecasting. ICML, 2024.",
+    ]
+    for ref in refs:
+        story.append(P(ref, "small"))
+    return story
+
+
 def main() -> None:
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     doc = ReportDocTemplate(str(OUTPUT))
-    doc.multiBuild(build_story())
+    doc.multiBuild(build_academic_story())
     print(OUTPUT)
 
 

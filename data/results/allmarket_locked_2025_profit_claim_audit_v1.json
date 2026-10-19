@@ -1,0 +1,28 @@
+{
+  "protocol": "allmarket_locked_2025_profit_claim_audit_v1",
+  "complete": true,
+  "selection_allowed": false,
+  "primary_endpoint": {
+    "market": "ERCOT",
+    "system": "transformer_fixed_seed012_ensemble",
+    "settlement_label": "da_ensemble__rt_at_da_ensemble__rt_ensemble",
+    "comparator": "pooled_allmarket_xgboost",
+    "comparator_settlement_label": "da_pooled_xgboost__rt_at_da_pooled_xgboost__rt_pooled_xgboost",
+    "metric": "macro_mean_daily_net_revenue_usd_per_node_day",
+    "aggregation": "node_equal_daily_mean",
+    "uncertainty": "paired_7day_block_bootstrap_95ci",
+    "stable_superiority_rule": "mean_difference_gt_0_and_ci_lower_gt_0",
+    "point_estimate_signal_rule": "mean_difference_gt_0_and_ci_contains_0",
+    "no_superiority_rule": "mean_difference_lte_0"
+  },
+  "transformer_mean_daily_revenue": 28.03982363006879,
+  "comparator_mean_daily_revenue": 44.42895205932536,
+  "mean_daily_difference": -16.389128429256566,
+  "paired_7day_block_bootstrap_95ci": [
+    -23.18969603944307,
+    -10.052004880857178
+  ],
+  "classification": "no_superiority",
+  "mae_can_override": false,
+  "report_regardless_of_outcome": true
+}

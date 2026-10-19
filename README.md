@@ -4,21 +4,18 @@
 
 ## 当前主线
 
-老师要求将日前（DA）与实时（RT）预测拆成独立模型，并先完成DA。
+第二阶段“多节点无ID通用系统、完整基线与一次性2025评价”已经结束。冻结系统由三个互不共享参数的
+Transformer价格模型（DA、RT-at-DA、rolling RT）和后置连续DA LP／逐小时RT MPC组成；利润不会
+反向更新Transformer。第二阶段取得四市场统一预测优势，但ERCOT 2025净收益没有超过公平pooled
+XGBoost，因此不能宣称经济收益领先。
 
-当前独立建模主线已经落地：
-
-1. 固定D-1 10:00起报的24小时DA样本；
-2. 季节性、ExtraTrees、GRU收益基线；
-3. 独立DA Transformer、零阶决策损失和收益选模入口；
-4. 每小时起报、预测4小时且只执行第1步的独立RT Transformer；
-5. 两个模型各自拥有独立权重和可编辑draw.io架构图。
+第三阶段按老师意见只研究负价、尖峰价和极端DA—RT价差等尾部动态。原始Transformer保持为对照，
+尾部加权DA是候选A；该阶段与第二阶段分开登记，不重写原2025结论。
 
 ERCOT正常情况下在交付日前一天10:00 Central Prevailing Time开始DAM清算，结果最迟13:30发布。当前DA样本已按D-1日10:00截断输入，并预测D日完整24小时交付日；旧v8相邻滑窗只保留作历史对照。
 
-实施记录从`docs/progress/00_执行索引.md`进入；当前阶段总结和统一比较见文档23、24。
-文档07只保留第一轮独立DA/RT流水线的历史验收。`train_formal.py`仍是旧联合模型入口，
-新实验应使用当前三个独立模型或联合V2入口。
+实施记录从`docs/progress/00_执行索引.md`进入；第二阶段最终结论见文档54，第三阶段唯一入口见文档56。
+文档01—53和`docs/archive/`默认只作历史追溯，不能据其中旧TODO自动重启实验。
 
 ## 只看这些活跃目录
 
@@ -30,7 +27,7 @@ src/evaluation/               回测与指标
 scripts/decision_aware/       当前审计、训练、比较入口
 tests/                        数据与收益正确性测试
 docs/PRD_DA_RT独立建模与跨模态融合.md
-docs/transformer_3day_learning_plan.md
+docs/concepts/transformer_3day_learning_plan.md
 docs/model_architecture.drawio
 docs/training_loop.drawio
 docs/da_model_architecture.drawio
@@ -40,7 +37,8 @@ data/markets/                 唯一正式市场数据入口
 external/                     三个原始模型及worker环境
 ```
 
-根目录的 `transformer_from_scratch.md` 是Transformer入门说明，`TODO-WIN.md` 记录尚未解决的代码问题。
+`docs/concepts/transformer_from_scratch.md`是Transformer入门说明；`TODO-WIN.md`只记录不阻塞当前
+阶段的未来结构研究候选，不属于第三阶段自动待办。
 `runtime_cache/` 只保存可重新生成的安装缓存、基础模型worker缓存和PDF预览，已被Git忽略。
 
 ## 归档位置

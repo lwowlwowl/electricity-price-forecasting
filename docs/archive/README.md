@@ -6,9 +6,13 @@
 当前请优先看：
 
 - 根目录 `README.md`：当前项目入口与最小结构；
-- 根目录 `TODO-WIN.md`：仍需处理的代码问题；
+- `docs/progress/00_执行索引.md`：当前最短阅读路径；
+- `docs/progress/56_第二阶段闭环与第三阶段尾部研究入口.md`：当前唯一活跃研究TODO；
 - `docs/PRD_DA_RT独立建模与跨模态融合.md`：当前实施要求；
-- `docs/transformer_3day_learning_plan.md`：学习顺序。
+- `docs/concepts/transformer_3day_learning_plan.md`：学习顺序。
+
+本目录中的旧TODO不会物理删除：若干历史汇报和代码注释仍引用它们，保留有助于复核实验决策。
+“保留”不表示“待执行”；除非追溯历史，任何新会话都不应从本目录恢复任务。
 
 2026-09-28归档内容包括：
 

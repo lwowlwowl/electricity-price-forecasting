@@ -1,0 +1,18 @@
+{
+  "protocol": "allmarket_locked_2025_final_artifact_audit_v1",
+  "complete": true,
+  "selection_allowed": false,
+  "checked_prediction_and_profit_archives": 129,
+  "settlement_systems": 11,
+  "markets": [
+    "CAISO",
+    "ERCOT",
+    "NYISO",
+    "PJM"
+  ],
+  "tasks": [
+    "da",
+    "rt_at_da",
+    "rt"
+  ]
+}
