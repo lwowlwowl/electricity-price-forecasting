@@ -1,0 +1,67 @@
+# 滚动RT数据合同、模型与正式结果
+
+## 实验合同
+
+独立RT模型使用43,677个训练窗口。每个窗口在小时`t`开始时读取
+`[t-168,t)`，预测`[t,t+4)`，部署诊断只执行第一个动作。模型是独立实例，
+不与DA模型共享可训练权重。
+
+三个seed都使用相同网络、数据、Huber监督损失、HardTopK策略和储能参数。
+checkpoint只按验证集RT-only滚动平均日收益选择，测试集不参与选模。训练使用
+RTX 4070 Laptop和CUDA混合精度；seed 1与2实测峰值分配显存约905 MB。
+
+RT 模型拥有独立参数。五条历史流形成 168 步 memory，4 个 query 接收已公布的
+目标小时 DA 价格和日历，输出 `p_rt [B,4]`；模型外策略每小时只执行第一步，
+真实 SOC 随时间连续传递。未来真实 RT、负荷和风光不进入输入。
+
+代码：`src/decision_aware/dataset_rt.py`、`src/decision_aware/model_rt.py`、
+`src/decision_aware/backtest_rt.py`；可编辑图：`docs/rt_model_architecture.drawio`、
+`docs/rt_training_loop.drawio`。
+
+## 第一阶段：纯Huber基线
+
+- seed 0：跑9轮，最佳轮6；验证收益140.68，测试收益69.43，执行小时
+  MAE 15.81，四步MAE 16.71。
+- seed 1：跑4轮，最佳轮1；验证收益118.93，测试收益65.42，执行小时
+  MAE 18.47，四步MAE 18.84。
+- seed 2：跑7轮，最佳轮4；验证收益146.28，测试收益78.90，执行小时
+  MAE 13.74，四步MAE 13.93。
+
+三seed测试RT-only平均日收益为`71.25 ± 6.92`，执行小时MAE为
+`16.01 ± 2.37`。严格按验证集选择，后续双结算固定使用seed 2：
+
+`data/checkpoints/rt_independent_seed2/pilot_LZ_LCRA_best_rolling_revenue.pt`
+
+汇总文件为`data/results/rt_transformer_3seed_summary.json`。三个单独训练报告在
+同目录的`rt_transformer_seed0.json`、`seed1.json`和`seed2.json`。
+
+## 性能与工程修正
+
+batch 64能完成第一轮，但验证后进入第二轮时出现显存不足，因此正式配置回退到
+稳定的batch 32。数据集把使用固定训练统计量的归一化提前计算一次；它没有改变
+任何样本、标签或原始Parquet，只避免每个epoch重复做相同运算。seed 1训练约
+11.1分钟，seed 2约19.1分钟；seed 0在优化前约22分钟。
+
+## 第二阶段：MPC收益微调
+
+从三个已有RT checkpoint分别开始，用
+`Huber预测损失 + 小权重MPC零阶代理损失`微调。验证集结果为：
+
+| seed | 最佳MPC验证收益/天 | 验证MAE |
+|---:|---:|---:|
+| 0 | 118.05 | 19.47 |
+| 1 | 139.84 | 17.05 |
+| 2 | **149.21** | 22.22 |
+
+完整双结算验证选择了seed 2，但最终测试平均收益为87.18/天，低于正式
+`rt_only`方案的89.44/天。因此MPC微调模型保留为实验checkpoint，不替换正式模型。
+
+## 阶段结论
+
+- 原纯Huber seed 2仍是正式滚动RT模型。
+- MPC收益微调已经实现，不再写成“尚未开始”。
+- MPC结果对seed敏感，而且验证提升没有在测试期保持。
+- 测试集已经看过，后续不能围绕这段测试期继续调MPC参数。
+
+MPC训练报告为`data/results/rt_mpc_transformer_seed0.json`、`seed1.json`、
+`seed2.json`；完整系统选择见`data/results/mpc_decision_aware_validation_selection.json`。

@@ -188,6 +188,12 @@ class PilotConfig:
     # Transformer候选，并仍按冻结的验证期macro MAE选择checkpoint。
     global_training_loss: str = "smooth_l1"
     global_loss_delta: float = 1.0
+    # DA局部动态后训练：在逐小时损失之外，显式约束24小时曲线的
+    # ``最高价-日内中位价``。默认关闭以保持所有历史checkpoint兼容。
+    # 两个损失先各自标准化，再按固定权重求加权平均；正式v1固定为1:1。
+    global_use_daily_peak_excursion_loss: bool = False
+    global_daily_peak_excursion_weight: float = 1.0
+    global_daily_peak_excursion_beta: float = 1.0
     # 仅使用训练期标签拟合逐节点阈值，对价格上下尾与绝对DA-RT价差较大的
     # 元素提高预测损失权重。默认关闭以严格复现既有checkpoint；权重使用
     # 加权均值且显式封顶，避免少数ERCOT尖峰支配整个epoch。

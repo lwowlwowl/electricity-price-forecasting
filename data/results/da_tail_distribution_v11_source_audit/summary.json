@@ -1,0 +1,360 @@
+{
+  "experiment": "da_tail_distribution_v11_source_audit",
+  "status": "complete",
+  "uses_ercot": false,
+  "runs_lp_mpc": false,
+  "test_2025_read": false,
+  "scope_note": "Beta calibrator is leave-one-market-out; the frozen Transformer and quantile head were trained jointly on all three source markets.",
+  "estimand_note": "q99 is a conditional quantile, not a conditional tail mean or risk-neutral expectation.",
+  "historical_tail_means_for_separate_gpd_audit": {
+    "0": 458.41859224759617,
+    "1": 513.3857599111703,
+    "2": 446.6772948044997,
+    "3": 287.3038845355694,
+    "4": 191.15238477266752,
+    "5": 226.40934571486252,
+    "6": 183.93346135066105,
+    "7": 223.7800378065843,
+    "8": 280.84965185216953,
+    "9": 201.1044996408316,
+    "10": 225.97719204242412,
+    "11": 232.37561534001276,
+    "12": 193.9939620384803,
+    "13": 201.32784599891076,
+    "14": 197.950366797814,
+    "15": 204.29877636249248,
+    "16": 200.0900853083684,
+    "17": 173.0127478966346,
+    "18": 178.36794245793268,
+    "19": 230.59958683894232,
+    "20": 255.18642449012168,
+    "21": 176.15049209594727,
+    "22": 209.6343596825233,
+    "23": 204.57854807927058,
+    "24": 211.20247720571663,
+    "25": 214.25397021953876,
+    "26": 213.9994650033804,
+    "27": 207.235137117826,
+    "28": 206.6092017540565,
+    "29": 206.16905910785383,
+    "30": 258.25585544292744,
+    "31": 177.31857464130107,
+    "32": 214.9673711336576,
+    "33": 215.26711918757513,
+    "34": 292.9641671400804,
+    "35": 263.0840048569899,
+    "36": 202.93044251662033,
+    "37": 209.6883905850924,
+    "38": 209.68298322237456,
+    "39": 260.2647962130033,
+    "40": 245.39137344360353,
+    "41": 198.50753807654746,
+    "42": 216.21475759652944,
+    "43": 193.36032579862155,
+    "44": 247.72343127910906,
+    "45": 220.77275349543646,
+    "46": 223.85033774742715,
+    "47": 209.11657057542067,
+    "48": 207.45087174635668
+  },
+  "folds": {
+    "CAISO": {
+      "samples": 26208,
+      "events": 13,
+      "event_rate": 0.000496031746031746,
+      "learned_q99": {
+        "pinball_q99": 0.6624250696906467,
+        "coverage": 0.990728021978022,
+        "spike_hours": 13,
+        "spike_mae": 188.5741694523738,
+        "mean_q99": 76.04062071864713
+      },
+      "comparators": {
+        "fixed_historical_q99": {
+          "pinball_q99": 2.9497788396242623,
+          "coverage": 0.9995039682539683,
+          "spike_hours": 13,
+          "spike_mae": 140.31040069580112,
+          "mean_q99": 323.2351788330074
+        },
+        "seasonal_hour_of_week_q99": {
+          "pinball_q99": 2.7175481595649567,
+          "coverage": 1.0,
+          "spike_hours": 13,
+          "spike_mae": 322.48893066406123,
+          "mean_q99": 306.9719521314321
+        },
+        "rolling_168h_q99": {
+          "pinball_q99": 1.4041117225110176,
+          "coverage": 0.9606990231990232,
+          "spike_hours": 13,
+          "spike_mae": 352.6366917536809,
+          "mean_q99": 85.75853262192163
+        }
+      },
+      "bootstrap": {
+        "cluster_unit": "delivery_date",
+        "clusters": 364,
+        "repetitions": 2000,
+        "seed": 20261020,
+        "invalid_spike_repetitions": 39,
+        "q99_spike_mae_improvement": {
+          "fixed_historical_q99": {
+            "estimate": -48.26376875657269,
+            "bootstrap_mean": -41.484764056031445,
+            "ci95": [
+              -83.40365620930956,
+              35.57113067626989
+            ],
+            "valid_repetitions": 1961
+          },
+          "seasonal_hour_of_week_q99": {
+            "estimate": 133.91476121168742,
+            "bootstrap_mean": 142.02836077741827,
+            "ci95": [
+              -43.934340413413736,
+              458.32457153320354
+            ],
+            "valid_repetitions": 1961
+          },
+          "rolling_168h_q99": {
+            "estimate": 164.0625223013071,
+            "bootstrap_mean": 163.75857420317917,
+            "ci95": [
+              142.28873189290366,
+              184.2576141357422
+            ],
+            "valid_repetitions": 1961
+          }
+        },
+        "brier_skill_vs_constant": {
+          "estimate": -0.03727513653238246,
+          "bootstrap_mean": -1.8226525431841667,
+          "ci95": [
+            -0.6873177072616824,
+            -0.007669646861413993
+          ],
+          "valid_repetitions": 2000
+        }
+      },
+      "beta_monotonicity": {
+        "actual_probability_range": [
+          1e-06,
+          0.24938735787413402
+        ],
+        "min_logit_derivative_on_dense_grid": 0.12851516919902128,
+        "strictly_increasing_on_actual_range": true,
+        "spearman_rank_correlation": 1.0,
+        "raw_unique_values": 309,
+        "calibrated_unique_values": 309,
+        "raw_pr_auc": 0.0008107336088987465,
+        "calibrated_pr_auc": 0.0008107336088987465,
+        "absolute_pr_auc_difference": 0.0,
+        "ranking_and_pr_auc_preserved": true
+      },
+      "positive_comparator_intervals": 1,
+      "passes": false
+    },
+    "NYISO": {
+      "samples": 96096,
+      "events": 240,
+      "event_rate": 0.0024975024975024975,
+      "learned_q99": {
+        "pinball_q99": 0.6700778620580571,
+        "coverage": 0.9782925407925408,
+        "spike_hours": 240,
+        "spike_mae": 59.30665740966797,
+        "mean_q99": 64.61730499837027
+      },
+      "comparators": {
+        "fixed_historical_q99": {
+          "pinball_q99": 1.4887588875521465,
+          "coverage": 0.9975024975024975,
+          "spike_hours": 240,
+          "spike_mae": 25.932852145513092,
+          "mean_q99": 179.12753594138385
+        },
+        "seasonal_hour_of_week_q99": {
+          "pinball_q99": 1.2999204993484623,
+          "coverage": 0.9961704961704961,
+          "spike_hours": 240,
+          "spike_mae": 29.55732050482436,
+          "mean_q99": 160.79917500194694
+        },
+        "rolling_168h_q99": {
+          "pinball_q99": 1.4970748231730815,
+          "coverage": 0.9479791042291043,
+          "spike_hours": 240,
+          "spike_mae": 88.00674482981364,
+          "mean_q99": 71.34152695039411
+        }
+      },
+      "bootstrap": {
+        "cluster_unit": "delivery_date",
+        "clusters": 364,
+        "repetitions": 2000,
+        "seed": 20261020,
+        "invalid_spike_repetitions": 0,
+        "q99_spike_mae_improvement": {
+          "fixed_historical_q99": {
+            "estimate": -33.37380526415487,
+            "bootstrap_mean": -37.23093562099864,
+            "ci95": [
+              -72.73030403876538,
+              -17.543560853120837
+            ],
+            "valid_repetitions": 2000
+          },
+          "seasonal_hour_of_week_q99": {
+            "estimate": -29.749336904843624,
+            "bootstrap_mean": -33.26437119518899,
+            "ci95": [
+              -70.15903753327936,
+              -11.950944810925236
+            ],
+            "valid_repetitions": 2000
+          },
+          "rolling_168h_q99": {
+            "estimate": 28.70008742014567,
+            "bootstrap_mean": 25.06499737222507,
+            "ci95": [
+              -25.748256512580102,
+              62.05124299274483
+            ],
+            "valid_repetitions": 2000
+          }
+        },
+        "brier_skill_vs_constant": {
+          "estimate": 0.01891938996724385,
+          "bootstrap_mean": 0.009090961863825325,
+          "ci95": [
+            -0.08438896879588287,
+            0.048356267473350714
+          ],
+          "valid_repetitions": 2000
+        }
+      },
+      "beta_monotonicity": {
+        "actual_probability_range": [
+          1e-06,
+          0.999999
+        ],
+        "min_logit_derivative_on_dense_grid": -144963.19988918692,
+        "strictly_increasing_on_actual_range": false,
+        "spearman_rank_correlation": 0.9999991918886381,
+        "raw_unique_values": 3593,
+        "calibrated_unique_values": 3593,
+        "raw_pr_auc": 0.03414359008796547,
+        "calibrated_pr_auc": 0.03419285244491038,
+        "absolute_pr_auc_difference": 4.926235694491243e-05,
+        "ranking_and_pr_auc_preserved": false
+      },
+      "positive_comparator_intervals": 0,
+      "passes": false
+    },
+    "PJM": {
+      "samples": 305760,
+      "events": 1039,
+      "event_rate": 0.003398090005232862,
+      "learned_q99": {
+        "pinball_q99": 0.5660327048064386,
+        "coverage": 0.9838697017268446,
+        "spike_hours": 1039,
+        "spike_mae": 53.499946755784656,
+        "mean_q99": 60.68503369877689
+      },
+      "comparators": {
+        "fixed_historical_q99": {
+          "pinball_q99": 1.4347043726477833,
+          "coverage": 0.9966019099947672,
+          "spike_hours": 1039,
+          "spike_mae": 42.61873054379603,
+          "mean_q99": 159.79440637207
+        },
+        "seasonal_hour_of_week_q99": {
+          "pinball_q99": 1.1900661019847418,
+          "coverage": 0.9946657509157509,
+          "spike_hours": 1039,
+          "spike_mae": 47.124638662329055,
+          "mean_q99": 129.3497644394351
+        },
+        "rolling_168h_q99": {
+          "pinball_q99": 1.324204871070041,
+          "coverage": 0.9597135007849293,
+          "spike_hours": 1039,
+          "spike_mae": 68.83809410734057,
+          "mean_q99": 76.09563573166564
+        }
+      },
+      "bootstrap": {
+        "cluster_unit": "delivery_date",
+        "clusters": 364,
+        "repetitions": 2000,
+        "seed": 20261020,
+        "invalid_spike_repetitions": 0,
+        "q99_spike_mae_improvement": {
+          "fixed_historical_q99": {
+            "estimate": -10.881216211988622,
+            "bootstrap_mean": -12.302183804945066,
+            "ci95": [
+              -36.26913485594401,
+              5.596845093755863
+            ],
+            "valid_repetitions": 2000
+          },
+          "seasonal_hour_of_week_q99": {
+            "estimate": -6.375308093455608,
+            "bootstrap_mean": -8.216611245925927,
+            "ci95": [
+              -36.08922039786906,
+              12.015848738832508
+            ],
+            "valid_repetitions": 2000
+          },
+          "rolling_168h_q99": {
+            "estimate": 15.33814735155591,
+            "bootstrap_mean": 15.451340357877102,
+            "ci95": [
+              -9.210198249608773,
+              36.9806719212374
+            ],
+            "valid_repetitions": 2000
+          }
+        },
+        "brier_skill_vs_constant": {
+          "estimate": 0.04529872130646451,
+          "bootstrap_mean": 0.04399116199751119,
+          "ci95": [
+            0.029328705775417407,
+            0.05288048373116776
+          ],
+          "valid_repetitions": 2000
+        }
+      },
+      "beta_monotonicity": {
+        "actual_probability_range": [
+          1e-06,
+          0.9169095003283791
+        ],
+        "min_logit_derivative_on_dense_grid": -7.396502989096508,
+        "strictly_increasing_on_actual_range": false,
+        "spearman_rank_correlation": 0.9999892564019269,
+        "raw_unique_values": 11257,
+        "calibrated_unique_values": 11257,
+        "raw_pr_auc": 0.09008316840710215,
+        "calibrated_pr_auc": 0.09372151102048701,
+        "absolute_pr_auc_difference": 0.0036383426133848595,
+        "ranking_and_pr_auc_preserved": false
+      },
+      "positive_comparator_intervals": 0,
+      "passes": false
+    }
+  },
+  "gate": {
+    "passed_markets": 0,
+    "required_markets": 2,
+    "passes": false,
+    "requires_source_gpd_validation": true,
+    "allows_ercot_evaluation": false
+  }
+}

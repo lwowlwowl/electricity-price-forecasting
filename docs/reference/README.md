@@ -581,7 +581,7 @@ NBEATSx-global`。DA与RT-at-DA再加入`TimeXer-global`；滚动RT只保留轻�
 
 论文只能说明方法动机，不能代替各市场的正式结算规则。CAISO、NYISO和PJM的逐条审计、当前
 可以确认的事实和仍缺少的决定量，统一记录在
-[CAISO、NYISO、PJM结算合同审计工作底稿](../progress/45_CAISO_NYISO_PJM结算合同审计工作底稿.md)。
+[三模型系统与市场结算边界](../progress/4_多市场审计与最终基线/2_三模型系统与市场结算边界.md)。
 
 ### CAISO
 
@@ -608,3 +608,46 @@ NBEATSx-global`。DA与RT-at-DA再加入`TimeXer-global`；滚动RT只保留轻�
 - 在CAISO、NYISO和PJM缺少ISO调度量、meter/dispatch状态或uplift账单决定量时，只能先比较
   价格预测；不得复制ERCOT偏差罚金后声称得到真实的跨市场盈利排名。
 - 正式实验应保存所用规则版本、访问日期和文件哈希。规则更新后先做差异审计，不能静默替换。
+
+## 十二、2026-10-19：尾部事件适配核心文献
+
+本节已核对论文原文的方法和实验边界，但尚未完成代码复现。完整实验映射见
+`../progress/5_尾部事件与幅度建模/1_尾部Oracle与研究边界.md`。
+
+### 12.1 极端事件训练与后训练
+
+- **ReFine**：<https://arxiv.org/abs/2409.14232>。先对极端样本重加权，再冻结前层并只用极端样本
+  微调后层；其元学习权重优于固定启发式权重。说明当前“权重2”适合作为简单基线，不能直接当作
+  完整尾部方法。
+- **Modeling Extreme Events in Time Series Prediction**：
+  <https://dl.acm.org/doi/10.1145/3292500.3330896>。从极值理论解释普通损失为何可能忽视尾部，并用
+  极端事件损失与历史事件记忆改善预测。本文不直接复制其端到端记忆网络。
+- **APAL**：<https://arxiv.org/abs/2607.14871>。提出不对称峰值损失，并区分Top-1%幅度误差、
+  Peak F1和Peak Timing Error。它支持本项目把幅度与事件时点分开评价。
+
+### 12.2 电价尖峰、负价与DA—RT价差
+
+- **Two-Stage Electricity Price Forecasting**：<https://doi.org/10.1016/j.epsr.2021.107416>。
+  将尖峰发生预测和尖峰价格校准拆开，直接支持“发生概率＋条件幅度”的两部分设计。
+- **Foreseeing the Worst: Forecasting Electricity DART Spikes**：
+  <https://doi.org/10.1016/j.eneco.2023.106521>。直接预测DA—RT价差尖峰概率，并将概率作为交易信号；
+  说明本项目必须单独评价极端价差，而非只看DA与RT各自MAE。
+- **Forecasting the Occurrence of Electricity Price Spikes: A Statistical-Economic Investigation Study**：
+  <https://doi.org/10.3390/forecast6010007>。强调尖峰分类需要统计表现、经济表现和可解释规则并列。
+
+### 12.3 概率与尾部校准
+
+- **Tail Calibration of Probabilistic Forecasts**：<https://arxiv.org/abs/2407.03167>。总体概率校准并不
+  自动保证尾部校准；论文给出与POT/GPD的联系和尾部可靠性诊断。
+- **EVEREST**：<https://arxiv.org/abs/2601.19022>。结合前兆、证据不确定性与GPD尾部头。它说明
+  事件概率和尾部分布可以显式建模，但一次加入多个模块不适合本项目的单因素归因要求。
+
+### 12.4 TSFM与电价迁移
+
+- **Chronos-2**：<https://arxiv.org/abs/2510.15821>；**TimesFM**：
+  <https://openreview.net/forum?id=jn2iTJas6h>。两者继续作为现代原生TSFM对照，不把通用基准平均
+  精度自动等同为电价尾部或储能盈利能力。
+- **Market-Information-Aware Gated-LoRA**：<https://arxiv.org/abs/2608.11359>。该文把Chronos-2
+  Source-LoRA按供需、备用、检修、可用容量和联络线状态门控，并做LOMO迁移。论文结果显示市场信息
+  接口贡献大于门控相对普通Source-LoRA的增量。本项目缺少备用、检修和可用容量字段，不能伪造输入；
+  也不能仅复述其门控结构作为新贡献。

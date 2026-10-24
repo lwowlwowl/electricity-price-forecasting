@@ -42,6 +42,10 @@ from decision_aware.global_data import (  # noqa: E402
 from decision_aware.model_da import DecisionAwareDAForecaster  # noqa: E402
 from decision_aware.model_rt import DecisionAwareRTForecaster  # noqa: E402
 from decision_aware.model_rt_da import DecisionAwareRTAtDAForecaster  # noqa: E402
+from decision_aware.local_peak_dynamics import (  # noqa: E402
+    daily_peak_excursion,
+    daily_peak_excursion_loss,
+)
 from decision_aware.spread_factorization import (  # noqa: E402
     normalized_spread_target,
 )
@@ -112,23 +116,37 @@ def _forecast_loss(
 
 
 def _norm_stats_equal(left, right) -> bool:
-    if not isinstance(left, dict) or not isinstance(right, dict) or set(left) != set(right):
-        return False
-    for node in left:
-        if set(left[node]) != set(right[node]):
+    """递归比较训练实体scaler或context-robust只读合同。
+
+    早期实现只支持``node -> stream -> statistic -> array``；无ID模型的
+    context-robust元数据则是``node -> contract fields``。两者都必须严格
+    比较，但字符串合同不能被当成第三层统计字典索引。
+    """
+    if isinstance(left, dict) or isinstance(right, dict):
+        if not isinstance(left, dict) or not isinstance(right, dict):
             return False
-        for stream in left[node]:
-            if set(left[node][stream]) != set(right[node][stream]):
-                return False
-            for statistic in left[node][stream]:
-                if not np.allclose(
-                    np.asarray(left[node][stream][statistic], dtype=np.float64),
-                    np.asarray(right[node][stream][statistic], dtype=np.float64),
-                    rtol=1e-7,
-                    atol=1e-7,
-                ):
-                    return False
-    return True
+        if set(left) != set(right):
+            return False
+        return all(_norm_stats_equal(left[key], right[key]) for key in left)
+    if isinstance(left, (str, bytes, bool, type(None))) or isinstance(
+        right, (str, bytes, bool, type(None))
+    ):
+        return left == right
+    try:
+        left_array = np.asarray(left)
+        right_array = np.asarray(right)
+    except (TypeError, ValueError):
+        return False
+    if left_array.shape != right_array.shape:
+        return False
+    if np.issubdtype(left_array.dtype, np.number) and np.issubdtype(
+        right_array.dtype, np.number
+    ):
+        return bool(np.allclose(
+            left_array.astype(np.float64), right_array.astype(np.float64),
+            rtol=1e-7, atol=1e-7,
+        ))
+    return bool(np.array_equal(left_array, right_array))
 
 
 def _configure_trainable_scope(
@@ -362,6 +380,8 @@ def evaluate(
     regime_confusion = torch.zeros(
         market_count, 3, 3, dtype=torch.int64
     )
+    peak_excursion_abs_sum = torch.zeros(node_count, dtype=torch.float64)
+    peak_excursion_counts = torch.zeros(node_count, dtype=torch.int64)
     huber_sum = 0.0
     normalized_elements = 0
     model.eval()
@@ -405,6 +425,22 @@ def evaluate(
                     market_ids, elements_per_sample, dtype=torch.int64
                 ),
             )
+            if task_name == "da":
+                predicted_excursion = daily_peak_excursion(
+                    output[task["prediction_raw"]]
+                ).detach().cpu()
+                true_excursion = daily_peak_excursion(
+                    batch[task["target"]]
+                ).detach().cpu()
+                per_sample_peak_abs = (
+                    predicted_excursion - true_excursion
+                ).abs().double()
+                peak_excursion_abs_sum.scatter_add_(
+                    0, ids, per_sample_peak_abs
+                )
+                peak_excursion_counts.scatter_add_(
+                    0, ids, torch.ones_like(ids, dtype=torch.int64)
+                )
             if "p_da_minus_rt_at_da" in output:
                 true_spread = (
                     batch["price_da_tgt_spread_only"]
@@ -504,6 +540,29 @@ def evaluate(
         "evaluated_markets": int(valid_markets.sum()),
         "evaluated_elements": int(counts.sum()),
     }
+    peak_valid = peak_excursion_counts > 0
+    if bool(peak_valid.any()):
+        per_market_peak = _per_market_node_macro_mae(
+            peak_excursion_abs_sum,
+            peak_excursion_counts,
+            node_market_ids,
+            market_names_by_id,
+        )
+        result.update({
+            "macro_daily_peak_excursion_mae": float(
+                (
+                    peak_excursion_abs_sum[peak_valid]
+                    / peak_excursion_counts[peak_valid]
+                ).mean()
+            ),
+            "market_macro_daily_peak_excursion_mae": float(
+                sum(per_market_peak.values()) / len(per_market_peak)
+            ),
+            "per_market_node_macro_daily_peak_excursion_mae": per_market_peak,
+            "evaluated_daily_peak_excursions": int(
+                peak_excursion_counts.sum()
+            ),
+        })
     spread_valid = spread_counts > 0
     if bool(spread_valid.any()):
         important_valid = important_direction_counts > 0
@@ -1011,6 +1070,15 @@ def main() -> None:
     )
     if cfg.global_keep_top_k_checkpoints < 1:
         raise ValueError("global_keep_top_k_checkpoints必须至少为1")
+    if cfg.global_use_daily_peak_excursion_loss:
+        if args.task != "da":
+            raise ValueError("日峰值幅度损失第一版只允许用于DA任务")
+        if cfg.global_use_critical_event_weighting:
+            raise ValueError("日峰值幅度损失不得与关键事件加权同时开启")
+        if cfg.global_daily_peak_excursion_weight <= 0:
+            raise ValueError("global_daily_peak_excursion_weight必须为正")
+        if cfg.global_daily_peak_excursion_beta <= 0:
+            raise ValueError("global_daily_peak_excursion_beta必须为正")
     if not 0.0 < cfg.global_lr_scheduler_factor < 1.0:
         raise ValueError("global_lr_scheduler_factor必须位于(0,1)")
     if cfg.global_lr_scheduler_patience < 0:
@@ -1134,7 +1202,20 @@ def main() -> None:
                     output, batch, task, cfg, args.task
                 )
                 if event_thresholds is None:
-                    loss = elementwise_loss.mean()
+                    point_loss = elementwise_loss.mean()
+                    if cfg.global_use_daily_peak_excursion_loss:
+                        peak_loss = daily_peak_excursion_loss(
+                            output[task["prediction_raw"]],
+                            batch[task["target"]],
+                            batch[task["std"]],
+                            beta=cfg.global_daily_peak_excursion_beta,
+                        )
+                        peak_weight = cfg.global_daily_peak_excursion_weight
+                        loss = (
+                            point_loss + peak_weight * peak_loss
+                        ) / (1.0 + peak_weight)
+                    else:
+                        loss = point_loss
                     batch_weight_sum = float(target.numel())
                 else:
                     event_weights = critical_event_weights(

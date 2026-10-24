@@ -1,0 +1,2057 @@
+{
+  "experiment": "da_tail_distribution_posttraining_source_v1",
+  "status": "complete",
+  "mechanisms": {
+    "original": "frozen MAE Transformer point forecast",
+    "mean_posttraining": "frozen backbone + linear conditional-mean MSE head",
+    "quantile_posttraining": "frozen backbone + non-crossing q01/q05/q10/q25/q50/q75/q90/q95/q99 pinball head; point forecast is fixed quantile integral",
+    "rank_preserving_peak_scale": "frozen backbone + positive daily excursion scale learned with log1p peak-excursion Smooth-L1; hourly ranking is unchanged"
+  },
+  "protocol": {
+    "training_markets": [
+      "CAISO",
+      "NYISO",
+      "PJM"
+    ],
+    "train_years": [
+      2020,
+      2021,
+      2022
+    ],
+    "evaluation_years": [
+      2023,
+      2024
+    ],
+    "uses_ercot": false,
+    "test_2025_read": false,
+    "epochs": 6,
+    "samples_per_market_per_epoch": 4096,
+    "learning_rate": 0.001,
+    "seed": 20261020,
+    "backbone_frozen": true,
+    "thresholds": "per-node 2020-2022 target q01/q99"
+  },
+  "training_history": [
+    {
+      "epoch": 1,
+      "mse": 2.587102772318758,
+      "pinball": 0.1717901812226046,
+      "log_peak_excursion": 0.06532024451735197,
+      "elapsed_seconds": 37.2899696000095
+    },
+    {
+      "epoch": 2,
+      "mse": 4.2794004558818415,
+      "pinball": 0.17343919621392465,
+      "log_peak_excursion": 0.06538528909853387,
+      "elapsed_seconds": 34.985046899993904
+    },
+    {
+      "epoch": 3,
+      "mse": 4.786506626560974,
+      "pinball": 0.17340043911826797,
+      "log_peak_excursion": 0.06424722815184698,
+      "elapsed_seconds": 34.99904109998897
+    },
+    {
+      "epoch": 4,
+      "mse": 3.3682185875174278,
+      "pinball": 0.16447165241697803,
+      "log_peak_excursion": 0.062385153486199364,
+      "elapsed_seconds": 35.53768480000144
+    },
+    {
+      "epoch": 5,
+      "mse": 2.9819813996825055,
+      "pinball": 0.16632489143133475,
+      "log_peak_excursion": 0.0628661843414496,
+      "elapsed_seconds": 34.00159580000036
+    },
+    {
+      "epoch": 6,
+      "mse": 2.753736287394228,
+      "pinball": 0.16414101750706322,
+      "log_peak_excursion": 0.06177456313647175,
+      "elapsed_seconds": 35.042040300002554
+    }
+  ],
+  "evaluations": {
+    "2023": {
+      "markets": {
+        "CAISO": {
+          "samples": 26136,
+          "original": {
+            "mae": 11.530157089233398,
+            "ordinary_mae": 10.813414573669434,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 39,
+              "tn": 26097,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 39,
+              "conditional_mae": 468.8976745605469,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 462,
+              "fp": 145,
+              "fn": 549,
+              "tn": 24980,
+              "precision": 0.7611202635914333,
+              "recall": 0.456973293768546,
+              "f1": 0.5710754017305315,
+              "false_positive_rate": 0.005771144278606965,
+              "event_hours": 1011,
+              "conditional_mae": 11.671453475952148,
+              "amplitude_ratio": 0.6877500004661665
+            }
+          },
+          "mean_posttraining": {
+            "mae": 12.178977012634277,
+            "ordinary_mae": 11.533470153808594,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 39,
+              "tn": 26097,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 39,
+              "conditional_mae": 426.69451904296875,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 474,
+              "fp": 193,
+              "fn": 537,
+              "tn": 24932,
+              "precision": 0.7106446776611695,
+              "recall": 0.4688427299703264,
+              "f1": 0.564958283671037,
+              "false_positive_rate": 0.007681592039800995,
+              "event_hours": 1011,
+              "conditional_mae": 12.205795288085938,
+              "amplitude_ratio": 0.7830461560837534
+            }
+          },
+          "quantile_mean": {
+            "mae": 11.885801315307617,
+            "ordinary_mae": 11.217785835266113,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 39,
+              "tn": 26097,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 39,
+              "conditional_mae": 440.2964782714844,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 515,
+              "fp": 208,
+              "fn": 496,
+              "tn": 24917,
+              "precision": 0.7123098201936376,
+              "recall": 0.5093966369930761,
+              "f1": 0.5940023068050749,
+              "false_positive_rate": 0.008278606965174129,
+              "event_hours": 1011,
+              "conditional_mae": 11.935104370117188,
+              "amplitude_ratio": 0.9189048442164579
+            }
+          },
+          "quantile_median": {
+            "mae": 11.248082160949707,
+            "ordinary_mae": 10.525347709655762,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 39,
+              "tn": 26097,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 39,
+              "conditional_mae": 463.64117431640625,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 516,
+              "fp": 191,
+              "fn": 495,
+              "tn": 24934,
+              "precision": 0.7298444130127298,
+              "recall": 0.5103857566765578,
+              "f1": 0.6006984866123399,
+              "false_positive_rate": 0.007601990049751243,
+              "event_hours": 1011,
+              "conditional_mae": 11.729964256286621,
+              "amplitude_ratio": 0.8881628375745168
+            }
+          },
+          "quantile_q01": {
+            "mae": 29.896202087402344,
+            "ordinary_mae": 28.72517967224121,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 39,
+              "tn": 26097,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 39,
+              "conditional_mae": 516.9860229492188,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 997,
+              "fp": 3973,
+              "fn": 14,
+              "tn": 21152,
+              "precision": 0.2006036217303823,
+              "recall": 0.9861523244312562,
+              "f1": 0.33338906537368335,
+              "false_positive_rate": 0.15812935323383084,
+              "event_hours": 1011,
+              "conditional_mae": 40.16301727294922,
+              "amplitude_ratio": 7.245464740093494
+            }
+          },
+          "quantile_q99": {
+            "mae": 60.95703125,
+            "ordinary_mae": 60.669525146484375,
+            "positive_spike": {
+              "tp": 28,
+              "fp": 631,
+              "fn": 11,
+              "tn": 25466,
+              "precision": 0.042488619119878605,
+              "recall": 0.717948717948718,
+              "f1": 0.08022922636103152,
+              "false_positive_rate": 0.024179024408935892,
+              "event_hours": 39,
+              "conditional_mae": 276.5827941894531,
+              "exceedance_amplitude_ratio": 0.30563319442156756
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 1011,
+              "tn": 25125,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 1011,
+              "conditional_mae": 59.773006439208984,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "peak_scale": {
+            "mae": 12.098234176635742,
+            "ordinary_mae": 11.45959186553955,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 39,
+              "tn": 26097,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 39,
+              "conditional_mae": 433.9552307128906,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 462,
+              "fp": 145,
+              "fn": 549,
+              "tn": 24980,
+              "precision": 0.7611202635914333,
+              "recall": 0.456973293768546,
+              "f1": 0.5710754017305315,
+              "false_positive_rate": 0.005771144278606965,
+              "event_hours": 1011,
+              "conditional_mae": 11.671453475952148,
+              "amplitude_ratio": 0.6877500004661665
+            }
+          },
+          "distribution": {
+            "mean_pinball": 2.8823797737166235,
+            "coverage": {
+              "q01": 0.01645240281603918,
+              "q05": 0.07078359351086624,
+              "q10": 0.13666972757881848,
+              "q25": 0.32679063360881544,
+              "q50": 0.5700566268748087,
+              "q75": 0.7676767676767676,
+              "q90": 0.9147918579736761,
+              "q95": 0.9547750229568411,
+              "q99": 0.9924625038261402
+            },
+            "coverage_absolute_error": {
+              "q01": 0.006452402816039178,
+              "q05": 0.02078359351086624,
+              "q10": 0.03666972757881848,
+              "q25": 0.07679063360881544,
+              "q50": 0.07005662687480874,
+              "q75": 0.017676767676767624,
+              "q90": 0.014791857973676104,
+              "q95": 0.0047750229568411795,
+              "q99": 0.0024625038261402166
+            },
+            "central_90_interval_coverage": 0.8839914294459749,
+            "central_98_interval_coverage": 0.976010101010101
+          }
+        },
+        "NYISO": {
+          "samples": 95832,
+          "original": {
+            "mae": 6.850522041320801,
+            "ordinary_mae": 6.168250560760498,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 123,
+              "fn": 369,
+              "tn": 95340,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0012884573080669999,
+              "event_hours": 369,
+              "conditional_mae": 183.02490234375,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 8,
+              "fn": 5,
+              "tn": 95819,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 8.348377805837603e-05,
+              "event_hours": 5,
+              "conditional_mae": 30.83624839782715,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "mean_posttraining": {
+            "mae": 7.405519008636475,
+            "ordinary_mae": 6.741467475891113,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 246,
+              "fn": 369,
+              "tn": 95217,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0025769146161339998,
+              "event_hours": 369,
+              "conditional_mae": 178.8493194580078,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 2,
+              "fn": 5,
+              "tn": 95825,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 2.0870944514594007e-05,
+              "event_hours": 5,
+              "conditional_mae": 32.67371368408203,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "quantile_mean": {
+            "mae": 7.192334175109863,
+            "ordinary_mae": 6.522329330444336,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 229,
+              "fn": 369,
+              "tn": 95234,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.002398835150791406,
+              "event_hours": 369,
+              "conditional_mae": 180.1843719482422,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 1,
+              "fn": 5,
+              "tn": 95826,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 1.0435472257297004e-05,
+              "event_hours": 5,
+              "conditional_mae": 31.83624267578125,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "quantile_median": {
+            "mae": 6.844553470611572,
+            "ordinary_mae": 6.158010482788086,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 147,
+              "fn": 369,
+              "tn": 95316,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0015398636120800729,
+              "event_hours": 369,
+              "conditional_mae": 184.12030029296875,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 3,
+              "fn": 5,
+              "tn": 95824,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 3.1306416771891014e-05,
+              "event_hours": 5,
+              "conditional_mae": 31.088359832763672,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "quantile_q01": {
+            "mae": 13.407694816589355,
+            "ordinary_mae": 12.646082878112793,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 369,
+              "tn": 95463,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 369,
+              "conditional_mae": 210.2967071533203,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 1976,
+              "fn": 5,
+              "tn": 93851,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.02062049318041888,
+              "event_hours": 5,
+              "conditional_mae": 23.37664794921875,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "quantile_q99": {
+            "mae": 28.087934494018555,
+            "ordinary_mae": 27.769922256469727,
+            "positive_spike": {
+              "tp": 38,
+              "fp": 1550,
+              "fn": 331,
+              "tn": 93913,
+              "precision": 0.02392947103274559,
+              "recall": 0.10298102981029811,
+              "f1": 0.038834951456310676,
+              "false_positive_rate": 0.01623665713417764,
+              "event_hours": 369,
+              "conditional_mae": 110.10139465332031,
+              "exceedance_amplitude_ratio": 0.042272276963540106
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 5,
+              "tn": 95827,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 5,
+              "conditional_mae": 46.90842819213867,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "peak_scale": {
+            "mae": 7.032721519470215,
+            "ordinary_mae": 6.355348110198975,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 139,
+              "fn": 369,
+              "tn": 95324,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0014560615107423818,
+              "event_hours": 369,
+              "conditional_mae": 181.94229125976562,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 8,
+              "fn": 5,
+              "tn": 95819,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 8.348377805837603e-05,
+              "event_hours": 5,
+              "conditional_mae": 30.83624839782715,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "distribution": {
+            "mean_pinball": 1.918259240483877,
+            "coverage": {
+              "q01": 0.030647382920110194,
+              "q05": 0.09322564487853743,
+              "q10": 0.15756740963352533,
+              "q25": 0.31231738876366977,
+              "q50": 0.5202228900576008,
+              "q75": 0.7009140996744303,
+              "q90": 0.8573545371066033,
+              "q95": 0.9134318390516738,
+              "q99": 0.9759474914433592
+            },
+            "coverage_absolute_error": {
+              "q01": 0.020647382920110195,
+              "q05": 0.04322564487853743,
+              "q10": 0.05756740963352533,
+              "q25": 0.06231738876366977,
+              "q50": 0.020222890057600806,
+              "q75": 0.0490859003255697,
+              "q90": 0.04264546289339677,
+              "q95": 0.036568160948326156,
+              "q99": 0.014052508556640753
+            },
+            "central_90_interval_coverage": 0.8202061941731363,
+            "central_98_interval_coverage": 0.945300108523249
+          }
+        },
+        "PJM": {
+          "samples": 304920,
+          "original": {
+            "mae": 5.554046154022217,
+            "ordinary_mae": 5.237327575683594,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 28,
+              "fn": 561,
+              "tn": 304331,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 9.19966224097201e-05,
+              "event_hours": 561,
+              "conditional_mae": 173.16461181640625,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 15,
+              "fp": 71,
+              "fn": 261,
+              "tn": 304573,
+              "precision": 0.1744186046511628,
+              "recall": 0.05434782608695652,
+              "f1": 0.08287292817679558,
+              "false_positive_rate": 0.00023305891466761204,
+              "event_hours": 276,
+              "conditional_mae": 13.81240463256836,
+              "amplitude_ratio": 0.017288288810158644
+            }
+          },
+          "mean_posttraining": {
+            "mae": 5.879883766174316,
+            "ordinary_mae": 5.574174880981445,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 67,
+              "fn": 561,
+              "tn": 304292,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.00022013477505183023,
+              "event_hours": 561,
+              "conditional_mae": 167.32485961914062,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 33,
+              "fn": 276,
+              "tn": 304611,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.00010832315752156616,
+              "event_hours": 276,
+              "conditional_mae": 14.540200233459473,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "quantile_mean": {
+            "mae": 5.692963600158691,
+            "ordinary_mae": 5.383004188537598,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 49,
+              "fn": 561,
+              "tn": 304310,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0001609940892170102,
+              "event_hours": 561,
+              "conditional_mae": 169.5613555908203,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 8,
+              "fp": 41,
+              "fn": 268,
+              "tn": 304603,
+              "precision": 0.16326530612244897,
+              "recall": 0.028985507246376812,
+              "f1": 0.04923076923076923,
+              "false_positive_rate": 0.0001345833169207337,
+              "event_hours": 276,
+              "conditional_mae": 14.109909057617188,
+              "amplitude_ratio": 0.00174540444253104
+            }
+          },
+          "quantile_median": {
+            "mae": 5.440791130065918,
+            "ordinary_mae": 5.1215434074401855,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 23,
+              "fn": 561,
+              "tn": 304336,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 7.556865412227008e-05,
+              "event_hours": 561,
+              "conditional_mae": 174.39083862304688,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 9,
+              "fp": 53,
+              "fn": 267,
+              "tn": 304591,
+              "precision": 0.14516129032258066,
+              "recall": 0.03260869565217391,
+              "f1": 0.05325443786982248,
+              "false_positive_rate": 0.00017397355601948505,
+              "event_hours": 276,
+              "conditional_mae": 13.76244068145752,
+              "amplitude_ratio": 0.003319740983296441
+            }
+          },
+          "quantile_q01": {
+            "mae": 13.73610782623291,
+            "ordinary_mae": 13.384782791137695,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 561,
+              "tn": 304359,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 561,
+              "conditional_mae": 207.42259216308594,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 203,
+              "fp": 4484,
+              "fn": 73,
+              "tn": 300160,
+              "precision": 0.04331128653723064,
+              "recall": 0.7355072463768116,
+              "f1": 0.08180535966149508,
+              "false_positive_rate": 0.014718819343233413,
+              "event_hours": 276,
+              "conditional_mae": 7.120246410369873,
+              "amplitude_ratio": 2.169502957070035
+            }
+          },
+          "quantile_q99": {
+            "mae": 27.32484245300293,
+            "ordinary_mae": 27.234834671020508,
+            "positive_spike": {
+              "tp": 297,
+              "fp": 4633,
+              "fn": 264,
+              "tn": 299726,
+              "precision": 0.06024340770791075,
+              "recall": 0.5294117647058824,
+              "f1": 0.10817701693680568,
+              "false_positive_rate": 0.015222155415151187,
+              "event_hours": 561,
+              "conditional_mae": 73.0907974243164,
+              "exceedance_amplitude_ratio": 0.3814723876939361
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 276,
+              "tn": 304644,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 276,
+              "conditional_mae": 33.468971252441406,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "peak_scale": {
+            "mae": 5.752233505249023,
+            "ordinary_mae": 5.437983989715576,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 34,
+              "fn": 561,
+              "tn": 304325,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.00011171018435466012,
+              "event_hours": 561,
+              "conditional_mae": 172.11343383789062,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 15,
+              "fp": 71,
+              "fn": 261,
+              "tn": 304573,
+              "precision": 0.1744186046511628,
+              "recall": 0.05434782608695652,
+              "f1": 0.08287292817679558,
+              "false_positive_rate": 0.00023305891466761204,
+              "event_hours": 276,
+              "conditional_mae": 13.8296480178833,
+              "amplitude_ratio": 0.017288288810158644
+            }
+          },
+          "distribution": {
+            "mean_pinball": 1.4249989826617866,
+            "coverage": {
+              "q01": 0.015508985963531417,
+              "q05": 0.0664731732913551,
+              "q10": 0.12642332415059687,
+              "q25": 0.3082546241637151,
+              "q50": 0.5582906991997901,
+              "q75": 0.7551259346713892,
+              "q90": 0.9030007870916962,
+              "q95": 0.9447592811229175,
+              "q99": 0.9881903450085269
+            },
+            "coverage_absolute_error": {
+              "q01": 0.005508985963531417,
+              "q05": 0.0164731732913551,
+              "q10": 0.026423324150596866,
+              "q25": 0.058254624163715074,
+              "q50": 0.05829069919979013,
+              "q75": 0.005125934671389221,
+              "q90": 0.0030007870916961554,
+              "q95": 0.00524071887708244,
+              "q99": 0.0018096549914731197
+            },
+            "central_90_interval_coverage": 0.8782861078315624,
+            "central_98_interval_coverage": 0.9726813590449954
+          }
+        }
+      },
+      "pooled": {
+        "original": {
+          "mae": 6.210975646972656,
+          "ordinary_mae": 5.776025295257568,
+          "positive_spike": {
+            "tp": 0,
+            "fp": 151,
+            "fn": 969,
+            "tn": 425768,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": null,
+            "false_positive_rate": 0.00035452750405593554,
+            "event_hours": 969,
+            "conditional_mae": 188.82203674316406,
+            "exceedance_amplitude_ratio": 0.0
+          },
+          "negative_price": {
+            "tp": 477,
+            "fp": 224,
+            "fn": 815,
+            "tn": 425372,
+            "precision": 0.6804564907275321,
+            "recall": 0.36919504643962847,
+            "f1": 0.47867536377320624,
+            "false_positive_rate": 0.0005263207360971438,
+            "event_hours": 1292,
+            "conditional_mae": 12.202975273132324,
+            "amplitude_ratio": 0.6034769372433844
+          }
+        },
+        "mean_posttraining": {
+          "mae": 6.608031749725342,
+          "ordinary_mae": 6.1886491775512695,
+          "positive_spike": {
+            "tp": 0,
+            "fp": 313,
+            "fn": 969,
+            "tn": 425606,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": null,
+            "false_positive_rate": 0.0007348815150298531,
+            "event_hours": 969,
+            "conditional_mae": 182.15245056152344,
+            "exceedance_amplitude_ratio": 0.0
+          },
+          "negative_price": {
+            "tp": 474,
+            "fp": 228,
+            "fn": 818,
+            "tn": 425368,
+            "precision": 0.6752136752136753,
+            "recall": 0.3668730650154799,
+            "f1": 0.47542627883650956,
+            "false_positive_rate": 0.0005357193206703071,
+            "event_hours": 1292,
+            "conditional_mae": 12.783686637878418,
+            "amplitude_ratio": 0.6847089207019635
+          }
+        },
+        "quantile_mean": {
+          "mae": 6.408710479736328,
+          "ordinary_mae": 5.983835220336914,
+          "positive_spike": {
+            "tp": 0,
+            "fp": 278,
+            "fn": 969,
+            "tn": 425641,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": null,
+            "false_positive_rate": 0.0006527062657453647,
+            "event_hours": 969,
+            "conditional_mae": 184.50311279296875,
+            "exceedance_amplitude_ratio": 0.0
+          },
+          "negative_price": {
+            "tp": 523,
+            "fp": 250,
+            "fn": 769,
+            "tn": 425346,
+            "precision": 0.6765847347994826,
+            "recall": 0.40479876160990713,
+            "f1": 0.5065375302663438,
+            "false_positive_rate": 0.0005874115358227051,
+            "event_hours": 1292,
+            "conditional_mae": 12.47670841217041,
+            "amplitude_ratio": 0.8037176523224451
+          }
+        },
+        "quantile_median": {
+          "mae": 6.111469745635986,
+          "ordinary_mae": 5.673789978027344,
+          "positive_spike": {
+            "tp": 0,
+            "fp": 170,
+            "fn": 969,
+            "tn": 425749,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": null,
+            "false_positive_rate": 0.00039913692509608635,
+            "event_hours": 969,
+            "conditional_mae": 189.73751831054688,
+            "exceedance_amplitude_ratio": 0.0
+          },
+          "negative_price": {
+            "tp": 525,
+            "fp": 247,
+            "fn": 767,
+            "tn": 425349,
+            "precision": 0.6800518134715026,
+            "recall": 0.40634674922600617,
+            "f1": 0.508720930232558,
+            "false_positive_rate": 0.0005803625973928326,
+            "event_hours": 1292,
+            "conditional_mae": 12.239063262939453,
+            "amplitude_ratio": 0.7770272917107365
+          }
+        },
+        "quantile_q01": {
+          "mae": 14.651776313781738,
+          "ordinary_mae": 14.12499713897705,
+          "positive_spike": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 969,
+            "tn": 425919,
+            "precision": null,
+            "recall": 0.0,
+            "f1": null,
+            "false_positive_rate": 0.0,
+            "event_hours": 969,
+            "conditional_mae": 220.97625732421875,
+            "exceedance_amplitude_ratio": 0.0
+          },
+          "negative_price": {
+            "tp": 1200,
+            "fp": 10433,
+            "fn": 92,
+            "tn": 415163,
+            "precision": 0.10315481818963294,
+            "recall": 0.9287925696594427,
+            "f1": 0.18568665377176016,
+            "false_positive_rate": 0.02451385821295313,
+            "event_hours": 1292,
+            "conditional_mae": 33.03937911987305,
+            "amplitude_ratio": 6.598662010558091
+          }
+        },
+        "quantile_q99": {
+          "mae": 29.555265426635742,
+          "ordinary_mae": 29.33036994934082,
+          "positive_spike": {
+            "tp": 363,
+            "fp": 6814,
+            "fn": 606,
+            "tn": 419105,
+            "precision": 0.05057823603176815,
+            "recall": 0.3746130030959752,
+            "f1": 0.08912349619445126,
+            "false_positive_rate": 0.01599834710355725,
+            "event_hours": 969,
+            "conditional_mae": 95.37469482421875,
+            "exceedance_amplitude_ratio": 0.275584398958965
+          },
+          "negative_price": {
+            "tp": 0,
+            "fp": 0,
+            "fn": 1292,
+            "tn": 425596,
+            "precision": null,
+            "recall": 0.0,
+            "f1": null,
+            "false_positive_rate": 0.0,
+            "event_hours": 1292,
+            "conditional_mae": 54.10409164428711,
+            "amplitude_ratio": 0.0
+          }
+        },
+        "peak_scale": {
+          "mae": 6.428221225738525,
+          "ordinary_mae": 5.9999542236328125,
+          "positive_spike": {
+            "tp": 0,
+            "fp": 173,
+            "fn": 969,
+            "tn": 425746,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": null,
+            "false_positive_rate": 0.00040618051789189963,
+            "event_hours": 969,
+            "conditional_mae": 186.39483642578125,
+            "exceedance_amplitude_ratio": 0.0
+          },
+          "negative_price": {
+            "tp": 477,
+            "fp": 224,
+            "fn": 815,
+            "tn": 425372,
+            "precision": 0.6804564907275321,
+            "recall": 0.36919504643962847,
+            "f1": 0.47867536377320624,
+            "false_positive_rate": 0.0005263207360971438,
+            "event_hours": 1292,
+            "conditional_mae": 12.206659317016602,
+            "amplitude_ratio": 0.6034769372433844
+          }
+        },
+        "distribution": {
+          "mean_pinball": 1.6249582726456133,
+          "coverage": {
+            "q01": 0.01896516182230468,
+            "q05": 0.07274273345701918,
+            "q10": 0.1340421843668597,
+            "q25": 0.31030153108075187,
+            "q50": 0.5504652274132794,
+            "q75": 0.7437243492438298,
+            "q90": 0.8934755720470006,
+            "q95": 0.9383397987294091,
+            "q99": 0.9857035100541595
+          },
+          "coverage_absolute_error": {
+            "q01": 0.00896516182230468,
+            "q05": 0.022742733457019174,
+            "q10": 0.034042184366859685,
+            "q25": 0.06030153108075187,
+            "q50": 0.05046522741327941,
+            "q75": 0.0062756507561702035,
+            "q90": 0.0065244279529994564,
+            "q95": 0.011660201270590864,
+            "q99": 0.0042964899458405315
+          },
+          "central_90_interval_coverage": 0.86559706527239,
+          "central_98_interval_coverage": 0.9667383482318547
+        }
+      }
+    },
+    "2024": {
+      "markets": {
+        "CAISO": {
+          "samples": 26208,
+          "original": {
+            "mae": 8.9933443069458,
+            "ordinary_mae": 7.82142972946167,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 13,
+              "tn": 26195,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 13,
+              "conditional_mae": 374.4783630371094,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 1358,
+              "fp": 139,
+              "fn": 1199,
+              "tn": 23512,
+              "precision": 0.9071476285905143,
+              "recall": 0.5310911224090731,
+              "f1": 0.669955599407992,
+              "false_positive_rate": 0.0058771299310811384,
+              "event_hours": 2557,
+              "conditional_mae": 17.96886444091797,
+              "amplitude_ratio": 0.36289545753853764
+            }
+          },
+          "mean_posttraining": {
+            "mae": 9.293109893798828,
+            "ordinary_mae": 8.221975326538086,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 13,
+              "tn": 26195,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 13,
+              "conditional_mae": 344.58050537109375,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 1446,
+              "fp": 145,
+              "fn": 1111,
+              "tn": 23506,
+              "precision": 0.9088623507228158,
+              "recall": 0.5655064528744622,
+              "f1": 0.6972034715525552,
+              "false_positive_rate": 0.006130818992854425,
+              "event_hours": 2557,
+              "conditional_mae": 17.49049186706543,
+              "amplitude_ratio": 0.4632175611808119
+            }
+          },
+          "quantile_mean": {
+            "mae": 8.989917755126953,
+            "ordinary_mae": 7.934665679931641,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 13,
+              "tn": 26195,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 13,
+              "conditional_mae": 353.9322814941406,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 1472,
+              "fp": 164,
+              "fn": 1085,
+              "tn": 23487,
+              "precision": 0.8997555012224939,
+              "recall": 0.5756746186937818,
+              "f1": 0.7021225852611495,
+              "false_positive_rate": 0.006934167688469832,
+              "event_hours": 2557,
+              "conditional_mae": 16.991409301757812,
+              "amplitude_ratio": 0.4589963648450066
+            }
+          },
+          "quantile_median": {
+            "mae": 8.681260108947754,
+            "ordinary_mae": 7.548555374145508,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 13,
+              "tn": 26195,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 13,
+              "conditional_mae": 370.5395202636719,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 1431,
+              "fp": 164,
+              "fn": 1126,
+              "tn": 23487,
+              "precision": 0.8971786833855799,
+              "recall": 0.5596402033633164,
+              "f1": 0.689306358381503,
+              "false_positive_rate": 0.006934167688469832,
+              "event_hours": 2557,
+              "conditional_mae": 17.31275749206543,
+              "amplitude_ratio": 0.4160105596719164
+            }
+          },
+          "quantile_q01": {
+            "mae": 19.03952980041504,
+            "ordinary_mae": 18.04079818725586,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 13,
+              "tn": 26195,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 13,
+              "conditional_mae": 405.83282470703125,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 2465,
+              "fp": 2776,
+              "fn": 92,
+              "tn": 20875,
+              "precision": 0.4703300896775425,
+              "recall": 0.9640203363316386,
+              "f1": 0.6322133880482176,
+              "false_positive_rate": 0.11737347258044058,
+              "event_hours": 2557,
+              "conditional_mae": 26.305734634399414,
+              "amplitude_ratio": 2.40508056134462
+            }
+          },
+          "quantile_q99": {
+            "mae": 41.33186340332031,
+            "ordinary_mae": 40.126094818115234,
+            "positive_spike": {
+              "tp": 1,
+              "fp": 307,
+              "fn": 12,
+              "tn": 25888,
+              "precision": 0.003246753246753247,
+              "recall": 0.07692307692307693,
+              "f1": 0.006230529595015577,
+              "false_positive_rate": 0.011719793853788891,
+              "event_hours": 13,
+              "conditional_mae": 188.57415771484375,
+              "exceedance_amplitude_ratio": 0.019501339941176674
+            },
+            "negative_price": {
+              "tp": 144,
+              "fp": 9,
+              "fn": 2413,
+              "tn": 23642,
+              "precision": 0.9411764705882353,
+              "recall": 0.05631599530700039,
+              "f1": 0.10627306273062731,
+              "false_positive_rate": 0.0003805335926599298,
+              "event_hours": 2557,
+              "conditional_mae": 51.72991943359375,
+              "amplitude_ratio": 0.021803041826678908
+            }
+          },
+          "peak_scale": {
+            "mae": 9.470707893371582,
+            "ordinary_mae": 8.365766525268555,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 13,
+              "tn": 26195,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 13,
+              "conditional_mae": 346.6165771484375,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 1358,
+              "fp": 139,
+              "fn": 1199,
+              "tn": 23512,
+              "precision": 0.9071476285905143,
+              "recall": 0.5310911224090731,
+              "f1": 0.669955599407992,
+              "false_positive_rate": 0.0058771299310811384,
+              "event_hours": 2557,
+              "conditional_mae": 17.971176147460938,
+              "amplitude_ratio": 0.36289545753853764
+            }
+          },
+          "distribution": {
+            "mean_pinball": 2.1845636039297056,
+            "coverage": {
+              "q01": 0.027090964590964592,
+              "q05": 0.10641788766788766,
+              "q10": 0.19406288156288157,
+              "q25": 0.40766178266178266,
+              "q50": 0.6240842490842491,
+              "q75": 0.7907509157509157,
+              "q90": 0.9224664224664225,
+              "q95": 0.9602029914529915,
+              "q99": 0.990728021978022
+            },
+            "coverage_absolute_error": {
+              "q01": 0.01709096459096459,
+              "q05": 0.05641788766788766,
+              "q10": 0.09406288156288156,
+              "q25": 0.15766178266178266,
+              "q50": 0.12408424908424909,
+              "q75": 0.04075091575091572,
+              "q90": 0.022466422466422498,
+              "q95": 0.010202991452991528,
+              "q99": 0.0007280219780220198
+            },
+            "central_90_interval_coverage": 0.8537851037851037,
+            "central_98_interval_coverage": 0.9636370573870574
+          }
+        },
+        "NYISO": {
+          "samples": 96096,
+          "original": {
+            "mae": 7.491349697113037,
+            "ordinary_mae": 7.2039713859558105,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 32,
+              "fn": 240,
+              "tn": 95824,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.00033383408446002337,
+              "event_hours": 240,
+              "conditional_mae": 122.27001953125,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 0,
+              "tn": 96096,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 0,
+              "conditional_mae": null,
+              "amplitude_ratio": null
+            }
+          },
+          "mean_posttraining": {
+            "mae": 7.549210071563721,
+            "ordinary_mae": 7.296761989593506,
+            "positive_spike": {
+              "tp": 1,
+              "fp": 81,
+              "fn": 239,
+              "tn": 95775,
+              "precision": 0.012195121951219513,
+              "recall": 0.004166666666666667,
+              "f1": 0.006211180124223603,
+              "false_positive_rate": 0.0008450175262894341,
+              "event_hours": 240,
+              "conditional_mae": 108.37667846679688,
+              "exceedance_amplitude_ratio": 0.003065307954451539
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 0,
+              "tn": 96096,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 0,
+              "conditional_mae": null,
+              "amplitude_ratio": null
+            }
+          },
+          "quantile_mean": {
+            "mae": 7.471207141876221,
+            "ordinary_mae": 7.209264278411865,
+            "positive_spike": {
+              "tp": 1,
+              "fp": 66,
+              "fn": 239,
+              "tn": 95790,
+              "precision": 0.014925373134328358,
+              "recall": 0.004166666666666667,
+              "f1": 0.0065146579804560255,
+              "false_positive_rate": 0.0006885327991987982,
+              "event_hours": 240,
+              "conditional_mae": 112.0909194946289,
+              "exceedance_amplitude_ratio": 0.0016895839365043467
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 0,
+              "tn": 96096,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 0,
+              "conditional_mae": null,
+              "amplitude_ratio": null
+            }
+          },
+          "quantile_median": {
+            "mae": 7.42181921005249,
+            "ordinary_mae": 7.136849880218506,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 35,
+              "fn": 240,
+              "tn": 95821,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.00036513102987815056,
+              "event_hours": 240,
+              "conditional_mae": 121.23839569091797,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 0,
+              "tn": 96096,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 0,
+              "conditional_mae": null,
+              "amplitude_ratio": null
+            }
+          },
+          "quantile_q01": {
+            "mae": 14.936178207397461,
+            "ordinary_mae": 14.579679489135742,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 1,
+              "fn": 240,
+              "tn": 95855,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 1.043231513937573e-05,
+              "event_hours": 240,
+              "conditional_mae": 157.32212829589844,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 794,
+              "fn": 0,
+              "tn": 95302,
+              "precision": 0.0,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.008262570762570762,
+              "event_hours": 0,
+              "conditional_mae": null,
+              "amplitude_ratio": null
+            }
+          },
+          "quantile_q99": {
+            "mae": 28.671300888061523,
+            "ordinary_mae": 28.594594955444336,
+            "positive_spike": {
+              "tp": 146,
+              "fp": 3446,
+              "fn": 94,
+              "tn": 92410,
+              "precision": 0.04064587973273942,
+              "recall": 0.6083333333333333,
+              "f1": 0.07620041753653443,
+              "false_positive_rate": 0.035949757970288765,
+              "event_hours": 240,
+              "conditional_mae": 59.30665588378906,
+              "exceedance_amplitude_ratio": 1.778750330494388
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 0,
+              "tn": 96096,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 0,
+              "conditional_mae": null,
+              "amplitude_ratio": null
+            }
+          },
+          "peak_scale": {
+            "mae": 7.485246658325195,
+            "ordinary_mae": 7.217594146728516,
+            "positive_spike": {
+              "tp": 1,
+              "fp": 48,
+              "fn": 239,
+              "tn": 95808,
+              "precision": 0.02040816326530612,
+              "recall": 0.004166666666666667,
+              "f1": 0.006920415224913495,
+              "false_positive_rate": 0.000500751126690035,
+              "event_hours": 240,
+              "conditional_mae": 114.38562774658203,
+              "exceedance_amplitude_ratio": 0.000538646841934022
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 0,
+              "tn": 96096,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 0,
+              "conditional_mae": null,
+              "amplitude_ratio": null
+            }
+          },
+          "distribution": {
+            "mean_pinball": 1.9627214812153828,
+            "coverage": {
+              "q01": 0.028273809523809524,
+              "q05": 0.08470695970695971,
+              "q10": 0.14627039627039626,
+              "q25": 0.28999125874125875,
+              "q50": 0.4901452713952714,
+              "q75": 0.693535631035631,
+              "q90": 0.8656031468531469,
+              "q95": 0.9219634532134532,
+              "q99": 0.9782925407925408
+            },
+            "coverage_absolute_error": {
+              "q01": 0.018273809523809526,
+              "q05": 0.03470695970695971,
+              "q10": 0.04627039627039625,
+              "q25": 0.03999125874125875,
+              "q50": 0.00985472860472858,
+              "q75": 0.056464368964369016,
+              "q90": 0.034396853146853146,
+              "q95": 0.028036546786546768,
+              "q99": 0.011707459207459192
+            },
+            "central_90_interval_coverage": 0.8372564935064936,
+            "central_98_interval_coverage": 0.9500187312687313
+          }
+        },
+        "PJM": {
+          "samples": 305760,
+          "original": {
+            "mae": 7.427541255950928,
+            "ordinary_mae": 7.020805835723877,
+            "positive_spike": {
+              "tp": 9,
+              "fp": 148,
+              "fn": 1030,
+              "tn": 304573,
+              "precision": 0.05732484076433121,
+              "recall": 0.008662175168431183,
+              "f1": 0.015050167224080266,
+              "false_positive_rate": 0.0004856901887300186,
+              "event_hours": 1039,
+              "conditional_mae": 124.84659576416016,
+              "exceedance_amplitude_ratio": 0.003883742140390193
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 2,
+              "fn": 194,
+              "tn": 305564,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 6.545230817564781e-06,
+              "event_hours": 194,
+              "conditional_mae": 17.032533645629883,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "mean_posttraining": {
+            "mae": 7.679982662200928,
+            "ordinary_mae": 7.320487022399902,
+            "positive_spike": {
+              "tp": 33,
+              "fp": 392,
+              "fn": 1006,
+              "tn": 304329,
+              "precision": 0.07764705882352942,
+              "recall": 0.03176130895091434,
+              "f1": 0.045081967213114756,
+              "false_positive_rate": 0.001286422662041671,
+              "event_hours": 1039,
+              "conditional_mae": 111.20365142822266,
+              "exceedance_amplitude_ratio": 0.01892574074713321
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 6,
+              "fn": 194,
+              "tn": 305560,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 1.9635692452694343e-05,
+              "event_hours": 194,
+              "conditional_mae": 17.55036163330078,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "quantile_mean": {
+            "mae": 7.55909538269043,
+            "ordinary_mae": 7.1863112449646,
+            "positive_spike": {
+              "tp": 26,
+              "fp": 317,
+              "fn": 1013,
+              "tn": 304404,
+              "precision": 0.07580174927113703,
+              "recall": 0.025024061597690085,
+              "f1": 0.03762662807525326,
+              "false_positive_rate": 0.0010402958772122695,
+              "event_hours": 1039,
+              "conditional_mae": 114.98442840576172,
+              "exceedance_amplitude_ratio": 0.01297225653425622
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 3,
+              "fn": 194,
+              "tn": 305563,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 9.817846226347172e-06,
+              "event_hours": 194,
+              "conditional_mae": 17.39447593688965,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "quantile_median": {
+            "mae": 7.389723300933838,
+            "ordinary_mae": 6.984149932861328,
+            "positive_spike": {
+              "tp": 11,
+              "fp": 146,
+              "fn": 1028,
+              "tn": 304575,
+              "precision": 0.07006369426751592,
+              "recall": 0.010587102983638113,
+              "f1": 0.018394648829431436,
+              "false_positive_rate": 0.00047912680780123456,
+              "event_hours": 1039,
+              "conditional_mae": 124.47515869140625,
+              "exceedance_amplitude_ratio": 0.004351736369139861
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 194,
+              "tn": 305566,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 194,
+              "conditional_mae": 16.956253051757812,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "quantile_q01": {
+            "mae": 16.372278213500977,
+            "ordinary_mae": 15.848690032958984,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 1039,
+              "tn": 304721,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 1039,
+              "conditional_mae": 171.4293212890625,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 92,
+              "fp": 10430,
+              "fn": 102,
+              "tn": 295136,
+              "precision": 0.008743584869796617,
+              "recall": 0.4742268041237113,
+              "f1": 0.017170586039567004,
+              "false_positive_rate": 0.03413337871360034,
+              "event_hours": 194,
+              "conditional_mae": 7.828487396240234,
+              "amplitude_ratio": 0.9775991241862408
+            }
+          },
+          "quantile_q99": {
+            "mae": 30.4133243560791,
+            "ordinary_mae": 30.331314086914062,
+            "positive_spike": {
+              "tp": 861,
+              "fp": 10395,
+              "fn": 178,
+              "tn": 294326,
+              "precision": 0.07649253731343283,
+              "recall": 0.8286814244465832,
+              "f1": 0.14005693371289143,
+              "false_positive_rate": 0.034113172377355026,
+              "event_hours": 1039,
+              "conditional_mae": 53.49994659423828,
+              "exceedance_amplitude_ratio": 1.7673430025063932
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 194,
+              "tn": 305566,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 194,
+              "conditional_mae": 35.501197814941406,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "peak_scale": {
+            "mae": 7.578419208526611,
+            "ordinary_mae": 7.199581623077393,
+            "positive_spike": {
+              "tp": 20,
+              "fp": 278,
+              "fn": 1019,
+              "tn": 304443,
+              "precision": 0.06711409395973154,
+              "recall": 0.019249278152069296,
+              "f1": 0.029917726252804786,
+              "false_positive_rate": 0.0009123099491009809,
+              "event_hours": 1039,
+              "conditional_mae": 116.83260345458984,
+              "exceedance_amplitude_ratio": 0.01139791913509456
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 2,
+              "fn": 194,
+              "tn": 305564,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 6.545230817564781e-06,
+              "event_hours": 194,
+              "conditional_mae": 17.12209701538086,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "distribution": {
+            "mean_pinball": 1.8882184330120835,
+            "coverage": {
+              "q01": 0.020542255363683936,
+              "q05": 0.07994832548403977,
+              "q10": 0.14141156462585033,
+              "q25": 0.30178244374672947,
+              "q50": 0.5135858189429618,
+              "q75": 0.6964678178963893,
+              "q90": 0.8680860805860806,
+              "q95": 0.923152145473574,
+              "q99": 0.9838697017268446
+            },
+            "coverage_absolute_error": {
+              "q01": 0.010542255363683936,
+              "q05": 0.029948325484039764,
+              "q10": 0.04141156462585033,
+              "q25": 0.05178244374672947,
+              "q50": 0.013585818942961847,
+              "q75": 0.05353218210361066,
+              "q90": 0.03191391941391941,
+              "q95": 0.026847854526425907,
+              "q99": 0.006130298273155366
+            },
+            "central_90_interval_coverage": 0.8432038199895343,
+            "central_98_interval_coverage": 0.9633274463631607
+          }
+        }
+      },
+      "pooled": {
+        "original": {
+          "mae": 7.5377302169799805,
+          "ordinary_mae": 7.106846332550049,
+          "positive_spike": {
+            "tp": 9,
+            "fp": 180,
+            "fn": 1283,
+            "tn": 426592,
+            "precision": 0.047619047619047616,
+            "recall": 0.00696594427244582,
+            "f1": 0.012153950033760972,
+            "false_positive_rate": 0.0004217708753151566,
+            "event_hours": 1292,
+            "conditional_mae": 126.87975311279297,
+            "exceedance_amplitude_ratio": 0.0032864409130136172
+          },
+          "negative_price": {
+            "tp": 1358,
+            "fp": 141,
+            "fn": 1393,
+            "tn": 425172,
+            "precision": 0.9059372915276851,
+            "recall": 0.49363867684478374,
+            "f1": 0.6390588235294117,
+            "false_positive_rate": 0.000331520550747332,
+            "event_hours": 2751,
+            "conditional_mae": 17.902835845947266,
+            "amplitude_ratio": 0.35703061627541166
+          }
+        },
+        "mean_posttraining": {
+          "mae": 7.749387741088867,
+          "ordinary_mae": 7.365379333496094,
+          "positive_spike": {
+            "tp": 34,
+            "fp": 473,
+            "fn": 1258,
+            "tn": 426299,
+            "precision": 0.0670611439842209,
+            "recall": 0.02631578947368421,
+            "f1": 0.03779877709838799,
+            "false_positive_rate": 0.0011083201334670502,
+            "event_hours": 1292,
+            "conditional_mae": 113.02672576904297,
+            "exceedance_amplitude_ratio": 0.01637963289585212
+          },
+          "negative_price": {
+            "tp": 1446,
+            "fp": 151,
+            "fn": 1305,
+            "tn": 425162,
+            "precision": 0.9054477144646211,
+            "recall": 0.5256270447110142,
+            "f1": 0.6651333946642134,
+            "false_positive_rate": 0.0003550326465450151,
+            "event_hours": 2751,
+            "conditional_mae": 17.494714736938477,
+            "amplitude_ratio": 0.4557313912192123
+          }
+        },
+        "quantile_mean": {
+          "mae": 7.626966953277588,
+          "ordinary_mae": 7.233219146728516,
+          "positive_spike": {
+            "tp": 27,
+            "fp": 383,
+            "fn": 1265,
+            "tn": 426389,
+            "precision": 0.06585365853658537,
+            "recall": 0.02089783281733746,
+            "f1": 0.031727379553466516,
+            "false_positive_rate": 0.000897434695809472,
+            "event_hours": 1292,
+            "conditional_mae": 116.85121154785156,
+            "exceedance_amplitude_ratio": 0.01117814051309801
+          },
+          "negative_price": {
+            "tp": 1472,
+            "fp": 167,
+            "fn": 1279,
+            "tn": 425146,
+            "precision": 0.8981086028065893,
+            "recall": 0.5350781533987641,
+            "f1": 0.6706150341685648,
+            "false_positive_rate": 0.0003926519998213081,
+            "event_hours": 2751,
+            "conditional_mae": 17.019834518432617,
+            "amplitude_ratio": 0.4515784382226053
+          }
+        },
+        "quantile_median": {
+          "mae": 7.476001739501953,
+          "ordinary_mae": 7.050135135650635,
+          "positive_spike": {
+            "tp": 11,
+            "fp": 181,
+            "fn": 1281,
+            "tn": 426591,
+            "precision": 0.057291666666666664,
+            "recall": 0.008513931888544891,
+            "f1": 0.014824797843665768,
+            "false_positive_rate": 0.0004241140468446852,
+            "event_hours": 1292,
+            "conditional_mae": 126.34978485107422,
+            "exceedance_amplitude_ratio": 0.0036824598362119113
+          },
+          "negative_price": {
+            "tp": 1431,
+            "fp": 164,
+            "fn": 1320,
+            "tn": 425149,
+            "precision": 0.8971786833855799,
+            "recall": 0.520174482006543,
+            "f1": 0.6585365853658536,
+            "false_positive_rate": 0.00038559837108200314,
+            "event_hours": 2751,
+            "conditional_mae": 17.287614822387695,
+            "amplitude_ratio": 0.4092873006767517
+          }
+        },
+        "quantile_q01": {
+          "mae": 16.21319007873535,
+          "ordinary_mae": 15.684017181396484,
+          "positive_spike": {
+            "tp": 0,
+            "fp": 1,
+            "fn": 1292,
+            "tn": 426771,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": null,
+            "false_positive_rate": 2.3431715295286475e-06,
+            "event_hours": 1292,
+            "conditional_mae": 171.16734313964844,
+            "exceedance_amplitude_ratio": 0.0
+          },
+          "negative_price": {
+            "tp": 2557,
+            "fp": 14000,
+            "fn": 194,
+            "tn": 411313,
+            "precision": 0.15443619013106238,
+            "recall": 0.9294801890221738,
+            "f1": 0.26486430495131547,
+            "false_positive_rate": 0.03291693411675636,
+            "event_hours": 2751,
+            "conditional_mae": 25.002723693847656,
+            "amplitude_ratio": 2.3820107493719265
+          }
+        },
+        "quantile_q99": {
+          "mae": 30.69074058532715,
+          "ordinary_mae": 30.4847354888916,
+          "positive_spike": {
+            "tp": 1008,
+            "fp": 14148,
+            "fn": 284,
+            "tn": 412624,
+            "precision": 0.0665083135391924,
+            "recall": 0.7801857585139319,
+            "f1": 0.122568093385214,
+            "false_positive_rate": 0.03315119079977131,
+            "event_hours": 1292,
+            "conditional_mae": 55.93769836425781,
+            "exceedance_amplitude_ratio": 1.7077748873100567
+          },
+          "negative_price": {
+            "tp": 144,
+            "fp": 9,
+            "fn": 2607,
+            "tn": 425304,
+            "precision": 0.9411764705882353,
+            "recall": 0.05234460196292257,
+            "f1": 0.09917355371900825,
+            "false_positive_rate": 2.1160886217914805e-05,
+            "event_hours": 2751,
+            "conditional_mae": 50.58546829223633,
+            "amplitude_ratio": 0.021450678128792505
+          }
+        },
+        "peak_scale": {
+          "mae": 7.6733574867248535,
+          "ordinary_mae": 7.268664836883545,
+          "positive_spike": {
+            "tp": 21,
+            "fp": 326,
+            "fn": 1271,
+            "tn": 426446,
+            "precision": 0.06051873198847262,
+            "recall": 0.016253869969040248,
+            "f1": 0.025625381330079317,
+            "false_positive_rate": 0.0007638739186263392,
+            "event_hours": 1292,
+            "conditional_mae": 118.69012451171875,
+            "exceedance_amplitude_ratio": 0.009709038538237789
+          },
+          "negative_price": {
+            "tp": 1358,
+            "fp": 141,
+            "fn": 1393,
+            "tn": 425172,
+            "precision": 0.9059372915276851,
+            "recall": 0.49363867684478374,
+            "f1": 0.6390588235294117,
+            "false_positive_rate": 0.000331520550747332,
+            "event_hours": 2751,
+            "conditional_mae": 17.911298751831055,
+            "amplitude_ratio": 0.35703061627541166
+          }
+        },
+        "distribution": {
+          "mean_pinball": 1.9230871889914543,
+          "coverage": {
+            "q01": 0.022678851760484415,
+            "q05": 0.08263717574942064,
+            "q10": 0.14572587276668908,
+            "q25": 0.3056178515362189,
+            "q50": 0.5150888652164163,
+            "q75": 0.7015820064289452,
+            "q90": 0.870858095985647,
+            "q95": 0.9251537153322867,
+            "q99": 0.9830375831651342
+          },
+          "coverage_absolute_error": {
+            "q01": 0.012678851760484415,
+            "q05": 0.03263717574942064,
+            "q10": 0.045725872766689074,
+            "q25": 0.0556178515362189,
+            "q50": 0.01508886521641628,
+            "q75": 0.04841799357105481,
+            "q90": 0.029141904014353015,
+            "q95": 0.024846284667713214,
+            "q99": 0.006962416834865759
+          },
+          "central_90_interval_coverage": 0.8425165395828661,
+          "central_98_interval_coverage": 0.9603587314046498
+        }
+      }
+    }
+  },
+  "screening_gate_2024": {
+    "per_market": {
+      "CAISO": {
+        "ordinary_mae_ratio": 1.0144776536243028,
+        "positive_spike_mae_ratio": 0.9451341290419689,
+        "positive_amplitude_distance_improves": false,
+        "negative_recall_change": 0.0445834962847087,
+        "passes_screen": false
+      },
+      "NYISO": {
+        "ordinary_mae_ratio": 1.0007347186950761,
+        "positive_spike_mae_ratio": 0.9167490111178113,
+        "positive_amplitude_distance_improves": true,
+        "negative_recall_change": null,
+        "passes_screen": true
+      },
+      "PJM": {
+        "ordinary_mae_ratio": 1.0235735630799792,
+        "positive_spike_mae_ratio": 0.9210057166714547,
+        "positive_amplitude_distance_improves": true,
+        "negative_recall_change": 0.0,
+        "passes_screen": false
+      }
+    },
+    "passed_markets": 1,
+    "required_markets": 2
+  },
+  "peak_scale_gate_2024": {
+    "per_market": {
+      "CAISO": {
+        "ordinary_mae_ratio": 1.0695955617623825,
+        "positive_spike_mae_ratio": 0.925598409310738,
+        "positive_amplitude_distance_improves": false,
+        "passes_screen": false
+      },
+      "NYISO": {
+        "ordinary_mae_ratio": 1.0018910070630296,
+        "positive_spike_mae_ratio": 0.9355165574120738,
+        "positive_amplitude_distance_improves": true,
+        "passes_screen": true
+      },
+      "PJM": {
+        "ordinary_mae_ratio": 1.0254637133594913,
+        "positive_spike_mae_ratio": 0.9358092845021658,
+        "positive_amplitude_distance_improves": true,
+        "passes_screen": false
+      }
+    },
+    "passed_markets": 1,
+    "required_markets": 2
+  }
+}

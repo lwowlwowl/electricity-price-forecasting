@@ -1,0 +1,895 @@
+{
+  "experiment": "positive_spike_day_lomo_audit_v1",
+  "status": "complete",
+  "markets": [
+    "CAISO",
+    "NYISO",
+    "PJM"
+  ],
+  "uses_ercot": false,
+  "ercot_files_read": [],
+  "test_2025_read": false,
+  "model": {
+    "type": "StandardScaler + L1 LogisticRegression",
+    "solver": "liblinear",
+    "C": 0.1,
+    "seed": 20261020,
+    "class_reweighting": false,
+    "market_equal_weighting": true,
+    "features": [
+      "da_lag168_peak_z",
+      "da_lag168_median_z",
+      "da_lag168_range_robust",
+      "da_context_max_z",
+      "da_context_last_z",
+      "da_context_negative_share",
+      "rt_lag168_peak_z",
+      "rt_lag168_median_z",
+      "rt_lag168_range_robust",
+      "rt_context_max_z",
+      "rt_context_last_z",
+      "rt_context_negative_share",
+      "load_lag168_peak_z",
+      "load_lag168_mean_z",
+      "net_load_lag168_peak_z",
+      "net_load_lag168_mean_z",
+      "wind_lag168_mean_z",
+      "solar_lag168_mean_z",
+      "dow_sin",
+      "dow_cos",
+      "month_sin",
+      "month_cos",
+      "is_weekend",
+      "is_holiday"
+    ]
+  },
+  "event_definition": "delivery day max DA > node 2020-2021 hourly DA q99",
+  "folds": {
+    "CAISO": {
+      "holdout_market": "CAISO",
+      "training_markets": [
+        "NYISO",
+        "PJM"
+      ],
+      "fit_years": [
+        2020,
+        2021
+      ],
+      "probability_threshold_selection_year": 2022,
+      "evaluation_year": 2023,
+      "event_price_threshold_source": "each node 2020-2021 hourly DA q99",
+      "probability_threshold": 0.01,
+      "threshold_selection_best_macro_f1": 0.7201944852662998,
+      "metrics": {
+        "samples": 1089,
+        "events": 207,
+        "event_rate": 0.19008264462809918,
+        "pr_auc": 0.23066405950104013,
+        "pr_auc_lift": 1.2134935304185155,
+        "precision": 0.2265625,
+        "recall": 0.5603864734299517,
+        "f1": 0.3226703755215577,
+        "false_positive_rate": 0.4489795918367347,
+        "brier": 0.17894499294745853,
+        "constant_event_rate_brier": 0.15395123283928694,
+        "brier_improvement_vs_constant": -0.024993760108171587,
+        "tp": 116,
+        "fp": 396,
+        "fn": 91,
+        "tn": 486
+      },
+      "pr_auc_minus_event_rate_bootstrap": {
+        "repeats": 2000,
+        "resampling_unit": "delivery_date_all_nodes",
+        "mean": 0.0440683699546752,
+        "ci95": [
+          0.0022390011326649246,
+          0.0971439996499057
+        ]
+      },
+      "clearly_above_baseline": false,
+      "calibration": [
+        {
+          "bin": 1,
+          "samples": 109,
+          "mean_probability": 8.530117255587034e-08,
+          "observed_rate": 0.045871559633027525,
+          "minimum_probability": 7.094915604026351e-14,
+          "maximum_probability": 4.4868288450737993e-07
+        },
+        {
+          "bin": 2,
+          "samples": 109,
+          "mean_probability": 5.79327813756979e-06,
+          "observed_rate": 0.03669724770642202,
+          "minimum_probability": 4.748026276544999e-07,
+          "maximum_probability": 1.5127114465953557e-05
+        },
+        {
+          "bin": 3,
+          "samples": 109,
+          "mean_probability": 5.179171100977902e-05,
+          "observed_rate": 0.11926605504587157,
+          "minimum_probability": 1.5161725861217115e-05,
+          "maximum_probability": 0.00012946054465134412
+        },
+        {
+          "bin": 4,
+          "samples": 109,
+          "mean_probability": 0.0005085998472564926,
+          "observed_rate": 0.3211009174311927,
+          "minimum_probability": 0.00013208154942483818,
+          "maximum_probability": 0.001209940859843342
+        },
+        {
+          "bin": 5,
+          "samples": 109,
+          "mean_probability": 0.003104983152572013,
+          "observed_rate": 0.29357798165137616,
+          "minimum_probability": 0.001223601753141695,
+          "maximum_probability": 0.0062501002845629485
+        },
+        {
+          "bin": 6,
+          "samples": 109,
+          "mean_probability": 0.013073706942119892,
+          "observed_rate": 0.25688073394495414,
+          "minimum_probability": 0.006282178589571744,
+          "maximum_probability": 0.021787750962995407
+        },
+        {
+          "bin": 7,
+          "samples": 109,
+          "mean_probability": 0.03188259753827499,
+          "observed_rate": 0.1743119266055046,
+          "minimum_probability": 0.021821206860380735,
+          "maximum_probability": 0.04317243911712746
+        },
+        {
+          "bin": 8,
+          "samples": 109,
+          "mean_probability": 0.06040644834615746,
+          "observed_rate": 0.24770642201834864,
+          "minimum_probability": 0.043423515855558516,
+          "maximum_probability": 0.0822766127114358
+        },
+        {
+          "bin": 9,
+          "samples": 109,
+          "mean_probability": 0.11523880792899856,
+          "observed_rate": 0.1926605504587156,
+          "minimum_probability": 0.08247325012530549,
+          "maximum_probability": 0.15094084018296625
+        },
+        {
+          "bin": 10,
+          "samples": 108,
+          "mean_probability": 0.27276948126676825,
+          "observed_rate": 0.21296296296296297,
+          "minimum_probability": 0.1510615092445479,
+          "maximum_probability": 0.6668819834652272
+        }
+      ],
+      "coefficients": [
+        {
+          "feature": "da_lag168_peak_z",
+          "standardized_coefficient": 0.0,
+          "nonzero": false
+        },
+        {
+          "feature": "da_lag168_median_z",
+          "standardized_coefficient": -0.23198740010796465,
+          "nonzero": true
+        },
+        {
+          "feature": "da_lag168_range_robust",
+          "standardized_coefficient": -0.051007244727423545,
+          "nonzero": true
+        },
+        {
+          "feature": "da_context_max_z",
+          "standardized_coefficient": 0.12888547220449434,
+          "nonzero": true
+        },
+        {
+          "feature": "da_context_last_z",
+          "standardized_coefficient": 0.5188474281311056,
+          "nonzero": true
+        },
+        {
+          "feature": "da_context_negative_share",
+          "standardized_coefficient": -0.08290276438618782,
+          "nonzero": true
+        },
+        {
+          "feature": "rt_lag168_peak_z",
+          "standardized_coefficient": 0.06489534058667135,
+          "nonzero": true
+        },
+        {
+          "feature": "rt_lag168_median_z",
+          "standardized_coefficient": -0.006262568374412806,
+          "nonzero": true
+        },
+        {
+          "feature": "rt_lag168_range_robust",
+          "standardized_coefficient": 0.0,
+          "nonzero": false
+        },
+        {
+          "feature": "rt_context_max_z",
+          "standardized_coefficient": -0.3011122614809275,
+          "nonzero": true
+        },
+        {
+          "feature": "rt_context_last_z",
+          "standardized_coefficient": 0.0,
+          "nonzero": false
+        },
+        {
+          "feature": "rt_context_negative_share",
+          "standardized_coefficient": 0.04180480786390159,
+          "nonzero": true
+        },
+        {
+          "feature": "load_lag168_peak_z",
+          "standardized_coefficient": 0.3345974463590048,
+          "nonzero": true
+        },
+        {
+          "feature": "load_lag168_mean_z",
+          "standardized_coefficient": -0.20016591748873339,
+          "nonzero": true
+        },
+        {
+          "feature": "net_load_lag168_peak_z",
+          "standardized_coefficient": 0.0,
+          "nonzero": false
+        },
+        {
+          "feature": "net_load_lag168_mean_z",
+          "standardized_coefficient": -0.1365734418367172,
+          "nonzero": true
+        },
+        {
+          "feature": "wind_lag168_mean_z",
+          "standardized_coefficient": -0.2705827886318925,
+          "nonzero": true
+        },
+        {
+          "feature": "solar_lag168_mean_z",
+          "standardized_coefficient": -0.07961725000366175,
+          "nonzero": true
+        },
+        {
+          "feature": "dow_sin",
+          "standardized_coefficient": 0.0806194247647544,
+          "nonzero": true
+        },
+        {
+          "feature": "dow_cos",
+          "standardized_coefficient": 0.2198148793591508,
+          "nonzero": true
+        },
+        {
+          "feature": "month_sin",
+          "standardized_coefficient": -0.747089222653157,
+          "nonzero": true
+        },
+        {
+          "feature": "month_cos",
+          "standardized_coefficient": 0.0,
+          "nonzero": false
+        },
+        {
+          "feature": "is_weekend",
+          "standardized_coefficient": -0.6272672545771458,
+          "nonzero": true
+        },
+        {
+          "feature": "is_holiday",
+          "standardized_coefficient": -0.06771641630519522,
+          "nonzero": true
+        }
+      ],
+      "intercept": -3.1173258165775004,
+      "nonzero_coefficients": 19,
+      "event_price_thresholds_by_node": {
+        "TH_NP15_GEN-APND": 135.0809967041017,
+        "TH_SP15_GEN-APND": 152.3487617492678,
+        "TH_ZP26_GEN-APND": 132.01528472900392
+      }
+    },
+    "NYISO": {
+      "holdout_market": "NYISO",
+      "training_markets": [
+        "CAISO",
+        "PJM"
+      ],
+      "fit_years": [
+        2020,
+        2021
+      ],
+      "probability_threshold_selection_year": 2022,
+      "evaluation_year": 2023,
+      "event_price_threshold_source": "each node 2020-2021 hourly DA q99",
+      "probability_threshold": 0.02,
+      "threshold_selection_best_macro_f1": 0.6586347930179363,
+      "metrics": {
+        "samples": 3993,
+        "events": 220,
+        "event_rate": 0.05509641873278237,
+        "pr_auc": 0.10670660791075934,
+        "pr_auc_lift": 1.9367249335802819,
+        "precision": 0.07727975270479134,
+        "recall": 0.6818181818181818,
+        "f1": 0.13882461823229986,
+        "false_positive_rate": 0.4746885767293931,
+        "brier": 0.053450638702585374,
+        "constant_event_rate_brier": 0.05206080337560428,
+        "brier_improvement_vs_constant": -0.001389835326981094,
+        "tp": 150,
+        "fp": 1791,
+        "fn": 70,
+        "tn": 1982
+      },
+      "pr_auc_minus_event_rate_bootstrap": {
+        "repeats": 2000,
+        "resampling_unit": "delivery_date_all_nodes",
+        "mean": 0.05802970243392733,
+        "ci95": [
+          0.011788344401183086,
+          0.13084464173336113
+        ]
+      },
+      "clearly_above_baseline": true,
+      "calibration": [
+        {
+          "bin": 1,
+          "samples": 400,
+          "mean_probability": 0.0009548729205820363,
+          "observed_rate": 0.0425,
+          "minimum_probability": 5.223361612546019e-10,
+          "maximum_probability": 0.001994485521375187
+        },
+        {
+          "bin": 2,
+          "samples": 400,
+          "mean_probability": 0.0032411326777437867,
+          "observed_rate": 0.0325,
+          "minimum_probability": 0.0019973183372423253,
+          "maximum_probability": 0.004692562706218168
+        },
+        {
+          "bin": 3,
+          "samples": 400,
+          "mean_probability": 0.006317884772883129,
+          "observed_rate": 0.0375,
+          "minimum_probability": 0.004696021099083603,
+          "maximum_probability": 0.008022083307207498
+        },
+        {
+          "bin": 4,
+          "samples": 399,
+          "mean_probability": 0.010073622481109348,
+          "observed_rate": 0.03007518796992481,
+          "minimum_probability": 0.008023622292153148,
+          "maximum_probability": 0.012374037385319217
+        },
+        {
+          "bin": 5,
+          "samples": 399,
+          "mean_probability": 0.015320872443040272,
+          "observed_rate": 0.03007518796992481,
+          "minimum_probability": 0.012375231121239455,
+          "maximum_probability": 0.018642220759850125
+        },
+        {
+          "bin": 6,
+          "samples": 399,
+          "mean_probability": 0.02362096649106445,
+          "observed_rate": 0.015037593984962405,
+          "minimum_probability": 0.018666981999790264,
+          "maximum_probability": 0.028715676505085715
+        },
+        {
+          "bin": 7,
+          "samples": 399,
+          "mean_probability": 0.03555780850588289,
+          "observed_rate": 0.06265664160401002,
+          "minimum_probability": 0.02873510730751591,
+          "maximum_probability": 0.042575826246484184
+        },
+        {
+          "bin": 8,
+          "samples": 399,
+          "mean_probability": 0.052605716799515194,
+          "observed_rate": 0.07017543859649122,
+          "minimum_probability": 0.04260650040005521,
+          "maximum_probability": 0.06417224420907185
+        },
+        {
+          "bin": 9,
+          "samples": 399,
+          "mean_probability": 0.08361869605038316,
+          "observed_rate": 0.08771929824561403,
+          "minimum_probability": 0.06423616097270102,
+          "maximum_probability": 0.10870418091094486
+        },
+        {
+          "bin": 10,
+          "samples": 399,
+          "mean_probability": 0.19542369281971375,
+          "observed_rate": 0.14285714285714285,
+          "minimum_probability": 0.1087944091338722,
+          "maximum_probability": 0.9996540068190443
+        }
+      ],
+      "coefficients": [
+        {
+          "feature": "da_lag168_peak_z",
+          "standardized_coefficient": -0.023102757276915235,
+          "nonzero": true
+        },
+        {
+          "feature": "da_lag168_median_z",
+          "standardized_coefficient": -0.4320716308148626,
+          "nonzero": true
+        },
+        {
+          "feature": "da_lag168_range_robust",
+          "standardized_coefficient": 0.0,
+          "nonzero": false
+        },
+        {
+          "feature": "da_context_max_z",
+          "standardized_coefficient": 0.19797174141811436,
+          "nonzero": true
+        },
+        {
+          "feature": "da_context_last_z",
+          "standardized_coefficient": 0.8874272408244587,
+          "nonzero": true
+        },
+        {
+          "feature": "da_context_negative_share",
+          "standardized_coefficient": -0.25899915229197007,
+          "nonzero": true
+        },
+        {
+          "feature": "rt_lag168_peak_z",
+          "standardized_coefficient": 0.0,
+          "nonzero": false
+        },
+        {
+          "feature": "rt_lag168_median_z",
+          "standardized_coefficient": 0.06151958464690991,
+          "nonzero": true
+        },
+        {
+          "feature": "rt_lag168_range_robust",
+          "standardized_coefficient": -0.21964023392522583,
+          "nonzero": true
+        },
+        {
+          "feature": "rt_context_max_z",
+          "standardized_coefficient": -0.1537015099989885,
+          "nonzero": true
+        },
+        {
+          "feature": "rt_context_last_z",
+          "standardized_coefficient": -0.06871177605609455,
+          "nonzero": true
+        },
+        {
+          "feature": "rt_context_negative_share",
+          "standardized_coefficient": 0.02307727267510078,
+          "nonzero": true
+        },
+        {
+          "feature": "load_lag168_peak_z",
+          "standardized_coefficient": 0.31409062444264096,
+          "nonzero": true
+        },
+        {
+          "feature": "load_lag168_mean_z",
+          "standardized_coefficient": 0.023000866198841514,
+          "nonzero": true
+        },
+        {
+          "feature": "net_load_lag168_peak_z",
+          "standardized_coefficient": 0.4590788592157308,
+          "nonzero": true
+        },
+        {
+          "feature": "net_load_lag168_mean_z",
+          "standardized_coefficient": -0.7412468647525604,
+          "nonzero": true
+        },
+        {
+          "feature": "wind_lag168_mean_z",
+          "standardized_coefficient": -0.3386001872886574,
+          "nonzero": true
+        },
+        {
+          "feature": "solar_lag168_mean_z",
+          "standardized_coefficient": 0.035212491714096524,
+          "nonzero": true
+        },
+        {
+          "feature": "dow_sin",
+          "standardized_coefficient": 0.0,
+          "nonzero": false
+        },
+        {
+          "feature": "dow_cos",
+          "standardized_coefficient": 0.2852687493626347,
+          "nonzero": true
+        },
+        {
+          "feature": "month_sin",
+          "standardized_coefficient": -0.7352985315661421,
+          "nonzero": true
+        },
+        {
+          "feature": "month_cos",
+          "standardized_coefficient": -0.7450695189507924,
+          "nonzero": true
+        },
+        {
+          "feature": "is_weekend",
+          "standardized_coefficient": -0.7236881076560536,
+          "nonzero": true
+        },
+        {
+          "feature": "is_holiday",
+          "standardized_coefficient": 0.0568017635026293,
+          "nonzero": true
+        }
+      ],
+      "intercept": -3.232837483627384,
+      "nonzero_coefficients": 21,
+      "event_price_thresholds_by_node": {
+        "CAPITL": 97.33600044250494,
+        "CENTRL": 69.05800132751467,
+        "DUNWOD": 88.46850242614755,
+        "GENESE": 67.60650024414089,
+        "HUD VL": 84.18250160217289,
+        "LONGIL": 143.31300201416042,
+        "MHK VL": 70.2959995269776,
+        "MILLWD": 89.77749977111827,
+        "N.Y.C.": 91.52449760437013,
+        "NORTH": 62.22950057983407,
+        "WEST": 85.0
+      }
+    },
+    "PJM": {
+      "holdout_market": "PJM",
+      "training_markets": [
+        "CAISO",
+        "NYISO"
+      ],
+      "fit_years": [
+        2020,
+        2021
+      ],
+      "probability_threshold_selection_year": 2022,
+      "evaluation_year": 2023,
+      "event_price_threshold_source": "each node 2020-2021 hourly DA q99",
+      "probability_threshold": 0.03,
+      "threshold_selection_best_macro_f1": 0.6479270920340179,
+      "metrics": {
+        "samples": 12705,
+        "events": 630,
+        "event_rate": 0.049586776859504134,
+        "pr_auc": 0.16671869440635714,
+        "pr_auc_lift": 3.362160337194869,
+        "precision": 0.0542475204829668,
+        "recall": 0.9984126984126984,
+        "f1": 0.1029038854805726,
+        "false_positive_rate": 0.9081573498964803,
+        "brier": 0.07812605765275264,
+        "constant_event_rate_brier": 0.047127928420189875,
+        "brier_improvement_vs_constant": -0.030998129232562767,
+        "tp": 629,
+        "fp": 10966,
+        "fn": 1,
+        "tn": 1109
+      },
+      "pr_auc_minus_event_rate_bootstrap": {
+        "repeats": 2000,
+        "resampling_unit": "delivery_date_all_nodes",
+        "mean": 0.1190485612933856,
+        "ci95": [
+          0.039789701242350844,
+          0.2184014111393602
+        ]
+      },
+      "clearly_above_baseline": true,
+      "calibration": [
+        {
+          "bin": 1,
+          "samples": 1271,
+          "mean_probability": 0.01981893545869558,
+          "observed_rate": 0.0007867820613690008,
+          "minimum_probability": 0.0003921069543112234,
+          "maximum_probability": 0.032614168091362056
+        },
+        {
+          "bin": 2,
+          "samples": 1271,
+          "mean_probability": 0.04197576766807395,
+          "observed_rate": 0.003933910306845004,
+          "minimum_probability": 0.03263218250933061,
+          "maximum_probability": 0.05116481673130537
+        },
+        {
+          "bin": 3,
+          "samples": 1271,
+          "mean_probability": 0.06065811465778968,
+          "observed_rate": 0.015735641227380016,
+          "minimum_probability": 0.051173220216017355,
+          "maximum_probability": 0.07272477942145059
+        },
+        {
+          "bin": 4,
+          "samples": 1271,
+          "mean_probability": 0.0863237970901756,
+          "observed_rate": 0.06372934697088907,
+          "minimum_probability": 0.07274304552055665,
+          "maximum_probability": 0.10179216860202076
+        },
+        {
+          "bin": 5,
+          "samples": 1271,
+          "mean_probability": 0.12041107474018178,
+          "observed_rate": 0.044846577498033044,
+          "minimum_probability": 0.10180301203799114,
+          "maximum_probability": 0.13857220880230817
+        },
+        {
+          "bin": 6,
+          "samples": 1270,
+          "mean_probability": 0.15821488559945784,
+          "observed_rate": 0.025196850393700787,
+          "minimum_probability": 0.13858685369196194,
+          "maximum_probability": 0.17980630137177256
+        },
+        {
+          "bin": 7,
+          "samples": 1270,
+          "mean_probability": 0.20455062905424792,
+          "observed_rate": 0.05590551181102362,
+          "minimum_probability": 0.17980891948757238,
+          "maximum_probability": 0.22892997737241397
+        },
+        {
+          "bin": 8,
+          "samples": 1270,
+          "mean_probability": 0.26098940074804106,
+          "observed_rate": 0.05196850393700787,
+          "minimum_probability": 0.2289585327208004,
+          "maximum_probability": 0.2936276648733657
+        },
+        {
+          "bin": 9,
+          "samples": 1270,
+          "mean_probability": 0.3338466004660998,
+          "observed_rate": 0.06535433070866142,
+          "minimum_probability": 0.2936595731641702,
+          "maximum_probability": 0.3898751884561327
+        },
+        {
+          "bin": 10,
+          "samples": 1270,
+          "mean_probability": 0.5650375578703718,
+          "observed_rate": 0.16850393700787403,
+          "minimum_probability": 0.3899792331568652,
+          "maximum_probability": 0.9999999177536253
+        }
+      ],
+      "coefficients": [
+        {
+          "feature": "da_lag168_peak_z",
+          "standardized_coefficient": 0.0,
+          "nonzero": false
+        },
+        {
+          "feature": "da_lag168_median_z",
+          "standardized_coefficient": -0.2222468808034991,
+          "nonzero": true
+        },
+        {
+          "feature": "da_lag168_range_robust",
+          "standardized_coefficient": -0.04174474076085775,
+          "nonzero": true
+        },
+        {
+          "feature": "da_context_max_z",
+          "standardized_coefficient": 0.29282081105514934,
+          "nonzero": true
+        },
+        {
+          "feature": "da_context_last_z",
+          "standardized_coefficient": 1.019896587146475,
+          "nonzero": true
+        },
+        {
+          "feature": "da_context_negative_share",
+          "standardized_coefficient": -0.29285868456483694,
+          "nonzero": true
+        },
+        {
+          "feature": "rt_lag168_peak_z",
+          "standardized_coefficient": 0.0,
+          "nonzero": false
+        },
+        {
+          "feature": "rt_lag168_median_z",
+          "standardized_coefficient": 0.10713040729886628,
+          "nonzero": true
+        },
+        {
+          "feature": "rt_lag168_range_robust",
+          "standardized_coefficient": -0.19164376121232474,
+          "nonzero": true
+        },
+        {
+          "feature": "rt_context_max_z",
+          "standardized_coefficient": -0.059759423170595086,
+          "nonzero": true
+        },
+        {
+          "feature": "rt_context_last_z",
+          "standardized_coefficient": -0.058511652388781546,
+          "nonzero": true
+        },
+        {
+          "feature": "rt_context_negative_share",
+          "standardized_coefficient": -0.11646650388383271,
+          "nonzero": true
+        },
+        {
+          "feature": "load_lag168_peak_z",
+          "standardized_coefficient": 0.0,
+          "nonzero": false
+        },
+        {
+          "feature": "load_lag168_mean_z",
+          "standardized_coefficient": 0.012541372135694912,
+          "nonzero": true
+        },
+        {
+          "feature": "net_load_lag168_peak_z",
+          "standardized_coefficient": 0.014299152625851599,
+          "nonzero": true
+        },
+        {
+          "feature": "net_load_lag168_mean_z",
+          "standardized_coefficient": 0.0,
+          "nonzero": false
+        },
+        {
+          "feature": "wind_lag168_mean_z",
+          "standardized_coefficient": -0.03152243263237955,
+          "nonzero": true
+        },
+        {
+          "feature": "solar_lag168_mean_z",
+          "standardized_coefficient": -0.01562706008827979,
+          "nonzero": true
+        },
+        {
+          "feature": "dow_sin",
+          "standardized_coefficient": 0.11569679780118873,
+          "nonzero": true
+        },
+        {
+          "feature": "dow_cos",
+          "standardized_coefficient": 0.17608291543478208,
+          "nonzero": true
+        },
+        {
+          "feature": "month_sin",
+          "standardized_coefficient": -0.33063223600496805,
+          "nonzero": true
+        },
+        {
+          "feature": "month_cos",
+          "standardized_coefficient": -0.6094898356836305,
+          "nonzero": true
+        },
+        {
+          "feature": "is_weekend",
+          "standardized_coefficient": -0.4050777697726205,
+          "nonzero": true
+        },
+        {
+          "feature": "is_holiday",
+          "standardized_coefficient": 0.07234699649176937,
+          "nonzero": true
+        }
+      ],
+      "intercept": -3.2645757964684616,
+      "nonzero_coefficients": 20,
+      "event_price_thresholds_by_node": {
+        "HUB:AEP GEN HUB": 85.56425056457519,
+        "HUB:AEP-DAYTON HUB": 87.24100189208991,
+        "HUB:ATSI GEN HUB": 86.09542083740239,
+        "HUB:CHICAGO GEN HUB": 78.45953712463412,
+        "HUB:CHICAGO HUB": 80.89525184631353,
+        "HUB:DOMINION HUB": 95.0560695648194,
+        "HUB:EASTERN HUB": 95.67602157592789,
+        "HUB:N ILLINOIS HUB": 79.93187942504903,
+        "HUB:NEW JERSEY HUB": 70.27482528686525,
+        "HUB:OHIO HUB": 86.82977256774909,
+        "HUB:WEST INT HUB": 88.81391181945807,
+        "HUB:WESTERN HUB": 91.43231849670435,
+        "ZONE:AECO": 70.33911895751957,
+        "ZONE:AEP": 87.90652313232422,
+        "ZONE:APS": 92.095233154297,
+        "ZONE:ATSI": 88.17451744079594,
+        "ZONE:BGE": 105.19077835083021,
+        "ZONE:COMED": 80.00182762146007,
+        "ZONE:DAY": 94.16526718139664,
+        "ZONE:DEOK": 93.45760803222659,
+        "ZONE:DOM": 104.16101379394549,
+        "ZONE:DPL": 102.00214729309128,
+        "ZONE:DUQ": 89.62380218505862,
+        "ZONE:EKPC": 88.57462577819832,
+        "ZONE:JCPL": 70.64030838012698,
+        "ZONE:METED": 102.12503051757818,
+        "ZONE:MID-ATL/APS": 97.58321304321309,
+        "ZONE:OVEC": 86.60300064086924,
+        "ZONE:PECO": 69.7999107360844,
+        "ZONE:PENELEC": 86.06221580505385,
+        "ZONE:PEPCO": 102.04416046142579,
+        "ZONE:PJM-RTO": 91.44332199096681,
+        "ZONE:PPL": 84.36269912719732,
+        "ZONE:PSEG": 70.37103958129887,
+        "ZONE:RECO": 78.64700775146486
+      }
+    }
+  },
+  "gate": {
+    "rule": "at least two of three holdout markets must have lift>=1.25 and bootstrap CI lower>0",
+    "passed_markets": [
+      "NYISO",
+      "PJM"
+    ],
+    "failed_markets": [
+      "CAISO"
+    ],
+    "audit_passed": true,
+    "conclusion": "正尖峰日级概率包含可跨市场泛化信号",
+    "allow_next_model_preregistration": true,
+    "required_action": "审计通过后只能另写预注册；本轮仍不得直接训练概率事件头或条件幅度分布模型。"
+  },
+  "input_files": {
+    "CAISO_train": {
+      "path": "data/results/negative_price_adapter_v1/feature_cache/caiso_train_features_v2.npz",
+      "sha256": "606bf98031302832434cd37d9cf79fd642d5c08f85db158e9d95c77e89db1ba1"
+    },
+    "CAISO_val": {
+      "path": "data/results/negative_price_adapter_v1/feature_cache/caiso_val_features_v2.npz",
+      "sha256": "53305f011de18a9d719f0feb6792daf3f23bd1c4236ec03500bbfd6b160590f1"
+    },
+    "NYISO_train": {
+      "path": "data/results/negative_price_adapter_v1/feature_cache/nyiso_train_features_v2.npz",
+      "sha256": "48ad6f06c39def4e627cf52f189c7048f250b90c0f401a735e6a23ec28203195"
+    },
+    "NYISO_val": {
+      "path": "data/results/negative_price_adapter_v1/feature_cache/nyiso_val_features_v2.npz",
+      "sha256": "5b4d0a7dec4c2b99e2ec29a731b0413853cdaac2fd138b96146923bfceb33bde"
+    },
+    "PJM_train": {
+      "path": "data/results/negative_price_adapter_v1/feature_cache/pjm_train_features_v2.npz",
+      "sha256": "e78db8e14a46f53d5d0c8cc762cb809f35ea0b553d83d297fca9b1c775563fef"
+    },
+    "PJM_val": {
+      "path": "data/results/negative_price_adapter_v1/feature_cache/pjm_val_features_v2.npz",
+      "sha256": "8116723db30cd2028aa49a38331b31f34b48871059b20a2eeaa92cf4b7f4901c"
+    }
+  },
+  "runtime_seconds": 32.56551510001009
+}

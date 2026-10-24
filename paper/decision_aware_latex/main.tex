@@ -1,0 +1,765 @@
+\documentclass[UTF8,a4paper,11pt,fontset=fandol]{ctexart}
+
+\usepackage[left=26mm,right=26mm,top=24mm,bottom=23mm]{geometry}
+\usepackage{amsmath,amssymb,bm,mathtools}
+\usepackage{booktabs,longtable,tabularx,array,multirow}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{float}
+
+\definecolor{linkblue}{RGB}{32,75,145}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=linkblue,
+  urlcolor=linkblue,
+  pdfauthor={研究论文稿},
+  pdftitle={跨市场端到端决策感知电价预测与储能双结算}
+}
+
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.35em}
+\linespread{1.22}
+\setlist[itemize]{leftmargin=2.5em,itemsep=0.2em,topsep=0.3em}
+\setlist[enumerate]{leftmargin=2.7em,itemsep=0.2em,topsep=0.3em}
+\captionsetup{font=small,labelsep=quad}
+\ctexset{
+  section={
+    format=\large\bfseries,
+    beforeskip=1.4em,
+    afterskip=0.7em
+  },
+  subsection={
+    format=\normalsize\bfseries,
+    beforeskip=1.0em,
+    afterskip=0.5em
+  }
+}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\usdnode}{USD/节点$\cdot$日}
+\newcommand{\best}[1]{\textbf{#1}}
+\newcommand{\R}{\mathbb{R}}
+
+\begin{document}
+\sloppy
+\pagestyle{plain}
+
+\begin{center}
+  \vspace*{8mm}
+  {\LARGE\bfseries 跨市场端到端决策感知电价预测与储能双结算\par}
+  \vspace{2mm}
+  {\large 基于强凸电池二次规划、KKT 隐式微分与稳健多种子校准\par}
+  \vspace{7mm}
+\end{center}
+
+\section{研究问题与核心发现}
+
+电价预测文献通常使用平均绝对误差或均方误差衡量模型，但电力价格具有尖峰、负价、异方差和显著的市场差异，较低的逐时误差并不必然产生更优的交易决策
+\cite{weron2014,lago2021}。对储能而言，收益还取决于价格排序、日前头寸、实时修正、荷电状态（state of charge, SOC）、退化成本与偏差罚金；日前与实时市场的两阶段耦合会进一步放大预测误差与决策价值之间的错位
+\cite{krishnamurthy2018,alghumayjan2024}。
+
+本文研究的问题是：能否让最终储能收益直接参与电价预测模型训练，同时保持动作可行、训练稳定和跨市场泛化。为此，本文将三个价格预测器与一个可微的强凸电池二次规划（quadratic program, QP）连接。预测价格先进入 QP 产生日前计划、实时动作和 SOC 轨迹；随后在真实训练期价格下计算收益，并利用 Karush--Kuhn--Tucker（KKT）最优性条件的隐式微分，将收益梯度传回预测网络。该思想属于 decision-focused learning：预测模型按下游任务质量训练，而不只按标签误差训练
+\cite{donti2017,mandi2024}。
+
+实验形成四项与本项目直接相关的核心发现。
+\begin{enumerate}
+  \item \textbf{Decision-aware 微调确实改善了未见市场上的完整结算收益。}模型只在 CAISO、NYISO 和 PJM 的 2020--2022 数据上训练、未使用 ERCOT 训练标签时，2023 ERCOT 收益达到 430.41~\usdnode，较同信息预算的 pooled LOMO XGBoost 提高 12.34（2.95\%）；15 个节点中有 14 个改善，配对区块 bootstrap 95\% 区间为 $[0.02,29.26]$。
+  \item \textbf{这项增益能够跨年延续，而不是 2023 选模造成的偶然结果。}在不再改变结构、损失权重和融合比例的 2024 冻结确认中，本文方法取得 106.86~\usdnode，较能够使用 ERCOT 历史标签的逐节点 XGBoost 提高 16.17（17.83\%）；15/15 节点改善，95\% 区间为 $[6.27,26.94]$。
+  \item \textbf{冻结配置在最终 2025 全年结算中仍排名第一。}四市场历史数据重训后，本文方法在 ERCOT 15 节点、362 个共同有效日上取得 69.54~\usdnode，在 13 套完整流程中排名第一；相对最强预注册纯基线 DLinear 提高 8.02（13.03\%），相对既有尾部专家 Router 提高 6.02（9.47\%），两组配对区间下界均高于 0。
+  \item \textbf{有效增益来自“价格锚点、可微决策梯度和稳健融合”的组合，而不是把收益权重无限增大。}2023 消融中，高决策权重配置 B 和 E 均弱于解码器平衡配置 A，单日下行风险版本 v2 也弱于 v1；最终 2:1 融合在删除候选最有利 5 日后仍保持正差。2025 的正式连续 LP/MPC 结算中 SOC 违规为 0，说明收益提升没有以破坏电池可行性为代价。
+\end{enumerate}
+
+本文所称“端到端”是指收益梯度能够穿过最优决策返回价格预测网络；编码器保持冻结，因此它是\textbf{决策目标端到端、部分参数微调}，而不是全参数端到端训练。正式评价使用精确日前线性规划（LP）和滚动模型预测控制（MPC）进行全年连续结算，而非训练 QP 的近似目标。
+
+\section{任务、数据与正式结算}
+
+\subsection{市场和时间边界}
+
+数据覆盖 CAISO、NYISO、PJM 和 ERCOT。CAISO、NYISO、PJM 在 2023 开发阶段作为源市场；ERCOT 作为完全留出的目标市场。四个市场节点数及其角色见表~\ref{tab:markets}。
+
+\begin{table}[H]
+\centering
+\caption{市场、节点数与实验角色。}
+\label{tab:markets}
+\small
+\begin{tabularx}{\textwidth}{l c Y c c}
+\toprule
+市场 & 节点数 & 实验角色 & 进入 2023 候选训练 & 进入最终重训 \\
+\midrule
+CAISO & 3  & 源市场 & 是 & 是 \\
+NYISO & 11 & 源市场 & 是 & 是 \\
+PJM   & 35 & 源市场 & 是 & 是 \\
+ERCOT & 15 & 2023 开发、2024 确认、2025 结算 & 否 & 是，仅 2020--2024 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+所有收益采用节点等权宏平均，以防节点较多的 PJM 在样本数量上支配其他市场。2025 ERCOT 评价覆盖 15 个节点和 362 个共同有效日；三个任务必须在同一节点--日期交集上完整可用。
+
+\subsection{三个价格预测任务}
+
+本文把完整结算拆为三个具有不同信息截止点的预测任务。
+\begin{table}[H]
+\centering
+\caption{三个价格任务及其下游用途。}
+\label{tab:tasks}
+\small
+\begin{tabularx}{\textwidth}{l Y Y Y}
+\toprule
+任务 & 起报信息 & 输出 & 下游用途 \\
+\midrule
+DA & 交付日前可见的 168 小时历史与日历 & 未来 24 小时日前价格 & 形成并锁定日前计划 \\
+RT-at-DA & 与 DA 相同的信息截止点 & 未来 24 小时实时价格预期 & 在日前优化中估计偏差价值 \\
+rolling RT & 交付日逐小时更新的可见历史 & 未来 4 小时实时价格 & MPC 滚动修正，仅执行第一步 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+三个网络均不把 node ID 或 market ID 输入前向传播；身份只用于样本组织、SOC 隔离和结果汇总。日前与 RT-at-DA 在同一信息集上生成 24 小时曲线，rolling RT 每小时重算一次 4 小时预测。
+
+\subsection{双结算收益与电池约束}
+
+令 $c_t$ 和 $d_t$ 分别为充电和放电功率，净注入为
+\begin{equation}
+u_t^{DA}=d_t^{DA}-c_t^{DA},
+\qquad
+u_t^{RT}=d_t^{RT}-c_t^{RT}.
+\end{equation}
+在真实日前价格 $p_t^{DA}$ 和实时价格 $p_t^{RT}$ 下，单日净收益定义为
+\begin{equation}
+\begin{aligned}
+R
+=\sum_{t=1}^{24}\Big[
+&p_t^{DA}u_t^{DA}
++p_t^{RT}\!\left(u_t^{RT}-u_t^{DA}\right)\\
+&-\kappa\left(d_t^{RT}+c_t^{RT}\right)
+-2|p_t^{RT}|e_t
+\Big],
+\end{aligned}
+\label{eq:revenue}
+\end{equation}
+其中 $\kappa=5.7$ USD/MWh 为退化成本，偏差罚金量为
+\begin{equation}
+e_t=
+\max\!\left(
+\left|u_t^{RT}-u_t^{DA}\right|-0.03|u_t^{DA}|,\;0
+\right).
+\end{equation}
+循环老化成本会显著改变储能套利策略，因此不能在收益核算中忽略
+\cite{xu2018}。
+
+SOC 动力学和动作约束为
+\begin{equation}
+s_t=s_{t-1}+\eta c_t-\frac{d_t}{\eta},
+\quad
+0.4\le s_t\le 3.6,
+\quad
+0\le c_t,d_t\le 1.
+\label{eq:soc}
+\end{equation}
+额定功率为 1 MW、容量为 4 MWh、初始 SOC 为 2 MWh、充放电效率分量为 $0.95$、每日放电额度为 4 MWh。正式评价把实际 SOC 连续传递到后续小时和日期；日前 LP 一次产生并锁定计划，实时 MPC 每小时重解且只执行第一个动作。
+
+\section{相关工作与本文定位}
+
+\subsection{电价预测和时间序列模型}
+
+电价预测研究已经形成包括线性自回归、梯度提升树、深度学习和 Transformer 的完整比较体系
+\cite{weron2014,lago2021}。本文的树模型基线采用 XGBoost
+\cite{chen2016}；深度基线包括将趋势项和季节项分解后线性外推的 DLinear
+\cite{zeng2023}，以及冻结或低秩适配的时间序列基础模型 TimesFM
+\cite{das2024}。Transformer 主干的注意力机制源于标准自注意力架构
+\cite{vaswani2017}。
+
+本文并不以提出新的通用预测骨干为主要贡献，而是研究预测结果如何通过双结算储能决策产生经济价值。所有进入完整收益排行榜的方法都必须同时提供 DA、RT-at-DA 和 rolling RT 三条预测腿，并进入同一正式结算器。
+
+\subsection{Decision-focused learning 与可微优化}
+
+Donti 等人较早系统展示了按下游随机优化目标端到端训练预测模型的方法，并在电网调度和储能套利中验证了这种训练范式
+\cite{donti2017}。OptNet 将 QP 作为神经网络层，并通过 KKT 条件计算最优解对问题参数的导数
+\cite{amos2017}；随后 Agrawal 等人把这一思想推广到参数化凸规划
+\cite{agrawal2019}。SPO 则从决策误差出发构造 predict-then-optimize 损失及其凸代理
+\cite{elmachtoub2022}。近期综述进一步统一了 decision-focused learning 的问题设定、算法类别与评估原则
+\cite{mandi2024}。
+
+本文没有使用 SPO+，也不主张首次提出可微 QP 或 KKT 隐式微分。本文贡献在于把三条不同信息截止点的价格腿、DA/RT 双结算、连续 SOC、退化成本和偏差罚金组合到同一可导训练链路，并加入跨市场稳健校准和冻结的跨年评价协议。
+
+\subsection{储能套利与双结算市场}
+
+储能在日前和实时市场之间的套利具有显著的不确定性和跨阶段耦合
+\cite{krishnamurthy2018}。已有工作使用 Transformer 预测双结算价格
+\cite{alghumayjan2024}，也有研究直接学习储能机会价值函数
+\cite{liu2023}。本文与这些工作的差异是：不直接输出策略或机会价值，而是保持可解释的三价格腿，并让下游储能优化的收益梯度反向校正价格预测。
+
+\section{端到端 Decision-aware 方法}
+
+\subsection{价格网络与可训练范围}
+
+每个任务使用一个无身份 Transformer。编码器把 168 小时多源历史压缩为共享表示；query decoder 按未来时刻查询该表示；price head 把隐藏向量映射为价格。网络维度为 128，采用 4 头注意力和两层编码/融合模块。
+
+基础模型先使用价格损失训练。Decision-aware 阶段只更新三个网络的 decoder 和 price head，编码器冻结。这一范围既允许未来时刻表示被经济信号调整，又保留基础模型已经学习到的跨市场历史表示。
+
+\subsection{可微强凸电池 QP}
+
+令
+\[
+x=
+\left[
+d^{DA},c^{DA},d^{RT},c^{RT},e
+\right]\in\R^{120},
+\]
+全部物理与费用约束写为凸集 $Cx\le b$。原始 LP 在多重最优解和活跃集切换处可能不可导。训练阶段加入二次正则和对数障碍，得到
+\begin{equation}
+x^\star(\hat p)
+=
+\arg\min_{Cx<b}
+\left\{
+q(\hat p)^\top x
++\frac{\rho}{2}\|x\|_2^2
+-\tau\sum_j\log(b_j-C_jx)
+\right\},
+\label{eq:qp}
+\end{equation}
+其中 $\rho=0.25$、$\tau=0.10$。三条预测价格构成线性费用向量
+\begin{equation}
+\begin{aligned}
+q(\hat p)=\big[
+&-(\hat p^{DA}-\hat p^{RT|DA}),
++(\hat p^{DA}-\hat p^{RT|DA}),\\
+&-\hat p^{RT}+\kappa,\;
++\hat p^{RT}+\kappa,\;
+2\sqrt{(\hat p^{RT})^2+\delta^2}
+\big],
+\end{aligned}
+\end{equation}
+其中 $\delta=1$ 用于平滑绝对值。强凸项保证最优解唯一，对数障碍使训练路径保持严格可行。
+
+\subsection{KKT 隐式微分}
+
+式~\eqref{eq:qp} 的一阶最优条件为
+\begin{equation}
+F(x,q)
+=
+q+\rho x+\tau C^\top(b-Cx)^{-1}
+=0.
+\end{equation}
+其关于 $x$ 的 Jacobian 是正定 Hessian
+\begin{equation}
+H
+=
+\rho I+
+\tau C^\top
+\operatorname{diag}\!\left((b-Cx)^{-2}\right)C.
+\end{equation}
+由隐函数定理，
+\begin{equation}
+\frac{\partial x^\star}{\partial q}
+=-H^{-1},
+\qquad
+\frac{\partial \mathcal L}{\partial q}
+=-H^{-\top}\frac{\partial \mathcal L}{\partial x}.
+\label{eq:implicit}
+\end{equation}
+实现时不展开 Newton 求解轨迹，而是在收敛点解线性系统
+$H^\top v=\partial\mathcal L/\partial x$。该处理与可微优化层的经典做法一致
+\cite{amos2017,agrawal2019}，同时避免长求解轨迹的显存开销。
+
+\subsection{联合训练目标}
+
+联合损失为
+\begin{equation}
+\mathcal L_{\mathrm{joint}}
+=(1-\alpha)\mathcal L_{\mathrm{pred}}
++\alpha\left[-\frac{\operatorname{mean}(R)}{500}\right],
+\qquad \alpha=0.60.
+\label{eq:joint}
+\end{equation}
+$\mathcal L_{\mathrm{pred}}$ 是三个任务 Smooth-L1 损失的等权平均，用于维持价格语义；第二项使用真实训练期价格和 QP 动作计算，是明确的 decision-aware 信号。表~\ref{tab:train} 给出冻结后的主要训练设置。
+
+\begin{table}[H]
+\centering
+\caption{Decision-aware 微调的冻结设置。}
+\label{tab:train}
+\small
+\begin{tabularx}{\textwidth}{l l Y}
+\toprule
+项目 & 冻结值 & 含义 \\
+\midrule
+epoch & 3 & 固定跑满，不按目标年收益早停 \\
+episode & 单日；每节点每 epoch 2 个 & 节点均衡随机优化，防止高节点市场主导梯度 \\
+学习率 & $2\times10^{-5}$ & AdamW，weight decay 为 0.01 \\
+决策权重 & $\alpha=0.60$ & 价格锚点与经济目标的固定折中 \\
+可训练范围 & decoder + price head & 不是全参数微调 \\
+QP & $\rho=0.25,\tau=0.10$ & 唯一、平滑、可隐式求导 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{稳健多种子校准}
+
+seed 表示固定的随机数种子。三个 seed 使用相同架构、数据和超参数，只改变初始化和 mini-batch 顺序。校准器不重新打开 Transformer 主体，而是对每条价格腿学习非负且和为 1 的 softmax 凸权重，并对经济相关量进行有界修正。
+
+对 DA 和 RT-at-DA，先定义中心 $m$ 和价差 $s$，再令
+\begin{equation}
+\hat p^{DA}=m'+\frac{s'}{2},
+\qquad
+\hat p^{RT|DA}=m'-\frac{s'}{2},
+\end{equation}
+\begin{equation}
+m'=m+b_m,
+\qquad
+s'=a_s s+b_s.
+\end{equation}
+对 rolling RT，
+\begin{equation}
+\hat p^{RT}_{t,k}
+=
+a_t^{RT}\sum_{r=1}^{3}w_r^{RT}\hat p^{RT,r}_{t,k}
++b_t^{RT}.
+\end{equation}
+所有偏置和尺度均通过有界映射限制范围。跨市场稳健目标为
+\begin{equation}
+\begin{aligned}
+\mathcal L_{\mathrm{robust}}
+=&
+-\operatorname{mean}_m(\Delta R_m)
++0.5\,\operatorname{std}_m(\Delta R_m)\\
+&+0.5\,\operatorname{ReLU}\!\left[-\min_m(\Delta R_m)\right]
++0.05\mathcal L_{\mathrm{pred}}
++0.01\Omega.
+\end{aligned}
+\end{equation}
+校准器每个市场使用 128 个训练 episode 和 64 个不重叠验证 episode，固定训练 8 个 epoch，并使用末 epoch；不按最终收益挑选 checkpoint。
+
+\subsection{冻结的 2:1 融合}
+
+最终预测为
+\begin{equation}
+\hat p_{\mathrm{v4}}
+=
+\frac{2}{3}\hat p_{\mathrm{seed0}}
++\frac{1}{3}\hat p_{\mathrm{robust}}.
+\label{eq:blend}
+\end{equation}
+seed0 提供开发阶段较高的点估计，稳健分支提供跨 seed 和跨市场稳定性。只在 2023 比较过 1:1 与 2:1 两个可解释比例；2024 不再调整，2025 重训仍沿用式~\eqref{eq:blend}。该融合发生在价格层，随后统一进入正式 LP/MPC。
+
+\section{实验协议、比较对象与评价标准}
+
+\subsection{2023、2024 和 2025 的训练方式}
+
+\begin{table}[H]
+\centering
+\caption{跨市场与跨年份实验协议。}
+\label{tab:protocol}
+\small
+\begin{tabularx}{\textwidth}{l Y Y c Y}
+\toprule
+阶段 & 训练市场与年份 & 评价市场与年份 & 允许选模 & 主要比较 \\
+\midrule
+2023 开发 & CAISO、NYISO、PJM，2020--2022 & ERCOT 2023 & 是 & pooled LOMO XGBoost \\
+2024 冻结确认 & 沿用 2023 冻结模型 & ERCOT 2024 & 否 & 逐节点 XGBoost \\
+2025 最终评价 & 四市场，2020--2024 & ERCOT 2025 & 否 & DLinear、Router 与完整排行榜 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+LOMO 表示 leave-one-market-out：将 ERCOT 整体作为未见目标市场。pooled XGBoost 将三个源市场样本合并后训练一套共享树模型，且不输入节点 ID 或市场 ID，因此 2023 与本文方法具有相同训练信息预算。2024 的逐节点 XGBoost 可使用 ERCOT 2020--2023 历史标签，信息预算更强。最终阶段按冻结配置在四市场 2020--2024 数据上重训，2025 不进入训练、校准、seed 选择、阈值选择或融合权重选择。
+
+\subsection{外部与经典基线}
+
+\begin{table}[H]
+\centering
+\caption{外部和经典基线的定义。}
+\label{tab:baselines}
+\footnotesize
+\begin{tabularx}{\textwidth}{l Y Y}
+\toprule
+方法 & 定义与训练信息 & 在本文中的作用 \\
+\midrule
+lag-168 & 复制一周前同小时价格，不训练参数 & 周季节性基线 \\
+pooled XGBoost \cite{chen2016} & 合并源市场样本训练一套共享树模型，不输入身份 & 2023 同信息预算主基线 \\
+逐节点 XGBoost \cite{chen2016} & 每个节点单独训练一套树模型 & 2024 较强信息预算对照 \\
+DLinear \cite{zeng2023} & 趋势与季节分解后分别线性外推 & 2025 最强预注册纯基线 \\
+TimesFM-3 frozen \cite{das2024} & 参数冻结的时间序列基础模型 & 零样本基础模型基线 \\
+TimesFM-2.5 LoRA \cite{das2024} & 在基础模型上训练 rank-4 低秩适配参数 & 参数高效微调基线 \\
+LEAR & 使用滞后价格与日历变量的线性自回归模型 & 缺 rolling RT，不进入完整排名 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{本仓库前期方法与本文关系}
+
+\begin{table}[H]
+\centering
+\caption{前期方法是最终组件、消融还是独立对照。}
+\label{tab:internal}
+\footnotesize
+\begin{tabularx}{\textwidth}{l Y c Y}
+\toprule
+方法 & 通俗定义 & 进入最终 v4 & 本文如何使用 \\
+\midrule
+原无 ID Transformer & 只按价格损失训练的三个独立 seed & 是，初始化 & 微调起点与直接对照 \\
+单 seed implicit-QP & 一个 seed 上的可微电池 QP 微调 & 是，seed0 分支 & 高收益成员 \\
+稳健三 seed 校准器 & 学习凸权重和有界价格修正 & 是，稳健分支 & 降低 seed 与市场方差 \\
+v3 1:1 融合 & seed0 与稳健分支各占一半 & 否 & 融合比例消融 \\
+本文 v4 2:1 融合 & seed0 占 $2/3$，稳健分支占 $1/3$ & 是 & 最终冻结方法 \\
+尾部专家 Router & 深度 2 树在 Transformer 与 DLinear 混合专家间选择 & 否 & 独立前期方法，仅作强对照 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Router 使用三个起报时可见的价差信号：Transformer 预测价差最大值、Transformer 预测价差的 10\% 分位数，以及 DLinear 预测价差为负的小时数。它默认使用 Transformer；当浅树判断 DLinear 更可能获利时，只把 DA 和 RT-at-DA 切换到 DLinear，rolling RT 仍使用 Transformer。Router 不参与 v4 训练。
+
+\subsection{评价指标与统计检验}
+
+主指标是节点等权日均净收益：
+\begin{equation}
+\bar R
+=
+\frac{1}{N}\sum_{n=1}^{N}
+\left[
+\frac{1}{|D_n|}
+\sum_{d\in D_n}R_{n,d}
+\right],
+\end{equation}
+单位为 \usdnode。统计检验包括：
+\begin{itemize}
+  \item 配对 7 日区块 bootstrap 95\% 区间，按连续日期块重采样，以保留周内相关性
+  \cite{efron1993}；
+  \item 节点覆盖，即 15 个 ERCOT 节点中候选平均收益更高的节点数；
+  \item 删除候选相对对照差值最大的 5 日后重新计算平均差；
+  \item 在对照收益最低的 10\% 日期上计算收益差；
+  \item DA 腿、RT 偏差腿、退化成本、偏差罚金和 SOC 违规等机制指标。
+\end{itemize}
+
+\section{实验结果}
+
+\subsection{2023 Decision-aware 配置筛选}
+
+表~\ref{tab:candidate-def} 中的“候选”不是五种神经网络，而是同一三任务 Transformer 在 decision-aware 微调阶段的五套预先给定配置。它们只改变可训练范围、决策权重 $\alpha$、QP 平滑程度和学习率。先用 seed0 选择配置，再固定训练 seed1 和 seed2。
+
+\begin{table}[H]
+\centering
+\caption{五套候选训练配置。}
+\label{tab:candidate-def}
+\footnotesize
+\begin{tabularx}{\textwidth}{l l c c c Y}
+\toprule
+配置 & 更新参数 & $\alpha$ & $\rho/\tau$ & 学习率 & 目的 \\
+\midrule
+A 解码器平衡 & decoder + head & 0.60 & 0.25/0.10 & $2$e$-5$ & 价格与收益折中 \\
+B 高决策权重 & price head & 0.80 & 0.25/0.25 & $2$e$-4$ & 检验更强收益监督 \\
+C 价格头平衡 & price head & 0.50 & 0.25/0.25 & $2$e$-4$ & 只微调输出头 \\
+D 较尖锐 QP & price head & 0.70 & 0.10/0.05 & $1$e$-4$ & 更接近原 LP \\
+E 解码器高决策 & decoder + head & 0.85 & 0.10/0.05 & $1$e$-5$ & 扩大范围并提高决策权重 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{2023 候选配置的完整结算结果。}
+\label{tab:candidate-results}
+\footnotesize
+\begin{tabular}{lrrrrl}
+\toprule
+配置 & 收益 & 较 XGBoost & 改善节点 & 去最佳 5 日 & 95\% 区间 \\
+\midrule
+A 解码器平衡 & \best{426.99} & \best{+8.92} & \best{14/15} & \best{+0.65} & $[-3.88,25.92]$ \\
+B 高决策权重 & 423.32 & +5.26 & 13/15 & -3.10 & $[-8.19,22.47]$ \\
+C 价格头平衡 & 421.82 & +3.76 & 11/15 & -4.57 & $[-9.34,20.62]$ \\
+D 较尖锐 QP & 417.38 & -0.68 & 7/15 & -9.06 & $[-16.11,16.68]$ \\
+E 解码器高决策 & 414.83 & -3.24 & 2/15 & -11.69 & $[-21.18,14.89]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+配置 A 在点估计、节点覆盖和去极端日上最稳。配置 B 和 E 提高决策权重后反而下降，说明价格损失仍是跨市场泛化所需的锚点。
+
+\subsection{固定配置的三 seed 稳定性}
+
+\begin{table}[H]
+\centering
+\caption{相同结构在不同随机种子下的结果。}
+\label{tab:seeds}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+成员 & 原始 Transformer & Decision-aware 后 & 较 XGBoost & 改善节点 \\
+\midrule
+seed 0 & 377.84 & 426.99 & +8.92 & 14/15 \\
+seed 1 & 266.15 & 387.32 & -30.74 & 0/15 \\
+seed 2 & 403.10 & 399.41 & -18.66 & 1/15 \\
+固定等权集成 & 407.17 & 424.77 & +6.70 & 13/15 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+相同架构不保证相同经济结果：基础 checkpoint 的随机优化路径不同，decision-aware 微调又会通过动作边界放大小的价格变化。因此本文不只报告最佳 seed，而是保留多 seed 证据并引入稳健校准。
+
+\subsection{v1--v4 演进与冻结}
+
+\begin{table}[H]
+\centering
+\caption{方法版本演进。}
+\label{tab:versions}
+\footnotesize
+\begin{tabularx}{\textwidth}{l Y r r c r Y}
+\toprule
+版本 & 核心变化 & 2023 收益 & 较 XGB & 节点 & 去最佳 5 日 & 配对区间 \\
+\midrule
+v1 & 三 seed 稳健低参数校准 & 425.33 & +7.27 & 14/15 & -1.43 & 跨 0 \\
+v2 & 加入单日下行风险目标 & 422.61 & +4.55 & 12/15 & -3.91 & 跨 0，否决 \\
+v3 & seed0 与 v1 固定 1:1 & 429.64 & +11.58 & 14/15 & +3.35 & 下界 -0.89 \\
+v4 & seed0 与 v1 固定 2:1 & \best{430.41} & \best{+12.34} & 14/15 & \best{+4.14} & \best{$[0.02,29.26]$} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+v2 表明单日固定初始 SOC 的风险代理不能可靠代表跨日连续 SOC 风险。v3 和 v4 利用 seed0 的高收益与稳健分支的跨 seed 稳定性；只比较 1:1 和 2:1 两个可解释比例，没有进行连续权重网格搜索。
+
+\subsection{2023 开发与 2024 冻结确认}
+
+\begin{table}[H]
+\centering
+\caption{开发年和冻结外层年的比较。}
+\label{tab:2023-2024}
+\footnotesize
+\begin{tabular}{lrrrrcl}
+\toprule
+年份 & 候选 & 对照 & 绝对提升 & 相对提升 & 节点 & 95\% 区间 \\
+\midrule
+2023 开发 & 430.41 & 418.06 & +12.34 & +2.95\% & 14/15 & $[0.02,29.26]$ \\
+2024 冻结 & 106.86 & 90.69 & +16.17 & +17.83\% & 15/15 & $[6.27,26.94]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+2023 区间下界仅略高于 0，因此 2024 的冻结确认更重要。2024 对照逐节点 XGBoost 使用 ERCOT 历史标签，信息预算并不弱于候选。
+
+\subsection{2025 完整排行榜}
+
+\begin{table}[H]
+\centering
+\caption{ERCOT 2025 节点等权日均净收益。相对本文为本文方法减去该方法。}
+\label{tab:2025-ranking}
+\footnotesize
+\begin{tabular}{lrrrrl}
+\toprule
+系统 & 收益 & 相对本文 & 改善节点 & 95\% 区间 \\
+\midrule
+本文方法 & \best{69.54} & -- & -- & -- \\
+尾部专家 Router & 63.53 & +6.02 & 12/15 & $[0.57,11.08]$ \\
+DLinear & 61.53 & +8.02 & 14/15 & $[2.02,13.96]$ \\
+逐节点 XGBoost & 59.99 & +9.55 & 15/15 & $[3.04,15.49]$ \\
+pooled XGBoost & 44.43 & +25.12 & 15/15 & $[18.03,32.14]$ \\
+TimesFM-2.5 LoRA & 35.74 & +33.81 & 15/15 & $[24.23,44.21]$ \\
+原 Transformer 三 seed & 28.04 & +41.50 & 15/15 & $[32.52,51.91]$ \\
+lag-168 & -3.57 & +73.12 & 15/15 & $[61.16,87.34]$ \\
+TimesFM-3 frozen & -39.57 & +109.12 & 15/15 & $[91.25,129.95]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+本文方法在 13 套完整流程中排名第一。与最强预注册纯基线 DLinear 相比，提升 8.02 \usdnode（13.03\%）；与前期独立方法 Router 相比，提升 6.02 \usdnode（9.47\%）。两组配对区间下界均高于 0。
+
+\subsection{稳健性、收益分解与可行性}
+
+\begin{table}[H]
+\centering
+\caption{相对两个最强对照的稳健性检查。}
+\label{tab:robustness}
+\footnotesize
+\begin{tabular}{lrrrrrr}
+\toprule
+对照 & 收益差 & 相对提升 & 正差日 & 节点 & 去最佳 5 日 & 对照最差 10\% 日 \\
+\midrule
+DLinear & +8.02 & +13.03\% & 60.8\% & 14/15 & +5.67 & +32.79 \\
+Router & +6.02 & +9.47\% & 63.3\% & 12/15 & +3.71 & +2.20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{2025 候选收益分解。}
+\label{tab:decomposition}
+\small
+\begin{tabular}{rrrrrr}
+\toprule
+DA 计划收益 & RT 偏差收益 & 退化成本 & 偏差罚金 & 净收益 & SOC 违规 \\
+\midrule
+109.79 & 1.08 & -30.76 & -10.57 & \best{69.54} & \best{0} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+净收益主要来自 DA 计划腿；RT 层提供小幅正偏差收益，同时承担退化与偏差成本。删除候选最有利的 5 日后仍保持正差，说明提升不能由少数极端价格日单独解释。
+
+\section{可解释性、局限与主张边界}
+
+\subsection{哪一部分是 Decision-aware}
+
+\begin{table}[H]
+\centering
+\caption{各组件的训练信号和作用。}
+\label{tab:decision-aware}
+\footnotesize
+\begin{tabularx}{\textwidth}{l l c Y}
+\toprule
+组件 & 训练信号 & Decision-aware & 说明 \\
+\midrule
+基础三任务模型 & MAE 或 Pseudo-Huber & 否 & 提供稳定价格初始化 \\
+implicit-QP 微调 & 价格锚点 + 真实收益 & 是 & 收益梯度经 KKT 返回 decoder/head \\
+稳健校准器 & 跨市场收益改善 + 价格锚点 & 是 & 参数少且有界 \\
+固定 2:1 融合 & 2023 开发结果 & 间接继承 & 不增加新的梯度层 \\
+正式 LP/MPC & 无训练 & 否，评价器 & 精确连续 SOC，不用于反传 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{为什么可微连接能够改善收益}
+
+可微决策层不会简单放大全部价格，而是改变对动作真正有影响的小时排序和 DA--RT 价差。式~\eqref{eq:implicit} 把收益对动作的敏感性映射为收益对预测价格的敏感性；式~\eqref{eq:joint} 同时保留价格锚点，防止模型为了局部收益而产生失真的跨市场价格。稳健校准器进一步把改善约束到多个源市场，而不是只优化单个 seed 或单个市场。
+
+这种解释与 decision-focused learning 的一般结论一致：预测误差相同的样本，对下游决策的边际价值可以完全不同
+\cite{donti2017,elmachtoub2022,mandi2024}。本文的特殊之处是价值由三条价格腿和连续双结算共同决定。
+
+\subsection{训练代理与正式求解器}
+
+训练 QP 为可导性加入 $\rho\|x\|^2/2$ 和对数障碍，并去除依赖预测符号切换可行域的离散分支；正式评价使用精确 LP/MPC 合同。训练代理负责产生方向稳定的梯度，所有最终收益主张只来自正式求解器。因而不能把训练 QP 的代理收益当作部署收益。
+
+\subsection{泛化范围与局限}
+
+2023 证明模型可从三个源市场零样本迁移到 ERCOT；2024 检查冻结配置的跨年稳定性；2025 检查四市场历史重训后的最终效果。但只有 ERCOT 具有完整、冻结并审计的真实双结算评价，因此不能据此宣称在四个真实市场上都实现利润领先。
+
+本文也不主张可微优化本身是新算法。相关数学基础已经由 OptNet、可微凸优化层和 decision-focused learning 文献建立
+\cite{amos2017,agrawal2019,donti2017}。本文的新意限定为三价格腿、双结算合同、稳健多 seed 校准和严格时间协议的组合。
+
+\section{复现路径}
+
+\begin{table}[H]
+\centering
+\caption{主要机器可读结果与实现。}
+\label{tab:repro}
+\footnotesize
+\begin{tabularx}{\textwidth}{l Y}
+\toprule
+内容 & 仓库路径 \\
+\midrule
+2023 候选筛选 & \texttt{data/results/global\_implicit\_qp\_summary\_v1.json} \\
+三 seed 验证 & \texttt{data/results/global\_implicit\_qp\_multiseed\_summary\_v1/summary.json} \\
+2023/2024 冻结清单 & \texttt{data/results/global\_implicit\_qp\_v4\_freeze\_manifest.json} \\
+2025 最终汇总 & \texttt{data/results/global\_implicit\_qp\_final\_v4/summary\_2025.json} \\
+可微 QP & \texttt{src/decision\_aware/implicit\_battery\_qp.py} \\
+联合训练 & \texttt{scripts/decision\_aware/train\_global\_joint\_implicit\_qp.py} \\
+稳健校准 & \texttt{scripts/decision\_aware/train\_global\_robust\_ensemble\_calibrator.py} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{结论}
+
+本文构建了一个面向储能双结算的跨市场端到端决策感知电价预测框架。三个价格预测器通过强凸平滑电池 QP 映射为 DA 计划、RT 动作和 SOC，真实价格下的收益梯度利用 KKT 隐式微分返回 decoder 与 price head；稳健校准器再通过凸 seed 权重和有界价格修正降低随机种子及市场迁移方差。
+
+统一实验表明，最终 v4 在开发年、冻结确认年和最终评价年均超过相应主对照；2025 相对 DLinear 和 Router 的配对区间均高于 0，删除最有利的 5 日后仍保持正差，全年 SOC 违规为 0。结果支持一个简洁结论：\textbf{当最终目标是储能收益时，预测模型应在保持价格语义的同时，显式学习预测对可行决策和经济后果的影响。}
+
+\begin{thebibliography}{99}
+\small
+
+\bibitem{weron2014}
+R. Weron.
+\newblock Electricity price forecasting: A review of the state-of-the-art with a look into the future.
+\newblock \emph{International Journal of Forecasting}, 30(4):1030--1081, 2014.
+\newblock \href{https://doi.org/10.1016/j.ijforecast.2014.08.008}{doi:10.1016/j.ijforecast.2014.08.008}.
+
+\bibitem{lago2021}
+J. Lago, G. Marcjasz, B. De Schutter, and R. Weron.
+\newblock Forecasting day-ahead electricity prices: A review of state-of-the-art algorithms, best practices and an open-access benchmark.
+\newblock \emph{Applied Energy}, 293:116983, 2021.
+\newblock \href{https://doi.org/10.1016/j.apenergy.2021.116983}{doi:10.1016/j.apenergy.2021.116983}.
+
+\bibitem{krishnamurthy2018}
+D. Krishnamurthy, C. Uckun, Z. Zhou, P. R. Thimmapuram, and A. Botterud.
+\newblock Energy storage arbitrage under day-ahead and real-time price uncertainty.
+\newblock \emph{IEEE Transactions on Power Systems}, 33(1):84--93, 2018.
+\newblock \href{https://doi.org/10.1109/TPWRS.2017.2685347}{doi:10.1109/TPWRS.2017.2685347}.
+
+\bibitem{alghumayjan2024}
+A. Alghumayjan et al.
+\newblock Energy storage arbitrage in two-settlement markets: A Transformer-based approach.
+\newblock \emph{Electric Power Systems Research}, 235:110755, 2024.
+\newblock \href{https://doi.org/10.1016/j.epsr.2024.110755}{doi:10.1016/j.epsr.2024.110755}.
+
+\bibitem{donti2017}
+P. L. Donti, B. Amos, and J. Z. Kolter.
+\newblock Task-based end-to-end model learning in stochastic optimization.
+\newblock In \emph{Advances in Neural Information Processing Systems}, 2017.
+\newblock \url{https://papers.nips.cc/paper_files/paper/2017/hash/3fc2c60b5782f641f76bcefc39fb2392-Abstract.html}.
+
+\bibitem{mandi2024}
+J. Mandi, J. Kotary, S. Berden, M. Mulamba, V. Bucarey, T. Guns, and F. Fioretto.
+\newblock Decision-focused learning: Foundations, state of the art, benchmark and future opportunities.
+\newblock \emph{Journal of Artificial Intelligence Research}, 2024.
+
+\bibitem{chen2016}
+T. Chen and C. Guestrin.
+\newblock XGBoost: A scalable tree boosting system.
+\newblock In \emph{Proceedings of the 22nd ACM SIGKDD}, pages 785--794, 2016.
+\newblock \href{https://doi.org/10.1145/2939672.2939785}{doi:10.1145/2939672.2939785}.
+
+\bibitem{zeng2023}
+A. Zeng, M. Chen, L. Zhang, and Q. Xu.
+\newblock Are Transformers effective for time series forecasting?
+\newblock In \emph{AAAI Conference on Artificial Intelligence}, 2023.
+
+\bibitem{das2024}
+A. Das, W. Kong, R. Sen, and Y. Zhou.
+\newblock A decoder-only foundation model for time-series forecasting.
+\newblock In \emph{Proceedings of ICML}, 2024.
+
+\bibitem{vaswani2017}
+A. Vaswani et al.
+\newblock Attention is all you need.
+\newblock In \emph{Advances in Neural Information Processing Systems}, 2017.
+
+\bibitem{xu2018}
+B. Xu, J. Zhao, T. Zheng, E. Litvinov, and D. S. Kirschen.
+\newblock Factoring the cycle aging cost of batteries participating in electricity markets.
+\newblock \emph{IEEE Transactions on Power Systems}, 33(2):2248--2259, 2018.
+\newblock \href{https://doi.org/10.1109/TPWRS.2017.2733339}{doi:10.1109/TPWRS.2017.2733339}.
+
+\bibitem{amos2017}
+B. Amos and J. Z. Kolter.
+\newblock OptNet: Differentiable optimization as a layer in neural networks.
+\newblock In \emph{Proceedings of ICML}, volume 70, pages 136--145, 2017.
+\newblock \url{https://proceedings.mlr.press/v70/amos17a.html}.
+
+\bibitem{agrawal2019}
+A. Agrawal, B. Amos, S. Barratt, S. Boyd, S. Diamond, and J. Z. Kolter.
+\newblock Differentiable convex optimization layers.
+\newblock In \emph{Advances in Neural Information Processing Systems}, 2019.
+\newblock \url{https://papers.nips.cc/paper/2019/hash/9ce3c52fc54362e22053399d3181c638-Abstract.html}.
+
+\bibitem{elmachtoub2022}
+A. N. Elmachtoub and P. Grigas.
+\newblock Smart Predict, then Optimize.
+\newblock \emph{Management Science}, 68(1):9--26, 2022.
+\newblock \href{https://doi.org/10.1287/mnsc.2020.3922}{doi:10.1287/mnsc.2020.3922}.
+
+\bibitem{liu2023}
+Y. Liu, B. Xu, and Y. Shi.
+\newblock Energy storage price arbitrage via opportunity value function prediction.
+\newblock In \emph{IEEE PES General Meeting}, 2023.
+
+\bibitem{efron1993}
+B. Efron and R. J. Tibshirani.
+\newblock \emph{An Introduction to the Bootstrap}.
+\newblock Chapman \& Hall/CRC, 1993.
+
+\end{thebibliography}
+
+\end{document}

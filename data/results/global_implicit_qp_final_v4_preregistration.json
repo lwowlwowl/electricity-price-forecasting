@@ -1,0 +1,144 @@
+{
+  "protocol": "global_implicit_qp_final_v4_locked_followup",
+  "frozen_at_local_date": "2026-10-24",
+  "status": "frozen_before_candidate_2025_prediction_or_settlement",
+  "operational_amendments": [
+    {
+      "date": "2026-10-24",
+      "reason": "desktop terminal lifetime interrupted the fixed eight-epoch calibrator",
+      "change": "save and restore model plus optimizer state after every epoch",
+      "scientific_effect": "none; hyperparameters, samples, epoch count, objective and fixed-last selection are unchanged",
+      "candidate_2025_score_seen_before_amendment": false
+    },
+    {
+      "date": "2026-10-24",
+      "reason": "runner passed an analysis-only YAML that disables deviation penalty; the formal evaluator rejected it before settlement",
+      "change": "replace the runner YAML path with the existing formal allmarket final configuration required by the frozen settlement contract",
+      "scientific_effect": "restores the preregistered degradation and deviation-penalty settlement; predictions and model parameters are unchanged",
+      "candidate_2025_score_seen_before_amendment": false
+    }
+  ],
+  "integrity_boundary": {
+    "candidate_2025_score_seen_before_freeze": false,
+    "repository_contains_preexisting_2025_results": true,
+    "claim": "locked follow-up confirmation, not a pristine first opening of 2025",
+    "selection_allowed_after_candidate_2025_opening": false,
+    "model_or_weight_changes_after_candidate_2025_opening": false
+  },
+  "training_contract": {
+    "markets": ["CAISO", "ERCOT", "NYISO", "PJM"],
+    "years": [2020, 2021, 2022, 2023, 2024],
+    "annual_stage": "final_train",
+    "uses_node_or_market_identity_embeddings": false,
+    "locked_2025_used_for_training_or_selection": false
+  },
+  "candidate": {
+    "family": "implicitqp_final_robust_seed0_twothirds_v4",
+    "member_families": [
+      "implicitqp_final_decoder_balanced_seed0_v4",
+      "implicitqp_final_decoder_balanced_seed1_v4",
+      "implicitqp_final_decoder_balanced_seed2_v4"
+    ],
+    "member_training": {
+      "epochs": 3,
+      "episode_days": 1,
+      "episodes_per_node": 2,
+      "decision_weight": 0.6,
+      "revenue_scale": 500.0,
+      "prediction_scale": 25.0,
+      "learning_rate": 0.00002,
+      "weight_decay": 0.01,
+      "trainable_scope": "decoder_head",
+      "quadratic_regularization": 0.25,
+      "barrier_temperature": 0.1,
+      "newton_steps": 60,
+      "training_seed": 20261023,
+      "method": "strongly_convex_barrier_qp_kkt_implicit_differentiation"
+    },
+    "calibrator": {
+      "family": "implicitqp_final_robust_ensemble_v4",
+      "epochs": 8,
+      "selection_mode": "fixed_last",
+      "train_per_market": 128,
+      "validation_per_market": 64,
+      "samples_are_disjoint": true,
+      "learning_rate": 0.005,
+      "prediction_weight": 0.05,
+      "market_std_weight": 0.5,
+      "worst_market_weight": 0.5,
+      "regularization_weight": 0.01,
+      "seed": 20261024
+    },
+    "final_blend": {
+      "members": [
+        "implicitqp_final_robust_ensemble_v4",
+        "implicitqp_final_decoder_balanced_seed0_v4"
+      ],
+      "weights": [0.3333333333333333, 0.6666666666666666],
+      "rule_source": "frozen v4 rule selected on 2023 and confirmed without adjustment on 2024"
+    }
+  },
+  "evaluation_contract": {
+    "market": "ERCOT",
+    "nodes": 15,
+    "year": 2025,
+    "expected_common_days": 362,
+    "settlement": "continuous DA LP plus rolling RT MPC with continuous SOC, degradation and deviation penalty",
+    "primary_metric": "node-equal macro mean daily net revenue USD per node-day",
+    "comparators": {
+      "strongest_preregistered_pure_baseline": {
+        "name": "DLinear",
+        "value": 61.525252465913894
+      },
+      "strongest_existing_post-test_method": {
+        "name": "three-feature tail expert router",
+        "value": 63.525093624873264
+      }
+    },
+    "mandatory_diagnostics": [
+      "paired_7day_block_bootstrap_95ci",
+      "improved_nodes",
+      "difference_after_removing_5_best_candidate_days",
+      "difference_on_baseline_worst_10pct_days",
+      "revenue_components",
+      "soc_violations"
+    ]
+  },
+  "source_checkpoints": {
+    "seed0": {
+      "da": {"path": "data/checkpoints/allmarket_final_da_mae_v1/da_final_seed0/best.pt", "sha256": "64d97a56ce2e4675c4753a497b20221e86335913802312b4a93eadee8fe0d010"},
+      "rt_at_da": {"path": "data/checkpoints/allmarket_final_rt_at_da_pseudohuber_v1/rt_at_da_final_seed0/best.pt", "sha256": "19951250788b2c699dd4f9293324b4cf725cac171c7bd7e8aaa4a9d30bb91184"},
+      "rt": {"path": "data/checkpoints/allmarket_final_rt_mae_v1/rt_final_seed0/best.pt", "sha256": "be25141a3bf437dba2cde8d761337be69591e0ffc025572c8fcde20f984713eb"}
+    },
+    "seed1": {
+      "da": {"path": "data/checkpoints/allmarket_final_da_mae_v1/da_final_seed1/best.pt", "sha256": "b2bc96f3dccf2dc1ced04d557169c74a4dea0bbec3c7ecdb8e9795add6d50993"},
+      "rt_at_da": {"path": "data/checkpoints/allmarket_final_rt_at_da_pseudohuber_v1/rt_at_da_final_seed1/best.pt", "sha256": "0f06d81530107b1c1acb04ae38b1f622cc71618f9922d7d5ae66acb28519dc14"},
+      "rt": {"path": "data/checkpoints/allmarket_final_rt_mae_v1/rt_final_seed1/best.pt", "sha256": "6688a49d413522be5c7a17ea3e4f009703beb3c7b53da53ec9ed4f4d31098705"}
+    },
+    "seed2": {
+      "da": {"path": "data/checkpoints/allmarket_final_da_mae_v1/da_final_seed2/best.pt", "sha256": "d8f9ec44198544d145cc9b3274d79e1fb4716382c7d4a49bd87c9f5a74bda508"},
+      "rt_at_da": {"path": "data/checkpoints/allmarket_final_rt_at_da_pseudohuber_v1/rt_at_da_final_seed2/best.pt", "sha256": "7a0bdbf63cff4195817008f9094dbd30f120b8d9d5afaa7ba78681014246b618"},
+      "rt": {"path": "data/checkpoints/allmarket_final_rt_mae_v1/rt_final_seed2/best.pt", "sha256": "d0972420baccaee4de900a2256e327f57426aaaf2baa3f6d51fee907e118819e"}
+    }
+  },
+  "code_and_contract_hashes": {
+    "scripts/decision_aware/train_global_joint_implicit_qp.py": "664d2b3121fb9b9d99e928027818b408961d8893d5db250611ab5a7a686e358c",
+    "scripts/decision_aware/train_global_robust_ensemble_calibrator.py": "25f24466b2b0be3bea390606b8a986e743e9d91bf517020683e2651075f10b0c",
+    "scripts/decision_aware/apply_robust_ensemble_calibrator.py": "052ad01c1bca76b367e76246104e706b87f2b959cbb9b0091a37bdf0eb90d421",
+    "scripts/decision_aware/evaluate_universal_holdout.py": "014cc4692f19e22b21e196939dff23935190a6ef10aeeb678c256d85207b85b0",
+    "scripts/decision_aware/prepare_universal_lomo_profit_archives.py": "79d6bdcd0d27b74423c5fb5dae7f2b14d5097bb06452fd2b2713d5dfd48c5984",
+    "scripts/decision_aware/prepare_fixed_family_ensemble.py": "038c5b605336da4b66d63bb8b00a8bc255cc1ce6ff2b6b6ce591ed83725f5533",
+    "scripts/decision_aware/evaluate_global_continuous_mpc.py": "8064b2d5dedb91f86f7a19434c282f7acda59dd89947ae528fdf444f3801c0fb",
+    "scripts/decision_aware/summarize_final_decision_aware_v4.py": "97feebf453c7814aabf6df9e93f4019364026ba2289b8dee85405e267ee1ab9f",
+    "scripts/decision_aware/run_local_global_implicit_qp_final_v4.ps1": "d93a46ff2e77681662057650a056be55bf02592b18135e4f975cd39237559225",
+    "configs/decision_aware/allmarket_final_da_mae_v1.yaml": "8d065b303f865ac565d9c5185c1cbe6cd71189ed6b6b829bc96091e088756133",
+    "configs/nodes.yaml": "0bcf1d1001ecfee1ec5bf0548a19cb36d5e0695c013d2e5451b487a417f0624e"
+  },
+  "outputs": {
+    "run_directory": "data/results/global_implicit_qp_final_v4",
+    "checkpoint_directory": "data/checkpoints/global_joint_implicit_qp_final_v4",
+    "calibrator": "data/checkpoints/global_robust_ensemble_final_v4/calibrator.pt",
+    "settlement": "data/results/global_implicit_qp_final_v4/settlement_2025.json",
+    "summary": "data/results/global_implicit_qp_final_v4/summary_2025.json"
+  }
+}

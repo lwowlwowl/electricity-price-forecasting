@@ -47,6 +47,7 @@ FAMILIES = {
 PHASE_STAGES = {
     "inner": (AnnualStage.INNER_TRAIN, AnnualStage.INNER_VALIDATION),
     "outer": (AnnualStage.OUTER_TRAIN, AnnualStage.OUTER_VALIDATION),
+    "final": (AnnualStage.FINAL_TRAIN, AnnualStage.LOCKED_RETROSPECTIVE_TEST),
 }
 
 

@@ -21,12 +21,36 @@ from scripts.decision_aware.train_global_forecaster import (  # noqa: E402
     _rank_candidate_records,
     _save_ranked_candidates,
     _validation_selection_score,
+    _norm_stats_equal,
 )
 from decision_aware.config import PilotConfig  # noqa: E402
 
 
 def _record(epoch: int, mae: float) -> dict:
     return {"epoch": epoch, "validation": {"macro_mae": mae}}
+
+
+def test_norm_stats_equal_accepts_context_robust_contract() -> None:
+    contract = {
+        "NODE": {
+            "mode": "context_robust",
+            "context_len": 168,
+            "center": "median",
+            "scale_floor": 1.0,
+            "uses_target_window": False,
+        }
+    }
+    assert _norm_stats_equal(contract, dict(contract))
+    changed = {"NODE": dict(contract["NODE"], context_len=24)}
+    assert not _norm_stats_equal(contract, changed)
+
+
+def test_norm_stats_equal_still_checks_nested_numeric_scalers() -> None:
+    left = {"NODE": {"price": {"center": [1.0], "scale": [2.0]}}}
+    right = {"NODE": {"price": {"center": [1.0], "scale": [2.0]}}}
+    assert _norm_stats_equal(left, right)
+    right["NODE"]["price"]["scale"] = [3.0]
+    assert not _norm_stats_equal(left, right)
 
 
 def test_rank_candidate_records_uses_mae_then_earlier_epoch():

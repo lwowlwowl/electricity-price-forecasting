@@ -29,6 +29,14 @@ def _macro_mae(target: np.ndarray, prediction: np.ndarray) -> float:
     return float(np.mean(np.mean(np.abs(prediction - target), axis=node_axes)))
 
 
+def _report_path(path: Path) -> str:
+    """Keep repository artifacts portable without rejecting test/temp paths."""
+    try:
+        return path.relative_to(ROOT).as_posix()
+    except ValueError:
+        return path.resolve().as_posix()
+
+
 def summarize(
     result_root: Path,
     holdouts: tuple[str, ...],
@@ -84,7 +92,7 @@ def summarize(
                         raise ValueError(f"{holdout}/{task}不同seed的DA结算真值不一致")
                 predictions.append(prediction)
                 seed_mae[str(seed)] = _macro_mae(target, prediction)
-                paths[str(seed)] = path.relative_to(ROOT).as_posix()
+                paths[str(seed)] = _report_path(path)
             values = np.asarray(list(seed_mae.values()), dtype=np.float64)
             ensemble = np.mean(np.stack(predictions), axis=0)
             result = {
@@ -118,9 +126,7 @@ def summarize(
                 if target_da_reference is not None:
                     arrays["target_da"] = target_da_reference
                 np.savez_compressed(ensemble_path, **arrays)
-                result["equal_weight_ensemble_path"] = (
-                    ensemble_path.relative_to(ROOT).as_posix()
-                )
+                result["equal_weight_ensemble_path"] = _report_path(ensemble_path)
             report["results"][f"{holdout}_{task}"] = result
     return report
 

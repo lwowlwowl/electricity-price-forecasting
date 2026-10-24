@@ -1,0 +1,1306 @@
+{
+  "experiment": "da_tail_distribution_posttraining_source_v1",
+  "status": "complete",
+  "mechanisms": {
+    "original": "frozen MAE Transformer point forecast",
+    "mean_posttraining": "frozen backbone + linear conditional-mean MSE head",
+    "quantile_posttraining": "frozen backbone + non-crossing q01/q05/q10/q25/q50/q75/q90/q95/q99 pinball head; point forecast is fixed quantile integral"
+  },
+  "protocol": {
+    "training_markets": [
+      "CAISO",
+      "NYISO",
+      "PJM"
+    ],
+    "train_years": [
+      2020,
+      2021,
+      2022
+    ],
+    "evaluation_years": [
+      2023,
+      2024
+    ],
+    "uses_ercot": false,
+    "test_2025_read": false,
+    "epochs": 6,
+    "samples_per_market_per_epoch": 4096,
+    "learning_rate": 0.001,
+    "seed": 20261020,
+    "backbone_frozen": true,
+    "thresholds": "per-node 2020-2022 target q01/q99"
+  },
+  "training_history": [
+    {
+      "epoch": 1,
+      "mse": 2.587235090245182,
+      "pinball": 0.1718044582036479,
+      "elapsed_seconds": 37.12717609999527
+    },
+    {
+      "epoch": 2,
+      "mse": 4.279748142347671,
+      "pinball": 0.17345952399773523,
+      "elapsed_seconds": 34.07569910000893
+    },
+    {
+      "epoch": 3,
+      "mse": 4.787014178504857,
+      "pinball": 0.1734227636285747,
+      "elapsed_seconds": 35.382331100001466
+    },
+    {
+      "epoch": 4,
+      "mse": 3.36856301384978,
+      "pinball": 0.16448417521314695,
+      "elapsed_seconds": 34.194686599992565
+    },
+    {
+      "epoch": 5,
+      "mse": 2.982198434746048,
+      "pinball": 0.16633595948223956,
+      "elapsed_seconds": 35.166058200004045
+    },
+    {
+      "epoch": 6,
+      "mse": 2.7540296034227745,
+      "pinball": 0.16416124655127837,
+      "elapsed_seconds": 35.39703269999882
+    }
+  ],
+  "evaluations": {
+    "2023": {
+      "markets": {
+        "CAISO": {
+          "samples": 26136,
+          "original": {
+            "mae": 11.530157089233398,
+            "ordinary_mae": 10.813414573669434,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 39,
+              "tn": 26097,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 39,
+              "conditional_mae": 468.8976745605469,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 462,
+              "fp": 145,
+              "fn": 549,
+              "tn": 24980,
+              "precision": 0.7611202635914333,
+              "recall": 0.456973293768546,
+              "f1": 0.5710754017305315,
+              "false_positive_rate": 0.005771144278606965,
+              "event_hours": 1011,
+              "conditional_mae": 11.671453475952148,
+              "amplitude_ratio": 0.6877500004661665
+            }
+          },
+          "mean_posttraining": {
+            "mae": 12.17209243774414,
+            "ordinary_mae": 11.526161193847656,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 39,
+              "tn": 26097,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 39,
+              "conditional_mae": 426.8163146972656,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 476,
+              "fp": 193,
+              "fn": 535,
+              "tn": 24932,
+              "precision": 0.7115097159940209,
+              "recall": 0.4708209693372898,
+              "f1": 0.5666666666666667,
+              "false_positive_rate": 0.007681592039800995,
+              "event_hours": 1011,
+              "conditional_mae": 12.204436302185059,
+              "amplitude_ratio": 0.7835749754330221
+            }
+          },
+          "quantile_mean": {
+            "mae": 11.883292198181152,
+            "ordinary_mae": 11.21524715423584,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 39,
+              "tn": 26097,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 39,
+              "conditional_mae": 440.3772888183594,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 517,
+              "fp": 209,
+              "fn": 494,
+              "tn": 24916,
+              "precision": 0.7121212121212122,
+              "recall": 0.5113748763600395,
+              "f1": 0.595279217040875,
+              "false_positive_rate": 0.008318407960199005,
+              "event_hours": 1011,
+              "conditional_mae": 11.930093765258789,
+              "amplitude_ratio": 0.9224106405315045
+            }
+          },
+          "quantile_median": {
+            "mae": 11.245227813720703,
+            "ordinary_mae": 10.52277660369873,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 39,
+              "tn": 26097,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 39,
+              "conditional_mae": 463.6423645019531,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 520,
+              "fp": 194,
+              "fn": 491,
+              "tn": 24931,
+              "precision": 0.7282913165266106,
+              "recall": 0.5143422354104846,
+              "f1": 0.6028985507246376,
+              "false_positive_rate": 0.0077213930348258705,
+              "event_hours": 1011,
+              "conditional_mae": 11.719915390014648,
+              "amplitude_ratio": 0.8929615188825428
+            }
+          },
+          "distribution": {
+            "mean_pinball": 2.8826188852407864,
+            "coverage": {
+              "q01": 0.01652892561983471,
+              "q05": 0.07089837771655953,
+              "q10": 0.13655494337312518,
+              "q25": 0.32679063360881544,
+              "q50": 0.5696740128558311,
+              "q75": 0.7678298132843587,
+              "q90": 0.9150596877869606,
+              "q95": 0.9546985001530456,
+              "q99": 0.9923094582185491
+            },
+            "coverage_absolute_error": {
+              "q01": 0.006528925619834711,
+              "q05": 0.02089837771655953,
+              "q10": 0.036554943373125176,
+              "q25": 0.07679063360881544,
+              "q50": 0.06967401285583108,
+              "q75": 0.01782981328435873,
+              "q90": 0.01505968778696054,
+              "q95": 0.004698500153045626,
+              "q99": 0.0023094582185491097
+            },
+            "central_90_interval_coverage": 0.8838001224364861,
+            "central_98_interval_coverage": 0.9757805325987144
+          }
+        },
+        "NYISO": {
+          "samples": 95832,
+          "original": {
+            "mae": 6.850522041320801,
+            "ordinary_mae": 6.168250560760498,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 123,
+              "fn": 369,
+              "tn": 95340,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0012884573080669999,
+              "event_hours": 369,
+              "conditional_mae": 183.02490234375,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 8,
+              "fn": 5,
+              "tn": 95819,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 8.348377805837603e-05,
+              "event_hours": 5,
+              "conditional_mae": 30.83624839782715,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "mean_posttraining": {
+            "mae": 7.402108669281006,
+            "ordinary_mae": 6.737969875335693,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 246,
+              "fn": 369,
+              "tn": 95217,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0025769146161339998,
+              "event_hours": 369,
+              "conditional_mae": 178.86810302734375,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 2,
+              "fn": 5,
+              "tn": 95825,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 2.0870944514594007e-05,
+              "event_hours": 5,
+              "conditional_mae": 32.673221588134766,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "quantile_mean": {
+            "mae": 7.191000938415527,
+            "ordinary_mae": 6.520927906036377,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 229,
+              "fn": 369,
+              "tn": 95234,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.002398835150791406,
+              "event_hours": 369,
+              "conditional_mae": 180.20079040527344,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 1,
+              "fn": 5,
+              "tn": 95826,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 1.0435472257297004e-05,
+              "event_hours": 5,
+              "conditional_mae": 31.830169677734375,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "quantile_median": {
+            "mae": 6.843686580657959,
+            "ordinary_mae": 6.15709114074707,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 147,
+              "fn": 369,
+              "tn": 95316,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0015398636120800729,
+              "event_hours": 369,
+              "conditional_mae": 184.13320922851562,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 3,
+              "fn": 5,
+              "tn": 95824,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 3.1306416771891014e-05,
+              "event_hours": 5,
+              "conditional_mae": 31.078964233398438,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "distribution": {
+            "mean_pinball": 1.9189917423937628,
+            "coverage": {
+              "q01": 0.030678687703481092,
+              "q05": 0.09355956256782703,
+              "q10": 0.15753610485015443,
+              "q25": 0.3122965189080892,
+              "q50": 0.5198889723683112,
+              "q75": 0.7010810585190751,
+              "q90": 0.8575423658068286,
+              "q95": 0.9131709658569163,
+              "q99": 0.9755927038984891
+            },
+            "coverage_absolute_error": {
+              "q01": 0.020678687703481094,
+              "q05": 0.04355956256782703,
+              "q10": 0.057536104850154424,
+              "q25": 0.06229651890808918,
+              "q50": 0.01988897236831122,
+              "q75": 0.048918941480924905,
+              "q90": 0.04245763419317139,
+              "q95": 0.036829034143083694,
+              "q99": 0.014407296101510925
+            },
+            "central_90_interval_coverage": 0.8196114032890892,
+            "central_98_interval_coverage": 0.9449140161950079
+          }
+        },
+        "PJM": {
+          "samples": 304920,
+          "original": {
+            "mae": 5.554046154022217,
+            "ordinary_mae": 5.237327575683594,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 28,
+              "fn": 561,
+              "tn": 304331,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 9.19966224097201e-05,
+              "event_hours": 561,
+              "conditional_mae": 173.16461181640625,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 15,
+              "fp": 71,
+              "fn": 261,
+              "tn": 304573,
+              "precision": 0.1744186046511628,
+              "recall": 0.05434782608695652,
+              "f1": 0.08287292817679558,
+              "false_positive_rate": 0.00023305891466761204,
+              "event_hours": 276,
+              "conditional_mae": 13.81240463256836,
+              "amplitude_ratio": 0.017288288810158644
+            }
+          },
+          "mean_posttraining": {
+            "mae": 5.877416610717773,
+            "ordinary_mae": 5.571651458740234,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 67,
+              "fn": 561,
+              "tn": 304292,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.00022013477505183023,
+              "event_hours": 561,
+              "conditional_mae": 167.35702514648438,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 33,
+              "fn": 276,
+              "tn": 304611,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.00010832315752156616,
+              "event_hours": 276,
+              "conditional_mae": 14.529215812683105,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "quantile_mean": {
+            "mae": 5.6917314529418945,
+            "ordinary_mae": 5.381679534912109,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 49,
+              "fn": 561,
+              "tn": 304310,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0001609940892170102,
+              "event_hours": 561,
+              "conditional_mae": 169.61012268066406,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 8,
+              "fp": 41,
+              "fn": 268,
+              "tn": 304603,
+              "precision": 0.16326530612244897,
+              "recall": 0.028985507246376812,
+              "f1": 0.04923076923076923,
+              "false_positive_rate": 0.0001345833169207337,
+              "event_hours": 276,
+              "conditional_mae": 14.10901165008545,
+              "amplitude_ratio": 0.0017145541251431628
+            }
+          },
+          "quantile_median": {
+            "mae": 5.440008163452148,
+            "ordinary_mae": 5.120736598968506,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 23,
+              "fn": 561,
+              "tn": 304336,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 7.556865412227008e-05,
+              "event_hours": 561,
+              "conditional_mae": 174.4074249267578,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 9,
+              "fp": 54,
+              "fn": 267,
+              "tn": 304590,
+              "precision": 0.14285714285714285,
+              "recall": 0.03260869565217391,
+              "f1": 0.053097345132743355,
+              "false_positive_rate": 0.00017725607594438098,
+              "event_hours": 276,
+              "conditional_mae": 13.753168106079102,
+              "amplitude_ratio": 0.003395539852103188
+            }
+          },
+          "distribution": {
+            "mean_pinball": 1.425307330684912,
+            "coverage": {
+              "q01": 0.015571297389479207,
+              "q05": 0.06675521448248721,
+              "q10": 0.12651187196641742,
+              "q25": 0.30824806506624686,
+              "q50": 0.557939787485242,
+              "q75": 0.7553358257903713,
+              "q90": 0.9031975600157418,
+              "q95": 0.9447527220254492,
+              "q99": 0.9880788403515677
+            },
+            "coverage_absolute_error": {
+              "q01": 0.005571297389479207,
+              "q05": 0.016755214482487207,
+              "q10": 0.02651187196641741,
+              "q25": 0.05824806506624686,
+              "q50": 0.05793978748524198,
+              "q75": 0.005335825790371285,
+              "q90": 0.003197560015741785,
+              "q95": 0.0052472779745507125,
+              "q99": 0.0019211596484323135
+            },
+            "central_90_interval_coverage": 0.8779975075429621,
+            "central_98_interval_coverage": 0.9725075429620884
+          }
+        }
+      },
+      "pooled": {
+        "original": {
+          "mae": 6.210975646972656,
+          "ordinary_mae": 5.776025295257568,
+          "positive_spike": {
+            "tp": 0,
+            "fp": 151,
+            "fn": 969,
+            "tn": 425768,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": null,
+            "false_positive_rate": 0.00035452750405593554,
+            "event_hours": 969,
+            "conditional_mae": 188.82203674316406,
+            "exceedance_amplitude_ratio": 0.0
+          },
+          "negative_price": {
+            "tp": 477,
+            "fp": 224,
+            "fn": 815,
+            "tn": 425372,
+            "precision": 0.6804564907275321,
+            "recall": 0.36919504643962847,
+            "f1": 0.47867536377320624,
+            "false_positive_rate": 0.0005263207360971438,
+            "event_hours": 1292,
+            "conditional_mae": 12.202975273132324,
+            "amplitude_ratio": 0.6034769372433844
+          }
+        },
+        "mean_posttraining": {
+          "mae": 6.6050825119018555,
+          "ordinary_mae": 6.185624122619629,
+          "positive_spike": {
+            "tp": 0,
+            "fp": 313,
+            "fn": 969,
+            "tn": 425606,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": null,
+            "false_positive_rate": 0.0007348815150298531,
+            "event_hours": 969,
+            "conditional_mae": 182.18313598632812,
+            "exceedance_amplitude_ratio": 0.0
+          },
+          "negative_price": {
+            "tp": 476,
+            "fp": 228,
+            "fn": 816,
+            "tn": 425368,
+            "precision": 0.6761363636363636,
+            "recall": 0.3684210526315789,
+            "f1": 0.4769539078156313,
+            "false_positive_rate": 0.0005357193206703071,
+            "event_hours": 1292,
+            "conditional_mae": 12.7802734375,
+            "amplitude_ratio": 0.685171331026616
+          }
+        },
+        "quantile_mean": {
+          "mae": 6.407377243041992,
+          "ordinary_mae": 5.982421398162842,
+          "positive_spike": {
+            "tp": 0,
+            "fp": 278,
+            "fn": 969,
+            "tn": 425641,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": null,
+            "false_positive_rate": 0.0006527062657453647,
+            "event_hours": 969,
+            "conditional_mae": 184.54086303710938,
+            "exceedance_amplitude_ratio": 0.0
+          },
+          "negative_price": {
+            "tp": 525,
+            "fp": 251,
+            "fn": 767,
+            "tn": 425345,
+            "precision": 0.6765463917525774,
+            "recall": 0.40634674922600617,
+            "f1": 0.5077369439071566,
+            "false_positive_rate": 0.0005897611819659959,
+            "event_hours": 1292,
+            "conditional_mae": 12.47257137298584,
+            "amplitude_ratio": 0.8067793287582382
+          }
+        },
+        "quantile_median": {
+          "mae": 6.110541820526123,
+          "ordinary_mae": 5.672853946685791,
+          "positive_spike": {
+            "tp": 0,
+            "fp": 170,
+            "fn": 969,
+            "tn": 425749,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": null,
+            "false_positive_rate": 0.00039913692509608635,
+            "event_hours": 969,
+            "conditional_mae": 189.7520751953125,
+            "exceedance_amplitude_ratio": 0.0
+          },
+          "negative_price": {
+            "tp": 529,
+            "fp": 251,
+            "fn": 763,
+            "tn": 425345,
+            "precision": 0.6782051282051282,
+            "recall": 0.40944272445820434,
+            "f1": 0.5106177606177605,
+            "false_positive_rate": 0.0005897611819659959,
+            "event_hours": 1292,
+            "conditional_mae": 12.229182243347168,
+            "amplitude_ratio": 0.7812325752237748
+          }
+        },
+        "distribution": {
+          "mean_pinball": 1.625357599918891,
+          "coverage": {
+            "q01": 0.019021382657746295,
+            "q05": 0.07302618016903731,
+            "q10": 0.1340913775978711,
+            "q25": 0.3102921609415116,
+            "q50": 0.5501161897265794,
+            "q75": 0.7439211221678754,
+            "q90": 0.8936746875058563,
+            "q95": 0.9382718652199171,
+            "q99": 0.9855348475478346
+          },
+          "coverage_absolute_error": {
+            "q01": 0.009021382657746295,
+            "q05": 0.023026180169037305,
+            "q10": 0.03409137759787109,
+            "q25": 0.060292160941511574,
+            "q50": 0.050116189726579385,
+            "q75": 0.006078877832124574,
+            "q90": 0.006325312494143698,
+            "q95": 0.011728134780082833,
+            "q99": 0.0044651524521653885
+          },
+          "central_90_interval_coverage": 0.8652456850508798,
+          "central_98_interval_coverage": 0.9665134648900883
+        }
+      }
+    },
+    "2024": {
+      "markets": {
+        "CAISO": {
+          "samples": 26208,
+          "original": {
+            "mae": 8.9933443069458,
+            "ordinary_mae": 7.82142972946167,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 13,
+              "tn": 26195,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 13,
+              "conditional_mae": 374.4783630371094,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 1358,
+              "fp": 139,
+              "fn": 1199,
+              "tn": 23512,
+              "precision": 0.9071476285905143,
+              "recall": 0.5310911224090731,
+              "f1": 0.669955599407992,
+              "false_positive_rate": 0.0058771299310811384,
+              "event_hours": 2557,
+              "conditional_mae": 17.96886444091797,
+              "amplitude_ratio": 0.36289545753853764
+            }
+          },
+          "mean_posttraining": {
+            "mae": 9.288191795349121,
+            "ordinary_mae": 8.216801643371582,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 13,
+              "tn": 26195,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 13,
+              "conditional_mae": 344.6704406738281,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 1448,
+              "fp": 145,
+              "fn": 1109,
+              "tn": 23506,
+              "precision": 0.9089767733835531,
+              "recall": 0.5662886194759483,
+              "f1": 0.6978313253012047,
+              "false_positive_rate": 0.006130818992854425,
+              "event_hours": 2557,
+              "conditional_mae": 17.487472534179688,
+              "amplitude_ratio": 0.4632208070481196
+            }
+          },
+          "quantile_mean": {
+            "mae": 8.986370086669922,
+            "ordinary_mae": 7.9324445724487305,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 13,
+              "tn": 26195,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 13,
+              "conditional_mae": 353.9942932128906,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 1472,
+              "fp": 164,
+              "fn": 1085,
+              "tn": 23487,
+              "precision": 0.8997555012224939,
+              "recall": 0.5756746186937818,
+              "f1": 0.7021225852611495,
+              "false_positive_rate": 0.006934167688469832,
+              "event_hours": 2557,
+              "conditional_mae": 16.97525405883789,
+              "amplitude_ratio": 0.46023801728575814
+            }
+          },
+          "quantile_median": {
+            "mae": 8.677247047424316,
+            "ordinary_mae": 7.547133445739746,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 13,
+              "tn": 26195,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 13,
+              "conditional_mae": 370.5393371582031,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 1435,
+              "fp": 165,
+              "fn": 1122,
+              "tn": 23486,
+              "precision": 0.896875,
+              "recall": 0.5612045365662887,
+              "f1": 0.6904017320182825,
+              "false_positive_rate": 0.00697644919876538,
+              "event_hours": 2557,
+              "conditional_mae": 17.284767150878906,
+              "amplitude_ratio": 0.41759408308684576
+            }
+          },
+          "distribution": {
+            "mean_pinball": 2.1841953226325566,
+            "coverage": {
+              "q01": 0.027167277167277168,
+              "q05": 0.10683760683760683,
+              "q10": 0.19352869352869354,
+              "q25": 0.40773809523809523,
+              "q50": 0.6236645299145299,
+              "q75": 0.7911706349206349,
+              "q90": 0.9226190476190477,
+              "q95": 0.9601266788766789,
+              "q99": 0.9906898656898657
+            },
+            "coverage_absolute_error": {
+              "q01": 0.017167277167277166,
+              "q05": 0.05683760683760683,
+              "q10": 0.09352869352869353,
+              "q25": 0.15773809523809523,
+              "q50": 0.12366452991452992,
+              "q75": 0.041170634920634885,
+              "q90": 0.02261904761904765,
+              "q95": 0.010126678876678952,
+              "q99": 0.0006898656898657318
+            },
+            "central_90_interval_coverage": 0.853289072039072,
+            "central_98_interval_coverage": 0.9635225885225885
+          }
+        },
+        "NYISO": {
+          "samples": 96096,
+          "original": {
+            "mae": 7.491349697113037,
+            "ordinary_mae": 7.2039713859558105,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 32,
+              "fn": 240,
+              "tn": 95824,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.00033383408446002337,
+              "event_hours": 240,
+              "conditional_mae": 122.27001953125,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 0,
+              "tn": 96096,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 0,
+              "conditional_mae": null,
+              "amplitude_ratio": null
+            }
+          },
+          "mean_posttraining": {
+            "mae": 7.547331809997559,
+            "ordinary_mae": 7.294775485992432,
+            "positive_spike": {
+              "tp": 1,
+              "fp": 81,
+              "fn": 239,
+              "tn": 95775,
+              "precision": 0.012195121951219513,
+              "recall": 0.004166666666666667,
+              "f1": 0.006211180124223603,
+              "false_positive_rate": 0.0008450175262894341,
+              "event_hours": 240,
+              "conditional_mae": 108.41808319091797,
+              "exceedance_amplitude_ratio": 0.003055295414151051
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 0,
+              "tn": 96096,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 0,
+              "conditional_mae": null,
+              "amplitude_ratio": null
+            }
+          },
+          "quantile_mean": {
+            "mae": 7.470010280609131,
+            "ordinary_mae": 7.208028793334961,
+            "positive_spike": {
+              "tp": 1,
+              "fp": 66,
+              "fn": 239,
+              "tn": 95790,
+              "precision": 0.014925373134328358,
+              "recall": 0.004166666666666667,
+              "f1": 0.0065146579804560255,
+              "false_positive_rate": 0.0006885327991987982,
+              "event_hours": 240,
+              "conditional_mae": 112.10533905029297,
+              "exceedance_amplitude_ratio": 0.0016788849340872729
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 0,
+              "tn": 96096,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 0,
+              "conditional_mae": null,
+              "amplitude_ratio": null
+            }
+          },
+          "quantile_median": {
+            "mae": 7.420788764953613,
+            "ordinary_mae": 7.135808944702148,
+            "positive_spike": {
+              "tp": 0,
+              "fp": 35,
+              "fn": 240,
+              "tn": 95821,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.00036513102987815056,
+              "event_hours": 240,
+              "conditional_mae": 121.24205017089844,
+              "exceedance_amplitude_ratio": 0.0
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 0,
+              "tn": 96096,
+              "precision": null,
+              "recall": null,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 0,
+              "conditional_mae": null,
+              "amplitude_ratio": null
+            }
+          },
+          "distribution": {
+            "mean_pinball": 1.9628660366575803,
+            "coverage": {
+              "q01": 0.028284215784215784,
+              "q05": 0.08497752247752248,
+              "q10": 0.14627039627039626,
+              "q25": 0.28985597735597735,
+              "q50": 0.4897810522810523,
+              "q75": 0.6938270063270063,
+              "q90": 0.8658945221445221,
+              "q95": 0.921672077922078,
+              "q99": 0.9780740093240093
+            },
+            "coverage_absolute_error": {
+              "q01": 0.018284215784215782,
+              "q05": 0.03497752247752248,
+              "q10": 0.04627039627039625,
+              "q25": 0.039855977355977346,
+              "q50": 0.010218947718947713,
+              "q75": 0.056172993672993665,
+              "q90": 0.034105477855477906,
+              "q95": 0.028327922077922008,
+              "q99": 0.01192599067599065
+            },
+            "central_90_interval_coverage": 0.8366945554445554,
+            "central_98_interval_coverage": 0.9497897935397935
+          }
+        },
+        "PJM": {
+          "samples": 305760,
+          "original": {
+            "mae": 7.427541255950928,
+            "ordinary_mae": 7.020805835723877,
+            "positive_spike": {
+              "tp": 9,
+              "fp": 148,
+              "fn": 1030,
+              "tn": 304573,
+              "precision": 0.05732484076433121,
+              "recall": 0.008662175168431183,
+              "f1": 0.015050167224080266,
+              "false_positive_rate": 0.0004856901887300186,
+              "event_hours": 1039,
+              "conditional_mae": 124.84659576416016,
+              "exceedance_amplitude_ratio": 0.003883742140390193
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 2,
+              "fn": 194,
+              "tn": 305564,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 6.545230817564781e-06,
+              "event_hours": 194,
+              "conditional_mae": 17.032533645629883,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "mean_posttraining": {
+            "mae": 7.678046703338623,
+            "ordinary_mae": 7.318383693695068,
+            "positive_spike": {
+              "tp": 33,
+              "fp": 392,
+              "fn": 1006,
+              "tn": 304329,
+              "precision": 0.07764705882352942,
+              "recall": 0.03176130895091434,
+              "f1": 0.045081967213114756,
+              "false_positive_rate": 0.001286422662041671,
+              "event_hours": 1039,
+              "conditional_mae": 111.2519760131836,
+              "exceedance_amplitude_ratio": 0.018812012945818794
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 6,
+              "fn": 194,
+              "tn": 305560,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 1.9635692452694343e-05,
+              "event_hours": 194,
+              "conditional_mae": 17.542675018310547,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "quantile_mean": {
+            "mae": 7.558338165283203,
+            "ordinary_mae": 7.1854352951049805,
+            "positive_spike": {
+              "tp": 26,
+              "fp": 316,
+              "fn": 1013,
+              "tn": 304405,
+              "precision": 0.07602339181286549,
+              "recall": 0.025024061597690085,
+              "f1": 0.03765387400434468,
+              "false_positive_rate": 0.0010370141867478775,
+              "event_hours": 1039,
+              "conditional_mae": 115.0174331665039,
+              "exceedance_amplitude_ratio": 0.012905563001174784
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 3,
+              "fn": 194,
+              "tn": 305563,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 9.817846226347172e-06,
+              "event_hours": 194,
+              "conditional_mae": 17.397735595703125,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "quantile_median": {
+            "mae": 7.389241695404053,
+            "ordinary_mae": 6.983626842498779,
+            "positive_spike": {
+              "tp": 11,
+              "fp": 146,
+              "fn": 1028,
+              "tn": 304575,
+              "precision": 0.07006369426751592,
+              "recall": 0.010587102983638113,
+              "f1": 0.018394648829431436,
+              "false_positive_rate": 0.00047912680780123456,
+              "event_hours": 1039,
+              "conditional_mae": 124.488037109375,
+              "exceedance_amplitude_ratio": 0.004343335928157659
+            },
+            "negative_price": {
+              "tp": 0,
+              "fp": 0,
+              "fn": 194,
+              "tn": 305566,
+              "precision": null,
+              "recall": 0.0,
+              "f1": null,
+              "false_positive_rate": 0.0,
+              "event_hours": 194,
+              "conditional_mae": 16.951780319213867,
+              "amplitude_ratio": 0.0
+            }
+          },
+          "distribution": {
+            "mean_pinball": 1.8885439986887,
+            "coverage": {
+              "q01": 0.020676347462061748,
+              "q05": 0.08030154369440083,
+              "q10": 0.1413919413919414,
+              "q25": 0.30172684458398746,
+              "q50": 0.5133274463631606,
+              "q75": 0.6967098377812664,
+              "q90": 0.8682790423861853,
+              "q95": 0.9230540293040294,
+              "q99": 0.9837029042386185
+            },
+            "coverage_absolute_error": {
+              "q01": 0.010676347462061747,
+              "q05": 0.03030154369440083,
+              "q10": 0.041391941391941384,
+              "q25": 0.051726844583987464,
+              "q50": 0.013327446363160633,
+              "q75": 0.05329016221873362,
+              "q90": 0.03172095761381477,
+              "q95": 0.0269459706959706,
+              "q99": 0.006297095761381488
+            },
+            "central_90_interval_coverage": 0.8427524856096285,
+            "central_98_interval_coverage": 0.9630265567765568
+          }
+        }
+      },
+      "pooled": {
+        "original": {
+          "mae": 7.5377302169799805,
+          "ordinary_mae": 7.106846332550049,
+          "positive_spike": {
+            "tp": 9,
+            "fp": 180,
+            "fn": 1283,
+            "tn": 426592,
+            "precision": 0.047619047619047616,
+            "recall": 0.00696594427244582,
+            "f1": 0.012153950033760972,
+            "false_positive_rate": 0.0004217708753151566,
+            "event_hours": 1292,
+            "conditional_mae": 126.87975311279297,
+            "exceedance_amplitude_ratio": 0.0032864409130136172
+          },
+          "negative_price": {
+            "tp": 1358,
+            "fp": 141,
+            "fn": 1393,
+            "tn": 425172,
+            "precision": 0.9059372915276851,
+            "recall": 0.49363867684478374,
+            "f1": 0.6390588235294117,
+            "false_positive_rate": 0.000331520550747332,
+            "event_hours": 2751,
+            "conditional_mae": 17.902835845947266,
+            "amplitude_ratio": 0.35703061627541166
+          }
+        },
+        "mean_posttraining": {
+          "mae": 7.747282981872559,
+          "ordinary_mae": 7.363130569458008,
+          "positive_spike": {
+            "tp": 34,
+            "fp": 473,
+            "fn": 1258,
+            "tn": 426299,
+            "precision": 0.0670611439842209,
+            "recall": 0.02631578947368421,
+            "f1": 0.03779877709838799,
+            "false_positive_rate": 0.0011083201334670502,
+            "event_hours": 1292,
+            "conditional_mae": 113.0741958618164,
+            "exceedance_amplitude_ratio": 0.016282205021814038
+          },
+          "negative_price": {
+            "tp": 1448,
+            "fp": 151,
+            "fn": 1303,
+            "tn": 425162,
+            "precision": 0.9055659787367104,
+            "recall": 0.5263540530716103,
+            "f1": 0.6657471264367816,
+            "false_positive_rate": 0.0003550326465450151,
+            "event_hours": 2751,
+            "conditional_mae": 17.49136734008789,
+            "amplitude_ratio": 0.4557345692366311
+          }
+        },
+        "quantile_mean": {
+          "mae": 7.625939846038818,
+          "ordinary_mae": 7.232187271118164,
+          "positive_spike": {
+            "tp": 27,
+            "fp": 382,
+            "fn": 1265,
+            "tn": 426390,
+            "precision": 0.06601466992665037,
+            "recall": 0.02089783281733746,
+            "f1": 0.031746031746031744,
+            "false_positive_rate": 0.0008950915242799433,
+            "event_hours": 1292,
+            "conditional_mae": 116.88105773925781,
+            "exceedance_amplitude_ratio": 0.011120431612145574
+          },
+          "negative_price": {
+            "tp": 1472,
+            "fp": 167,
+            "fn": 1279,
+            "tn": 425146,
+            "precision": 0.8981086028065893,
+            "recall": 0.5350781533987641,
+            "f1": 0.6706150341685648,
+            "false_positive_rate": 0.0003926519998213081,
+            "event_hours": 2751,
+            "conditional_mae": 17.005046844482422,
+            "amplitude_ratio": 0.4528000280352672
+          }
+        },
+        "quantile_median": {
+          "mae": 7.4751811027526855,
+          "ordinary_mae": 7.04944372177124,
+          "positive_spike": {
+            "tp": 11,
+            "fp": 181,
+            "fn": 1281,
+            "tn": 426591,
+            "precision": 0.057291666666666664,
+            "recall": 0.008513931888544891,
+            "f1": 0.014824797843665768,
+            "false_positive_rate": 0.0004241140468446852,
+            "event_hours": 1292,
+            "conditional_mae": 126.36080169677734,
+            "exceedance_amplitude_ratio": 0.003675351343440429
+          },
+          "negative_price": {
+            "tp": 1435,
+            "fp": 165,
+            "fn": 1316,
+            "tn": 425148,
+            "precision": 0.896875,
+            "recall": 0.5216284987277354,
+            "f1": 0.6596184785106872,
+            "false_positive_rate": 0.00038794958066177144,
+            "event_hours": 2751,
+            "conditional_mae": 17.26128387451172,
+            "amplitude_ratio": 0.4108451877200491
+          }
+        },
+        "distribution": {
+          "mean_pinball": 1.9233296392905217,
+          "coverage": {
+            "q01": 0.022781640128578903,
+            "q05": 0.08297591014427749,
+            "q10": 0.1456791507811916,
+            "q25": 0.3055524407565224,
+            "q50": 0.5147968528070569,
+            "q75": 0.7018459856470061,
+            "q90": 0.8710706810196606,
+            "q95": 0.9250135493757943,
+            "q99": 0.9828670479180683
+          },
+          "coverage_absolute_error": {
+            "q01": 0.012781640128578903,
+            "q05": 0.03297591014427749,
+            "q10": 0.045679150781191585,
+            "q25": 0.05555244075652238,
+            "q50": 0.014796852807056893,
+            "q75": 0.048154014352993935,
+            "q90": 0.028929318980339458,
+            "q95": 0.02498645062420568,
+            "q99": 0.007132952081931654
+          },
+          "central_90_interval_coverage": 0.8420376392315168,
+          "central_98_interval_coverage": 0.9600854077894895
+        }
+      }
+    }
+  },
+  "screening_gate_2024": {
+    "per_market": {
+      "CAISO": {
+        "ordinary_mae_ratio": 1.0141936764539214,
+        "positive_spike_mae_ratio": 0.9452997239731342,
+        "positive_amplitude_distance_improves": false,
+        "negative_recall_change": 0.0445834962847087,
+        "passes_screen": false
+      },
+      "NYISO": {
+        "ordinary_mae_ratio": 1.0005632181420183,
+        "positive_spike_mae_ratio": 0.916866943180956,
+        "positive_amplitude_distance_improves": true,
+        "negative_recall_change": null,
+        "passes_screen": true
+      },
+      "PJM": {
+        "ordinary_mae_ratio": 1.0234487982196319,
+        "positive_spike_mae_ratio": 0.9212700791920357,
+        "positive_amplitude_distance_improves": true,
+        "negative_recall_change": 0.0,
+        "passes_screen": false
+      }
+    },
+    "passed_markets": 1,
+    "required_markets": 2
+  }
+}

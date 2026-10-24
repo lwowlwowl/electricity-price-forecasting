@@ -159,6 +159,126 @@ def settlement_slice_report(
     return result
 
 
+def event_detection_report(
+    prediction,
+    target,
+    *,
+    threshold: float,
+    direction: str,
+    tolerance_hours: int = 1,
+) -> dict:
+    """把尾部事件的“是否发生”与“发生后幅度”分开报告。
+
+    最后一维视为连续小时，因此容差指标只在同一条曲线内匹配，
+    不会跨节点或交付日。`direction='above'`用于正尖峰，
+    `direction='below'`用于负价或低尾。
+    """
+    pred = np.asarray(prediction, dtype=np.float64)
+    truth = np.asarray(target, dtype=np.float64)
+    if pred.shape != truth.shape:
+        raise ValueError("预测与真值必须同形")
+    if pred.ndim < 1 or pred.shape[-1] < 1:
+        raise ValueError("预测必须包含小时维")
+    if tolerance_hours < 0:
+        raise ValueError("tolerance_hours不能为负")
+    finite = np.isfinite(pred) & np.isfinite(truth)
+    if direction == "above":
+        true_event = finite & (truth >= threshold)
+        pred_event = finite & (pred >= threshold)
+        true_magnitude = np.maximum(truth - threshold, 0.0)
+        pred_magnitude = np.maximum(pred - threshold, 0.0)
+    elif direction == "below":
+        true_event = finite & (truth < threshold)
+        pred_event = finite & (pred < threshold)
+        true_magnitude = np.maximum(threshold - truth, 0.0)
+        pred_magnitude = np.maximum(threshold - pred, 0.0)
+    else:
+        raise ValueError("direction必须为above或below")
+
+    exact = _binary_metrics(true_event, pred_event)
+    dilated_prediction = _dilate_last_axis(pred_event, tolerance_hours)
+    dilated_truth = _dilate_last_axis(true_event, tolerance_hours)
+    tolerant = _binary_metrics(
+        true_event,
+        pred_event,
+        recall_match=dilated_prediction,
+        precision_match=dilated_truth,
+    )
+    event_count = int(true_event.sum())
+    denominator = float(np.sum(true_magnitude[true_event]))
+    predicted_total = float(np.sum(pred_magnitude[true_event]))
+    return {
+        "true_events": event_count,
+        "predicted_events": int(pred_event.sum()),
+        "exact": exact,
+        f"within_{tolerance_hours}h": tolerant,
+        "mean_true_magnitude": (
+            float(np.mean(true_magnitude[true_event])) if event_count else None
+        ),
+        "mean_predicted_magnitude_at_true_events": (
+            float(np.mean(pred_magnitude[true_event])) if event_count else None
+        ),
+        "magnitude_ratio_at_true_events": (
+            predicted_total / denominator if denominator > 1e-12 else None
+        ),
+        "wrong_side_rate_at_true_events": (
+            float(np.mean(~pred_event[true_event])) if event_count else None
+        ),
+    }
+
+
+def daily_peak_report(
+    prediction,
+    target,
+    *,
+    positive_threshold: float,
+) -> dict:
+    """报告含真实正尖峰的节点-日曲线上，日峰值的时点和幅度。"""
+    pred = np.asarray(prediction, dtype=np.float64)
+    truth = np.asarray(target, dtype=np.float64)
+    if pred.shape != truth.shape:
+        raise ValueError("预测与真值必须同形")
+    if pred.ndim < 2 or pred.shape[-1] < 2:
+        raise ValueError("日峰值评价需要最后一维为小时")
+    finite_curve = np.all(np.isfinite(pred) & np.isfinite(truth), axis=-1)
+    true_peak_value = np.max(truth, axis=-1)
+    selected = finite_curve & (true_peak_value >= positive_threshold)
+    count = int(selected.sum())
+    if not count:
+        return {
+            "node_days": 0,
+            "exact_hour_rate": None,
+            "within_1h_rate": None,
+            "mean_absolute_timing_error_hours": None,
+            "predicted_daily_peak_to_true_peak_ratio": None,
+            "prediction_at_true_peak_to_true_peak_ratio": None,
+        }
+    true_hour = np.argmax(truth, axis=-1)[selected]
+    pred_hour = np.argmax(pred, axis=-1)[selected]
+    timing_error = np.abs(pred_hour - true_hour)
+    selected_truth = truth[selected]
+    selected_pred = pred[selected]
+    row = np.arange(count)
+    actual_peak = selected_truth[row, true_hour]
+    predicted_daily_peak = selected_pred[row, pred_hour]
+    prediction_at_true_peak = selected_pred[row, true_hour]
+    denominator = float(np.mean(actual_peak))
+    return {
+        "node_days": count,
+        "exact_hour_rate": float(np.mean(timing_error == 0)),
+        "within_1h_rate": float(np.mean(timing_error <= 1)),
+        "mean_absolute_timing_error_hours": float(np.mean(timing_error)),
+        "predicted_daily_peak_to_true_peak_ratio": (
+            float(np.mean(predicted_daily_peak) / denominator)
+            if abs(denominator) > 1e-12 else None
+        ),
+        "prediction_at_true_peak_to_true_peak_ratio": (
+            float(np.mean(prediction_at_true_peak) / denominator)
+            if abs(denominator) > 1e-12 else None
+        ),
+    }
+
+
 def _finite_flat(value, name: str) -> np.ndarray:
     result = np.asarray(value, dtype=np.float64).reshape(-1)
     result = result[np.isfinite(result)]
@@ -169,6 +289,39 @@ def _finite_flat(value, name: str) -> np.ndarray:
 
 def _safe_rate(numerator: int, denominator: int) -> float | None:
     return float(numerator / denominator) if denominator else None
+
+
+def _dilate_last_axis(mask: np.ndarray, tolerance: int) -> np.ndarray:
+    result = np.asarray(mask, dtype=bool).copy()
+    if tolerance == 0:
+        return result
+    original = np.asarray(mask, dtype=bool)
+    width = original.shape[-1]
+    for offset in range(1, tolerance + 1):
+        if offset >= width:
+            break
+        result[..., offset:] |= original[..., :-offset]
+        result[..., :-offset] |= original[..., offset:]
+    return result
+
+
+def _binary_metrics(
+    truth: np.ndarray,
+    prediction: np.ndarray,
+    *,
+    recall_match: np.ndarray | None = None,
+    precision_match: np.ndarray | None = None,
+) -> dict[str, float | None]:
+    recall_hits = truth & (prediction if recall_match is None else recall_match)
+    precision_hits = prediction & (truth if precision_match is None else precision_match)
+    recall = _safe_rate(int(recall_hits.sum()), int(truth.sum()))
+    precision = _safe_rate(int(precision_hits.sum()), int(prediction.sum()))
+    f1 = (
+        2.0 * precision * recall / (precision + recall)
+        if precision is not None and recall is not None and precision + recall > 0
+        else None
+    )
+    return {"precision": precision, "recall": recall, "f1": f1}
 
 
 def _price_metrics(pred, truth, mask, *, upper_1pct: float) -> dict:

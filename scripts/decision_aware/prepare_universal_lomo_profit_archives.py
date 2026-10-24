@@ -19,7 +19,10 @@ def _load(path: Path) -> dict[str, np.ndarray]:
 
 
 def _require_equal(left: np.ndarray, right: np.ndarray, label: str) -> None:
-    if left.shape != right.shape or not np.allclose(left, right, rtol=0.0, atol=1e-5):
+    # Independent float32 export paths can differ by one ULP for large price
+    # spikes (observed maximum: 2.44e-4 USD/MWh).  This tolerance accepts only
+    # serialization-level drift; it is still orders of magnitude below a cent.
+    if left.shape != right.shape or not np.allclose(left, right, rtol=0.0, atol=5e-4):
         raise ValueError(f"{label}不一致")
 
 
@@ -33,10 +36,18 @@ def prepare(
     seed: int = 0,
     source_paths: dict[str, Path] | None = None,
 ) -> None:
-    if phase not in ("inner", "outer"):
-        raise ValueError("phase必须为inner或outer")
-    suffix = "_outer_frozen" if phase == "outer" else ""
-    template_family = "outertemplate" if phase == "outer" else "c0"
+    if phase not in ("inner", "outer", "final"):
+        raise ValueError("phase必须为inner、outer或final")
+    suffix = (
+        "_outer_frozen" if phase == "outer"
+        else "_locked_2025" if phase == "final"
+        else ""
+    )
+    template_family = (
+        "outertemplate" if phase == "outer"
+        else "ensemble" if phase == "final"
+        else "c0"
+    )
     if not family or any(character.isspace() for character in family):
         raise ValueError("family必须是非空且不含空白的标识")
     if source_paths is None:
@@ -55,10 +66,17 @@ def prepare(
     }
 
     for task in TASKS:
+        metadata = json.loads(str(source[task]["metadata"]))
         if phase == "outer":
-            metadata = json.loads(str(source[task]["metadata"]))
             if metadata.get("evaluation_stage") != "outer_frozen" or metadata.get("retrained") is not False:
                 raise ValueError(f"{task}不是冻结时间外检查产物")
+        if phase == "final":
+            if (
+                metadata.get("protocol") != "all_market_locked_2025"
+                or metadata.get("selection_allowed") is not False
+                or metadata.get("checkpoint_phase") != "final"
+            ):
+                raise ValueError(f"{task}不是锁定2025 final预测产物")
         if not np.array_equal(source[task]["nodes"], template[task]["nodes"]):
             raise ValueError(f"{task}节点顺序与结算模板不一致")
         if not np.array_equal(source[task]["dates"], template[task]["dates"]):
@@ -85,8 +103,12 @@ def prepare(
                     "task": task,
                     "phase": phase,
                     "source_metadata": json.loads(str(source[task]["metadata"])),
-                    "protocol": "leave_one_market_out_zero_shot",
-                    "holdout_market": "ERCOT",
+                    "protocol": (
+                        "all_market_locked_2025_decision_aware_followup"
+                        if phase == "final"
+                        else "leave_one_market_out_zero_shot"
+                    ),
+                    "holdout_market": None if phase == "final" else "ERCOT",
                     "uses_node_id_for_prediction": False,
                     "uses_market_id_for_prediction": False,
                     "source": str(
@@ -110,7 +132,9 @@ def prepare(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--source-root", default="data/results")
-    parser.add_argument("--phase", choices=("inner", "outer"), default="inner")
+    parser.add_argument(
+        "--phase", choices=("inner", "outer", "final"), default="inner"
+    )
     parser.add_argument(
         "--template-root", default="data/results/global_f0_f1_stable_v2_predictions"
     )

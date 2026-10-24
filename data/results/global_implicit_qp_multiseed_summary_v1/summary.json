@@ -1,0 +1,158 @@
+{
+  "experiment": "implicit_qp_fixed_multiseed_validation_v1",
+  "status": "2023_inner_fixed_method_validation",
+  "selection_year": 2023,
+  "2024_used": false,
+  "2025_used": false,
+  "seed_selection_by_profit": false,
+  "frozen_method": {
+    "scope": "decoder_head",
+    "decision_weight": 0.6,
+    "learning_rate": 2e-05,
+    "quadratic_regularization": 0.25,
+    "barrier_temperature": 0.1,
+    "epochs": 3,
+    "episodes_per_node": 2
+  },
+  "seed_families": [
+    "implicitqp_decoder_balanced_seed0",
+    "implicitqp_decoder_balanced_seed1",
+    "implicitqp_decoder_balanced_seed2"
+  ],
+  "individual_seeds": {
+    "implicitqp_decoder_balanced_seed0": {
+      "macro_mean_daily_revenue": 426.9883792377504,
+      "baseline_macro_mean_daily_revenue": 418.0648632856565,
+      "mean_daily_difference": 8.923515952093817,
+      "paired_7day_block_bootstrap_95ci": [
+        -4.656190328453645,
+        25.379025622458098
+      ],
+      "difference_after_removing_5_best_delta_days": 0.6450827559514044,
+      "improved_nodes": 14,
+      "node_count": 15,
+      "node_differences": {
+        "HB_BUSAVG": 5.399741073776852,
+        "HB_HOUSTON": 13.057139333593511,
+        "HB_HUBAVG": 2.678527670114363,
+        "HB_NORTH": 10.016928368053925,
+        "HB_PAN": 34.42503678778411,
+        "HB_SOUTH": 7.203980700847353,
+        "HB_WEST": 5.88458722271406,
+        "LZ_AEN": 13.778175809968616,
+        "LZ_CPS": 10.950752862918762,
+        "LZ_HOUSTON": 13.794814616071221,
+        "LZ_LCRA": 5.942836785534439,
+        "LZ_NORTH": 10.180474526444584,
+        "LZ_RAYBN": 10.455801417392763,
+        "LZ_SOUTH": 4.386862479444517,
+        "LZ_WEST": -14.30292037325222
+      },
+      "passes_point_estimate": true,
+      "passes_paired_interval": false,
+      "passes_remove_top5": true
+    },
+    "implicitqp_decoder_balanced_seed1": {
+      "macro_mean_daily_revenue": 387.3219058692522,
+      "baseline_macro_mean_daily_revenue": 418.0648632856565,
+      "mean_daily_difference": -30.742957416404337,
+      "paired_7day_block_bootstrap_95ci": [
+        -68.22106942219747,
+        0.6024240225918608
+      ],
+      "difference_after_removing_5_best_delta_days": -40.402861603340575,
+      "improved_nodes": 0,
+      "node_count": 15,
+      "node_differences": {
+        "HB_BUSAVG": -25.257069936189623,
+        "HB_HOUSTON": -19.771520242667577,
+        "HB_HUBAVG": -20.508152267209084,
+        "HB_NORTH": -25.331454878855254,
+        "HB_PAN": -87.28505147631552,
+        "HB_SOUTH": -11.85685165148584,
+        "HB_WEST": -18.015961188654842,
+        "LZ_AEN": -28.283513610883915,
+        "LZ_CPS": -27.7569889761715,
+        "LZ_HOUSTON": -20.193005247718247,
+        "LZ_LCRA": -37.027342049932884,
+        "LZ_NORTH": -35.31411484798127,
+        "LZ_RAYBN": -46.1541046839385,
+        "LZ_SOUTH": -11.871420638784798,
+        "LZ_WEST": -46.51780954927602
+      },
+      "passes_point_estimate": false,
+      "passes_paired_interval": false,
+      "passes_remove_top5": false
+    },
+    "implicitqp_decoder_balanced_seed2": {
+      "macro_mean_daily_revenue": 399.40658118087856,
+      "baseline_macro_mean_daily_revenue": 418.0648632856565,
+      "mean_daily_difference": -18.658282104777925,
+      "paired_7day_block_bootstrap_95ci": [
+        -50.64244427753158,
+        10.46100410203358
+      ],
+      "difference_after_removing_5_best_delta_days": -28.695849871743235,
+      "improved_nodes": 1,
+      "node_count": 15,
+      "node_differences": {
+        "HB_BUSAVG": -17.86402906955948,
+        "HB_HOUSTON": -37.073834111302574,
+        "HB_HUBAVG": -11.730264213374937,
+        "HB_NORTH": -36.11232487657503,
+        "HB_PAN": -5.822127484303508,
+        "HB_SOUTH": -3.6636273248680027,
+        "HB_WEST": 9.274513439419877,
+        "LZ_AEN": -20.65482142336583,
+        "LZ_CPS": -10.681817272666194,
+        "LZ_HOUSTON": -39.88931133094894,
+        "LZ_LCRA": -21.108167336413317,
+        "LZ_NORTH": -37.145456297197086,
+        "LZ_RAYBN": -38.09614948840175,
+        "LZ_SOUTH": -0.12497122931694093,
+        "LZ_WEST": -9.181843552795328
+      },
+      "passes_point_estimate": false,
+      "passes_paired_interval": false,
+      "passes_remove_top5": false
+    }
+  },
+  "across_seed_mean_daily_revenue": 404.57228876262707,
+  "across_seed_sample_std_daily_revenue": 20.331519335468872,
+  "fixed_equal_weight_ensemble_family": "implicitqp_decoder_balanced_ensemble",
+  "fixed_equal_weight_ensemble": {
+    "macro_mean_daily_revenue": 424.76896152519095,
+    "baseline_macro_mean_daily_revenue": 418.0648632856565,
+    "mean_daily_difference": 6.704098239534444,
+    "paired_7day_block_bootstrap_95ci": [
+      -9.521123890025116,
+      25.080160806913934
+    ],
+    "difference_after_removing_5_best_delta_days": -2.05517474151844,
+    "improved_nodes": 13,
+    "node_count": 15,
+    "node_differences": {
+      "HB_BUSAVG": 5.8066325785111985,
+      "HB_HOUSTON": 6.397806594034023,
+      "HB_HUBAVG": 5.944246646053045,
+      "HB_NORTH": 3.0349573294184893,
+      "HB_PAN": 10.904933480727607,
+      "HB_SOUTH": 11.182402684558667,
+      "HB_WEST": 12.236998568681543,
+      "LZ_AEN": 10.068169285247848,
+      "LZ_CPS": 13.059344963289789,
+      "LZ_HOUSTON": 7.5872224176881105,
+      "LZ_LCRA": 5.106922193623973,
+      "LZ_NORTH": -2.3066152455800193,
+      "LZ_RAYBN": -3.5385617694574876,
+      "LZ_SOUTH": 10.94831414404149,
+      "LZ_WEST": 4.128699722178112
+    },
+    "passes_point_estimate": true,
+    "passes_paired_interval": false,
+    "passes_remove_top5": false
+  },
+  "baseline_family": "xgbpooled",
+  "source": "global_predicted_continuous_da_lp_rt_mpc_v1",
+  "source_path": "data/results/global_implicit_qp_multiseed_continuous_mpc_v1.json"
+}

@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "status": "frozen",
+  "title": "后续实验唯一基线注册表",
+  "scope": "当前论文的Global、无实体ID、ERCOT完整双结算实验",
+  "primary_metric": {
+    "name": "node_equal_macro_mean_daily_net_revenue",
+    "unit": "USD_per_node_day",
+    "settlement": "DA_LP_plus_rolling_RT_MPC_with_continuous_SOC_degradation_and_deviation_penalty"
+  },
+  "rules": [
+    "新实验不得自行重算、改名或挑选另一套最强基线。",
+    "所有实验脚本必须通过src/decision_aware/baseline_registry.py读取本文件，不得手写基线数值。",
+    "不同年份、实体ID设置、节点范围或结算合同的收益不得放入同一排行榜。",
+    "只有源结果缺失、损坏或哈希不符时才允许重算基线；重算前必须先记录原因。",
+    "2025已经打开，禁止用于训练、选模、阈值、seed或超参数选择。"
+  ],
+  "stages": {
+    "development_2023": {
+      "purpose": "2020-2022训练后的2023开发与选模",
+      "selection_allowed": true,
+      "market": "ERCOT",
+      "year": 2023,
+      "nodes": 15,
+      "days": 362,
+      "protocol": "global_no_id_lomo_same_source_markets_and_years",
+      "strongest_fair_baseline": {
+        "system": "pooled_lomo_xgboost",
+        "value": 418.0648632863855,
+        "source": "data/results/fair_xgboost_comparison_v1/summary.json",
+        "source_sha256": "c93bb28a283c4d45368c2099ce4b7022bdc27085654f999c431c68a6853d6d4b",
+        "source_selector": "profit_rows[system=xgboost_pooled].ercot_2023_mean_daily_net_revenue"
+      },
+      "frozen_transformer_incumbent": {
+        "system": "no_id_transformer_three_seed_equal_prediction_ensemble",
+        "value": 407.166707634525,
+        "source": "data/results/fair_xgboost_comparison_v1/summary.json",
+        "source_sha256": "c93bb28a283c4d45368c2099ce4b7022bdc27085654f999c431c68a6853d6d4b",
+        "source_selector": "profit_rows[system=transformer_ensemble].ercot_2023_mean_daily_net_revenue"
+      },
+      "complete_three_leg_comparators": {
+        "no_id_transformer_seed0": {
+          "role": "当前方法的单seed结果，不是外部基线",
+          "value": 377.8381252155746,
+          "source": "data/results/fair_xgboost_comparison_v1/summary.json",
+          "source_sha256": "c93bb28a283c4d45368c2099ce4b7022bdc27085654f999c431c68a6853d6d4b",
+          "source_selector": "profit_rows[system=transformer].ercot_2023_mean_daily_net_revenue"
+        },
+        "per_node_local_xgboost": {
+          "role": "看过ERCOT训练标签的监督比较器；信息预算不同，不是LOMO公平基线",
+          "value": 292.2892646773067,
+          "source": "data/results/fair_xgboost_comparison_v1/summary.json",
+          "source_sha256": "c93bb28a283c4d45368c2099ce4b7022bdc27085654f999c431c68a6853d6d4b",
+          "source_selector": "profit_rows[system=xgboost_local].ercot_2023_mean_daily_net_revenue"
+        },
+        "timesfm_2_5_lora": {
+          "role": "源市场监督LoRA基础模型基线",
+          "value": 262.7869561974966,
+          "source": "data/results/universal_lomo_timesfm25_lora_ercot_continuous_mpc_v1.json",
+          "source_sha256": "2a268b95aa9c0fb3209103d13067af338bee5256c4a042f5c2d7e22087679ad3",
+          "source_selector": "systems[da_timesfm25_lora__rt_at_da_timesfm25_lora__rt_timesfm25_lora].macro_mean_daily_revenue"
+        },
+        "lag_168_seasonal": {
+          "role": "简单季节性基线",
+          "value": 213.7797541925254,
+          "source": "data/results/global_xgboost_robust_continuous_mpc_backtest_v1.json",
+          "source_sha256": "cfdece01dd3040b1a12da714ec33843fd0442d2fa4856452a6234e3fcd5b80ca",
+          "source_selector": "systems[da_seasonal__rt_at_da_seasonal__rt_seasonal].macro_mean_daily_revenue"
+        },
+        "timesfm_3_frozen": {
+          "role": "冻结基础模型零样本基线",
+          "value": -91.13896382319936,
+          "source": "data/results/universal_lomo_timesfm3_ercot_continuous_mpc_v1.json",
+          "source_sha256": "5f930d9dd40198fb2a57fc84ae841ff7813d015adbf08c636e74432e09a7fb5e",
+          "source_selector": "systems[da_timesfm3_frozen__rt_at_da_timesfm3_frozen__rt_timesfm3_frozen].macro_mean_daily_revenue"
+        }
+      },
+      "incomplete_not_rankable": {
+        "lear": "只覆盖DA与RT-at-DA，且多市场任务未全部完成；没有rolling RT，禁止进入完整收益排行榜。",
+        "simple_deep_baselines": "MLP、LSTM、DLinear和PatchTST没有形成当前2023无ID LOMO协议下可复核的三腿完整收益，不得用其他年份结果补位。"
+      },
+      "promotion_gate": {
+        "must_beat_system": "pooled_lomo_xgboost",
+        "point_estimate_must_exceed": 418.0648632863855,
+        "paired_7day_block_bootstrap_ci_lower_must_exceed_zero": true,
+        "improved_node_count_must_be_reported": true,
+        "gain_after_removing_5_best_delta_days_must_exceed_zero": true,
+        "worst_10pct_difference_must_be_reported": true,
+        "note": "统计显著性只由配对区间判定；不另设临时百分比目标或任意节点数硬门槛。"
+      }
+    },
+    "frozen_confirmation_2024": {
+      "purpose": "方法、超参数和seed规则冻结后的时间外确认；不得反向调参",
+      "selection_allowed": false,
+      "market": "ERCOT",
+      "year": 2024,
+      "nodes": 15,
+      "days": 363,
+      "protocol": "frozen_outer_year_same_settlement_but_unequal_training_data",
+      "strongest_available_comparator": {
+        "system": "per_node_xgboost",
+        "value": 90.69091958351444,
+        "source": "data/results/universal_lomo_ercot_outer_frozen_summary_v1.json",
+        "source_sha256": "4db5aa7f57e9e63a3a2191c708623254323236670e65749c05ed1d16a410e44b",
+        "source_selector": "xgboost_usd_per_node_day",
+        "fairness_warning": "XGBoost看过目标市场且训练年份不同，只能作可用强比较，不能称同数据架构对照。"
+      },
+      "frozen_transformer_incumbent": {
+        "system": "no_id_transformer_seed0",
+        "value": 73.37555847744397,
+        "source": "data/results/universal_lomo_ercot_outer_frozen_summary_v1.json",
+        "source_sha256": "4db5aa7f57e9e63a3a2191c708623254323236670e65749c05ed1d16a410e44b",
+        "source_selector": "universal_usd_per_node_day"
+      }
+    },
+    "locked_report_only_2025": {
+      "purpose": "原始锁定测试与完全冻结方法的固定事后跟进；绝不选模",
+      "selection_allowed": false,
+      "market": "ERCOT",
+      "year": 2025,
+      "nodes": 15,
+      "protocol": "allmarket_locked_2025_final",
+      "strongest_preregistered_pure_baseline": {
+        "system": "dlinear",
+        "value": 61.525252465913894,
+        "source": "data/results/allmarket_locked_2025_all_continuous_mpc_v2.json",
+        "source_sha256": "6b56cf6d752fd2848bf68c1d1be5755d3311a0366aa6da916cddaf53cdbd0994",
+        "source_selector": "systems[da_dlinear__rt_at_da_dlinear__rt_dlinear].macro_mean_daily_revenue"
+      },
+      "complete_three_leg_preregistered_baselines": {
+        "dlinear": {
+          "value": 61.525252465913894,
+          "source": "data/results/allmarket_locked_2025_all_continuous_mpc_v2.json",
+          "source_sha256": "6b56cf6d752fd2848bf68c1d1be5755d3311a0366aa6da916cddaf53cdbd0994",
+          "source_selector": "systems[da_dlinear__rt_at_da_dlinear__rt_dlinear].macro_mean_daily_revenue"
+        },
+        "per_node_xgboost": {
+          "value": 59.98924902404078,
+          "role": "看过目标节点历史标签的监督强基线",
+          "source": "data/results/allmarket_locked_2025_all_continuous_mpc_v2.json",
+          "source_sha256": "6b56cf6d752fd2848bf68c1d1be5755d3311a0366aa6da916cddaf53cdbd0994",
+          "source_selector": "systems[da_per_node_xgboost__rt_at_da_per_node_xgboost__rt_per_node_xgboost].macro_mean_daily_revenue"
+        },
+        "pooled_xgboost": {
+          "value": 44.42895205932536,
+          "role": "全市场无ID pooled 基线",
+          "source": "data/results/allmarket_locked_2025_all_continuous_mpc_v2.json",
+          "source_sha256": "6b56cf6d752fd2848bf68c1d1be5755d3311a0366aa6da916cddaf53cdbd0994",
+          "source_selector": "systems[da_pooled_xgboost__rt_at_da_pooled_xgboost__rt_pooled_xgboost].macro_mean_daily_revenue"
+        },
+        "timesfm_2_5_lora": {
+          "value": 35.73712454782225,
+          "source": "data/results/allmarket_locked_2025_all_continuous_mpc_v2.json",
+          "source_sha256": "6b56cf6d752fd2848bf68c1d1be5755d3311a0366aa6da916cddaf53cdbd0994",
+          "source_selector": "systems[da_timesfm25__rt_at_da_timesfm25__rt_timesfm25].macro_mean_daily_revenue"
+        },
+        "lag_168_seasonal": {
+          "value": -3.5721237332584477,
+          "source": "data/results/allmarket_locked_2025_all_continuous_mpc_v2.json",
+          "source_sha256": "6b56cf6d752fd2848bf68c1d1be5755d3311a0366aa6da916cddaf53cdbd0994",
+          "source_selector": "systems[da_seasonal__rt_at_da_seasonal__rt_seasonal].macro_mean_daily_revenue"
+        },
+        "timesfm_3_frozen": {
+          "value": -39.57320616081085,
+          "source": "data/results/allmarket_locked_2025_all_continuous_mpc_v2.json",
+          "source_sha256": "6b56cf6d752fd2848bf68c1d1be5755d3311a0366aa6da916cddaf53cdbd0994",
+          "source_selector": "systems[da_timesfm3__rt_at_da_timesfm3__rt_timesfm3].macro_mean_daily_revenue"
+        }
+      },
+      "diagnostic_not_baseline": {
+        "restricted_perfect_price_reference": {
+          "value": 39.46051280373298,
+          "reason": "使用真实价格，不可部署，只是同策略可行域诊断；不得进入基线胜负排名。",
+          "source": "data/results/allmarket_locked_2025_all_continuous_mpc_v2.json",
+          "source_sha256": "6b56cf6d752fd2848bf68c1d1be5755d3311a0366aa6da916cddaf53cdbd0994",
+          "source_selector": "systems[da_oracle__rt_at_da_oracle__rt_oracle].macro_mean_daily_revenue"
+        },
+        "lear": {
+          "reason": "没有rolling RT完整腿，因此不进入完整经济收益排行榜。"
+        }
+      },
+      "strongest_existing_posttest_method": {
+        "system": "three_feature_tail_expert_router",
+        "value": 63.525093624873264,
+        "source": "data/results/tail_expert_router_v1/followup_2025_audit_v1.json",
+        "source_sha256": "cdf0399d719a28740f90917af4f18f746056c21029d2eaa731532b08c06978e0",
+        "source_selector": "router_macro_mean_daily_revenue",
+        "role_warning": "这是post-original-test固定跟进方法，不是预注册纯基线；新方法必须同时报告与它及DLinear的差异。"
+      },
+      "frozen_transformer_incumbent": {
+        "system": "no_id_transformer_three_seed_equal_prediction_ensemble",
+        "value": 28.03982363006879,
+        "source": "data/results/allmarket_locked_2025_all_continuous_mpc_v2.json",
+        "source_sha256": "6b56cf6d752fd2848bf68c1d1be5755d3311a0366aa6da916cddaf53cdbd0994",
+        "source_selector": "systems[da_ensemble__rt_at_da_ensemble__rt_ensemble].macro_mean_daily_revenue"
+      }
+    }
+  }
+}

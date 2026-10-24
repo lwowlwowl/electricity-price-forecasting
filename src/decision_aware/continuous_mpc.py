@@ -84,8 +84,18 @@ def solve_predicted_da_penalty_lp_day(
     )
     for label, value in (("initial_plan_soc_mwh", plan_soc0),
                          ("initial_actual_soc_mwh", actual_soc0)):
-        if not soc_min - 1e-9 <= value <= soc_max + 1e-9:
-            raise ValueError(f"{label}超出SOC上下限")
+        # HiGHS may return a boundary solution a few ulps outside the stated
+        # SOC bounds.  The rolling evaluator already treats deviations up to
+        # 1e-7 MWh as numerical noise, so use the same tolerance here and
+        # project only those boundary-level deviations back onto the feasible
+        # interval.  Larger violations remain hard failures.
+        if not soc_min - 1e-7 <= value <= soc_max + 1e-7:
+            raise ValueError(
+                f"{label}超出SOC上下限: value={value:.12g}, "
+                f"bounds=[{soc_min:.12g}, {soc_max:.12g}]"
+            )
+    plan_soc0 = float(np.clip(plan_soc0, soc_min, soc_max))
+    actual_soc0 = float(np.clip(actual_soc0, soc_min, soc_max))
 
     def trajectory_rows(variable_count, d_start, c_start, initial_soc):
         rows = []

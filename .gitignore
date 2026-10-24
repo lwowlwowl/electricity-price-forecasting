@@ -30,6 +30,7 @@ wheels/
 # 2. 虚拟环境（所有 .venv 目录）
 # --------------------------------------------
 **/.venv/
+**/.venv-*/
 .venv_forecast/
 venv/
 ENV/
@@ -127,17 +128,25 @@ tmp/
 *.tmp
 *.bak
 *.backup
+.chart-data-*/
+.codex-build/
+.codex-finalizer/
 
 # --------------------------------------------
 # 11. 测试相关（可选）
 # --------------------------------------------
 .pytest_cache/
 .pytest_tmp/
+.pytest_tmp*/
 .test-tmp/
 .coverage
 htmlcov/
 .tox/
 .nox/
+
+# Smoke/quick试跑只用于接口检查，不作为正式实验产物保存。
+data/results/**/*smoke*/
+data/results/**/*quick*/
 
 # --------------------------------------------
 # 12. 其他（根据项目需要添加）
@@ -158,6 +167,12 @@ data/archive/checkpoints/
 
 # 长任务GPU遥测体积随运行时间增长，由最终计算成本摘要代替提交。
 data/results/**/gpu_usage.csv
+
+# 流水线心跳、运行状态和结果目录内的派生展示文件均可由正式脚本重建。
+data/results/**/status.tsv
+data/results/**/*.csv
+data/results/**/*.png
+data/results/**/*.md
 
 # --------------------------------------------
 # 13. 团队内部资料（按周归档，含个人/同学产出，不适合公开仓库）
@@ -182,3 +197,61 @@ data/results/**/run.lock
 # 上传前代码快照和完整结果归档；正式结论、哈希清单及JSON摘要继续提交。
 data/results/**/*.tar
 data/results/**/*.tar.gz
+
+# --------------------------------------------
+# 16. 实验JSON：默认不提交逐时轨迹和筛选中间产物
+# --------------------------------------------
+# 已经被Git跟踪的历史JSON不受影响。新结果默认忽略，只放行论文复现所需的
+# 精简摘要、预注册协议、清单、审计结论和冻结配置。
+data/results/*.json
+data/results/**/*.json
+
+!data/results/**/*summary*.json
+!data/results/**/summary.json
+!data/results/**/protocol.json
+!data/results/**/manifest.json
+!data/results/**/*audit*.json
+!data/results/**/*preregistration*.json
+!data/results/**/*claim*.json
+!data/results/**/*closure*.json
+!data/results/**/*comparison*.json
+!data/results/**/LOCKED_2025_OPENED.json
+!data/results/**/frozen_router.json
+!data/results/**/followup_router.json
+
+# 最终跨市场冻结评价本身不是中间MPC轨迹，单独保留。
+!data/results/tail_expert_router_cross_market_2025_v1.json
+
+# 已由进度文档汇总的基础模型探索及路由候选输入，不进入论文证据包。
+data/results/chronos2*/**/*.json
+data/results/**/*candidates*/**/*.json
+data/results/**/*profit_inputs*/**/*.json
+
+# 海报迭代稿不全部入库，只保留当前最高版本；源图和生成代码正常提交。
+output/pptx/*
+!output/pptx/FoSE_2026_Decision_Aware_Electricity_Forecasting_Poster_v14.pptx
+
+# --------------------------------------------
+# 17. LaTeX 编译与生成 PDF（由源码重新生成，不上传）
+# --------------------------------------------
+paper/**/*.aux
+paper/**/*.out
+paper/**/*.toc
+paper/**/*.lof
+paper/**/*.lot
+paper/**/*.fls
+paper/**/*.fdb_latexmk
+paper/**/*.synctex.gz
+paper/**/*.xdv
+paper/**/*.bcf
+paper/**/*.run.xml
+paper/**/*.bbl
+paper/**/*.blg
+paper/**/main.pdf
+output/pdf/
+
+# --------------------------------------------
+# 18. 本地编辑器/Agent 规则
+# --------------------------------------------
+# 持久的项目基线规则由 BASELINES.md 与配置注册表维护；本地 IDE 规则不上传。
+.cursor/

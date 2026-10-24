@@ -22,7 +22,7 @@ def main() -> None:
         "--output", default="data/results/global_da_outer_validation_conclusion_v1.json"
     )
     parser.add_argument(
-        "--document", default="docs/progress/31_ERCOT_DA冻结候选2024外层验证.md"
+        "--document", default="docs/progress/3_多节点Global与跨市场泛化/5_ERCOT_DA冻结候选2024外层验证.md"
     )
     parser.add_argument(
         "--training-protocol",

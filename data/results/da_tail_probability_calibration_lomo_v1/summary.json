@@ -1,0 +1,931 @@
+{
+  "experiment": "da_positive_spike_beta_calibration_lomo_v1",
+  "status": "complete",
+  "uses_ercot": false,
+  "test_2025_read": false,
+  "probability_source": "piecewise-linear CDF of frozen non-crossing q01..q99 adapter",
+  "calibrator": "Beta calibration: logistic(log(p), log(1-p)), C=1",
+  "folds": {
+    "CAISO": {
+      "fit_markets": [
+        "NYISO",
+        "PJM"
+      ],
+      "fit_year": 2023,
+      "evaluation_year": 2024,
+      "coefficients": [
+        0.27528094292868804,
+        0.7320827261212202
+      ],
+      "intercept": -2.297605163249737,
+      "raw": {
+        "samples": 26208,
+        "events": 13,
+        "event_rate": 0.000496031746031746,
+        "mean_probability": 0.000639491307264034,
+        "pr_auc": 0.0008107336088987465,
+        "pr_auc_lift": 1.634438955539873,
+        "brier": 0.0005581316529955206,
+        "constant_brier": 0.0004957856985386746,
+        "brier_improvement_vs_constant": -6.234595445684602e-05,
+        "node_equal_brier": 0.0005581316529955207,
+        "node_equal_constant_brier": 0.0004957827867340231,
+        "node_metrics": [
+          {
+            "node_id": 0,
+            "samples": 8736,
+            "event_rate": 0.0004578754578754579,
+            "mean_probability": 0.0006826756411246362,
+            "brier": 0.0005082536251862261,
+            "constant_brier": 0.00045766580794053327
+          },
+          {
+            "node_id": 1,
+            "samples": 8736,
+            "event_rate": 0.0005723443223443224,
+            "mean_probability": 0.000592014883451217,
+            "brier": 0.00063766752992363,
+            "constant_brier": 0.0005720167443210027
+          },
+          {
+            "node_id": 2,
+            "samples": 8736,
+            "event_rate": 0.0004578754578754579,
+            "mean_probability": 0.0006437833972162486,
+            "brier": 0.0005284738038767059,
+            "constant_brier": 0.00045766580794053327
+          }
+        ]
+      },
+      "calibrated": {
+        "samples": 26208,
+        "events": 13,
+        "event_rate": 0.000496031746031746,
+        "mean_probability": 0.0026628946766144575,
+        "pr_auc": 0.0008107336088987465,
+        "pr_auc_lift": 1.634438955539873,
+        "brier": 0.0005142661781425058,
+        "constant_brier": 0.0004957856985386746,
+        "brier_improvement_vs_constant": -1.848047960383123e-05,
+        "node_equal_brier": 0.0005142661781425059,
+        "node_equal_constant_brier": 0.0004957827867340231,
+        "node_metrics": [
+          {
+            "node_id": 0,
+            "samples": 8736,
+            "event_rate": 0.0004578754578754579,
+            "mean_probability": 0.002749370054481435,
+            "brier": 0.0004821677370216963,
+            "constant_brier": 0.00045766580794053327
+          },
+          {
+            "node_id": 1,
+            "samples": 8736,
+            "event_rate": 0.0005723443223443224,
+            "mean_probability": 0.0025977362373482086,
+            "brier": 0.000582617237287513,
+            "constant_brier": 0.0005720167443210027
+          },
+          {
+            "node_id": 2,
+            "samples": 8736,
+            "event_rate": 0.0004578754578754579,
+            "mean_probability": 0.002641577738013729,
+            "brier": 0.00047801356011830846,
+            "constant_brier": 0.00045766580794053327
+          }
+        ]
+      },
+      "passes": false
+    },
+    "NYISO": {
+      "fit_markets": [
+        "CAISO",
+        "PJM"
+      ],
+      "fit_year": 2023,
+      "evaluation_year": 2024,
+      "coefficients": [
+        0.42567557213765717,
+        0.14496362556935324
+      ],
+      "intercept": -1.468125710350105,
+      "raw": {
+        "samples": 96096,
+        "events": 240,
+        "event_rate": 0.0024975024975024975,
+        "mean_probability": 0.002296904785100079,
+        "pr_auc": 0.03414359008796547,
+        "pr_auc_lift": 13.671093471221374,
+        "brier": 0.002723974907775215,
+        "constant_brier": 0.0024912649787774666,
+        "brier_improvement_vs_constant": -0.0002327099289977483,
+        "node_equal_brier": 0.002723974907775215,
+        "node_equal_constant_brier": 0.002491034320532947,
+        "node_metrics": [
+          {
+            "node_id": 3,
+            "samples": 8736,
+            "event_rate": 0.002174908424908425,
+            "mean_probability": 0.001544929949617369,
+            "brier": 0.0022940037342294127,
+            "constant_brier": 0.002170178198251687
+          },
+          {
+            "node_id": 4,
+            "samples": 8736,
+            "event_rate": 0.0028617216117216115,
+            "mean_probability": 0.0013778956457222826,
+            "brier": 0.0028865457381704765,
+            "constant_brier": 0.0028535321611386174
+          },
+          {
+            "node_id": 5,
+            "samples": 8736,
+            "event_rate": 0.0025183150183150185,
+            "mean_probability": 0.002962268050584687,
+            "brier": 0.00282277350259053,
+            "constant_brier": 0.0025119731077835475
+          },
+          {
+            "node_id": 6,
+            "samples": 8736,
+            "event_rate": 0.0022893772893772895,
+            "mean_probability": 0.0014977728958826561,
+            "brier": 0.0023318602548619556,
+            "constant_brier": 0.002284136041004172
+          },
+          {
+            "node_id": 7,
+            "samples": 8736,
+            "event_rate": 0.002403846153846154,
+            "mean_probability": 0.00283261778447234,
+            "brier": 0.0026524584993411703,
+            "constant_brier": 0.0023980676775147924
+          },
+          {
+            "node_id": 8,
+            "samples": 8736,
+            "event_rate": 0.002632783882783883,
+            "mean_probability": 0.0025370908989556127,
+            "brier": 0.0025463696503018785,
+            "constant_brier": 0.002625852331810436
+          },
+          {
+            "node_id": 9,
+            "samples": 8736,
+            "event_rate": 0.003205128205128205,
+            "mean_probability": 0.0014613731029650895,
+            "brier": 0.003258470647659835,
+            "constant_brier": 0.0031948553583168973
+          },
+          {
+            "node_id": 10,
+            "samples": 8736,
+            "event_rate": 0.0025183150183150185,
+            "mean_probability": 0.0027796507588924123,
+            "brier": 0.0027512483752847546,
+            "constant_brier": 0.0025119731077835475
+          },
+          {
+            "node_id": 11,
+            "samples": 8736,
+            "event_rate": 0.0033195970695970695,
+            "mean_probability": 0.005007710757271077,
+            "brier": 0.0045682876656588526,
+            "constant_brier": 0.0033085773448925933
+          },
+          {
+            "node_id": 12,
+            "samples": 8736,
+            "event_rate": 0.0018315018315018315,
+            "mean_probability": 0.0015903499236890562,
+            "brier": 0.0020365726542026646,
+            "constant_brier": 0.001828147432543037
+          },
+          {
+            "node_id": 13,
+            "samples": 8736,
+            "event_rate": 0.001717032967032967,
+            "mean_probability": 0.001674292868048284,
+            "brier": 0.0018151332632258326,
+            "constant_brier": 0.0017140847648230895
+          }
+        ]
+      },
+      "calibrated": {
+        "samples": 96096,
+        "events": 240,
+        "event_rate": 0.0024975024975024975,
+        "mean_probability": 0.0027588434754252933,
+        "pr_auc": 0.03419285244491038,
+        "pr_auc_lift": 13.690818118942117,
+        "brier": 0.002444131765132241,
+        "constant_brier": 0.0024912649787774666,
+        "brier_improvement_vs_constant": 4.7133213645225627e-05,
+        "node_equal_brier": 0.002444131765132241,
+        "node_equal_constant_brier": 0.002491034320532947,
+        "node_metrics": [
+          {
+            "node_id": 3,
+            "samples": 8736,
+            "event_rate": 0.002174908424908425,
+            "mean_probability": 0.0022263445097190854,
+            "brier": 0.0021662924568461566,
+            "constant_brier": 0.002170178198251687
+          },
+          {
+            "node_id": 4,
+            "samples": 8736,
+            "event_rate": 0.0028617216117216115,
+            "mean_probability": 0.002331900930910285,
+            "brier": 0.002820178722381456,
+            "constant_brier": 0.0028535321611386174
+          },
+          {
+            "node_id": 5,
+            "samples": 8736,
+            "event_rate": 0.0025183150183150185,
+            "mean_probability": 0.0031978392822320993,
+            "brier": 0.0024001090663249586,
+            "constant_brier": 0.0025119731077835475
+          },
+          {
+            "node_id": 6,
+            "samples": 8736,
+            "event_rate": 0.0022893772893772895,
+            "mean_probability": 0.0024801622780280487,
+            "brier": 0.0022810964250968824,
+            "constant_brier": 0.002284136041004172
+          },
+          {
+            "node_id": 7,
+            "samples": 8736,
+            "event_rate": 0.002403846153846154,
+            "mean_probability": 0.003071163064824849,
+            "brier": 0.0023220591364233423,
+            "constant_brier": 0.0023980676775147924
+          },
+          {
+            "node_id": 8,
+            "samples": 8736,
+            "event_rate": 0.002632783882783883,
+            "mean_probability": 0.002980673722649824,
+            "brier": 0.0024312830824094666,
+            "constant_brier": 0.002625852331810436
+          },
+          {
+            "node_id": 9,
+            "samples": 8736,
+            "event_rate": 0.003205128205128205,
+            "mean_probability": 0.00234792554661955,
+            "brier": 0.0031596966808358734,
+            "constant_brier": 0.0031948553583168973
+          },
+          {
+            "node_id": 10,
+            "samples": 8736,
+            "event_rate": 0.0025183150183150185,
+            "mean_probability": 0.003115402446944987,
+            "brier": 0.0024287484155410947,
+            "constant_brier": 0.0025119731077835475
+          },
+          {
+            "node_id": 11,
+            "samples": 8736,
+            "event_rate": 0.0033195970695970695,
+            "mean_probability": 0.0038187524265311914,
+            "brier": 0.0031939730105003316,
+            "constant_brier": 0.0033085773448925933
+          },
+          {
+            "node_id": 12,
+            "samples": 8736,
+            "event_rate": 0.0018315018315018315,
+            "mean_probability": 0.0022418934888296218,
+            "brier": 0.0019315946088292524,
+            "constant_brier": 0.001828147432543037
+          },
+          {
+            "node_id": 13,
+            "samples": 8736,
+            "event_rate": 0.001717032967032967,
+            "mean_probability": 0.0025352205323886843,
+            "brier": 0.0017504178112658331,
+            "constant_brier": 0.0017140847648230895
+          }
+        ]
+      },
+      "passes": true
+    },
+    "PJM": {
+      "fit_markets": [
+        "CAISO",
+        "NYISO"
+      ],
+      "fit_year": 2023,
+      "evaluation_year": 2024,
+      "coefficients": [
+        0.2747607293738189,
+        0.6394779946533597
+      ],
+      "intercept": -2.418422902795271,
+      "raw": {
+        "samples": 305760,
+        "events": 1039,
+        "event_rate": 0.003398090005232862,
+        "mean_probability": 0.002707750254158833,
+        "pr_auc": 0.09008316840710215,
+        "pr_auc_lift": 26.50994184038071,
+        "brier": 0.0035074006745236456,
+        "constant_brier": 0.0033865429895491984,
+        "brier_improvement_vs_constant": -0.00012085768497444721,
+        "node_equal_brier": 0.003507400674523645,
+        "node_equal_constant_brier": 0.0033826264506577504,
+        "node_metrics": [
+          {
+            "node_id": 14,
+            "samples": 8736,
+            "event_rate": 0.0016025641025641025,
+            "mean_probability": 0.0021282277112069695,
+            "brier": 0.0018984682468661614,
+            "constant_brier": 0.001599995890861276
+          },
+          {
+            "node_id": 15,
+            "samples": 8736,
+            "event_rate": 0.001717032967032967,
+            "mean_probability": 0.002122868799934644,
+            "brier": 0.0019834885479805275,
+            "constant_brier": 0.0017140847648230895
+          },
+          {
+            "node_id": 16,
+            "samples": 8736,
+            "event_rate": 0.0030906593406593405,
+            "mean_probability": 0.0026337840716016084,
+            "brier": 0.0034002779231691806,
+            "constant_brier": 0.0030811071654993356
+          },
+          {
+            "node_id": 17,
+            "samples": 8736,
+            "event_rate": 0.003205128205128205,
+            "mean_probability": 0.002806232829444688,
+            "brier": 0.0033331945528161516,
+            "constant_brier": 0.0031948553583168965
+          },
+          {
+            "node_id": 18,
+            "samples": 8736,
+            "event_rate": 0.0035485347985347985,
+            "mean_probability": 0.0029207051227210686,
+            "brier": 0.0037884181122877594,
+            "constant_brier": 0.003535942699318386
+          },
+          {
+            "node_id": 19,
+            "samples": 8736,
+            "event_rate": 0.001945970695970696,
+            "mean_probability": 0.003829470722731502,
+            "brier": 0.0023787988147883966,
+            "constant_brier": 0.0019421838940211192
+          },
+          {
+            "node_id": 20,
+            "samples": 8736,
+            "event_rate": 0.008012820512820512,
+            "mean_probability": 0.0021580713805400098,
+            "brier": 0.007231667360627122,
+            "constant_brier": 0.007948615220249837
+          },
+          {
+            "node_id": 21,
+            "samples": 8736,
+            "event_rate": 0.003434065934065934,
+            "mean_probability": 0.002989462848758746,
+            "brier": 0.00364354004532541,
+            "constant_brier": 0.0034222731252264225
+          },
+          {
+            "node_id": 22,
+            "samples": 8736,
+            "event_rate": 0.0027472527472527475,
+            "mean_probability": 0.0025357767216207154,
+            "brier": 0.0029219104611286732,
+            "constant_brier": 0.00273970534959546
+          },
+          {
+            "node_id": 23,
+            "samples": 8736,
+            "event_rate": 0.001945970695970696,
+            "mean_probability": 0.0021123433611531877,
+            "brier": 0.00219577488434286,
+            "constant_brier": 0.0019421838940211192
+          },
+          {
+            "node_id": 24,
+            "samples": 8736,
+            "event_rate": 0.001945970695970696,
+            "mean_probability": 0.0029576745247204142,
+            "brier": 0.0024225002308811,
+            "constant_brier": 0.0019421838940211192
+          },
+          {
+            "node_id": 25,
+            "samples": 8736,
+            "event_rate": 0.004235347985347985,
+            "mean_probability": 0.0033654510017275315,
+            "brier": 0.004271387927876559,
+            "constant_brier": 0.004217409812790994
+          },
+          {
+            "node_id": 26,
+            "samples": 8736,
+            "event_rate": 0.0033195970695970695,
+            "mean_probability": 0.002544665083485937,
+            "brier": 0.0034049175307622895,
+            "constant_brier": 0.003308577344892593
+          },
+          {
+            "node_id": 27,
+            "samples": 8736,
+            "event_rate": 0.001717032967032967,
+            "mean_probability": 0.002394793507877348,
+            "brier": 0.0020939574440157057,
+            "constant_brier": 0.0017140847648230895
+          },
+          {
+            "node_id": 28,
+            "samples": 8736,
+            "event_rate": 0.0037774725274725275,
+            "mean_probability": 0.0032399270762651523,
+            "brier": 0.004119011355568862,
+            "constant_brier": 0.003763203228776719
+          },
+          {
+            "node_id": 29,
+            "samples": 8736,
+            "event_rate": 0.003205128205128205,
+            "mean_probability": 0.002679718367253245,
+            "brier": 0.003504941097384372,
+            "constant_brier": 0.003194855358316897
+          },
+          {
+            "node_id": 30,
+            "samples": 8736,
+            "event_rate": 0.00744047619047619,
+            "mean_probability": 0.005068223448818661,
+            "brier": 0.006639037037764741,
+            "constant_brier": 0.007385115504535147
+          },
+          {
+            "node_id": 31,
+            "samples": 8736,
+            "event_rate": 0.003434065934065934,
+            "mean_probability": 0.0028229590709628045,
+            "brier": 0.003545161508812047,
+            "constant_brier": 0.0034222731252264225
+          },
+          {
+            "node_id": 32,
+            "samples": 8736,
+            "event_rate": 0.0028617216117216115,
+            "mean_probability": 0.0023070716006806996,
+            "brier": 0.0030731917482180837,
+            "constant_brier": 0.0028535321611386174
+          },
+          {
+            "node_id": 33,
+            "samples": 8736,
+            "event_rate": 0.002403846153846154,
+            "mean_probability": 0.002235766279257192,
+            "brier": 0.002708310087362863,
+            "constant_brier": 0.0023980676775147932
+          },
+          {
+            "node_id": 34,
+            "samples": 8736,
+            "event_rate": 0.001717032967032967,
+            "mean_probability": 0.0019735486498697217,
+            "brier": 0.0018252736841777974,
+            "constant_brier": 0.0017140847648230897
+          },
+          {
+            "node_id": 35,
+            "samples": 8736,
+            "event_rate": 0.008928571428571428,
+            "mean_probability": 0.0020805872716142906,
+            "brier": 0.00800988558205165,
+            "constant_brier": 0.008848852040816327
+          },
+          {
+            "node_id": 36,
+            "samples": 8736,
+            "event_rate": 0.0028617216117216115,
+            "mean_probability": 0.0027980918289971083,
+            "brier": 0.0032274297200672766,
+            "constant_brier": 0.0028535321611386174
+          },
+          {
+            "node_id": 37,
+            "samples": 8736,
+            "event_rate": 0.002632783882783883,
+            "mean_probability": 0.0026028805923769696,
+            "brier": 0.0031355100018244336,
+            "constant_brier": 0.0026258523318104356
+          },
+          {
+            "node_id": 38,
+            "samples": 8736,
+            "event_rate": 0.002403846153846154,
+            "mean_probability": 0.002489592133254844,
+            "brier": 0.00259923534646893,
+            "constant_brier": 0.0023980676775147924
+          },
+          {
+            "node_id": 39,
+            "samples": 8736,
+            "event_rate": 0.0011446886446886447,
+            "mean_probability": 0.0013197159959934394,
+            "brier": 0.0013533263045370195,
+            "constant_brier": 0.0011433783325953655
+          },
+          {
+            "node_id": 40,
+            "samples": 8736,
+            "event_rate": 0.006639194139194139,
+            "mean_probability": 0.0036387886558990603,
+            "brier": 0.006126569223801728,
+            "constant_brier": 0.006595115240376228
+          },
+          {
+            "node_id": 41,
+            "samples": 8736,
+            "event_rate": 0.0011446886446886447,
+            "mean_probability": 0.001981010646050975,
+            "brier": 0.0015221990620845464,
+            "constant_brier": 0.0011433783325953655
+          },
+          {
+            "node_id": 42,
+            "samples": 8736,
+            "event_rate": 0.005151098901098901,
+            "mean_probability": 0.0023949279964232,
+            "brier": 0.004934799418961332,
+            "constant_brier": 0.00512456508121
+          },
+          {
+            "node_id": 43,
+            "samples": 8736,
+            "event_rate": 0.004235347985347985,
+            "mean_probability": 0.003400461880073524,
+            "brier": 0.004612589131388905,
+            "constant_brier": 0.004217409812790994
+          },
+          {
+            "node_id": 44,
+            "samples": 8736,
+            "event_rate": 0.007326007326007326,
+            "mean_probability": 0.004514834251560261,
+            "brier": 0.0068095077903792215,
+            "constant_brier": 0.007272336942666612
+          },
+          {
+            "node_id": 45,
+            "samples": 8736,
+            "event_rate": 0.0033195970695970695,
+            "mean_probability": 0.003147765054627097,
+            "brier": 0.0033758485105797606,
+            "constant_brier": 0.0033085773448925933
+          },
+          {
+            "node_id": 46,
+            "samples": 8736,
+            "event_rate": 0.0018315018315018315,
+            "mean_probability": 0.001716736142741529,
+            "brier": 0.0020236306227845065,
+            "constant_brier": 0.0018281474325430374
+          },
+          {
+            "node_id": 47,
+            "samples": 8736,
+            "event_rate": 0.0020604395604395605,
+            "mean_probability": 0.0024430735004580552,
+            "brier": 0.002391474027008015,
+            "constant_brier": 0.0020561941492573364
+          },
+          {
+            "node_id": 48,
+            "samples": 8736,
+            "event_rate": 0.001945970695970696,
+            "mean_probability": 0.0024160507648569676,
+            "brier": 0.0022537902642335984,
+            "constant_brier": 0.0019421838940211194
+          }
+        ]
+      },
+      "calibrated": {
+        "samples": 305760,
+        "events": 1039,
+        "event_rate": 0.003398090005232862,
+        "mean_probability": 0.0032097372021162016,
+        "pr_auc": 0.09372151102048701,
+        "pr_auc_lift": 27.580644090109825,
+        "brier": 0.003233136922473231,
+        "constant_brier": 0.0033865429895491984,
+        "brier_improvement_vs_constant": 0.00015340606707596764,
+        "node_equal_brier": 0.0032331369224732312,
+        "node_equal_constant_brier": 0.0033826264506577504,
+        "node_metrics": [
+          {
+            "node_id": 14,
+            "samples": 8736,
+            "event_rate": 0.0016025641025641025,
+            "mean_probability": 0.003095620181649281,
+            "brier": 0.0015516465927602223,
+            "constant_brier": 0.001599995890861276
+          },
+          {
+            "node_id": 15,
+            "samples": 8736,
+            "event_rate": 0.001717032967032967,
+            "mean_probability": 0.0031091552525100907,
+            "brier": 0.0016646649512806007,
+            "constant_brier": 0.0017140847648230895
+          },
+          {
+            "node_id": 16,
+            "samples": 8736,
+            "event_rate": 0.0030906593406593405,
+            "mean_probability": 0.003223974752308526,
+            "brier": 0.0029676252309175795,
+            "constant_brier": 0.0030811071654993356
+          },
+          {
+            "node_id": 17,
+            "samples": 8736,
+            "event_rate": 0.003205128205128205,
+            "mean_probability": 0.0033677653567511993,
+            "brier": 0.003051415473919022,
+            "constant_brier": 0.0031948553583168965
+          },
+          {
+            "node_id": 18,
+            "samples": 8736,
+            "event_rate": 0.0035485347985347985,
+            "mean_probability": 0.0033811882442531904,
+            "brier": 0.0033814532027159195,
+            "constant_brier": 0.003535942699318386
+          },
+          {
+            "node_id": 19,
+            "samples": 8736,
+            "event_rate": 0.001945970695970696,
+            "mean_probability": 0.0035263253701721133,
+            "brier": 0.001896276889330208,
+            "constant_brier": 0.0019421838940211192
+          },
+          {
+            "node_id": 20,
+            "samples": 8736,
+            "event_rate": 0.008012820512820512,
+            "mean_probability": 0.0029980826472760696,
+            "brier": 0.0076011793413625316,
+            "constant_brier": 0.007948615220249837
+          },
+          {
+            "node_id": 21,
+            "samples": 8736,
+            "event_rate": 0.003434065934065934,
+            "mean_probability": 0.0033819221344482675,
+            "brier": 0.003256503156615793,
+            "constant_brier": 0.0034222731252264225
+          },
+          {
+            "node_id": 22,
+            "samples": 8736,
+            "event_rate": 0.0027472527472527475,
+            "mean_probability": 0.0030502585344222765,
+            "brier": 0.0026078808462462154,
+            "constant_brier": 0.00273970534959546
+          },
+          {
+            "node_id": 23,
+            "samples": 8736,
+            "event_rate": 0.001945970695970696,
+            "mean_probability": 0.0031180760919109164,
+            "brier": 0.0018802426149599062,
+            "constant_brier": 0.0019421838940211192
+          },
+          {
+            "node_id": 24,
+            "samples": 8736,
+            "event_rate": 0.001945970695970696,
+            "mean_probability": 0.0033664630344805947,
+            "brier": 0.0018815149756240648,
+            "constant_brier": 0.0019421838940211192
+          },
+          {
+            "node_id": 25,
+            "samples": 8736,
+            "event_rate": 0.004235347985347985,
+            "mean_probability": 0.0034690127402009687,
+            "brier": 0.003987978892912306,
+            "constant_brier": 0.004217409812790994
+          },
+          {
+            "node_id": 26,
+            "samples": 8736,
+            "event_rate": 0.0033195970695970695,
+            "mean_probability": 0.0030723668481209064,
+            "brier": 0.003153282263533668,
+            "constant_brier": 0.003308577344892593
+          },
+          {
+            "node_id": 27,
+            "samples": 8736,
+            "event_rate": 0.001717032967032967,
+            "mean_probability": 0.003169937135960163,
+            "brier": 0.0016680819532748313,
+            "constant_brier": 0.0017140847648230895
+          },
+          {
+            "node_id": 28,
+            "samples": 8736,
+            "event_rate": 0.0037774725274725275,
+            "mean_probability": 0.003345790378372871,
+            "brier": 0.003590398495992848,
+            "constant_brier": 0.003763203228776719
+          },
+          {
+            "node_id": 29,
+            "samples": 8736,
+            "event_rate": 0.003205128205128205,
+            "mean_probability": 0.0032294543134275757,
+            "brier": 0.003060860958644916,
+            "constant_brier": 0.003194855358316897
+          },
+          {
+            "node_id": 30,
+            "samples": 8736,
+            "event_rate": 0.00744047619047619,
+            "mean_probability": 0.003942338286049036,
+            "brier": 0.006968743793092699,
+            "constant_brier": 0.007385115504535147
+          },
+          {
+            "node_id": 31,
+            "samples": 8736,
+            "event_rate": 0.003434065934065934,
+            "mean_probability": 0.003410086492063625,
+            "brier": 0.0032572559695725986,
+            "constant_brier": 0.0034222731252264225
+          },
+          {
+            "node_id": 32,
+            "samples": 8736,
+            "event_rate": 0.0028617216117216115,
+            "mean_probability": 0.003166950269911241,
+            "brier": 0.0027255583574657114,
+            "constant_brier": 0.0028535321611386174
+          },
+          {
+            "node_id": 33,
+            "samples": 8736,
+            "event_rate": 0.002403846153846154,
+            "mean_probability": 0.0030405613111435686,
+            "brier": 0.002279372236312411,
+            "constant_brier": 0.0023980676775147932
+          },
+          {
+            "node_id": 34,
+            "samples": 8736,
+            "event_rate": 0.001717032967032967,
+            "mean_probability": 0.003003842023426445,
+            "brier": 0.0016625034459882215,
+            "constant_brier": 0.0017140847648230897
+          },
+          {
+            "node_id": 35,
+            "samples": 8736,
+            "event_rate": 0.008928571428571428,
+            "mean_probability": 0.002964370112108382,
+            "brier": 0.008479729821907086,
+            "constant_brier": 0.008848852040816327
+          },
+          {
+            "node_id": 36,
+            "samples": 8736,
+            "event_rate": 0.0028617216117216115,
+            "mean_probability": 0.00327893476375845,
+            "brier": 0.002729925631612787,
+            "constant_brier": 0.0028535321611386174
+          },
+          {
+            "node_id": 37,
+            "samples": 8736,
+            "event_rate": 0.002632783882783883,
+            "mean_probability": 0.0030872928313039004,
+            "brier": 0.002506372247115581,
+            "constant_brier": 0.0026258523318104356
+          },
+          {
+            "node_id": 38,
+            "samples": 8736,
+            "event_rate": 0.002403846153846154,
+            "mean_probability": 0.003032800458823058,
+            "brier": 0.0022809286737402856,
+            "constant_brier": 0.0023980676775147924
+          },
+          {
+            "node_id": 39,
+            "samples": 8736,
+            "event_rate": 0.0011446886446886447,
+            "mean_probability": 0.00258026193567797,
+            "brier": 0.0011168117572829357,
+            "constant_brier": 0.0011433783325953655
+          },
+          {
+            "node_id": 40,
+            "samples": 8736,
+            "event_rate": 0.006639194139194139,
+            "mean_probability": 0.003535358908839108,
+            "brier": 0.006227035319383939,
+            "constant_brier": 0.006595115240376228
+          },
+          {
+            "node_id": 41,
+            "samples": 8736,
+            "event_rate": 0.0011446886446886447,
+            "mean_probability": 0.0030206635231203004,
+            "brier": 0.001125868596974097,
+            "constant_brier": 0.0011433783325953655
+          },
+          {
+            "node_id": 42,
+            "samples": 8736,
+            "event_rate": 0.005151098901098901,
+            "mean_probability": 0.0030022373392085064,
+            "brier": 0.004921256016513953,
+            "constant_brier": 0.00512456508121
+          },
+          {
+            "node_id": 43,
+            "samples": 8736,
+            "event_rate": 0.004235347985347985,
+            "mean_probability": 0.0033211877868290023,
+            "brier": 0.0040520085134647076,
+            "constant_brier": 0.004217409812790994
+          },
+          {
+            "node_id": 44,
+            "samples": 8736,
+            "event_rate": 0.007326007326007326,
+            "mean_probability": 0.0038171391285196908,
+            "brier": 0.006904625415454201,
+            "constant_brier": 0.007272336942666612
+          },
+          {
+            "node_id": 45,
+            "samples": 8736,
+            "event_rate": 0.0033195970695970695,
+            "mean_probability": 0.003380416870930636,
+            "brier": 0.003123187147574492,
+            "constant_brier": 0.0033085773448925933
+          },
+          {
+            "node_id": 46,
+            "samples": 8736,
+            "event_rate": 0.0018315018315018315,
+            "mean_probability": 0.0027867274280128623,
+            "brier": 0.0017688091219376528,
+            "constant_brier": 0.0018281474325430374
+          },
+          {
+            "node_id": 47,
+            "samples": 8736,
+            "event_rate": 0.0020604395604395605,
+            "mean_probability": 0.0030352824392305246,
+            "brier": 0.0019681436641093225,
+            "constant_brier": 0.0020561941492573364
+          },
+          {
+            "node_id": 48,
+            "samples": 8736,
+            "event_rate": 0.001945970695970696,
+            "mean_probability": 0.003028957148845727,
+            "brier": 0.0018606507169697853,
+            "constant_brier": 0.0019421838940211194
+          }
+        ]
+      },
+      "passes": true
+    }
+  },
+  "gate": {
+    "passed_markets": 2,
+    "required_markets": 2,
+    "passes": true
+  }
+}

@@ -1,0 +1,378 @@
+{
+  "protocol": "tail_expert_router_v1",
+  "status": "post_original_2025_test_fixed_followup",
+  "primary_metric": "complete net revenue after degradation and deviation penalty",
+  "router_macro_mean_daily_revenue": 63.525093624873264,
+  "router_7day_block_bootstrap_95ci": [
+    47.805565668341366,
+    79.73992705098273
+  ],
+  "router_maximum_drawdown_macro_usd": 145.04631602701375,
+  "router_mean_without_top_days": {
+    "1": 60.94575480013938,
+    "5": 54.500516656485615,
+    "10": 50.00225662570604
+  },
+  "router_components": {
+    "da_leg": 98.68801593512892,
+    "rt_deviation_leg": 0.857627294518519,
+    "degradation_cost": 27.171371592190347,
+    "deviation_penalty": 8.84917801258383
+  },
+  "comparisons": {
+    "static_hybrid": {
+      "baseline": "static_hybrid",
+      "days": 362,
+      "router_mean": 63.525093624873264,
+      "baseline_mean": 61.79589922921051,
+      "mean_difference": 1.7291943956627416,
+      "difference_7day_block_bootstrap_95ci": [
+        -1.2357739644452799,
+        4.750121618332922
+      ],
+      "positive_day_rate": 0.4613259668508287,
+      "nodes_improved": 13,
+      "node_count": 15,
+      "node_differences": {
+        "HB_BUSAVG": 4.198175592608146,
+        "HB_HUBAVG": 1.3649278227007178,
+        "HB_NORTH": 3.3004909537479397,
+        "HB_HOUSTON": 2.7572802341128195,
+        "HB_SOUTH": 5.193134177828434,
+        "HB_PAN": 8.004074647907903,
+        "HB_WEST": -3.7272262127663844,
+        "LZ_AEN": 3.9443216026574737,
+        "LZ_CPS": 4.467661679744481,
+        "LZ_HOUSTON": 2.7712008844097262,
+        "LZ_LCRA": 1.6660436215566576,
+        "LZ_NORTH": 3.3534280746762515,
+        "LZ_SOUTH": 6.985540895033491,
+        "LZ_RAYBN": 0.9823914628062534,
+        "LZ_WEST": -19.323529502082817
+      },
+      "without_router_top_days": {
+        "1": {
+          "mean_difference": 1.7571225113549584,
+          "positive_day_rate": 0.4626038781163435
+        },
+        "5": {
+          "mean_difference": 1.8289909494006438,
+          "positive_day_rate": 0.4649859943977591
+        },
+        "10": {
+          "mean_difference": 1.10239522288907,
+          "positive_day_rate": 0.45738636363636365
+        }
+      }
+    },
+    "dlinear": {
+      "baseline": "dlinear",
+      "days": 362,
+      "router_mean": 63.525093624873264,
+      "baseline_mean": 61.525252465913894,
+      "mean_difference": 1.9998411589593736,
+      "difference_7day_block_bootstrap_95ci": [
+        -1.9992631717999192,
+        5.848281265464147
+      ],
+      "positive_day_rate": 0.48342541436464087,
+      "nodes_improved": 12,
+      "node_count": 15,
+      "node_differences": {
+        "HB_BUSAVG": 3.0958677202559053,
+        "HB_HUBAVG": -0.5868946108391628,
+        "HB_NORTH": 4.504630072464922,
+        "HB_HOUSTON": 2.0277483045999483,
+        "HB_SOUTH": 4.463108375342723,
+        "HB_PAN": 12.123341883199581,
+        "HB_WEST": -1.8322520582895718,
+        "LZ_AEN": 2.70070636235155,
+        "LZ_CPS": 4.0732459405727415,
+        "LZ_HOUSTON": 1.6884602309813797,
+        "LZ_LCRA": 3.1240105546370467,
+        "LZ_NORTH": 3.599347123828713,
+        "LZ_SOUTH": 7.748274117877415,
+        "LZ_RAYBN": 1.489522232734235,
+        "LZ_WEST": -18.22149886532684
+      },
+      "without_router_top_days": {
+        "1": {
+          "mean_difference": 2.0688071891467628,
+          "positive_day_rate": 0.48476454293628807
+        },
+        "5": {
+          "mean_difference": 2.496461700347049,
+          "positive_day_rate": 0.48739495798319327
+        },
+        "10": {
+          "mean_difference": 1.7474861313978325,
+          "positive_day_rate": 0.48011363636363635
+        }
+      }
+    },
+    "per_node_xgboost": {
+      "baseline": "per_node_xgboost",
+      "days": 362,
+      "router_mean": 63.525093624873264,
+      "baseline_mean": 59.98924902404078,
+      "mean_difference": 3.5358446008324944,
+      "difference_7day_block_bootstrap_95ci": [
+        -2.2417916730753404,
+        9.346406913194723
+      ],
+      "positive_day_rate": 0.6298342541436464,
+      "nodes_improved": 12,
+      "node_count": 15,
+      "node_differences": {
+        "HB_BUSAVG": 5.288694477746348,
+        "HB_HUBAVG": 6.376587407176616,
+        "HB_NORTH": 3.7312652505171733,
+        "HB_HOUSTON": 2.048650839443248,
+        "HB_SOUTH": 3.4012527104375745,
+        "HB_PAN": 4.420486239523546,
+        "HB_WEST": 16.180712093086324,
+        "LZ_AEN": -1.27620943090399,
+        "LZ_CPS": 9.37712204940664,
+        "LZ_HOUSTON": 4.652661847881816,
+        "LZ_LCRA": -7.935664637623697,
+        "LZ_NORTH": 1.5894001901345327,
+        "LZ_SOUTH": 2.0310660782448435,
+        "LZ_RAYBN": -1.2263713869752912,
+        "LZ_WEST": 4.378015284391715
+      },
+      "without_router_top_days": {
+        "1": {
+          "mean_difference": 3.4063353421211238,
+          "positive_day_rate": 0.628808864265928
+        },
+        "5": {
+          "mean_difference": 2.964490823143949,
+          "positive_day_rate": 0.6274509803921569
+        },
+        "10": {
+          "mean_difference": 2.0496993878280025,
+          "positive_day_rate": 0.625
+        }
+      }
+    },
+    "transformer": {
+      "baseline": "transformer",
+      "days": 362,
+      "router_mean": 63.525093624873264,
+      "baseline_mean": 28.03982363006879,
+      "mean_difference": 35.48526999480447,
+      "difference_7day_block_bootstrap_95ci": [
+        26.958345547774233,
+        45.93370137801437
+      ],
+      "positive_day_rate": 0.8314917127071824,
+      "nodes_improved": 15,
+      "node_count": 15,
+      "node_differences": {
+        "HB_BUSAVG": 33.58482259298612,
+        "HB_HUBAVG": 31.445322951151287,
+        "HB_NORTH": 37.799225713683875,
+        "HB_HOUSTON": 38.63041427705624,
+        "HB_SOUTH": 24.658321155379433,
+        "HB_PAN": 27.488841829455367,
+        "HB_WEST": 27.95427438692317,
+        "LZ_AEN": 43.659115190437326,
+        "LZ_CPS": 42.994870068390114,
+        "LZ_HOUSTON": 39.29971840494428,
+        "LZ_LCRA": 43.65243044850094,
+        "LZ_NORTH": 39.47599571881592,
+        "LZ_SOUTH": 21.958451025867948,
+        "LZ_RAYBN": 38.420967802373156,
+        "LZ_WEST": 41.256278356101895
+      },
+      "without_router_top_days": {
+        "1": {
+          "mean_difference": 34.40721235461171,
+          "positive_day_rate": 0.8310249307479224
+        },
+        "5": {
+          "mean_difference": 31.004699349424648,
+          "positive_day_rate": 0.8291316526610645
+        },
+        "10": {
+          "mean_difference": 29.562140305445165,
+          "positive_day_rate": 0.8267045454545454
+        }
+      }
+    }
+  },
+  "tail_attribution": {
+    "threshold_definition": {
+      "positive_spike": "node-level q99 of 2023+2024 out-of-sample DA truth",
+      "rapid_ramp": "node-level q99 of 2023+2024 absolute hourly DA ramps",
+      "negative_price": "at least one negative DA hour"
+    },
+    "groups": {
+      "positive_spike": {
+        "node_days": 45,
+        "router_mean_profit": 753.5559272867018,
+        "hybrid_mean_profit": 714.6273610009581,
+        "mean_profit_difference": 38.92856628574363,
+        "hybrid_expert_selection_rate": 0.4222222222222222
+      },
+      "negative_price": {
+        "node_days": 241,
+        "router_mean_profit": 15.617221820549029,
+        "hybrid_mean_profit": 11.183103894274181,
+        "mean_profit_difference": 4.4341179262748485,
+        "hybrid_expert_selection_rate": 0.3817427385892116
+      },
+      "rapid_ramp": {
+        "node_days": 45,
+        "router_mean_profit": 753.5559272867018,
+        "hybrid_mean_profit": 714.6273610009581,
+        "mean_profit_difference": 38.92856628574363,
+        "hybrid_expert_selection_rate": 0.4222222222222222
+      },
+      "ordinary": {
+        "node_days": 5144,
+        "router_mean_profit": 59.73318258095022,
+        "hybrid_mean_profit": 58.456137933718885,
+        "mean_profit_difference": 1.2770446472313324,
+        "hybrid_expert_selection_rate": 0.4562597200622084
+      }
+    },
+    "prediction_metrics": {
+      "router": {
+        "positive_spike_event_count": 45,
+        "positive_spike_recall": 0.0,
+        "positive_spike_false_positive_rate": 0.0011142061281337048,
+        "positive_spike_peak_amplitude_ratio_mean": 0.11978786438703537,
+        "positive_spike_peak_within_1h_rate": 1.0,
+        "negative_event_count": 241,
+        "negative_recall": 0.26556016597510373,
+        "negative_false_positive_rate": 0.022933127770283293,
+        "rapid_ramp_event_count": 45,
+        "rapid_ramp_recall": 0.0,
+        "rapid_ramp_false_positive_rate": 0.00018570102135561745
+      },
+      "static_hybrid": {
+        "positive_spike_event_count": 45,
+        "positive_spike_recall": 0.0,
+        "positive_spike_false_positive_rate": 0.0012999071494893223,
+        "positive_spike_peak_amplitude_ratio_mean": 0.11291852593421936,
+        "positive_spike_peak_within_1h_rate": 0.9777777777777777,
+        "negative_event_count": 241,
+        "negative_recall": 0.2863070539419087,
+        "negative_false_positive_rate": 0.03565234149161688,
+        "rapid_ramp_event_count": 45,
+        "rapid_ramp_recall": 0.0,
+        "rapid_ramp_false_positive_rate": 0.0003714020427112349
+      },
+      "dlinear": {
+        "positive_spike_event_count": 45,
+        "positive_spike_recall": 0.0,
+        "positive_spike_false_positive_rate": 0.0012999071494893223,
+        "positive_spike_peak_amplitude_ratio_mean": 0.11291852593421936,
+        "positive_spike_peak_within_1h_rate": 0.9777777777777777,
+        "negative_event_count": 241,
+        "negative_recall": 0.2863070539419087,
+        "negative_false_positive_rate": 0.03565234149161688,
+        "rapid_ramp_event_count": 45,
+        "rapid_ramp_recall": 0.0,
+        "rapid_ramp_false_positive_rate": 0.0003714020427112349
+      },
+      "transformer": {
+        "positive_spike_event_count": 45,
+        "positive_spike_recall": 0.0,
+        "positive_spike_false_positive_rate": 0.0,
+        "positive_spike_peak_amplitude_ratio_mean": 0.1264020949602127,
+        "positive_spike_peak_within_1h_rate": 1.0,
+        "negative_event_count": 241,
+        "negative_recall": 0.2157676348547718,
+        "negative_false_positive_rate": 0.006745037579495085,
+        "rapid_ramp_event_count": 45,
+        "rapid_ramp_recall": 0.0,
+        "rapid_ramp_false_positive_rate": 0.0
+      },
+      "per_node_xgboost": {
+        "positive_spike_event_count": 45,
+        "positive_spike_recall": 0.0,
+        "positive_spike_false_positive_rate": 0.0,
+        "positive_spike_peak_amplitude_ratio_mean": 0.18145108222961426,
+        "positive_spike_peak_within_1h_rate": 0.8222222222222222,
+        "negative_event_count": 241,
+        "negative_recall": 0.03319502074688797,
+        "negative_false_positive_rate": 0.0007708614376565812,
+        "rapid_ramp_event_count": 45,
+        "rapid_ramp_recall": 0.0,
+        "rapid_ramp_false_positive_rate": 0.0
+      },
+      "pooled_xgboost": {
+        "positive_spike_event_count": 45,
+        "positive_spike_recall": 0.0,
+        "positive_spike_false_positive_rate": 0.00018570102135561745,
+        "positive_spike_peak_amplitude_ratio_mean": 0.10918403416872025,
+        "positive_spike_peak_within_1h_rate": 0.9555555555555556,
+        "negative_event_count": 241,
+        "negative_recall": 0.22821576763485477,
+        "negative_false_positive_rate": 0.00982848333012141,
+        "rapid_ramp_event_count": 45,
+        "rapid_ramp_recall": 0.0,
+        "rapid_ramp_false_positive_rate": 0.00018570102135561745
+      },
+      "timesfm3": {
+        "positive_spike_event_count": 45,
+        "positive_spike_recall": 0.0,
+        "positive_spike_false_positive_rate": 0.0,
+        "positive_spike_peak_amplitude_ratio_mean": 0.12220929563045502,
+        "positive_spike_peak_within_1h_rate": 0.044444444444444446,
+        "negative_event_count": 241,
+        "negative_recall": 0.2987551867219917,
+        "negative_false_positive_rate": 0.023511273848525728,
+        "rapid_ramp_event_count": 45,
+        "rapid_ramp_recall": 0.0,
+        "rapid_ramp_false_positive_rate": 0.0
+      },
+      "timesfm25": {
+        "positive_spike_event_count": 45,
+        "positive_spike_recall": 0.0,
+        "positive_spike_false_positive_rate": 0.0,
+        "positive_spike_peak_amplitude_ratio_mean": 0.07912282645702362,
+        "positive_spike_peak_within_1h_rate": 0.6666666666666666,
+        "negative_event_count": 241,
+        "negative_recall": 0.26141078838174275,
+        "negative_false_positive_rate": 0.021198689535555985,
+        "rapid_ramp_event_count": 45,
+        "rapid_ramp_recall": 0.0,
+        "rapid_ramp_false_positive_rate": 0.0
+      },
+      "seasonal": {
+        "positive_spike_event_count": 45,
+        "positive_spike_recall": 0.0,
+        "positive_spike_false_positive_rate": 0.008356545961002786,
+        "positive_spike_peak_amplitude_ratio_mean": 0.17016829550266266,
+        "positive_spike_peak_within_1h_rate": 0.9777777777777777,
+        "negative_event_count": 241,
+        "negative_recall": 0.35269709543568467,
+        "negative_false_positive_rate": 0.029292734630950088,
+        "rapid_ramp_event_count": 45,
+        "rapid_ramp_recall": 0.0,
+        "rapid_ramp_false_positive_rate": 0.008356545961002786
+      },
+      "oracle": {
+        "positive_spike_event_count": 45,
+        "positive_spike_recall": 1.0,
+        "positive_spike_false_positive_rate": 0.0,
+        "positive_spike_peak_amplitude_ratio_mean": 1.0,
+        "positive_spike_peak_within_1h_rate": 1.0,
+        "negative_event_count": 241,
+        "negative_recall": 1.0,
+        "negative_false_positive_rate": 0.0,
+        "rapid_ramp_event_count": 45,
+        "rapid_ramp_recall": 1.0,
+        "rapid_ramp_false_positive_rate": 0.0
+      }
+    }
+  },
+  "claim_boundary": {
+    "nominal_best": true,
+    "closest_baseline_difference_ci_excludes_zero": false,
+    "further_2025_tuning_allowed": false
+  }
+}

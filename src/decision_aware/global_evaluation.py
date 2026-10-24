@@ -80,9 +80,13 @@ def align_node_task_predictions(
     selected_da_rt = da_true_rt[da_rows]
     selected_rt_da_true = rt_da_true[rt_da_rows]
     selected_rt_actual = rt_true_windows[rt_rows, :, 0]
-    if not np.allclose(selected_da_rt, selected_rt_da_true, rtol=0, atol=1e-5):
+    # The task exporters reconstruct the same source prices through independent
+    # float32 paths.  Permit one-ULP drift at ERCOT spike magnitudes while still
+    # rejecting economically meaningful truth mismatches.
+    truth_atol = 5e-4
+    if not np.allclose(selected_da_rt, selected_rt_da_true, rtol=0, atol=truth_atol):
         raise ValueError("DA与RT-at-DA数据中的真实RT价格不一致")
-    if not np.allclose(selected_da_rt, selected_rt_actual, rtol=0, atol=1e-5):
+    if not np.allclose(selected_da_rt, selected_rt_actual, rtol=0, atol=truth_atol):
         raise ValueError("日前任务与滚动RT第一步真实价格不一致")
 
     timezone = str(rt.get("timezone", ""))

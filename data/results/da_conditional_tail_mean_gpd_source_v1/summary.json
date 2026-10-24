@@ -1,0 +1,225 @@
+{
+  "experiment": "da_conditional_tail_mean_gpd_lomo_source_v1",
+  "status": "complete",
+  "uses_ercot": false,
+  "runs_lp_mpc": false,
+  "test_2025_read": false,
+  "estimand": "E[Y | Y > node historical q99, x] under POT-GPD",
+  "scope_note": "The GPD head is leave-one-market-out. The frozen Transformer and quantile head are not leave-one-market-out.",
+  "folds": {
+    "CAISO": {
+      "fit_markets": [
+        "NYISO",
+        "PJM"
+      ],
+      "fit_year": 2023,
+      "evaluation_year": 2024,
+      "fit_exceedances_above_q95": 2173,
+      "evaluation_exceedances_above_q99": 13,
+      "feature_definition": [
+        "log(q99-q95)",
+        "log(q95-q50)"
+      ],
+      "feature_standardization_mean": [
+        3.556824500211837,
+        3.5815661827632987
+      ],
+      "feature_standardization_std": [
+        0.5376352115186162,
+        0.6192822394675569
+      ],
+      "conditional_fit": {
+        "success": true,
+        "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+        "negative_log_likelihood": 5.2403403989540145,
+        "coefficients": [
+          4.341274731833678,
+          0.2352876627887123,
+          -0.11780758180730548
+        ],
+        "raw_shape": -0.11185124651862093,
+        "xi": -0.08910969850966283
+      },
+      "static_fit": {
+        "success": true,
+        "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+        "negative_log_likelihood": 5.267284843206648,
+        "coefficients": [
+          4.451666011760277
+        ],
+        "raw_shape": -0.23469254817834534,
+        "xi": -0.1843811305972421
+      },
+      "conditional_gpd_tail_mean": {
+        "samples": 13,
+        "finite_predictions": 13,
+        "nonfinite_predictions": 0,
+        "mae": 93.96711246666351,
+        "bias": -81.77027240737362
+      },
+      "static_gpd_tail_mean": {
+        "samples": 13,
+        "finite_predictions": 13,
+        "nonfinite_predictions": 0,
+        "mae": 103.67221038991569,
+        "bias": -98.77867996872345
+      },
+      "node_historical_tail_mean": {
+        "samples": 13,
+        "finite_predictions": 13,
+        "nonfinite_predictions": 0,
+        "mae": 75.73241816413473,
+        "bias": 11.918053287302943
+      },
+      "conditional_support_violations": 0,
+      "static_support_violations": 0,
+      "passes": false
+    },
+    "NYISO": {
+      "fit_markets": [
+        "CAISO",
+        "PJM"
+      ],
+      "fit_year": 2023,
+      "evaluation_year": 2024,
+      "fit_exceedances_above_q95": 3555,
+      "evaluation_exceedances_above_q99": 240,
+      "feature_definition": [
+        "log(q99-q95)",
+        "log(q95-q50)"
+      ],
+      "feature_standardization_mean": [
+        3.887953713316484,
+        3.855667636578119
+      ],
+      "feature_standardization_std": [
+        0.5468055969809155,
+        0.5708263330482948
+      ],
+      "conditional_fit": {
+        "success": true,
+        "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+        "negative_log_likelihood": 4.949834905521279,
+        "coefficients": [
+          3.9358064346904134,
+          -0.1403011150186238,
+          0.4293074520094007
+        ],
+        "raw_shape": 0.03735275231472291,
+        "xi": 0.029868312107512337
+      },
+      "static_fit": {
+        "success": true,
+        "message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+        "negative_log_likelihood": 4.987932228907727,
+        "coefficients": [
+          3.794286658007471
+        ],
+        "raw_shape": 0.24695783599934104,
+        "xi": 0.1936454876953284
+      },
+      "conditional_gpd_tail_mean": {
+        "samples": 240,
+        "finite_predictions": 240,
+        "nonfinite_predictions": 0,
+        "mae": 48.99987974151545,
+        "bias": 43.35624416922826
+      },
+      "static_gpd_tail_mean": {
+        "samples": 240,
+        "finite_predictions": 240,
+        "nonfinite_predictions": 0,
+        "mae": 51.136304802471706,
+        "bias": 45.64244341573206
+      },
+      "node_historical_tail_mean": {
+        "samples": 240,
+        "finite_predictions": 240,
+        "nonfinite_predictions": 0,
+        "mae": 29.645108267129167,
+        "bias": 16.86395525908519
+      },
+      "conditional_support_violations": 0,
+      "static_support_violations": 0,
+      "passes": false
+    },
+    "PJM": {
+      "fit_markets": [
+        "CAISO",
+        "NYISO"
+      ],
+      "fit_year": 2023,
+      "evaluation_year": 2024,
+      "fit_exceedances_above_q95": 2788,
+      "evaluation_exceedances_above_q99": 1039,
+      "feature_definition": [
+        "log(q99-q95)",
+        "log(q95-q50)"
+      ],
+      "feature_standardization_mean": [
+        3.949313086127055,
+        3.9016056040058484
+      ],
+      "feature_standardization_std": [
+        0.544081912824709,
+        0.5778943240607737
+      ],
+      "conditional_fit": {
+        "success": true,
+        "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+        "negative_log_likelihood": 5.083709955549178,
+        "coefficients": [
+          3.9863109547480873,
+          -0.22757055481027305,
+          0.17217166906503803
+        ],
+        "raw_shape": 0.09048214297624092,
+        "xi": 0.07218881809961225
+      },
+      "static_fit": {
+        "success": true,
+        "message": "CONVERGENCE: RELATIVE REDUCTION OF F <= FACTR*EPSMCH",
+        "negative_log_likelihood": 5.087236539365101,
+        "coefficients": [
+          3.996880701413033
+        ],
+        "raw_shape": 0.11342872284790133,
+        "xi": 0.09035580207178287
+      },
+      "conditional_gpd_tail_mean": {
+        "samples": 1039,
+        "finite_predictions": 1039,
+        "nonfinite_predictions": 0,
+        "mae": 50.31643345958535,
+        "bias": 24.376309627195567
+      },
+      "static_gpd_tail_mean": {
+        "samples": 1039,
+        "finite_predictions": 1039,
+        "nonfinite_predictions": 0,
+        "mae": 47.912412828635375,
+        "bias": 23.504833159173728
+      },
+      "node_historical_tail_mean": {
+        "samples": 1039,
+        "finite_predictions": 1039,
+        "nonfinite_predictions": 0,
+        "mae": 41.80519596127248,
+        "bias": 15.016721071850634
+      },
+      "conditional_support_violations": 0,
+      "static_support_violations": 0,
+      "passes": false
+    }
+  },
+  "gpd_gate": {
+    "passed_markets": 0,
+    "required_markets": 2,
+    "passes": false
+  },
+  "combined_gate": {
+    "v11_q99_beta_passes": false,
+    "gpd_passes": false,
+    "allows_ercot_evaluation": false
+  }
+}

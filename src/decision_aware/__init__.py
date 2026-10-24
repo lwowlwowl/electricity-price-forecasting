@@ -57,6 +57,15 @@ from .continuous_mpc import (
     solve_fixed_da_penalty_lp_window,
     solve_predicted_da_penalty_lp_day,
 )
+from .economic_spread_factorization import (
+    DA_HIGH,
+    NEUTRAL,
+    RT_HIGH,
+    EconomicSpreadFactorizationHead,
+    EconomicSpreadFactorizedTransformer,
+    economic_spread_factorization_loss,
+    economic_spread_regime,
+)
 
 __all__ = [
     "PilotConfig", "FORMAL_EXPERIMENT_CONTRACT", "AnnualSplitContract",
@@ -82,4 +91,9 @@ __all__ = [
     "locked_continuous_mpc_backtest_by_node",
     "solve_fixed_da_penalty_lp_window",
     "solve_predicted_da_penalty_lp_day",
+    "NEUTRAL", "DA_HIGH", "RT_HIGH",
+    "EconomicSpreadFactorizationHead",
+    "EconomicSpreadFactorizedTransformer",
+    "economic_spread_factorization_loss",
+    "economic_spread_regime",
 ]

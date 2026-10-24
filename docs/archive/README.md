@@ -6,8 +6,8 @@
 当前请优先看：
 
 - 根目录 `README.md`：当前项目入口与最小结构；
-- `docs/progress/00_执行索引.md`：当前最短阅读路径；
-- `docs/progress/56_第二阶段闭环与第三阶段尾部研究入口.md`：当前唯一活跃研究TODO；
+- `docs/progress/1_总索引与基础单节点流程/1_阶段索引.md`：全阶段最短阅读路径；
+- `docs/progress/7_端到端Decision-aware重启与跨年验证/5_阶段索引.md`：当前阶段入口；
 - `docs/PRD_DA_RT独立建模与跨模态融合.md`：当前实施要求；
 - `docs/concepts/transformer_3day_learning_plan.md`：学习顺序。
 

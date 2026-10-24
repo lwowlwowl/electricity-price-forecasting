@@ -1,0 +1,21 @@
+{
+  "protocol": "tail_expert_router_v1",
+  "status": "post_original_2025_test_fixed_followup",
+  "mechanism_selected_on": "2023 blocked OOF",
+  "outer_confirmation": "2024 evaluated once without reselection",
+  "refit_records": "ERCOT 2023+2024 out-of-sample node-days",
+  "kind": "tree",
+  "threshold": 0.7,
+  "model_explanation": {
+    "kind": "tree",
+    "feature_count": 3,
+    "features": [
+      "transformer_spread_max",
+      "transformer_spread_q10",
+      "dlinear_spread_negative_hours"
+    ],
+    "rules": "|--- transformer_spread_q10 <= -0.10\n|   |--- transformer_spread_max <= 6.71\n|   |   |--- class: 1\n|   |--- transformer_spread_max >  6.71\n|   |   |--- class: 0\n|--- transformer_spread_q10 >  -0.10\n|   |--- dlinear_spread_negative_hours <= 0.50\n|   |   |--- class: 0\n|   |--- dlinear_spread_negative_hours >  0.50\n|   |   |--- class: 1\n"
+  },
+  "selection_rate_hybrid_2025": 0.45160697887970613,
+  "further_2025_tuning_allowed": false
+}

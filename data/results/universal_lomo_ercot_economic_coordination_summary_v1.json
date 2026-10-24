@@ -1,0 +1,329 @@
+{
+  "experiment": "frozen_economic_spread_coordination_v1",
+  "status": "complete_closed_after_frozen_2024_confirmation",
+  "selection_allowed": {
+    "2023": true,
+    "2024": false,
+    "2025": false
+  },
+  "years": {
+    "2023": {
+      "baseline": {
+        "mean_net_revenue": 377.8381252155746,
+        "components_per_node_day": {
+          "da_leg": 407.92342060603215,
+          "rt_deviation_leg": -2.22824879799401,
+          "degradation_cost": 20.655482696270223,
+          "deviation_penalty": 7.201563896193384
+        },
+        "daily_throughput_mwh": 3.6237688940824953,
+        "daily_equivalent_cycles": 0.4529711117603119,
+        "maximum_drawdown_usd": 195.0050847657736,
+        "positive_day_rate": 0.7292817679558011,
+        "worst_node_mean_revenue": 316.0202698190324,
+        "best_node_mean_revenue": 409.58450583028815
+      },
+      "candidate": {
+        "mean_net_revenue": 376.560817167304,
+        "components_per_node_day": {
+          "da_leg": 409.2991931825471,
+          "rt_deviation_leg": -2.273477011523314,
+          "degradation_cost": 24.590953516516915,
+          "deviation_penalty": 5.873945487202906
+        },
+        "daily_throughput_mwh": 4.314202371318758,
+        "daily_equivalent_cycles": 0.5392752964148447,
+        "maximum_drawdown_usd": 163.147000945887,
+        "positive_day_rate": 0.787292817679558,
+        "worst_node_mean_revenue": 342.6558238297825,
+        "best_node_mean_revenue": 409.18907011612606
+      },
+      "mean_daily_difference": -1.2773080482706622,
+      "7day_block_bootstrap_95ci": [
+        -23.750018996030132,
+        14.25531042461723
+      ],
+      "positive_difference_day_rate": 0.6077348066298343,
+      "positive_difference_node_rate": 0.26666666666666666,
+      "node_difference_min": -21.808745132432573,
+      "node_difference_max": 59.89131762177218,
+      "node_differences": {
+        "HB_BUSAVG": -9.911388762549993,
+        "HB_HOUSTON": -11.774177944325425,
+        "HB_HUBAVG": -8.574968652515794,
+        "HB_NORTH": -21.808745132432573,
+        "HB_PAN": -5.593760772431573,
+        "HB_SOUTH": 0.7221132149874945,
+        "HB_WEST": 19.311469426316307,
+        "LZ_AEN": -0.39543571416203693,
+        "LZ_CPS": -7.9736226442845455,
+        "LZ_HOUSTON": -10.430620193617962,
+        "LZ_LCRA": -2.687911074384569,
+        "LZ_NORTH": -21.714657738907018,
+        "LZ_RAYBN": -3.2925443687562397,
+        "LZ_SOUTH": 5.073312011232015,
+        "LZ_WEST": 59.89131762177218
+      },
+      "without_top_difference_days": {
+        "1": -2.5454858975383803,
+        "5": -5.986464892492158,
+        "10": -8.669427110534842
+      },
+      "without_top_candidate_revenue_days": {
+        "1": -2.194060819648563,
+        "5": -1.0360145758952848,
+        "10": 5.890736380876737
+      }
+    },
+    "2024": {
+      "baseline": {
+        "mean_net_revenue": 73.37555847744397,
+        "components_per_node_day": {
+          "da_leg": 101.85881759611381,
+          "rt_deviation_leg": 0.31122158935493016,
+          "degradation_cost": 21.648133775411132,
+          "deviation_penalty": 7.146346932613619
+        },
+        "daily_throughput_mwh": 3.7979182062124783,
+        "daily_equivalent_cycles": 0.4747397757765598,
+        "maximum_drawdown_usd": 278.0489625031662,
+        "positive_day_rate": 0.7796143250688705,
+        "worst_node_mean_revenue": 60.07560320637438,
+        "best_node_mean_revenue": 87.03869526701111
+      },
+      "candidate": {
+        "mean_net_revenue": 94.59029558675894,
+        "components_per_node_day": {
+          "da_leg": 126.24738425547609,
+          "rt_deviation_leg": -0.5900775819589085,
+          "degradation_cost": 25.5750062839031,
+          "deviation_penalty": 5.49200480285513
+        },
+        "daily_throughput_mwh": 4.486843207702297,
+        "daily_equivalent_cycles": 0.5608554009627871,
+        "maximum_drawdown_usd": 60.67342353515778,
+        "positive_day_rate": 0.8099173553719008,
+        "worst_node_mean_revenue": 82.25641129046693,
+        "best_node_mean_revenue": 133.18509964639563
+      },
+      "mean_daily_difference": 21.214737109314967,
+      "7day_block_bootstrap_95ci": [
+        8.074434890296175,
+        41.29646583524214
+      ],
+      "positive_difference_day_rate": 0.6666666666666666,
+      "positive_difference_node_rate": 1.0,
+      "node_difference_min": 10.994072872817283,
+      "node_difference_max": 51.44430413915828,
+      "node_differences": {
+        "HB_BUSAVG": 16.865421506594508,
+        "HB_HOUSTON": 11.783709532434608,
+        "HB_HUBAVG": 14.858333971784825,
+        "HB_NORTH": 15.638077120585432,
+        "HB_PAN": 22.901706501240803,
+        "HB_SOUTH": 16.922409846632387,
+        "HB_WEST": 33.20841897158157,
+        "LZ_AEN": 24.373345887457532,
+        "LZ_CPS": 22.009376114070925,
+        "LZ_HOUSTON": 10.994072872817283,
+        "LZ_LCRA": 25.36909691725013,
+        "LZ_NORTH": 13.22643548423533,
+        "LZ_RAYBN": 11.721785400397508,
+        "LZ_SOUTH": 26.90456237348336,
+        "LZ_WEST": 51.44430413915828
+      },
+      "without_top_difference_days": {
+        "1": 13.306584678745038,
+        "5": 7.958666873830443,
+        "10": 6.013034736348632
+      },
+      "without_top_candidate_revenue_days": {
+        "1": 18.642650195190658,
+        "5": 10.024190629281895,
+        "10": 9.08045673230833
+      }
+    }
+  },
+  "forecast_diagnostics": {
+    "inner": {
+      "accuracy": 0.580838689929599,
+      "predicted_counts": {
+        "-1": 15199,
+        "0": 68224,
+        "1": 47257
+      },
+      "true_counts": {
+        "-1": 18369,
+        "0": 70943,
+        "1": 41368
+      },
+      "per_state": {
+        "-1": {
+          "precision": 0.14612803473912758,
+          "recall": 0.12091022919048397
+        },
+        "0": {
+          "precision": 0.7199226078799249,
+          "recall": 0.692330462483966
+        },
+        "1": {
+          "precision": 0.519859491715513,
+          "recall": 0.5938648230516341
+        }
+      },
+      "original": {
+        "spread_mae": 35.18914531887663,
+        "direction_accuracy": 0.5773951637588001,
+        "economic_crossing_rate": 0.3296985001530456,
+        "mean_absolute_spread": 6.508394819327191
+      },
+      "coordinated": {
+        "spread_mae": 56.65558834659623,
+        "direction_accuracy": 0.5695592286501377,
+        "economic_crossing_rate": 0.47793082338536885,
+        "mean_absolute_spread": 37.73220336795411
+      }
+    },
+    "outer": {
+      "accuracy": 0.5583867521367522,
+      "predicted_counts": {
+        "-1": 16172,
+        "0": 70930,
+        "1": 43938
+      },
+      "true_counts": {
+        "-1": 20264,
+        "0": 78020,
+        "1": 32756
+      },
+      "per_state": {
+        "-1": {
+          "precision": 0.1675735839722978,
+          "recall": 0.13373470193446507
+        },
+        "0": {
+          "precision": 0.7357958550683773,
+          "recall": 0.6689310433222251
+        },
+        "1": {
+          "precision": 0.415835950657745,
+          "recall": 0.5577909390645989
+        }
+      },
+      "original": {
+        "spread_mae": 14.715603765969297,
+        "direction_accuracy": 0.535752442002442,
+        "economic_crossing_rate": 0.3221611721611722,
+        "mean_absolute_spread": 6.051617690696471
+      },
+      "coordinated": {
+        "spread_mae": 39.80802370053469,
+        "direction_accuracy": 0.5376068376068376,
+        "economic_crossing_rate": 0.4587148962148962,
+        "mean_absolute_spread": 35.10231686029925
+      }
+    }
+  },
+  "model": {
+    "threshold": 6.0,
+    "feature_names": [
+      "predicted_spread",
+      "absolute_predicted_spread",
+      "da_relative_to_daily_mean",
+      "rt_at_da_relative_to_daily_mean",
+      "hour_sin",
+      "hour_cos"
+    ],
+    "feature_mean": [
+      3.913032979734771,
+      6.508394819327191,
+      1.6583680318857556e-17,
+      -2.4195861448824962e-17,
+      -7.401104522630305e-17,
+      -7.401231958698329e-17
+    ],
+    "feature_std": [
+      10.551880289888684,
+      9.18122005119084,
+      12.963483885471584,
+      7.2869880521568815,
+      0.7071067811865476,
+      0.7071067811865476
+    ],
+    "classes": [
+      -1,
+      0,
+      1
+    ],
+    "classifier_coefficients": [
+      [
+        0.003914981647836069,
+        0.15599704348568744,
+        0.05319174487497393,
+        0.07259741875563636,
+        0.01958510362136476,
+        0.04375440319827255
+      ],
+      [
+        -0.08747305722868058,
+        -0.23970193774000825,
+        -0.16134708647203827,
+        -0.2376868835752707,
+        0.21432491081681174,
+        0.06623269908023076
+      ],
+      [
+        0.08355807558084481,
+        0.08370489425432126,
+        0.10815534159706429,
+        0.16508946481963463,
+        -0.23391001443817608,
+        -0.1099871022785034
+      ]
+    ],
+    "classifier_intercepts": [
+      0.08489896481584623,
+      -0.03318140516638769,
+      -0.05171755964941837
+    ],
+    "magnitude": {
+      "-1": {
+        "coefficients": [
+          38.79161101261554,
+          35.40024093306812,
+          55.04937138961202
+        ],
+        "residual_norm": 40856.54624265962,
+        "sample_count": 18369
+      },
+      "1": {
+        "coefficients": [
+          23.503969005463777,
+          33.61553026712932,
+          8.525888126676646
+        ],
+        "residual_norm": 43970.24292293045,
+        "sample_count": 41368
+      }
+    },
+    "magnitude_scale": 9.181220051190797,
+    "training_state_counts": {
+      "-1": 18369,
+      "0": 70943,
+      "1": 41368
+    },
+    "fixed_settings": {
+      "classifier_C": 1.0,
+      "classifier_class_weight": "balanced",
+      "classifier_solver": "lbfgs",
+      "magnitude_fit": "nonnegative_least_squares",
+      "state_decision": "argmax"
+    }
+  },
+  "conclusion": {
+    "2024_profit_confirmation_passed": true,
+    "route_status": "promising_frozen_post_training_mechanism",
+    "important_limitation": "The mechanism raises economic-threshold crossings by taking much larger spread positions and worsens spread MAE; it is a decision calibration layer, not a better probabilistic price forecaster.",
+    "no_parameter_search_after_2024": true
+  }
+}

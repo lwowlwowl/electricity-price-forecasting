@@ -1,0 +1,118 @@
+{
+  "status": "locked_2025_complete_no_model_selection_allowed",
+  "selection_allowed": false,
+  "markets": [
+    "CAISO",
+    "ERCOT",
+    "NYISO",
+    "PJM"
+  ],
+  "tasks": [
+    "da",
+    "rt_at_da",
+    "rt"
+  ],
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "rows": [
+    {
+      "market": "CAISO",
+      "task": "da",
+      "mae": 6.020544581272649,
+      "rmse": 8.63453177312672,
+      "elements": 26136,
+      "output": "data/results/allmarket_locked_2025_ensemble_v1/caiso_da_ensemble.npz"
+    },
+    {
+      "market": "CAISO",
+      "task": "rt_at_da",
+      "mae": 9.55610476951602,
+      "rmse": 17.59097482307332,
+      "elements": 26136,
+      "output": "data/results/allmarket_locked_2025_ensemble_v1/caiso_rt_at_da_ensemble.npz"
+    },
+    {
+      "market": "CAISO",
+      "task": "rt",
+      "mae": 5.785634565932992,
+      "rmse": 13.909868340104373,
+      "elements": 104256,
+      "output": "data/results/allmarket_locked_2025_ensemble_v1/caiso_rt_ensemble.npz"
+    },
+    {
+      "market": "ERCOT",
+      "task": "da",
+      "mae": 11.384897826530539,
+      "rmse": 25.189642887476698,
+      "elements": 130680,
+      "output": "data/results/allmarket_locked_2025_ensemble_v1/ercot_da_ensemble.npz"
+    },
+    {
+      "market": "ERCOT",
+      "task": "rt_at_da",
+      "mae": 14.92741569453094,
+      "rmse": 42.242769096011436,
+      "elements": 130680,
+      "output": "data/results/allmarket_locked_2025_ensemble_v1/ercot_rt_at_da_ensemble.npz"
+    },
+    {
+      "market": "ERCOT",
+      "task": "rt",
+      "mae": 8.877835705022262,
+      "rmse": 34.90796022613532,
+      "elements": 521280,
+      "output": "data/results/allmarket_locked_2025_ensemble_v1/ercot_rt_ensemble.npz"
+    },
+    {
+      "market": "NYISO",
+      "task": "da",
+      "mae": 13.17934887068722,
+      "rmse": 24.20639509930362,
+      "elements": 95832,
+      "output": "data/results/allmarket_locked_2025_ensemble_v1/nyiso_da_ensemble.npz"
+    },
+    {
+      "market": "NYISO",
+      "task": "rt_at_da",
+      "mae": 20.141118829595044,
+      "rmse": 62.002022635008736,
+      "elements": 95832,
+      "output": "data/results/allmarket_locked_2025_ensemble_v1/nyiso_rt_at_da_ensemble.npz"
+    },
+    {
+      "market": "NYISO",
+      "task": "rt",
+      "mae": 12.546605834861285,
+      "rmse": 49.72221722429639,
+      "elements": 382272,
+      "output": "data/results/allmarket_locked_2025_ensemble_v1/nyiso_rt_ensemble.npz"
+    },
+    {
+      "market": "PJM",
+      "task": "da",
+      "mae": 11.26416084239182,
+      "rmse": 24.53210296985052,
+      "elements": 304920,
+      "output": "data/results/allmarket_locked_2025_ensemble_v1/pjm_da_ensemble.npz"
+    },
+    {
+      "market": "PJM",
+      "task": "rt_at_da",
+      "mae": 15.947903617537873,
+      "rmse": 47.892084464045595,
+      "elements": 304920,
+      "output": "data/results/allmarket_locked_2025_ensemble_v1/pjm_rt_at_da_ensemble.npz"
+    },
+    {
+      "market": "PJM",
+      "task": "rt",
+      "mae": 11.542971938421172,
+      "rmse": 40.67658264452646,
+      "elements": 1216320,
+      "output": "data/results/allmarket_locked_2025_ensemble_v1/pjm_rt_ensemble.npz"
+    }
+  ]
+}

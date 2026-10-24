@@ -1,0 +1,1316 @@
+{
+  "experiment": "crossmarket_history_assisted_economic_regret_router_v1",
+  "deployment_setting": "history_assisted_adaptation",
+  "year": 2023,
+  "primary_endpoint": "complete LP/MPC net profit under standardized research contract",
+  "locked_2025_read": false,
+  "information_boundary": {
+    "transformer_training_markets": "three source markets, excluding the evaluated market",
+    "dlinear_training_markets": "all four markets using 2020-2022 history",
+    "router_training_markets": "three source markets using 2023 node-day outcomes",
+    "evaluated_market_2023_labels_used_for_router_training": false
+  },
+  "markets": {
+    "CAISO": {
+      "best_static_family": "da_static_hybrid__rt_at_da_static_hybrid__rt_static_hybrid",
+      "systems": {
+        "transformer": {
+          "mean_daily_net_revenue": 4.999152799268625,
+          "difference_vs_best_static": -65.07015601911314,
+          "difference_7day_block_bootstrap_95ci": [
+            -79.99048428352754,
+            -50.32966525630349
+          ],
+          "difference_without_top_1_day": -66.04588635144626,
+          "difference_without_top_5_days": -69.57449809261878,
+          "difference_without_top_10_days": -72.81299894728909,
+          "revenue_components": {
+            "da_leg": 44.41270613050762,
+            "rt_deviation_leg": 5.838656328906413,
+            "degradation_cost": 11.664814057764772,
+            "deviation_penalty": 33.587395602380646
+          },
+          "mean_daily_throughput_mwh": 2.0464586066253987,
+          "forecast": {
+            "da_mae": 18.1998099191576,
+            "rt_at_da_mae": 21.031589584754748,
+            "spread_direction_accuracy": 0.6325374961738598,
+            "spread_amplitude_mae": 15.305724494114346
+          },
+          "node_robustness": {
+            "positive_nodes": 0,
+            "node_count": 3,
+            "worst_node_difference": -88.69860948410874,
+            "best_node_difference": -43.898949604108786,
+            "per_node_mean_difference": {
+              "TH_NP15_GEN-APND": -43.898949604108786,
+              "TH_SP15_GEN-APND": -88.69860948410874,
+              "TH_ZP26_GEN-APND": -62.61290896912193
+            }
+          }
+        },
+        "static_hybrid": {
+          "mean_daily_net_revenue": 70.06930881838177,
+          "difference_vs_best_static": 0.0,
+          "difference_7day_block_bootstrap_95ci": [
+            0.0,
+            0.0
+          ],
+          "difference_without_top_1_day": 0.0,
+          "difference_without_top_5_days": 0.0,
+          "difference_without_top_10_days": 0.0,
+          "revenue_components": {
+            "da_leg": 118.13180177404917,
+            "rt_deviation_leg": -0.38855971925305094,
+            "degradation_cost": 24.795884098321086,
+            "deviation_penalty": 22.878049138093257
+          },
+          "mean_daily_throughput_mwh": 4.350155104968612,
+          "forecast": {
+            "da_mae": 13.317911290565915,
+            "rt_at_da_mae": 17.431878435151646,
+            "spread_direction_accuracy": 0.6093128252219161,
+            "spread_amplitude_mae": 15.6275358460676
+          },
+          "node_robustness": {
+            "positive_nodes": 0,
+            "node_count": 3,
+            "worst_node_difference": 0.0,
+            "best_node_difference": 0.0,
+            "per_node_mean_difference": {
+              "TH_NP15_GEN-APND": 0.0,
+              "TH_SP15_GEN-APND": 0.0,
+              "TH_ZP26_GEN-APND": 0.0
+            }
+          }
+        },
+        "economic_regret_tree": {
+          "mean_daily_net_revenue": 69.98125877285679,
+          "difference_vs_best_static": -0.08805004552498179,
+          "difference_7day_block_bootstrap_95ci": [
+            -0.2641501365749453,
+            0.0
+          ],
+          "difference_without_top_1_day": -0.08829395146826433,
+          "difference_without_top_5_days": -0.08928323943989754,
+          "difference_without_top_10_days": -0.09055146727285063,
+          "revenue_components": {
+            "da_leg": 118.04369630432164,
+            "rt_deviation_leg": -0.3893715594471911,
+            "degradation_cost": 24.791983669053852,
+            "deviation_penalty": 22.8810823029638
+          },
+          "mean_daily_throughput_mwh": 4.3494708191322555,
+          "forecast": {
+            "da_mae": 13.255969893255408,
+            "rt_at_da_mae": 17.432379439356982,
+            "spread_direction_accuracy": 0.6093128252219161,
+            "spread_amplitude_mae": 15.571364908733498
+          },
+          "node_robustness": {
+            "positive_nodes": 0,
+            "node_count": 3,
+            "worst_node_difference": -0.26415013657494524,
+            "best_node_difference": 0.0,
+            "per_node_mean_difference": {
+              "TH_NP15_GEN-APND": 0.0,
+              "TH_SP15_GEN-APND": -0.26415013657494524,
+              "TH_ZP26_GEN-APND": 0.0
+            }
+          }
+        },
+        "mae_regret_tree": {
+          "mean_daily_net_revenue": 4.999152799268625,
+          "difference_vs_best_static": -65.07015601911314,
+          "difference_7day_block_bootstrap_95ci": [
+            -79.99048428352754,
+            -50.32966525630349
+          ],
+          "difference_without_top_1_day": -66.04588635144626,
+          "difference_without_top_5_days": -69.57449809261878,
+          "difference_without_top_10_days": -72.81299894728909,
+          "revenue_components": {
+            "da_leg": 44.41270613050762,
+            "rt_deviation_leg": 5.838656328906413,
+            "degradation_cost": 11.664814057764772,
+            "deviation_penalty": 33.587395602380646
+          },
+          "mean_daily_throughput_mwh": 2.0464586066253987,
+          "forecast": {
+            "da_mae": 18.1998099191576,
+            "rt_at_da_mae": 21.031589584754748,
+            "spread_direction_accuracy": 0.6325374961738598,
+            "spread_amplitude_mae": 15.305724494114346
+          },
+          "node_robustness": {
+            "positive_nodes": 0,
+            "node_count": 3,
+            "worst_node_difference": -88.69860948410874,
+            "best_node_difference": -43.898949604108786,
+            "per_node_mean_difference": {
+              "TH_NP15_GEN-APND": -43.898949604108786,
+              "TH_SP15_GEN-APND": -88.69860948410874,
+              "TH_ZP26_GEN-APND": -62.61290896912193
+            }
+          }
+        },
+        "economic_no_tail_tree": {
+          "mean_daily_net_revenue": 70.1456967826381,
+          "difference_vs_best_static": 0.07638796425632957,
+          "difference_7day_block_bootstrap_95ci": [
+            -1.1407515697186483,
+            1.589528230530688
+          ],
+          "difference_without_top_1_day": -0.34418124658747506,
+          "difference_without_top_5_days": -0.6305380912124673,
+          "difference_without_top_10_days": -0.639494598189917,
+          "revenue_components": {
+            "da_leg": 118.20992751381318,
+            "rt_deviation_leg": -0.6721616263526696,
+            "degradation_cost": 24.81828480492184,
+            "deviation_penalty": 22.573784299900563
+          },
+          "mean_daily_throughput_mwh": 4.3540850534950595,
+          "forecast": {
+            "da_mae": 13.115750767207057,
+            "rt_at_da_mae": 17.451695025266083,
+            "spread_direction_accuracy": 0.6039179675543311,
+            "spread_amplitude_mae": 15.57439505233643
+          },
+          "node_robustness": {
+            "positive_nodes": 1,
+            "node_count": 3,
+            "worst_node_difference": -0.6325575057819466,
+            "best_node_difference": 0.9628406564258833,
+            "per_node_mean_difference": {
+              "TH_NP15_GEN-APND": -0.1011192578749479,
+              "TH_SP15_GEN-APND": -0.6325575057819466,
+              "TH_ZP26_GEN-APND": 0.9628406564258833
+            }
+          }
+        }
+      },
+      "router": {
+        "kind": "economic_regret_tree",
+        "feature_count": 3,
+        "features": [
+          "dlinear_spread_q90",
+          "dlinear_spread_max_up_ramp",
+          "rt_at_da_disagreement_max"
+        ],
+        "rules": "|--- dlinear_spread_max_up_ramp <= 172.85\n|   |--- dlinear_spread_q90 <= 74.14\n|   |   |--- value: [3.43]\n|   |--- dlinear_spread_q90 >  74.14\n|   |   |--- value: [296.20]\n|--- dlinear_spread_max_up_ramp >  172.85\n|   |--- rt_at_da_disagreement_max <= 69.03\n|   |   |--- value: [-1782.63]\n|   |--- rt_at_da_disagreement_max >  69.03\n|   |   |--- value: [-219.15]\n",
+        "leaves": [
+          {
+            "node": 2,
+            "samples": 21265,
+            "predicted_advantage": 3.4251783138464513
+          },
+          {
+            "node": 3,
+            "samples": 357,
+            "predicted_advantage": 296.1968691270604
+          },
+          {
+            "node": 5,
+            "samples": 100,
+            "predicted_advantage": -1782.6299898527222
+          },
+          {
+            "node": 6,
+            "samples": 360,
+            "predicted_advantage": -219.14770274139985
+          }
+        ],
+        "dlinear_selected_node_day_rate": 0.9990817263544536,
+        "predicted_advantage_mean": 3.9358471461138,
+        "predicted_advantage_positive_mean": 5.577911334531848
+      },
+      "economic_router_uses_tail_or_spread_feature": true,
+      "tail_profit_attribution": {
+        "subsets_are_nonexclusive_except_ordinary": true,
+        "thresholds": {
+          "da_q99": 195.14657974243167,
+          "absolute_da_ramp_q99": 53.23459823608399,
+          "absolute_da_rt_spread_q95": 40.62857509404421
+        },
+        "groups": {
+          "negative_price": {
+            "node_day_count": 367,
+            "mean_profit_difference": -6.776293120327931e-17,
+            "total_profit_difference": -2.4868995751603507e-14,
+            "share_of_total_improvement": 2.6007513826225486e-16
+          },
+          "positive_spike_q99": {
+            "node_day_count": 68,
+            "mean_profit_difference": 0.0,
+            "total_profit_difference": 0.0,
+            "share_of_total_improvement": -0.0
+          },
+          "rapid_ramp_q99": {
+            "node_day_count": 125,
+            "mean_profit_difference": 0.0,
+            "total_profit_difference": 0.0,
+            "share_of_total_improvement": -0.0
+          },
+          "extreme_da_rt_spread_q95": {
+            "node_day_count": 382,
+            "mean_profit_difference": -0.24695239423987836,
+            "total_profit_difference": -94.33581459963354,
+            "share_of_total_improvement": 0.9865456679528445
+          },
+          "ordinary": {
+            "node_day_count": 439,
+            "mean_profit_difference": -0.002930603281313569,
+            "total_profit_difference": -1.2865348404966568,
+            "share_of_total_improvement": 0.01345433204715562
+          }
+        }
+      }
+    },
+    "ERCOT": {
+      "best_static_family": "da_transformer__rt_at_da_transformer__rt_transformer",
+      "systems": {
+        "transformer": {
+          "mean_daily_net_revenue": 377.8381252155746,
+          "difference_vs_best_static": 0.0,
+          "difference_7day_block_bootstrap_95ci": [
+            0.0,
+            0.0
+          ],
+          "difference_without_top_1_day": 0.0,
+          "difference_without_top_5_days": 0.0,
+          "difference_without_top_10_days": 0.0,
+          "revenue_components": {
+            "da_leg": 407.92342060603215,
+            "rt_deviation_leg": -2.22824879799401,
+            "degradation_cost": 20.655482696270223,
+            "deviation_penalty": 7.201563896193384
+          },
+          "mean_daily_throughput_mwh": 3.6237688940824953,
+          "forecast": {
+            "da_mae": 37.27065299118209,
+            "rt_at_da_mae": 34.80049607109123,
+            "spread_direction_accuracy": 0.5773951637588001,
+            "spread_amplitude_mae": 35.18914531887663
+          },
+          "node_robustness": {
+            "positive_nodes": 0,
+            "node_count": 15,
+            "worst_node_difference": 0.0,
+            "best_node_difference": 0.0,
+            "per_node_mean_difference": {
+              "HB_BUSAVG": 0.0,
+              "HB_HOUSTON": 0.0,
+              "HB_HUBAVG": 0.0,
+              "HB_NORTH": 0.0,
+              "HB_PAN": 0.0,
+              "HB_SOUTH": 0.0,
+              "HB_WEST": 0.0,
+              "LZ_AEN": 0.0,
+              "LZ_CPS": 0.0,
+              "LZ_HOUSTON": 0.0,
+              "LZ_LCRA": 0.0,
+              "LZ_NORTH": 0.0,
+              "LZ_RAYBN": 0.0,
+              "LZ_SOUTH": 0.0,
+              "LZ_WEST": 0.0
+            }
+          }
+        },
+        "static_hybrid": {
+          "mean_daily_net_revenue": 359.88755735881006,
+          "difference_vs_best_static": -17.950567856764625,
+          "difference_7day_block_bootstrap_95ci": [
+            -83.78905409076759,
+            38.7869611564132
+          ],
+          "difference_without_top_1_day": -27.739491152164312,
+          "difference_without_top_5_days": -39.48365895714921,
+          "difference_without_top_10_days": -46.94906174888668,
+          "revenue_components": {
+            "da_leg": 393.23350463644573,
+            "rt_deviation_leg": -0.8989589938952405,
+            "degradation_cost": 26.51316661228367,
+            "deviation_penalty": 5.933821671456739
+          },
+          "mean_daily_throughput_mwh": 4.6514327389971335,
+          "forecast": {
+            "da_mae": 39.87447866963251,
+            "rt_at_da_mae": 36.68702111821676,
+            "spread_direction_accuracy": 0.5538720538720538,
+            "spread_amplitude_mae": 42.002848697958164
+          },
+          "node_robustness": {
+            "positive_nodes": 2,
+            "node_count": 15,
+            "worst_node_difference": -39.56201792999375,
+            "best_node_difference": 57.05409488972228,
+            "per_node_mean_difference": {
+              "HB_BUSAVG": -30.48095939060651,
+              "HB_HOUSTON": -39.56201792999375,
+              "HB_HUBAVG": -22.629447256297418,
+              "HB_NORTH": -34.114382810348765,
+              "HB_PAN": -8.084249604053953,
+              "HB_SOUTH": -27.918211307614378,
+              "HB_WEST": 7.399706790099026,
+              "LZ_AEN": -21.3071970732221,
+              "LZ_CPS": -28.06770545163107,
+              "LZ_HOUSTON": -31.531343293689925,
+              "LZ_LCRA": -28.08546826346011,
+              "LZ_NORTH": -30.57223674363449,
+              "LZ_RAYBN": -20.241003667566503,
+              "LZ_SOUTH": -11.11809673917159,
+              "LZ_WEST": 57.05409488972228
+            }
+          }
+        },
+        "economic_regret_tree": {
+          "mean_daily_net_revenue": 363.2828082785001,
+          "difference_vs_best_static": -14.555316937074428,
+          "difference_7day_block_bootstrap_95ci": [
+            -80.63080397619034,
+            42.16759656605635
+          ],
+          "difference_without_top_1_day": -24.334835105272766,
+          "difference_without_top_5_days": -36.04880652032718,
+          "difference_without_top_10_days": -43.4663055768299,
+          "revenue_components": {
+            "da_leg": 397.31534973708983,
+            "rt_deviation_leg": -1.2034697207559775,
+            "degradation_cost": 27.207863373833423,
+            "deviation_penalty": 5.621208364000238
+          },
+          "mean_daily_throughput_mwh": 4.773309363830424,
+          "forecast": {
+            "da_mae": 39.788195632532926,
+            "rt_at_da_mae": 36.739739867714086,
+            "spread_direction_accuracy": 0.5487909397000306,
+            "spread_amplitude_mae": 41.70372080604314
+          },
+          "node_robustness": {
+            "positive_nodes": 2,
+            "node_count": 15,
+            "worst_node_difference": -38.513038183349245,
+            "best_node_difference": 62.05771913899887,
+            "per_node_mean_difference": {
+              "HB_BUSAVG": -26.88952486313957,
+              "HB_HOUSTON": -38.513038183349245,
+              "HB_HUBAVG": -17.458776302617938,
+              "HB_NORTH": -31.05165629500416,
+              "HB_PAN": -6.239615989770322,
+              "HB_SOUTH": -23.481715758587562,
+              "HB_WEST": 12.149347647988254,
+              "LZ_AEN": -14.796059166815558,
+              "LZ_CPS": -24.823095021013035,
+              "LZ_HOUSTON": -30.042152700556287,
+              "LZ_LCRA": -22.69869728139114,
+              "LZ_NORTH": -29.00747836984574,
+              "LZ_RAYBN": -19.05734316307173,
+              "LZ_SOUTH": -8.47766774794119,
+              "LZ_WEST": 62.05771913899887
+            }
+          }
+        },
+        "mae_regret_tree": {
+          "mean_daily_net_revenue": 347.8051714287368,
+          "difference_vs_best_static": -30.032953786837822,
+          "difference_7day_block_bootstrap_95ci": [
+            -85.92269826183032,
+            13.593706052597641
+          ],
+          "difference_without_top_1_day": -33.436545207091235,
+          "difference_without_top_5_days": -41.456183639734206,
+          "difference_without_top_10_days": -46.52782861068909,
+          "revenue_components": {
+            "da_leg": 380.53873403134185,
+            "rt_deviation_leg": -0.6670014360429238,
+            "degradation_cost": 26.11227271781947,
+            "deviation_penalty": 5.954288448742651
+          },
+          "mean_daily_throughput_mwh": 4.581100476810434,
+          "forecast": {
+            "da_mae": 40.1904405634973,
+            "rt_at_da_mae": 36.70412900252668,
+            "spread_direction_accuracy": 0.549778083868993,
+            "spread_amplitude_mae": 41.973598725414554
+          },
+          "node_robustness": {
+            "positive_nodes": 1,
+            "node_count": 15,
+            "worst_node_difference": -53.74305642345571,
+            "best_node_difference": 29.34192665855888,
+            "per_node_mean_difference": {
+              "HB_BUSAVG": -37.64533128774468,
+              "HB_HOUSTON": -53.74305642345571,
+              "HB_HUBAVG": -31.588264655758646,
+              "HB_NORTH": -47.75212292654336,
+              "HB_PAN": -19.616566395778296,
+              "HB_SOUTH": -16.34618682024894,
+              "HB_WEST": -9.268737763015862,
+              "LZ_AEN": -47.41095996590573,
+              "LZ_CPS": -42.36225488765793,
+              "LZ_HOUSTON": -39.44465026477235,
+              "LZ_LCRA": -44.21225708784923,
+              "LZ_NORTH": -44.29306477960689,
+              "LZ_RAYBN": -34.56158511766097,
+              "LZ_SOUTH": -11.591195085127408,
+              "LZ_WEST": 29.34192665855888
+            }
+          }
+        },
+        "economic_no_tail_tree": {
+          "mean_daily_net_revenue": 359.88755735881006,
+          "difference_vs_best_static": -17.950567856764625,
+          "difference_7day_block_bootstrap_95ci": [
+            -83.78905409076759,
+            38.7869611564132
+          ],
+          "difference_without_top_1_day": -27.739491152164312,
+          "difference_without_top_5_days": -39.48365895714921,
+          "difference_without_top_10_days": -46.94906174888668,
+          "revenue_components": {
+            "da_leg": 393.23350463644573,
+            "rt_deviation_leg": -0.8989589938952405,
+            "degradation_cost": 26.51316661228367,
+            "deviation_penalty": 5.933821671456739
+          },
+          "mean_daily_throughput_mwh": 4.6514327389971335,
+          "forecast": {
+            "da_mae": 39.87447866963251,
+            "rt_at_da_mae": 36.68702111821676,
+            "spread_direction_accuracy": 0.5538720538720538,
+            "spread_amplitude_mae": 42.002848697958164
+          },
+          "node_robustness": {
+            "positive_nodes": 2,
+            "node_count": 15,
+            "worst_node_difference": -39.56201792999375,
+            "best_node_difference": 57.05409488972228,
+            "per_node_mean_difference": {
+              "HB_BUSAVG": -30.48095939060651,
+              "HB_HOUSTON": -39.56201792999375,
+              "HB_HUBAVG": -22.629447256297418,
+              "HB_NORTH": -34.114382810348765,
+              "HB_PAN": -8.084249604053953,
+              "HB_SOUTH": -27.918211307614378,
+              "HB_WEST": 7.399706790099026,
+              "LZ_AEN": -21.3071970732221,
+              "LZ_CPS": -28.06770545163107,
+              "LZ_HOUSTON": -31.531343293689925,
+              "LZ_LCRA": -28.08546826346011,
+              "LZ_NORTH": -30.57223674363449,
+              "LZ_RAYBN": -20.241003667566503,
+              "LZ_SOUTH": -11.11809673917159,
+              "LZ_WEST": 57.05409488972228
+            }
+          }
+        }
+      },
+      "router": {
+        "kind": "economic_regret_tree",
+        "feature_count": 3,
+        "features": [
+          "dlinear_da_std",
+          "dlinear_da_max_down_ramp",
+          "transformer_spread_q10"
+        ],
+        "rules": "|--- dlinear_da_std <= 12.30\n|   |--- transformer_spread_q10 <= 0.09\n|   |   |--- value: [-2.85]\n|   |--- transformer_spread_q10 >  0.09\n|   |   |--- value: [12.62]\n|--- dlinear_da_std >  12.30\n|   |--- dlinear_da_max_down_ramp <= -38.83\n|   |   |--- value: [186.29]\n|   |--- dlinear_da_max_down_ramp >  -38.83\n|   |   |--- value: [56.00]\n",
+        "leaves": [
+          {
+            "node": 2,
+            "samples": 11141,
+            "predicted_advantage": -2.846274623809009
+          },
+          {
+            "node": 3,
+            "samples": 4437,
+            "predicted_advantage": 12.615481197410837
+          },
+          {
+            "node": 5,
+            "samples": 117,
+            "predicted_advantage": 186.28844542332797
+          },
+          {
+            "node": 6,
+            "samples": 2043,
+            "predicted_advantage": 55.99766728493061
+          }
+        ],
+        "dlinear_selected_node_day_rate": 0.609366391184573,
+        "predicted_advantage_mean": 58.55137041338268,
+        "predicted_advantage_positive_mean": 97.91025859726054
+      },
+      "economic_router_uses_tail_or_spread_feature": true,
+      "tail_profit_attribution": {
+        "subsets_are_nonexclusive_except_ordinary": true,
+        "thresholds": {
+          "da_q99": 792.8925268554667,
+          "absolute_da_ramp_q99": 428.6552319335945,
+          "absolute_da_rt_spread_q95": 101.46812362670885
+        },
+        "groups": {
+          "negative_price": {
+            "node_day_count": 884,
+            "mean_profit_difference": 12.669823368917822,
+            "total_profit_difference": 11200.123858123354,
+            "share_of_total_improvement": -0.14171027124821833
+          },
+          "positive_spike_q99": {
+            "node_day_count": 352,
+            "mean_profit_difference": -543.4824939032507,
+            "total_profit_difference": -191305.83785394425,
+            "share_of_total_improvement": 2.4205091405295005
+          },
+          "rapid_ramp_q99": {
+            "node_day_count": 385,
+            "mean_profit_difference": -506.4806360171849,
+            "total_profit_difference": -194995.0448666162,
+            "share_of_total_improvement": 2.467187064191692
+          },
+          "extreme_da_rt_spread_q95": {
+            "node_day_count": 1731,
+            "mean_profit_difference": -59.83259803274497,
+            "total_profit_difference": -103570.22719468155,
+            "share_of_total_improvement": 1.310428810870055
+          },
+          "ordinary": {
+            "node_day_count": 2947,
+            "mean_profit_difference": 6.971846686705118,
+            "total_profit_difference": 20546.03218571998,
+            "share_of_total_improvement": -0.25995996392497533
+          }
+        }
+      }
+    },
+    "NYISO": {
+      "best_static_family": "da_transformer__rt_at_da_transformer__rt_transformer",
+      "systems": {
+        "transformer": {
+          "mean_daily_net_revenue": 11.30372648022594,
+          "difference_vs_best_static": 0.0,
+          "difference_7day_block_bootstrap_95ci": [
+            0.0,
+            0.0
+          ],
+          "difference_without_top_1_day": 0.0,
+          "difference_without_top_5_days": 0.0,
+          "difference_without_top_10_days": 0.0,
+          "revenue_components": {
+            "da_leg": 27.942848817431692,
+            "rt_deviation_leg": -0.24671626816215106,
+            "degradation_cost": 14.627742798003244,
+            "deviation_penalty": 1.7646632710403545
+          },
+          "mean_daily_throughput_mwh": 2.566270666316358,
+          "forecast": {
+            "da_mae": 8.553133333691962,
+            "rt_at_da_mae": 10.730053088580805,
+            "spread_direction_accuracy": 0.5464458635946239,
+            "spread_amplitude_mae": 10.888937286890462
+          },
+          "node_robustness": {
+            "positive_nodes": 0,
+            "node_count": 11,
+            "worst_node_difference": 0.0,
+            "best_node_difference": 0.0,
+            "per_node_mean_difference": {
+              "CAPITL": 0.0,
+              "CENTRL": 0.0,
+              "DUNWOD": 0.0,
+              "GENESE": 0.0,
+              "HUD VL": 0.0,
+              "LONGIL": 0.0,
+              "MHK VL": 0.0,
+              "MILLWD": 0.0,
+              "N.Y.C.": 0.0,
+              "NORTH": 0.0,
+              "WEST": 0.0
+            }
+          }
+        },
+        "static_hybrid": {
+          "mean_daily_net_revenue": 7.147790028680492,
+          "difference_vs_best_static": -4.155936451545449,
+          "difference_7day_block_bootstrap_95ci": [
+            -8.933826588062205,
+            -0.6114418665406789
+          ],
+          "difference_without_top_1_day": -4.427338055426168,
+          "difference_without_top_5_days": -4.869566540178745,
+          "difference_without_top_10_days": -5.294929170979307,
+          "revenue_components": {
+            "da_leg": 22.712049216422198,
+            "rt_deviation_leg": -0.035034814894073625,
+            "degradation_cost": 13.700505353432918,
+            "deviation_penalty": 1.8287190194147156
+          },
+          "mean_daily_throughput_mwh": 2.4035974304268275,
+          "forecast": {
+            "da_mae": 7.997786619202993,
+            "rt_at_da_mae": 11.04249403809403,
+            "spread_direction_accuracy": 0.5715940395692461,
+            "spread_amplitude_mae": 10.445557557311195
+          },
+          "node_robustness": {
+            "positive_nodes": 0,
+            "node_count": 11,
+            "worst_node_difference": -7.824948838986318,
+            "best_node_difference": -2.106845244223672,
+            "per_node_mean_difference": {
+              "CAPITL": -5.34491266549518,
+              "CENTRL": -3.2834881967573426,
+              "DUNWOD": -4.9328438615426835,
+              "GENESE": -2.8299117487140046,
+              "HUD VL": -4.528426260658306,
+              "LONGIL": -7.824948838986318,
+              "MHK VL": -3.750212936765768,
+              "MILLWD": -2.5634110840304904,
+              "N.Y.C.": -4.746610313887448,
+              "NORTH": -2.106845244223672,
+              "WEST": -3.8036898159387236
+            }
+          }
+        },
+        "economic_regret_tree": {
+          "mean_daily_net_revenue": 7.147790028680492,
+          "difference_vs_best_static": -4.155936451545449,
+          "difference_7day_block_bootstrap_95ci": [
+            -8.933826588062205,
+            -0.6114418665406789
+          ],
+          "difference_without_top_1_day": -4.427338055426168,
+          "difference_without_top_5_days": -4.869566540178745,
+          "difference_without_top_10_days": -5.294929170979307,
+          "revenue_components": {
+            "da_leg": 22.712049216422198,
+            "rt_deviation_leg": -0.035034814894073625,
+            "degradation_cost": 13.700505353432918,
+            "deviation_penalty": 1.8287190194147156
+          },
+          "mean_daily_throughput_mwh": 2.4035974304268275,
+          "forecast": {
+            "da_mae": 7.997786619202993,
+            "rt_at_da_mae": 11.04249403809403,
+            "spread_direction_accuracy": 0.5715940395692461,
+            "spread_amplitude_mae": 10.445557557311195
+          },
+          "node_robustness": {
+            "positive_nodes": 0,
+            "node_count": 11,
+            "worst_node_difference": -7.824948838986318,
+            "best_node_difference": -2.106845244223672,
+            "per_node_mean_difference": {
+              "CAPITL": -5.34491266549518,
+              "CENTRL": -3.2834881967573426,
+              "DUNWOD": -4.9328438615426835,
+              "GENESE": -2.8299117487140046,
+              "HUD VL": -4.528426260658306,
+              "LONGIL": -7.824948838986318,
+              "MHK VL": -3.750212936765768,
+              "MILLWD": -2.5634110840304904,
+              "N.Y.C.": -4.746610313887448,
+              "NORTH": -2.106845244223672,
+              "WEST": -3.8036898159387236
+            }
+          }
+        },
+        "mae_regret_tree": {
+          "mean_daily_net_revenue": 7.1481753597343936,
+          "difference_vs_best_static": -4.1555511204915465,
+          "difference_7day_block_bootstrap_95ci": [
+            -8.928006627031044,
+            -0.6298544751594826
+          ],
+          "difference_without_top_1_day": -4.395413555367433,
+          "difference_without_top_5_days": -4.83728434264036,
+          "difference_without_top_10_days": -5.2621884194986155,
+          "revenue_components": {
+            "da_leg": 22.704928961443144,
+            "rt_deviation_leg": -0.03545408257784404,
+            "degradation_cost": 13.692580499716193,
+            "deviation_penalty": 1.8287190194147156
+          },
+          "mean_daily_throughput_mwh": 2.4022071052133667,
+          "forecast": {
+            "da_mae": 7.983556251139474,
+            "rt_at_da_mae": 11.050307939348029,
+            "spread_direction_accuracy": 0.5715627347858753,
+            "spread_amplitude_mae": 10.477019719275518
+          },
+          "node_robustness": {
+            "positive_nodes": 0,
+            "node_count": 11,
+            "worst_node_difference": -7.824948838986318,
+            "best_node_difference": -2.106845244223672,
+            "per_node_mean_difference": {
+              "CAPITL": -5.340674023902259,
+              "CENTRL": -3.2834881967573426,
+              "DUNWOD": -4.9328438615426835,
+              "GENESE": -2.8299117487140046,
+              "HUD VL": -4.528426260658306,
+              "LONGIL": -7.824948838986318,
+              "MHK VL": -3.750212936765768,
+              "MILLWD": -2.5634110840304904,
+              "N.Y.C.": -4.746610313887448,
+              "NORTH": -2.106845244223672,
+              "WEST": -3.8036898159387236
+            }
+          }
+        },
+        "economic_no_tail_tree": {
+          "mean_daily_net_revenue": 7.282061760511175,
+          "difference_vs_best_static": -4.0216647197147655,
+          "difference_7day_block_bootstrap_95ci": [
+            -8.634346517116288,
+            -0.584051093433912
+          ],
+          "difference_without_top_1_day": -4.148741063176764,
+          "difference_without_top_5_days": -4.59146930347291,
+          "difference_without_top_10_days": -5.042137221928535,
+          "revenue_components": {
+            "da_leg": 22.81036339918364,
+            "rt_deviation_leg": -0.025023852991014017,
+            "degradation_cost": 13.683129393838572,
+            "deviation_penalty": 1.82014839184288
+          },
+          "mean_daily_throughput_mwh": 2.4005490164629073,
+          "forecast": {
+            "da_mae": 8.39648974872799,
+            "rt_at_da_mae": 11.234809381320632,
+            "spread_direction_accuracy": 0.5716670840637783,
+            "spread_amplitude_mae": 10.816212069811806
+          },
+          "node_robustness": {
+            "positive_nodes": 0,
+            "node_count": 11,
+            "worst_node_difference": -7.528900447665799,
+            "best_node_difference": -1.9567036680436298,
+            "per_node_mean_difference": {
+              "CAPITL": -5.411040010772964,
+              "CENTRL": -3.220984063925065,
+              "DUNWOD": -4.6606940486966675,
+              "GENESE": -2.8978798102144827,
+              "HUD VL": -4.374558606132827,
+              "LONGIL": -7.528900447665799,
+              "MHK VL": -3.5390669188416877,
+              "MILLWD": -2.4550380032883714,
+              "N.Y.C.": -4.532731677267619,
+              "NORTH": -1.9567036680436298,
+              "WEST": -3.660714662013311
+            }
+          }
+        }
+      },
+      "router": {
+        "kind": "economic_regret_tree",
+        "feature_count": 3,
+        "features": [
+          "dlinear_spread_q90",
+          "dlinear_spread_max_up_ramp",
+          "rt_at_da_disagreement_max"
+        ],
+        "rules": "|--- dlinear_spread_max_up_ramp <= 172.85\n|   |--- dlinear_spread_q90 <= 74.14\n|   |   |--- value: [27.33]\n|   |--- dlinear_spread_q90 >  74.14\n|   |   |--- value: [293.36]\n|--- dlinear_spread_max_up_ramp >  172.85\n|   |--- rt_at_da_disagreement_max <= 68.52\n|   |   |--- value: [-1704.04]\n|   |--- rt_at_da_disagreement_max >  68.52\n|   |   |--- value: [-220.12]\n",
+        "leaves": [
+          {
+            "node": 2,
+            "samples": 18372,
+            "predicted_advantage": 27.33430473334115
+          },
+          {
+            "node": 3,
+            "samples": 353,
+            "predicted_advantage": 293.3595941465124
+          },
+          {
+            "node": 5,
+            "samples": 100,
+            "predicted_advantage": -1704.043579338784
+          },
+          {
+            "node": 6,
+            "samples": 361,
+            "predicted_advantage": -220.12177464804302
+          }
+        ],
+        "dlinear_selected_node_day_rate": 1.0,
+        "predicted_advantage_mean": 28.13377968274211,
+        "predicted_advantage_positive_mean": 28.13377968274211
+      },
+      "economic_router_uses_tail_or_spread_feature": true,
+      "tail_profit_attribution": {
+        "subsets_are_nonexclusive_except_ordinary": true,
+        "thresholds": {
+          "da_q99": 101.08000183105469,
+          "absolute_da_ramp_q99": 20.67620056152339,
+          "absolute_da_rt_spread_q95": 26.42233304977416
+        },
+        "groups": {
+          "negative_price": {
+            "node_day_count": 194,
+            "mean_profit_difference": -0.4941171193398844,
+            "total_profit_difference": -95.85872115193757,
+            "share_of_total_improvement": 0.005792439106896634
+          },
+          "positive_spike_q99": {
+            "node_day_count": 161,
+            "mean_profit_difference": -77.1618751663413,
+            "total_profit_difference": -12423.06190178095,
+            "share_of_total_improvement": 0.750686309211409
+          },
+          "rapid_ramp_q99": {
+            "node_day_count": 362,
+            "mean_profit_difference": -40.83638858090163,
+            "total_profit_difference": -14782.77266628639,
+            "share_of_total_improvement": 0.8932761617468034
+          },
+          "extreme_da_rt_spread_q95": {
+            "node_day_count": 1544,
+            "mean_profit_difference": -10.257138647916525,
+            "total_profit_difference": -15837.022072383115,
+            "share_of_total_improvement": 0.9569811164438105
+          },
+          "ordinary": {
+            "node_day_count": 2355,
+            "mean_profit_difference": -0.44616249768148963,
+            "total_profit_difference": -1050.712682039908,
+            "share_of_total_improvement": 0.06349124165670338
+          }
+        }
+      }
+    },
+    "PJM": {
+      "best_static_family": "da_static_hybrid__rt_at_da_static_hybrid__rt_static_hybrid",
+      "systems": {
+        "transformer": {
+          "mean_daily_net_revenue": 11.407208434818035,
+          "difference_vs_best_static": -3.292968448552391,
+          "difference_7day_block_bootstrap_95ci": [
+            -8.219662621465995,
+            0.4377678855536286
+          ],
+          "difference_without_top_1_day": -3.573130709433399,
+          "difference_without_top_5_days": -4.319358126656971,
+          "difference_without_top_10_days": -4.996499173341159,
+          "revenue_components": {
+            "da_leg": 27.020709460783188,
+            "rt_deviation_leg": -0.3204767380924749,
+            "degradation_cost": 13.60416963208457,
+            "deviation_penalty": 1.688854655788106
+          },
+          "mean_daily_throughput_mwh": 2.386696426681503,
+          "forecast": {
+            "da_mae": 6.196589762302964,
+            "rt_at_da_mae": 8.96094552694081,
+            "spread_direction_accuracy": 0.5560474878656697,
+            "spread_amplitude_mae": 8.83211530160191
+          },
+          "node_robustness": {
+            "positive_nodes": 8,
+            "node_count": 35,
+            "worst_node_difference": -8.89493777067071,
+            "best_node_difference": 2.118266624213526,
+            "per_node_mean_difference": {
+              "HUB:AEP GEN HUB": -2.480810042661302,
+              "HUB:AEP-DAYTON HUB": -3.093720364603103,
+              "HUB:ATSI GEN HUB": -2.885752543759251,
+              "HUB:CHICAGO GEN HUB": -4.435596261155131,
+              "HUB:CHICAGO HUB": -6.4936753392880835,
+              "HUB:DOMINION HUB": -7.6207160643967145,
+              "HUB:EASTERN HUB": -3.333894678442781,
+              "HUB:N ILLINOIS HUB": -6.722653354163103,
+              "HUB:NEW JERSEY HUB": 0.13549127046215395,
+              "HUB:OHIO HUB": -3.805037115033604,
+              "HUB:WEST INT HUB": -3.0678952717657832,
+              "HUB:WESTERN HUB": -3.7975539164049117,
+              "ZONE:AECO": 0.5690755724201499,
+              "ZONE:AEP": -3.3576527397803386,
+              "ZONE:APS": -2.0128874616327925,
+              "ZONE:ATSI": -2.81741406926847,
+              "ZONE:BGE": -8.89493777067071,
+              "ZONE:COMED": -6.819316322419957,
+              "ZONE:DAY": -3.974457433244993,
+              "ZONE:DEOK": -5.758867914012684,
+              "ZONE:DOM": -6.596400140368242,
+              "ZONE:DPL": -3.7443704241555933,
+              "ZONE:DUQ": -2.430997892384668,
+              "ZONE:EKPC": -4.586719787095256,
+              "ZONE:JCPL": -0.1831868815851977,
+              "ZONE:METED": 2.118266624213526,
+              "ZONE:MID-ATL/APS": -7.086114269867158,
+              "ZONE:OVEC": -2.4000091820517997,
+              "ZONE:PECO": 0.4013108024230611,
+              "ZONE:PENELEC": 1.0478665260297348,
+              "ZONE:PEPCO": -8.23247708623807,
+              "ZONE:PJM-RTO": -5.094589471427273,
+              "ZONE:PPL": 1.1485351259593262,
+              "ZONE:PSEG": 0.2587611114256121,
+              "ZONE:RECO": 0.79450106560973
+            }
+          }
+        },
+        "static_hybrid": {
+          "mean_daily_net_revenue": 14.700176883370425,
+          "difference_vs_best_static": 0.0,
+          "difference_7day_block_bootstrap_95ci": [
+            0.0,
+            0.0
+          ],
+          "difference_without_top_1_day": 0.0,
+          "difference_without_top_5_days": 0.0,
+          "difference_without_top_10_days": 0.0,
+          "revenue_components": {
+            "da_leg": 30.271587417273537,
+            "rt_deviation_leg": -0.36984231110897614,
+            "degradation_cost": 13.603635958591791,
+            "deviation_penalty": 1.5979322642023441
+          },
+          "mean_daily_throughput_mwh": 2.3866027997529464,
+          "forecast": {
+            "da_mae": 6.278627140092841,
+            "rt_at_da_mae": 8.97177908023178,
+            "spread_direction_accuracy": 0.5639839958021776,
+            "spread_amplitude_mae": 8.748678082450708
+          },
+          "node_robustness": {
+            "positive_nodes": 0,
+            "node_count": 35,
+            "worst_node_difference": 0.0,
+            "best_node_difference": 0.0,
+            "per_node_mean_difference": {
+              "HUB:AEP GEN HUB": 0.0,
+              "HUB:AEP-DAYTON HUB": 0.0,
+              "HUB:ATSI GEN HUB": 0.0,
+              "HUB:CHICAGO GEN HUB": 0.0,
+              "HUB:CHICAGO HUB": 0.0,
+              "HUB:DOMINION HUB": 0.0,
+              "HUB:EASTERN HUB": 0.0,
+              "HUB:N ILLINOIS HUB": 0.0,
+              "HUB:NEW JERSEY HUB": 0.0,
+              "HUB:OHIO HUB": 0.0,
+              "HUB:WEST INT HUB": 0.0,
+              "HUB:WESTERN HUB": 0.0,
+              "ZONE:AECO": 0.0,
+              "ZONE:AEP": 0.0,
+              "ZONE:APS": 0.0,
+              "ZONE:ATSI": 0.0,
+              "ZONE:BGE": 0.0,
+              "ZONE:COMED": 0.0,
+              "ZONE:DAY": 0.0,
+              "ZONE:DEOK": 0.0,
+              "ZONE:DOM": 0.0,
+              "ZONE:DPL": 0.0,
+              "ZONE:DUQ": 0.0,
+              "ZONE:EKPC": 0.0,
+              "ZONE:JCPL": 0.0,
+              "ZONE:METED": 0.0,
+              "ZONE:MID-ATL/APS": 0.0,
+              "ZONE:OVEC": 0.0,
+              "ZONE:PECO": 0.0,
+              "ZONE:PENELEC": 0.0,
+              "ZONE:PEPCO": 0.0,
+              "ZONE:PJM-RTO": 0.0,
+              "ZONE:PPL": 0.0,
+              "ZONE:PSEG": 0.0,
+              "ZONE:RECO": 0.0
+            }
+          }
+        },
+        "economic_regret_tree": {
+          "mean_daily_net_revenue": 14.700176883370425,
+          "difference_vs_best_static": 0.0,
+          "difference_7day_block_bootstrap_95ci": [
+            0.0,
+            0.0
+          ],
+          "difference_without_top_1_day": 0.0,
+          "difference_without_top_5_days": 0.0,
+          "difference_without_top_10_days": 0.0,
+          "revenue_components": {
+            "da_leg": 30.271587417273537,
+            "rt_deviation_leg": -0.36984231110897614,
+            "degradation_cost": 13.603635958591791,
+            "deviation_penalty": 1.5979322642023441
+          },
+          "mean_daily_throughput_mwh": 2.3866027997529464,
+          "forecast": {
+            "da_mae": 6.278627140092841,
+            "rt_at_da_mae": 8.97177908023178,
+            "spread_direction_accuracy": 0.5639839958021776,
+            "spread_amplitude_mae": 8.748678082450708
+          },
+          "node_robustness": {
+            "positive_nodes": 0,
+            "node_count": 35,
+            "worst_node_difference": 0.0,
+            "best_node_difference": 0.0,
+            "per_node_mean_difference": {
+              "HUB:AEP GEN HUB": 0.0,
+              "HUB:AEP-DAYTON HUB": 0.0,
+              "HUB:ATSI GEN HUB": 0.0,
+              "HUB:CHICAGO GEN HUB": 0.0,
+              "HUB:CHICAGO HUB": 0.0,
+              "HUB:DOMINION HUB": 0.0,
+              "HUB:EASTERN HUB": 0.0,
+              "HUB:N ILLINOIS HUB": 0.0,
+              "HUB:NEW JERSEY HUB": 0.0,
+              "HUB:OHIO HUB": 0.0,
+              "HUB:WEST INT HUB": 0.0,
+              "HUB:WESTERN HUB": 0.0,
+              "ZONE:AECO": 0.0,
+              "ZONE:AEP": 0.0,
+              "ZONE:APS": 0.0,
+              "ZONE:ATSI": 0.0,
+              "ZONE:BGE": 0.0,
+              "ZONE:COMED": 0.0,
+              "ZONE:DAY": 0.0,
+              "ZONE:DEOK": 0.0,
+              "ZONE:DOM": 0.0,
+              "ZONE:DPL": 0.0,
+              "ZONE:DUQ": 0.0,
+              "ZONE:EKPC": 0.0,
+              "ZONE:JCPL": 0.0,
+              "ZONE:METED": 0.0,
+              "ZONE:MID-ATL/APS": 0.0,
+              "ZONE:OVEC": 0.0,
+              "ZONE:PECO": 0.0,
+              "ZONE:PENELEC": 0.0,
+              "ZONE:PEPCO": 0.0,
+              "ZONE:PJM-RTO": 0.0,
+              "ZONE:PPL": 0.0,
+              "ZONE:PSEG": 0.0,
+              "ZONE:RECO": 0.0
+            }
+          }
+        },
+        "mae_regret_tree": {
+          "mean_daily_net_revenue": 14.700176883370425,
+          "difference_vs_best_static": 0.0,
+          "difference_7day_block_bootstrap_95ci": [
+            0.0,
+            0.0
+          ],
+          "difference_without_top_1_day": 0.0,
+          "difference_without_top_5_days": 0.0,
+          "difference_without_top_10_days": 0.0,
+          "revenue_components": {
+            "da_leg": 30.271587417273537,
+            "rt_deviation_leg": -0.36984231110897614,
+            "degradation_cost": 13.603635958591791,
+            "deviation_penalty": 1.5979322642023441
+          },
+          "mean_daily_throughput_mwh": 2.3866027997529464,
+          "forecast": {
+            "da_mae": 6.278627140092841,
+            "rt_at_da_mae": 8.97177908023178,
+            "spread_direction_accuracy": 0.5639839958021776,
+            "spread_amplitude_mae": 8.748678082450708
+          },
+          "node_robustness": {
+            "positive_nodes": 0,
+            "node_count": 35,
+            "worst_node_difference": 0.0,
+            "best_node_difference": 0.0,
+            "per_node_mean_difference": {
+              "HUB:AEP GEN HUB": 0.0,
+              "HUB:AEP-DAYTON HUB": 0.0,
+              "HUB:ATSI GEN HUB": 0.0,
+              "HUB:CHICAGO GEN HUB": 0.0,
+              "HUB:CHICAGO HUB": 0.0,
+              "HUB:DOMINION HUB": 0.0,
+              "HUB:EASTERN HUB": 0.0,
+              "HUB:N ILLINOIS HUB": 0.0,
+              "HUB:NEW JERSEY HUB": 0.0,
+              "HUB:OHIO HUB": 0.0,
+              "HUB:WEST INT HUB": 0.0,
+              "HUB:WESTERN HUB": 0.0,
+              "ZONE:AECO": 0.0,
+              "ZONE:AEP": 0.0,
+              "ZONE:APS": 0.0,
+              "ZONE:ATSI": 0.0,
+              "ZONE:BGE": 0.0,
+              "ZONE:COMED": 0.0,
+              "ZONE:DAY": 0.0,
+              "ZONE:DEOK": 0.0,
+              "ZONE:DOM": 0.0,
+              "ZONE:DPL": 0.0,
+              "ZONE:DUQ": 0.0,
+              "ZONE:EKPC": 0.0,
+              "ZONE:JCPL": 0.0,
+              "ZONE:METED": 0.0,
+              "ZONE:MID-ATL/APS": 0.0,
+              "ZONE:OVEC": 0.0,
+              "ZONE:PECO": 0.0,
+              "ZONE:PENELEC": 0.0,
+              "ZONE:PEPCO": 0.0,
+              "ZONE:PJM-RTO": 0.0,
+              "ZONE:PPL": 0.0,
+              "ZONE:PSEG": 0.0,
+              "ZONE:RECO": 0.0
+            }
+          }
+        },
+        "economic_no_tail_tree": {
+          "mean_daily_net_revenue": 14.674384162321317,
+          "difference_vs_best_static": -0.025792721049110814,
+          "difference_7day_block_bootstrap_95ci": [
+            -0.13409922469112862,
+            0.054342304004320933
+          ],
+          "difference_without_top_1_day": -0.07674219883585971,
+          "difference_without_top_5_days": -0.08349823411808363,
+          "difference_without_top_10_days": -0.08468428857998823,
+          "revenue_components": {
+            "da_leg": 30.30662292105329,
+            "rt_deviation_leg": -0.3739638445432228,
+            "degradation_cost": 13.664674305069175,
+            "deviation_penalty": 1.5936006091195822
+          },
+          "mean_daily_throughput_mwh": 2.3973112815910835,
+          "forecast": {
+            "da_mae": 6.213724983614801,
+            "rt_at_da_mae": 8.94706115579547,
+            "spread_direction_accuracy": 0.562288469106651,
+            "spread_amplitude_mae": 8.747735631021946
+          },
+          "node_robustness": {
+            "positive_nodes": 3,
+            "node_count": 35,
+            "worst_node_difference": -0.06688371222084252,
+            "best_node_difference": 0.11213263436064229,
+            "per_node_mean_difference": {
+              "HUB:AEP GEN HUB": -0.031513085322413495,
+              "HUB:AEP-DAYTON HUB": -0.0446275201339611,
+              "HUB:ATSI GEN HUB": -0.04598690483808348,
+              "HUB:CHICAGO GEN HUB": 0.0,
+              "HUB:CHICAGO HUB": 0.0,
+              "HUB:DOMINION HUB": -0.03615707700205556,
+              "HUB:EASTERN HUB": -0.05489254460668604,
+              "HUB:N ILLINOIS HUB": 0.0,
+              "HUB:NEW JERSEY HUB": -0.02848376142330706,
+              "HUB:OHIO HUB": -0.030198601947511786,
+              "HUB:WEST INT HUB": -0.04830325487614968,
+              "HUB:WESTERN HUB": -0.046111984661487505,
+              "ZONE:AECO": -0.05597501420475209,
+              "ZONE:AEP": -0.04069444885319297,
+              "ZONE:APS": -0.048244956153786565,
+              "ZONE:ATSI": -0.04589531356500319,
+              "ZONE:BGE": -0.034934612553935394,
+              "ZONE:COMED": 0.0,
+              "ZONE:DAY": -0.02919928130883527,
+              "ZONE:DEOK": -0.00039038566536738964,
+              "ZONE:DOM": 0.11213263436064229,
+              "ZONE:DPL": -0.05555017960321202,
+              "ZONE:DUQ": -0.0330978486283755,
+              "ZONE:EKPC": -0.024210301271282826,
+              "ZONE:JCPL": -0.06688371222084252,
+              "ZONE:METED": -0.019210301787005526,
+              "ZONE:MID-ATL/APS": -0.04142703163555882,
+              "ZONE:OVEC": -0.03307332841458299,
+              "ZONE:PECO": -0.05806736062009522,
+              "ZONE:PENELEC": -0.03325131237681348,
+              "ZONE:PEPCO": -0.03809743889486134,
+              "ZONE:PJM-RTO": -0.050912785864751856,
+              "ZONE:PPL": -0.021014479374453617,
+              "ZONE:PSEG": 0.030732559358019218,
+              "ZONE:RECO": 0.05079439737082469
+            }
+          }
+        }
+      },
+      "router": {
+        "kind": "economic_regret_tree",
+        "feature_count": 3,
+        "features": [
+          "dlinear_spread_q90",
+          "dlinear_spread_max_up_ramp",
+          "rt_at_da_disagreement_max"
+        ],
+        "rules": "|--- dlinear_spread_max_up_ramp <= 172.85\n|   |--- dlinear_spread_q90 <= 74.14\n|   |   |--- value: [24.76]\n|   |--- dlinear_spread_q90 >  74.14\n|   |   |--- value: [289.13]\n|--- dlinear_spread_max_up_ramp >  172.85\n|   |--- rt_at_da_disagreement_max <= 68.52\n|   |   |--- value: [-1704.04]\n|   |--- rt_at_da_disagreement_max >  68.52\n|   |   |--- value: [-220.12]\n",
+        "leaves": [
+          {
+            "node": 2,
+            "samples": 9702,
+            "predicted_advantage": 24.75822682277225
+          },
+          {
+            "node": 3,
+            "samples": 335,
+            "predicted_advantage": 289.13032092390995
+          },
+          {
+            "node": 5,
+            "samples": 100,
+            "predicted_advantage": -1704.043579338781
+          },
+          {
+            "node": 6,
+            "samples": 361,
+            "predicted_advantage": -220.12177464804492
+          }
+        ],
+        "dlinear_selected_node_day_rate": 1.0,
+        "predicted_advantage_mean": 25.382482062680488,
+        "predicted_advantage_positive_mean": 25.382482062680488
+      },
+      "economic_router_uses_tail_or_spread_feature": true,
+      "tail_profit_attribution": {
+        "subsets_are_nonexclusive_except_ordinary": true,
+        "thresholds": {
+          "da_q99": 80.35346122741697,
+          "absolute_da_ramp_q99": 24.88093009948729,
+          "absolute_da_rt_spread_q95": 23.970553684234613
+        },
+        "groups": {
+          "negative_price": {
+            "node_day_count": 472,
+            "mean_profit_difference": 0.0,
+            "total_profit_difference": 0.0,
+            "share_of_total_improvement": null
+          },
+          "positive_spike_q99": {
+            "node_day_count": 1015,
+            "mean_profit_difference": 0.0,
+            "total_profit_difference": 0.0,
+            "share_of_total_improvement": null
+          },
+          "rapid_ramp_q99": {
+            "node_day_count": 1250,
+            "mean_profit_difference": 0.0,
+            "total_profit_difference": 0.0,
+            "share_of_total_improvement": null
+          },
+          "extreme_da_rt_spread_q95": {
+            "node_day_count": 6069,
+            "mean_profit_difference": 0.0,
+            "total_profit_difference": 0.0,
+            "share_of_total_improvement": null
+          },
+          "ordinary": {
+            "node_day_count": 6353,
+            "mean_profit_difference": 0.0,
+            "total_profit_difference": 0.0,
+            "share_of_total_improvement": null
+          }
+        }
+      }
+    }
+  },
+  "market_equal_summary": {
+    "mean_daily_profit_difference_vs_best_static": -4.699825858536215,
+    "hierarchical_7day_block_bootstrap_95ci": [
+      -21.42882655706235,
+      10.440724359052334
+    ],
+    "positive_markets": 0,
+    "economic_router_beats_or_ties_mae_router_markets": 3
+  },
+  "pre_registered_gate": {
+    "positive_vs_best_static_at_least_3_of_4": false,
+    "market_equal_profit_difference_positive": false,
+    "economic_not_worse_than_mae_router_at_least_3_of_4": true,
+    "tail_or_spread_feature_used_in_every_fold": true,
+    "main_method_passes_pre_registered_core_gate": false
+  },
+  "claim": "history_assisted_gate_failed_stop_router_research"
+}

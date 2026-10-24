@@ -88,6 +88,23 @@ def test_da_direction_uses_da_minus_rt_at_da_spread():
     assert late.dispatch.da_discharge_mwh[1] > 0.0
 
 
+def test_da_lp_clips_only_solver_scale_soc_boundary_noise():
+    solved = solve_predicted_da_penalty_lp_day(
+        [50.0, 50.0],
+        [0.0, 100.0],
+        _simulator(),
+        initial_plan_soc_mwh=3.6 + 5e-8,
+    )
+    assert solved.dispatch.da_soc_path_mwh[0] == pytest.approx(3.6)
+    with pytest.raises(ValueError, match="initial_plan_soc_mwh"):
+        solve_predicted_da_penalty_lp_day(
+            [50.0, 50.0],
+            [0.0, 100.0],
+            _simulator(),
+            initial_plan_soc_mwh=3.6 + 1e-5,
+        )
+
+
 def test_backtest_decisions_do_not_use_realized_prices():
     delivery_date = date(2023, 1, 3)
     timestamps = pd.date_range(

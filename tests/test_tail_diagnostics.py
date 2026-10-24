@@ -9,6 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from decision_aware.tail_diagnostics import (
+    daily_peak_report,
+    event_detection_report,
     fit_tail_thresholds,
     price_slice_report,
     settlement_slice_report,
@@ -67,6 +69,50 @@ def test_settlement_slices_sum_the_complete_hourly_ledger():
     assert report["all"]["total_net_revenue"] == pytest.approx(12.0)
     assert report["da_negative_price"]["hours"] == 1
     assert report["da_negative_price"]["total_net_revenue"] == pytest.approx(2.25)
+
+
+def test_event_detection_separates_exact_tolerant_and_magnitude_metrics():
+    truth = np.asarray([[0.0, 12.0, 0.0, 0.0]])
+    prediction = np.asarray([[0.0, 0.0, 11.0, 0.0]])
+    report = event_detection_report(
+        prediction, truth, threshold=10.0, direction="above", tolerance_hours=1
+    )
+    assert report["true_events"] == 1
+    assert report["predicted_events"] == 1
+    assert report["exact"]["recall"] == pytest.approx(0.0)
+    assert report["within_1h"]["recall"] == pytest.approx(1.0)
+    assert report["within_1h"]["precision"] == pytest.approx(1.0)
+    # 真实超阈值幅度为2，预测在真实事件时刻没有超阈值。
+    assert report["magnitude_ratio_at_true_events"] == pytest.approx(0.0)
+
+
+def test_negative_event_report_uses_depth_below_zero():
+    truth = np.asarray([[-10.0, 2.0, -20.0]])
+    prediction = np.asarray([[-5.0, -1.0, 3.0]])
+    report = event_detection_report(
+        prediction, truth, threshold=0.0, direction="below", tolerance_hours=0
+    )
+    assert report["true_events"] == 2
+    assert report["exact"]["recall"] == pytest.approx(0.5)
+    assert report["exact"]["precision"] == pytest.approx(0.5)
+    assert report["magnitude_ratio_at_true_events"] == pytest.approx(1 / 6)
+    assert report["wrong_side_rate_at_true_events"] == pytest.approx(0.5)
+
+
+def test_daily_peak_report_measures_timing_and_peak_compression():
+    truth = np.asarray([
+        [[0.0, 10.0, 100.0, 0.0], [0.0, 1.0, 2.0, 0.0]],
+    ])
+    prediction = np.asarray([
+        [[0.0, 20.0, 10.0, 0.0], [0.0, 0.0, 1.0, 0.0]],
+    ])
+    report = daily_peak_report(prediction, truth, positive_threshold=50.0)
+    assert report["node_days"] == 1
+    assert report["exact_hour_rate"] == pytest.approx(0.0)
+    assert report["within_1h_rate"] == pytest.approx(1.0)
+    assert report["mean_absolute_timing_error_hours"] == pytest.approx(1.0)
+    assert report["predicted_daily_peak_to_true_peak_ratio"] == pytest.approx(0.2)
+    assert report["prediction_at_true_peak_to_true_peak_ratio"] == pytest.approx(0.1)
 
 
 def test_pooled_xgboost_loader_enforces_zero_shot_contract(tmp_path, monkeypatch):

@@ -102,3 +102,60 @@ def test_outer_conversion_refuses_corrupted_settlement_truth(outer_files):
     np.savez(path, **arrays)
     with pytest.raises(ValueError, match="真值"):
         prepare(sources, templates, output, phase="outer")
+
+
+def test_final_conversion_requires_locked_no_selection_metadata(tmp_path):
+    sources = tmp_path / "sources"
+    templates = tmp_path / "templates"
+    output = tmp_path / "output"
+    sources.mkdir()
+    templates.mkdir()
+    source_paths = {}
+    for task in ("da", "rt_at_da", "rt"):
+        target = np.ones(
+            (1, 2, 24, 4) if task == "rt" else (1, 2, 24),
+            dtype=np.float32,
+        )
+        arrays = {
+            "nodes": np.array(["N"]),
+            "dates": np.array(["2025-01-01", "2025-01-02"]),
+            "prediction": target,
+            "target": target,
+            "metadata": json.dumps({
+                "protocol": "all_market_locked_2025",
+                "selection_allowed": False,
+                "checkpoint_phase": "final",
+            }),
+        }
+        if task == "rt_at_da":
+            arrays["target_da"] = target
+        source_paths[task] = sources / f"{task}.npz"
+        np.savez(source_paths[task], **arrays)
+
+        template = {
+            "nodes": arrays["nodes"],
+            "dates": arrays["dates"],
+            "prediction": target,
+            "target_rt": target,
+        }
+        if task == "da":
+            template["target_da"] = target
+        if task == "rt":
+            template.update(
+                executed_timestamps=np.zeros((2, 24)),
+                timezone="America/Chicago",
+            )
+        np.savez(templates / f"ensemble_{task}_final_seed0.npz", **template)
+
+    prepare(
+        sources,
+        templates,
+        output,
+        phase="final",
+        family="candidate",
+        source_paths=source_paths,
+    )
+    with np.load(output / "candidate_da_final_seed0.npz") as archive:
+        metadata = json.loads(str(archive["metadata"]))
+        assert metadata["phase"] == "final"
+        assert metadata["protocol"] == "all_market_locked_2025_decision_aware_followup"
