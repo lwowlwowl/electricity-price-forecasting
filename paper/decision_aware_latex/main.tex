@@ -75,6 +75,8 @@
 
 本文所称“端到端”是指收益梯度能够穿过最优决策返回价格预测网络；编码器保持冻结，因此它是\textbf{决策目标端到端、部分参数微调}，而不是全参数端到端训练。正式评价使用精确日前线性规划（LP）和滚动模型预测控制（MPC）进行全年连续结算，而非训练 QP 的近似目标。
 
+在美国市场的冻结实验完成后，本文又把全部可迁移系统原样接入奥地利原生 15 分钟数据，作为不参与训练和选模的外部压力测试。该实验不是把奥地利数据重采样成新的训练集，而是通过一个确定性的时间、货币和频率接口检验已冻结小时模型能否迁移到不同市场制度；具体协议与结果见第~\ref{sec:austria} 节。
+
 \section{任务、数据与正式结算}
 
 \subsection{市场和时间边界}
@@ -599,6 +601,105 @@ DA 计划收益 & RT 偏差收益 & 退化成本 & 偏差罚金 & 净收益 & SO
 
 净收益主要来自 DA 计划腿；RT 层提供小幅正偏差收益，同时承担退化与偏差成本。删除候选最有利的 5 日后仍保持正差，说明提升不能由少数极端价格日单独解释。
 
+\section{奥地利 15 分钟外部迁移与结算}
+\label{sec:austria}
+
+\subsection{外部测试定位与数据边界}
+
+奥地利实验只用于严格外部测试。奥地利价格、负荷、风电和光伏数据均不进入训练、微调、归一化参数拟合、seed 选择、阈值选择、模型筛选或融合权重选择；执行器中不存在优化器、\texttt{backward} 或 \texttt{fit} 路径。原始 Parquet 文件在运行前后核对 SHA--256，以防评价过程中发生改写。逐节点 XGBoost 因需要目标节点标签训练而不具备参评资格；LEAR 因缺少完整 rolling RT 腿而不进入收益榜。
+
+奥地利日前市场价格由 APG 公布，奥地利控制区的不平衡价格具有 15 分钟分辨率\cite{apgda,apgmarket}；欧洲日前订单簿通常在交付日前 12:00 CET 关闭\cite{epexmarket}。因此本文将日前起报点固定为当地时间 D--1 12:00。完整可比区间为 2025 年 10 月 1 日至 2026 年 9 月 1 日（右开），共 335 个当地日、32,160 个原生 15 分钟交付段。2026 年 9 月缺少完整不平衡结算价，同时会破坏 rolling RT 的历史输入，故不进入统一排名。
+
+所有原始时刻首先保留在单调递增的 UTC 时间轴上，再转换为 \texttt{Europe/Vienna} 计算当地交付日、小时和星期。结算不删除也不补造夏令时段：秋季回拨日含 100 个 15 分钟段，春季跳时日含 92 个段，其余完整日含 96 个段。这样避免了把重复的当地小时错误去重，或为不存在的当地小时伪造观测。
+
+\subsection{冻结小时模型到 15 分钟市场的确定性接口}
+
+本项目全部正式模型均为小时模型。为保持零样本条件，本文没有用奥地利标签把它们重训为 15 分钟模型，而只建立如下只读接口：
+\begin{enumerate}
+  \item \textbf{历史聚合：}每个已完成 UTC 小时内的四个 15 分钟观测取均值，构成冻结模型所需的 168 小时历史。该小时视图只用于推理，原始 15 分钟数据不被改写。
+  \item \textbf{当地日历：}小时、星期、月份和周末特征由 \texttt{Europe/Vienna} 时间重新计算，不使用原文件中按 UTC 生成的日历列；没有可靠对齐的奥地利节假日标记设为中性值 0。
+  \item \textbf{货币桥接：}美国模型的训练价格单位为 USD/MWh。按预先冻结的 ECB 2024 年年度参考汇率 $1\,\mathrm{EUR}=1.0824\,\mathrm{USD}$，因果历史价格先转成美元输入模型，预测再转回欧元后才计算误差和结算\cite{ecbfx}。负荷、风电和光伏等物理量不做货币换算。
+  \item \textbf{预测展开：}若冻结模型对当地钟表小时 $h$ 给出预测 $\hat p_h^{60}$，则该小时内四个交付段使用
+  \begin{equation}
+    \hat p_{h,r}^{15}=\hat p_h^{60},\qquad r\in\{0,1,2,3\}.
+    \label{eq:quarter-expand}
+  \end{equation}
+  这只是零阶保持，不声称模型能够识别小时内部四段的差异。夏令时回拨产生的两个同名小时使用同一钟表小时预测，但仍作为 UTC 上不同的八个交付段分别结算。
+  \item \textbf{滚动执行：}rolling RT 模型仍每个整点产生未来 4 小时预测；15 分钟 MPC 在每个交付段重解，并使用最近一次整点预测展开后尚未过去的部分。例如 14:15 重解时，窗口从 14:15 开始，而不是重新调用小时模型或窥视 14:15 之后的真实价格。
+\end{enumerate}
+
+表~\ref{tab:austria-transfer} 给出每类模型在这一共同接口中的具体迁移方式。所有神经网络、树模型、LoRA adapter、校准器和 Router 均读取美国阶段已经冻结的权重；奥地利只提供因果历史和最终结算真值。
+
+\begin{table}[H]
+\centering
+\caption{冻结模型迁移到奥地利 15 分钟数据的具体方式。}
+\label{tab:austria-transfer}
+\scriptsize
+\begin{tabularx}{\textwidth}{p{26mm} Y Y}
+\toprule
+系统 & 奥地利推理输入与冻结组件 & 15 分钟输出及限制 \\
+\midrule
+lag-168 & 对各任务复制严格滞后 168 小时的同任务价格；无参数 & 小时值按式~\eqref{eq:quarter-expand} 展开 \\
+pooled XGBoost & 冻结的四市场共享树；从同一 168 小时因果样本构造既定特征，不含市场或节点 ID & 不在奥地利重拟合树或 scaler；逐节点版本不参评 \\
+DLinear & DA 使用 DA 价格历史，RT-at-DA 与 rolling RT 使用 RT 价格历史；固定 seed 0 权重 & 三任务分别预测，输出做零阶保持 \\
+TimesFM-2.5 LoRA & 冻结 TimesFM-2.5 骨干及三个美国监督 rank-4 adapter；每个任务只读自身 168 小时价格历史 & 是普通价格损失 LoRA，不含奥地利微调或收益梯度 \\
+TimesFM-3 frozen & 官方冻结模型；价格历史和当地日历，rolling RT 额外读取起报时已公布的未来 DA 价格 & 不使用项目监督标签，保持官方零样本推理 \\
+原 Transformer & 三个美国训练 seed 等权；读取历史 DA/RT、实际负荷、风光及重算后的当地日历，不输入身份 & 未来真实负荷、风光和 RT 均不可见 \\
+Decision-aware v4 & 三个已完成美国 decision-aware 微调的三任务模型；seed0、三 seed 等权和冻结校准器均原样加载 & 最终方法在预测层固定为 $\tfrac23$ seed0 $+\tfrac13$ 稳健校准分支，权重不按奥地利结果调整 \\
+三特征 Router & 冻结 ERCOT 2023--2024 浅树及 0.70 阈值；在原 Transformer 与 DLinear 之间选择 DA、RT-at-DA，rolling RT 始终用 Transformer & 路由器不看奥地利真实收益，也不重新训练 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{原生 15 分钟双结算}
+
+预测虽然来自小时模型，电池决策和收益核算并未降为小时级。令 $\Delta=0.25$ 小时，$c_k,d_k$ 为第 $k$ 个 15 分钟段的 MW 功率，并定义该段实际能量净注入 $q_k=\Delta(d_k-c_k)$。日前计划 $q_k^{DA}$ 在 D--1 12:00 后按整日 92、96 或 100 段一次求解并锁定；实时动作 $q_k^{RT}$ 每 15 分钟由 MPC 重解且只执行第一步。当地日净收益为
+\begin{equation}
+\begin{aligned}
+R_d=\sum_{k\in d}\Big[
+&p_k^{DA}q_k^{DA}+p_k^{RT}(q_k^{RT}-q_k^{DA})\\
+&-\kappa_{EUR}(d_k^{E}+c_k^{E})
+-2|p_k^{RT}|e_k
+\Big],
+\end{aligned}
+\label{eq:austria-revenue}
+\end{equation}
+其中 $d_k^{E}=\Delta d_k$、$c_k^{E}=\Delta c_k$，$\kappa_{EUR}=5.2661$ EUR/MWh，且
+\begin{equation}
+e_k=\max\!\left(|q_k^{RT}-q_k^{DA}|-0.03|q_k^{DA}|,0\right).
+\end{equation}
+SOC 按 15 分钟能量更新，功率上限仍为 1 MW，因此单段最多充电或放电 0.25 MWh；容量为 4 MWh，SOC 范围为 $[0.4,3.6]$ MWh，效率分量为 0.95，每个当地日的放电额度为 4 MWh。计划 SOC 与实际 SOC 都连续传递，不在每日开始时重置为 2 MWh；只有首次评价起点为 2 MWh。真实 DA 和不平衡价格只在动作确定后进入式~\eqref{eq:austria-revenue}，不会返回模型或用于选择系统。
+
+\subsection{外部结果与解释边界}
+
+\begin{table}[H]
+\centering
+\caption{奥地利 335 日原生 15 分钟外部测试。收益单位为 EUR/竞价区$\cdot$日，误差单位为 EUR/MWh。}
+\label{tab:austria-ranking}
+\footnotesize
+\begin{tabular}{lrrr}
+\toprule
+系统 & 净收益 & DA MAE & rolling RT MAE \\
+\midrule
+本文 v4 最终 2:1 融合 & \best{96.04} & 24.76 & 45.31 \\
+本文 v4 seed0 & 87.61 & 25.19 & 45.49 \\
+本文 v4 三 seed 等权 & 85.69 & 24.63 & 45.13 \\
+本文 v4 稳健校准 & 77.41 & 24.66 & 45.24 \\
+TimesFM-2.5 LoRA & 38.23 & 29.50 & 48.64 \\
+pooled XGBoost & -47.25 & 30.17 & 46.76 \\
+三特征 Router & -49.36 & 26.20 & 46.77 \\
+DLinear & -68.71 & 29.41 & 51.23 \\
+原 Transformer 三 seed & -74.68 & \best{24.00} & 46.77 \\
+TimesFM-3 frozen & -300.63 & 49.27 & 47.61 \\
+lag-168 & -458.99 & 29.94 & 73.47 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+最终 v4 相对最强可迁移冻结基线 TimesFM-2.5 LoRA 的点估计提高 57.81 EUR/日（151.19\%）；删除差值最大的 5 日后仍提高 32.78 EUR/日，全部系统的 SOC 违规均为 0。然而，按同一天配对的 7 日区块 bootstrap 95\% 区间为 $[-27.47,138.89]$，仍跨 0。因此可以陈述“点估计最高且去极端日后方向不变”，不能陈述“统计显著超过 TimesFM-2.5”。
+
+原 Transformer 的 DA MAE 最低但收益为负，而 v4 的 MAE 略高、收益最高，说明外部优势仍主要来自价格排序和 DA--RT 价差的决策价值，而不是普通误差全面更小。该实验验证的是\textbf{冻结小时模型经确定性接口迁移到 15 分钟结算}，不是原生 15 分钟模型；真正建模小时内四段差异需要重新构造 15 分钟训练样本、预测范围和可微决策层，并重新训练全部方法。
+
 \section{可解释性、局限与主张边界}
 
 \subsection{哪一部分是 Decision-aware}
@@ -634,7 +735,7 @@ implicit-QP 微调 & 价格锚点 + 真实收益 & 是 & 收益梯度经 KKT 返
 
 \subsection{泛化范围与局限}
 
-2023 证明模型可从三个源市场零样本迁移到 ERCOT；2024 检查冻结配置的跨年稳定性；2025 检查四市场历史重训后的最终效果。但只有 ERCOT 具有完整、冻结并审计的真实双结算评价，因此不能据此宣称在四个真实市场上都实现利润领先。
+2023 证明模型可从三个美国源市场零样本迁移到 ERCOT；2024 检查冻结配置的跨年稳定性；2025 检查四市场历史重训后的最终效果。奥地利实验进一步提供了一个完全不参与训练和选择的外部竞价区，但采用的是小时预测到 15 分钟结算的确定性接口，且只有一个竞价区和 335 个完整日。因此不能把奥地利 EUR/竞价区$\cdot$日与 ERCOT USD/节点$\cdot$日直接比较，也不能据此宣称已在多个真实欧洲市场上普遍实现利润领先。
 
 本文也不主张可微优化本身是新算法。相关数学基础已经由 OptNet、可微凸优化层和 decision-focused learning 文献建立
 \cite{amos2017,agrawal2019,donti2017}。本文的新意限定为三价格腿、双结算合同、稳健多 seed 校准和严格时间协议的组合。
@@ -657,6 +758,9 @@ implicit-QP 微调 & 价格锚点 + 真实收益 & 是 & 收益梯度经 KKT 返
 可微 QP & \texttt{src/decision\_aware/implicit\_battery\_qp.py} \\
 联合训练 & \texttt{scripts/decision\_aware/train\_global\_joint\_implicit\_qp.py} \\
 稳健校准 & \texttt{scripts/decision\_aware/train\_global\_robust\_ensemble\_calibrator.py} \\
+奥地利冻结协议 & \texttt{configs/decision\_aware/austria\_external\_15min\_v1.json} \\
+奥地利适配与结算 & \texttt{src/decision\_aware/austria\_external.py} \\
+奥地利完整汇总 & \texttt{data/results/austria\_external\_15min\_v1/summary.json} \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -665,7 +769,7 @@ implicit-QP 微调 & 价格锚点 + 真实收益 & 是 & 收益梯度经 KKT 返
 
 本文构建了一个面向储能双结算的跨市场端到端决策感知电价预测框架。三个价格预测器通过强凸平滑电池 QP 映射为 DA 计划、RT 动作和 SOC，真实价格下的收益梯度利用 KKT 隐式微分返回 decoder 与 price head；稳健校准器再通过凸 seed 权重和有界价格修正降低随机种子及市场迁移方差。
 
-统一实验表明，最终 v4 在开发年、冻结确认年和最终评价年均超过相应主对照；2025 相对 DLinear 和 Router 的配对区间均高于 0，删除最有利的 5 日后仍保持正差，全年 SOC 违规为 0。结果支持一个简洁结论：\textbf{当最终目标是储能收益时，预测模型应在保持价格语义的同时，显式学习预测对可行决策和经济后果的影响。}
+统一实验表明，最终 v4 在开发年、冻结确认年和最终评价年均超过相应主对照；2025 相对 DLinear 和 Router 的配对区间均高于 0，删除最有利的 5 日后仍保持正差，全年 SOC 违规为 0。完全冻结后迁移到奥地利原生 15 分钟结算时，v4 仍取得最高点估计，并显著优于其原始价格模型；但相对最强 TimesFM-2.5 基线的区间仍跨 0，应保留统计边界。结果支持一个简洁结论：\textbf{当最终目标是储能收益时，预测模型应在保持价格语义的同时，显式学习预测对可行决策和经济后果的影响。}
 
 \begin{thebibliography}{99}
 \small
@@ -759,6 +863,26 @@ Y. Liu, B. Xu, and Y. Shi.
 B. Efron and R. J. Tibshirani.
 \newblock \emph{An Introduction to the Bootstrap}.
 \newblock Chapman \& Hall/CRC, 1993.
+
+\bibitem{apgda}
+Austrian Power Grid.
+\newblock Day-Ahead prices.
+\newblock \url{https://markt.apg.at/en/transparency/transmission/day-ahead-prices/}, accessed 2026-10-25.
+
+\bibitem{apgmarket}
+Austrian Power Grid.
+\newblock Austrian electricity market model and 15-minute imbalance energy prices.
+\newblock \url{https://markt.apg.at/en/electricity-market/austrian-electricity-market-model/}, accessed 2026-10-25.
+
+\bibitem{epexmarket}
+EPEX SPOT.
+\newblock Basics of the Power Market: Day-Ahead and Intraday markets.
+\newblock \url{https://www.epexspot.com/en/basicspowermarket}, accessed 2026-10-25.
+
+\bibitem{ecbfx}
+European Central Bank.
+\newblock EXR exchange-rate dataset and reference-rate methodology.
+\newblock \url{https://data.ecb.europa.eu/data/datasets/EXR}, accessed 2026-10-25.
 
 \end{thebibliography}
 

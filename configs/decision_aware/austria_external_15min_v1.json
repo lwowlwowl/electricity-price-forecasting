@@ -1,0 +1,69 @@
+{
+  "protocol_version": "austria_external_15min_v1",
+  "status": "frozen_before_scoring",
+  "raw_parquet": "data/Austria/奥地利_20250801_20260930.parquet",
+  "raw_sha256": "7dec9dabd778a042836c88b3c3460140f0057aff6e5d8a8e775a95ad8e9b887a",
+  "market": "Austria",
+  "timezone": "Europe/Vienna",
+  "currency": "EUR",
+  "evaluation": {
+    "forecast_start_local": "2025-10-01T00:00:00",
+    "forecast_end_local_exclusive": "2026-10-01T00:00:00",
+    "complete_dual_settlement_end_local_exclusive": "2026-09-01T00:00:00",
+    "native_interval_minutes": 15,
+    "day_ahead_gate_closure_local": "D-1 12:00",
+    "day_ahead_gate_source": "https://www.epexspot.com/en/basicspowermarket",
+    "fifteen_minute_sdam_source": "https://markt.apg.at/en/"
+  },
+  "strict_external_test": {
+    "austria_training_allowed": false,
+    "austria_finetuning_allowed": false,
+    "austria_scaler_fitting_allowed": false,
+    "austria_seed_selection_allowed": false,
+    "austria_model_or_threshold_selection_allowed": false,
+    "austria_fusion_weight_selection_allowed": false,
+    "failed_models_must_remain_reported": true
+  },
+  "hourly_model_adapter": {
+    "raw_data_rewritten": false,
+    "causal_history_aggregation": "mean of completed 15-minute observations in each UTC hour",
+    "forecast_expansion": "each frozen hourly prediction is repeated over its four native 15-minute delivery periods",
+    "dst_rule": "settlement remains on the native UTC timeline; local days retain 92, 96, or 100 quarters",
+    "rolling_rt_refresh": "hourly frozen model; 15-minute MPC re-solves using the remaining forecast from the latest hourly issue"
+  },
+  "currency_bridge": {
+    "eur_to_usd": 1.0824,
+    "source": "ECB annual EUR reference rate for 2024; USD per EUR",
+    "source_url": "https://data.ecb.europa.eu/data/datasets/EXR/EXR.A.USD.EUR.SP00.A",
+    "rule": "convert causal EUR price inputs to the training currency before inference and convert predictions back to EUR before metrics and settlement"
+  },
+  "battery": {
+    "power_mw": 1.0,
+    "energy_mwh": 4.0,
+    "efficiency_component": 0.95,
+    "initial_soc_mwh": 2.0,
+    "soc_min_mwh": 0.4,
+    "soc_max_mwh": 3.6,
+    "daily_discharge_cap_mwh": 4.0,
+    "degradation_eur_per_mwh": 5.266075388026607,
+    "deviation_tolerance_fraction": 0.03,
+    "deviation_penalty_abs_rt_multiplier": 2.0
+  },
+  "eligible_systems": [
+    "seasonal_lag168",
+    "pooled_xgboost",
+    "dlinear",
+    "timesfm25_lora",
+    "timesfm3_frozen",
+    "transformer_three_seed_equal",
+    "decision_aware_v4_seed0",
+    "decision_aware_v4_three_seed_equal",
+    "decision_aware_v4_robust_calibrated",
+    "decision_aware_v4_final_2to1_blend",
+    "three_feature_tail_expert_router"
+  ],
+  "ineligible_systems": {
+    "per_node_xgboost": "requires Austria target-label training",
+    "lear": "no complete rolling-RT leg under the frozen project contract"
+  }
+}
