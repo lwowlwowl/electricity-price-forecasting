@@ -76,7 +76,7 @@ try {
         'configs/decision_aware/universal_lomo_holdout_ercot_da_peakdynamic_v1.yaml',
         'configs/decision_aware/universal_lomo_holdout_ercot_da_peakdynamic_seed1_v1.yaml',
         'configs/decision_aware/universal_lomo_holdout_ercot_da_peakdynamic_seed2_v1.yaml',
-        'docs/progress/5_尾部事件与幅度建模/8_DA局部峰值幅度多seed与动作机制审计预注册.md',
+        'docs/progress/5_尾部事件与幅度建模/3_局部峰值幅度后训练.md',
         'data/checkpoints/universal_lomo_holdout_ercot_mae_v1/da_inner_seed0/best.pt',
         'data/checkpoints/universal_lomo_holdout_ercot_mae_v1/da_inner_seed1/best.pt',
         'data/checkpoints/universal_lomo_holdout_ercot_mae_v1/da_inner_seed2/best.pt',

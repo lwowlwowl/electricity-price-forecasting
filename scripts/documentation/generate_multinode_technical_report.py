@@ -1711,7 +1711,7 @@ def build_story() -> list:
         ["最终2025统一汇总", "data/results/allmarket_locked_2025_summary_v2.json"],
         ["最终盈利主张审计", "data/results/allmarket_locked_2025_profit_claim_audit_v1.json"],
         ["历史经济状态头", "data/results/global_economic_regime_multiseed_continuous_mpc_v1.json"],
-        ["最终口径文档", "docs/progress/4_多市场审计与最终基线/12_2025一次性锁定测试最终结论.md"],
+        ["最终口径文档", "docs/progress/4_多市场审计与最终基线/5_最终四市场训练与2025锁定结果.md"],
     ], [48 * mm, 126 * mm]))
     story.append(H2("12.3 当前架构图"))
     story.append(P(
@@ -2658,11 +2658,11 @@ def build_academic_story() -> list:
         ["DA LP / RT MPC", "src/decision_aware/continuous_mpc.py"],
         ["2025统一汇总", "data/results/allmarket_locked_2025_summary_v2.json"],
         ["盈利审计", "data/results/allmarket_locked_2025_profit_claim_audit_v1.json"],
-        ["最终结论", "docs/progress/4_多市场审计与最终基线/12_2025一次性锁定测试最终结论.md"],
-        ["正峰值多seed结论", "docs/progress/5_尾部事件与幅度建模/9_DA局部峰值幅度多seed稳健性与动作机制结论.md"],
-        ["正尖峰概率门控结论", "docs/progress/5_尾部事件与幅度建模/13_正尖峰概率门控三折可用性审计结论.md"],
-        ["专家路由ERCOT结论", "docs/progress/6_经济协调与专家路由/9_收益优先尾部专家路由结果与2025固定跟进.md"],
-        ["专家路由跨市场结论", "docs/progress/6_经济协调与专家路由/11_冻结尾部专家路由跨市场迁移结果.md"],
+        ["最终结论", "docs/progress/4_多市场审计与最终基线/5_最终四市场训练与2025锁定结果.md"],
+        ["正峰值多seed结论", "docs/progress/5_尾部事件与幅度建模/3_局部峰值幅度后训练.md"],
+        ["正尖峰概率门控结论", "docs/progress/5_尾部事件与幅度建模/4_正尖峰概率路线.md"],
+        ["专家路由ERCOT结论", "docs/progress/6_经济协调与专家路由/2_收益优先专家路由与跨市场迁移.md"],
+        ["专家路由跨市场结论", "docs/progress/6_经济协调与专家路由/2_收益优先专家路由与跨市场迁移.md"],
     ], [48 * mm, 126 * mm]))
     story.append(H2("A.2 完整性与停止规则"))
     story.append(bullets([

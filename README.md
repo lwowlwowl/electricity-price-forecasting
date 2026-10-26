@@ -16,6 +16,9 @@ SOC 违规为 0。完整冻结与跨年证据见
 `docs/progress/7_端到端Decision-aware重启与跨年验证/3_v4冻结与2024外层确认.md`及
 `docs/progress/7_端到端Decision-aware重启与跨年验证/4_2025锁定跟进.md`。
 
+此外，所有模型均已按冻结、零样本协议迁移到奥地利原生15分钟市场；奥地利数据不参与训练、
+选模或seed选择。协议与结果见`docs/progress/100_奥地利15分钟外部验证/`。
+
 Router、尾部适配和经济价差分解保留为历史对照与负结果，不再代表当前主线。当前处于方法、外部
 验证和论文材料整理阶段，尚未获得老师的投稿许可，也没有进入“论文冻结/投稿准备”状态。
 
@@ -34,19 +37,17 @@ src/models/                   季节性/树/RNN/Foundation基线适配
 src/evaluation/               回测与指标
 scripts/decision_aware/       当前审计、训练、比较入口
 tests/                        数据与收益正确性测试
-docs/PRD_DA_RT独立建模与跨模态融合.md
+docs/README.md                文档状态与阅读入口
 docs/concepts/transformer_3day_learning_plan.md
-docs/model_architecture.drawio
-docs/training_loop.drawio
-docs/da_model_architecture.drawio
-docs/rt_model_architecture.drawio
 docs/progress/                本轮按顺序整理的实施结论
+paper/decision_aware_latex/   当前 LaTeX 论文材料
 data/markets/                 唯一正式市场数据入口
+data/Austria/                 只用于零样本外部评价的奥地利15分钟数据
 external/                     三个原始模型及worker环境
 ```
 
-`docs/concepts/transformer_from_scratch.md`是Transformer入门说明；`TODO-WIN.md`只记录不阻塞当前
-阶段的未来结构研究候选，不属于第三阶段自动待办。
+`docs/concepts/transformer_from_scratch.md`是Transformer入门说明。旧Global PRD和`TODO-WIN.md`
+已移入`docs/archive/`，仅供追溯，不能当作当前待办恢复执行。
 `runtime_cache/` 只保存可重新生成的安装缓存、基础模型worker缓存和PDF预览，已被Git忽略。
 
 ## 归档位置

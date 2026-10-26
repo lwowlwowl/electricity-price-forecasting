@@ -6,9 +6,11 @@
 当前请优先看：
 
 - 根目录 `README.md`：当前项目入口与最小结构；
+- `docs/README.md`：当前文档地图与状态规则；
+- 根目录 `BASELINES.md`：冻结基线与统一比较口径；
 - `docs/progress/1_总索引与基础单节点流程/1_阶段索引.md`：全阶段最短阅读路径；
 - `docs/progress/7_端到端Decision-aware重启与跨年验证/5_阶段索引.md`：当前阶段入口；
-- `docs/PRD_DA_RT独立建模与跨模态融合.md`：当前实施要求；
+- `docs/progress/100_奥地利15分钟外部验证/`：外部验证协议与结果；
 - `docs/concepts/transformer_3day_learning_plan.md`：学习顺序。
 
 本目录中的旧TODO不会物理删除：若干历史汇报和代码注释仍引用它们，保留有助于复核实验决策。
@@ -22,3 +24,8 @@
 - todo3、todo3_2、todo4和w10提取文本；
 - 先行版、正式版与v8阶段历史结果；
 - 项目整理前的完整README快照。
+
+2026-10-26新增归档：
+
+- `PRD_DA_RT独立建模与跨模态融合.md`：已闭环Global阶段的需求与主张边界；
+- `TODO-WIN.md`：QueryDecoder全局上下文的未来消融备忘。
