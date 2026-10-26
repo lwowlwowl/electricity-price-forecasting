@@ -45,8 +45,8 @@ def resolve_market_unified_path(market: str) -> str:
     path = os.path.abspath(os.path.join(_DATA_ROOT, market, filename))
     if not os.path.isfile(path):
         raise FileNotFoundError(
-            f"找不到 {market} 统一小时数据。请把团队数据包解压到：\n"
-            f"  {path}"
+            f"找不到 {market} 统一小时数据。请确认仓库中的 Parquet 已完整拉取。\n"
+            f"预期路径：{path}"
         )
     return path
 
