@@ -1,0 +1,71 @@
+{
+  "model": "Chronos2-ZS-fat-proxy14plus3",
+  "status": "approximate_reproduction_not_exact_teacher_run",
+  "protocol": "365 local days; native 15-minute truth and prediction",
+  "teacher_protocol_difference": "teacher board has 366 days; local file has 365 days",
+  "context_length": {
+    "maximum": 8192,
+    "minimum_available": 5184
+  },
+  "used_known_future_teacher_family_proxies": [
+    "hour_sin",
+    "hour_cos",
+    "dow",
+    "is_weekend",
+    "month_sin",
+    "month_cos",
+    "is_holiday",
+    "at_load_da_proxy",
+    "at_solar_da_proxy",
+    "at_resload_da_proxy",
+    "at_gen_da_a71_proxy",
+    "wx_temp_c_proxy",
+    "wx_wind10_ms_proxy",
+    "wx_sw_rad_proxy"
+  ],
+  "used_past_only_teacher_family_proxies": [
+    "gen_solar_lag24",
+    "gen_resload_lag24",
+    "gen_renewable_share_lag24"
+  ],
+  "unavailable_teacher_features": [
+    "wx_cloud_pct",
+    "ttf",
+    "nine unavailable gen_*_lag24 series"
+  ],
+  "added_non_teacher_features": [],
+  "austria_training_or_tuning_used": false,
+  "metrics": {
+    "all": 18.802962060416327,
+    "neg": 23.378668918100644,
+    "spike": 24.350202948796365,
+    "ordinary": 14.015801473402238
+  },
+  "teacher_comparison": {
+    "all": {
+      "ours": 18.802962060416327,
+      "teacher": 18.139,
+      "absolute_gap_ours_minus_teacher": 0.6639620604163277,
+      "relative_gap_percent": 3.6604116016115906
+    },
+    "neg": {
+      "ours": 23.378668918100644,
+      "teacher": 22.793,
+      "absolute_gap_ours_minus_teacher": 0.5856689181006445,
+      "relative_gap_percent": 2.569512210330549
+    },
+    "spike": {
+      "ours": 24.350202948796365,
+      "teacher": 22.947,
+      "absolute_gap_ours_minus_teacher": 1.4032029487963662,
+      "relative_gap_percent": 6.114973411759128
+    },
+    "ordinary": {
+      "ours": 14.015801473402238,
+      "teacher": 13.786,
+      "absolute_gap_ours_minus_teacher": 0.22980147340223844,
+      "relative_gap_percent": 1.666919145526169
+    }
+  },
+  "device": "cuda"
+}

@@ -1,0 +1,32 @@
+{
+  "protocol": "paired_austria_settlement_365_v1",
+  "candidate": "decision_aware_v4_final_2to1_blend",
+  "comparator": "three_feature_tail_expert_router",
+  "days": 365,
+  "mean_difference_eur_per_day": 176.09683193566653,
+  "median_paired_difference_eur_per_day": 54.23936970502024,
+  "candidate_better_day_rate": 0.6657534246575343,
+  "paired_7day_block_bootstrap_95ci": [
+    81.73408022483358,
+    275.21073357586664
+  ],
+  "mean_difference_without_best_5_difference_days": 133.20373854124998,
+  "candidate_mean_without_its_top_5_revenue_days": 68.45818511333583,
+  "comparator_mean_without_its_top_5_revenue_days": -106.12234144152204,
+  "mean_daily_components": {
+    "decision_aware_v4_final_2to1_blend": {
+      "da_leg": 233.20391084886387,
+      "rt_deviation_leg": -12.98541933206107,
+      "degradation_cost": 27.03238650936314,
+      "deviation_penalty": 108.6768486029781,
+      "throughput_mwh": 5.133307922409591
+    },
+    "three_feature_tail_expert_router": {
+      "da_leg": 128.35221999233312,
+      "rt_deviation_leg": -16.658265980414278,
+      "degradation_cost": 20.1040761855564,
+      "deviation_penalty": 183.1774533575675,
+      "throughput_mwh": 3.817658256709869
+    }
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "protocol": "austria_settlement_365_v1",
+  "status": "complete",
+  "selection_allowed": false,
+  "austria_training_or_tuning_used": false,
+  "evaluation": {
+    "days": 365,
+    "quarters": 35040,
+    "local_interval": [
+      "2025-10-01 00:00:00+02:00",
+      "2026-09-30 23:45:00+02:00"
+    ],
+    "forecast_resolution": "frozen hourly forecasts repeated over four native quarter-hours",
+    "settlement_resolution": "native 15-minute LP/MPC and cash settlement",
+    "dst_rule": "native local days retain 92, 96, or 100 quarters",
+    "group_counts": {
+      "neg": 63,
+      "spike": 112,
+      "ordinary": 190
+    }
+  },
+  "sources": {
+    "september_rt": {
+      "source": "APCS Statistik-RZ September 2026",
+      "sha256": "f168e748cb06208387a9e7902e8b6cc6cd2ddd6185384f069cf5925de3036a5e",
+      "august_overlap_verification": {
+        "overlap_quarters": 2976,
+        "max_absolute_difference_eur_per_mwh": 0.005579999999994811,
+        "mean_absolute_difference_eur_per_mwh": 0.0024403158602146575,
+        "interpretation": "same field; differences are explained by two-decimal rounding"
+      }
+    },
+    "october_first_da_boundary": {
+      "source": "Energy-Charts AT day-ahead price",
+      "purpose": "known future DA input for the last three rolling-RT issue hours only",
+      "license_info": "CC BY 4.0 (creativecommons.org/licenses/by/4.0) from Bundesnetzagentur | SMARD.de",
+      "unit": "EUR / MWh",
+      "sha256": "f839f6381dc5cdfbd2c65e8a1f0a0de3dcd29ad947d51ba241d70b9350291b01",
+      "september_exact_overlap_verification": {
+        "overlap_quarters": 2880,
+        "max_absolute_difference_eur_per_mwh": 0.0
+      },
+      "september_source_metadata": {
+        "license_info": "CC BY 4.0 (creativecommons.org/licenses/by/4.0) from Bundesnetzagentur | SMARD.de",
+        "unit": "EUR / MWh",
+        "sha256": "6cdcf8774d1c1c7955aca45b4fb8a820fd41f87abb03465aac1355793fd857b8"
+      }
+    },
+    "frozen_parquet_modified": false
+  },
+  "battery": {
+    "power_mw": 1.0,
+    "energy_mwh": 4.0,
+    "efficiency_component": 0.95,
+    "initial_soc_mwh": 2.0,
+    "soc_min_mwh": 0.4,
+    "soc_max_mwh": 3.6,
+    "daily_discharge_cap_mwh": 4.0,
+    "degradation_eur_per_mwh": 5.266075388026607,
+    "deviation_tolerance_fraction": 0.03,
+    "deviation_penalty_abs_rt_multiplier": 2.0
+  },
+  "systems": {
+    "decision_aware_v4_final_2to1_blend": {
+      "settlement": {
+        "days": 365,
+        "mean_daily_net_revenue_eur": 84.50925640446145,
+        "median_daily_net_revenue_eur": 84.5537425409787,
+        "p10_daily_net_revenue_eur": -166.4781973400061,
+        "positive_day_rate": 0.6520547945205479,
+        "mean_daily_throughput_mwh": 5.133307922409591,
+        "soc_violation_count": 0,
+        "final_soc_mwh": 0.4066315789473695
+      },
+      "by_day_group": {
+        "all": {
+          "days": 365,
+          "mean_net_revenue_eur_per_day": 84.50925640446145,
+          "positive_day_rate": 0.6520547945205479
+        },
+        "neg": {
+          "days": 63,
+          "mean_net_revenue_eur_per_day": 276.23748992835647,
+          "positive_day_rate": 0.8253968253968254
+        },
+        "spike": {
+          "days": 112,
+          "mean_net_revenue_eur_per_day": 46.51007363361485,
+          "positive_day_rate": 0.7321428571428571
+        },
+        "ordinary": {
+          "days": 190,
+          "mean_net_revenue_eur_per_day": 43.335728816721605,
+          "positive_day_rate": 0.5473684210526316
+        }
+      }
+    },
+    "three_feature_tail_expert_router": {
+      "settlement": {
+        "days": 365,
+        "mean_daily_net_revenue_eur": -91.58757553120506,
+        "median_daily_net_revenue_eur": 0.0,
+        "p10_daily_net_revenue_eur": -466.5022013079568,
+        "positive_day_rate": 0.4246575342465753,
+        "mean_daily_throughput_mwh": 3.817658256709869,
+        "soc_violation_count": 0,
+        "final_soc_mwh": 0.7513022246337497
+      },
+      "by_day_group": {
+        "all": {
+          "days": 365,
+          "mean_net_revenue_eur_per_day": -91.58757553120506,
+          "positive_day_rate": 0.4246575342465753
+        },
+        "neg": {
+          "days": 63,
+          "mean_net_revenue_eur_per_day": 142.98078899837674,
+          "positive_day_rate": 0.6031746031746031
+        },
+        "spike": {
+          "days": 112,
+          "mean_net_revenue_eur_per_day": -294.09791086746276,
+          "positive_day_rate": 0.41964285714285715
+        },
+        "ordinary": {
+          "days": 190,
+          "mean_net_revenue_eur_per_day": -49.99099346648294,
+          "positive_day_rate": 0.3684210526315789
+        }
+      }
+    }
+  },
+  "runtime_seconds": 335.81051569999545,
+  "raw_parquet_sha256": "7dec9dabd778a042836c88b3c3460140f0057aff6e5d8a8e775a95ad8e9b887a"
+}

@@ -1,0 +1,57 @@
+{
+  "model": "TimesFM3-ZS-mainU11-proxy6",
+  "status": "approximate_reproduction_not_exact_teacher_run",
+  "protocol": "365 local days; native 15-minute truth and prediction",
+  "teacher_protocol_difference": "teacher board has 366 days; local file has 365 days",
+  "context_length": 4096,
+  "used_teacher_feature_proxies": [
+    "at_gen_da_a71_proxy",
+    "at_resload_da_proxy",
+    "at_solar_da_proxy",
+    "at_wind_da_proxy",
+    "wx_sw_rad_proxy",
+    "wx_wind10_ms_proxy"
+  ],
+  "unavailable_teacher_features": [
+    "maxbex_at_de",
+    "maxbex_at_hu",
+    "maxbex_cz_at",
+    "maxbex_de_at",
+    "ttf"
+  ],
+  "added_non_teacher_features": [],
+  "austria_training_or_tuning_used": false,
+  "metrics": {
+    "all": 18.840952288319748,
+    "neg": 22.88799553534457,
+    "spike": 24.872659842611895,
+    "ordinary": 13.943505074407726
+  },
+  "teacher_comparison": {
+    "all": {
+      "ours": 18.840952288319748,
+      "teacher": 16.532,
+      "absolute_gap_ours_minus_teacher": 2.308952288319748,
+      "relative_gap_percent": 13.96656356351167
+    },
+    "neg": {
+      "ours": 22.88799553534457,
+      "teacher": 20.052,
+      "absolute_gap_ours_minus_teacher": 2.835995535344569,
+      "relative_gap_percent": 14.14320534283149
+    },
+    "spike": {
+      "ours": 24.872659842611895,
+      "teacher": 21.065,
+      "absolute_gap_ours_minus_teacher": 3.807659842611894,
+      "relative_gap_percent": 18.07576474062138
+    },
+    "ordinary": {
+      "ours": 13.943505074407726,
+      "teacher": 12.714,
+      "absolute_gap_ours_minus_teacher": 1.2295050744077258,
+      "relative_gap_percent": 9.67048194437412
+    }
+  },
+  "device": "cuda"
+}

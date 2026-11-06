@@ -1,0 +1,98 @@
+{
+  "protocol": "austria_da_mae_365_v1",
+  "status": "complete",
+  "selection_allowed": false,
+  "austria_training_or_tuning_used": false,
+  "evaluation": {
+    "days": 365,
+    "quarters": 35040,
+    "local_interval": [
+      "2025-10-01 00:00:00+02:00",
+      "2026-09-30 23:45:00+02:00"
+    ],
+    "mae_aggregation": "point-weighted over native 15-minute rows",
+    "dst_rule": "native local days retain 92, 96, or 100 quarters",
+    "group_precedence": "negative first; otherwise spike; otherwise ordinary",
+    "spike_floor_eur_per_mwh": 212.456,
+    "group_counts": {
+      "neg": 63,
+      "spike": 112,
+      "ordinary": 190
+    }
+  },
+  "rt_history_extension": {
+    "purpose": "DA-model causal input only; no settlement is run",
+    "september_source": "APCS Statistik-RZ September 2026",
+    "source_url": "https://www.apcs.at/fileadmin/user_upload/APCS/Daten_Preise/RZ-Statistik/Statistik-RZ_202609_NEU.xlsx",
+    "source_sha256": "f168e748cb06208387a9e7902e8b6cc6cd2ddd6185384f069cf5925de3036a5e",
+    "quarters_filled": 2880,
+    "rounding": "rounded to two decimals to match the frozen parquet field",
+    "august_overlap_verification": {
+      "overlap_quarters": 2976,
+      "max_absolute_difference_eur_per_mwh": 0.005579999999994811,
+      "mean_absolute_difference_eur_per_mwh": 0.0024403158602146575,
+      "interpretation": "same field; differences are explained by two-decimal rounding"
+    },
+    "frozen_parquet_modified": false
+  },
+  "router": {
+    "hybrid_selection_days": 149,
+    "hybrid_selection_rate": 0.40821917808219177,
+    "router_sha256": "1526e1bc43ca09abade12e43aeb1c403d36f8818a8c37eb488bc0f91489f73f7"
+  },
+  "systems": {
+    "decision_aware_v4_final_2to1_blend": {
+      "all": {
+        "days": 365,
+        "quarters": 35040,
+        "point_weighted_mae_eur_per_mwh": 25.687045700178185,
+        "daily_macro_mae_eur_per_mwh": 25.68769888839753
+      },
+      "neg": {
+        "days": 63,
+        "quarters": 6048,
+        "point_weighted_mae_eur_per_mwh": 31.3359737641974,
+        "daily_macro_mae_eur_per_mwh": 31.3359737641974
+      },
+      "spike": {
+        "days": 112,
+        "quarters": 10752,
+        "point_weighted_mae_eur_per_mwh": 32.385519171354495,
+        "daily_macro_mae_eur_per_mwh": 32.385519171354495
+      },
+      "ordinary": {
+        "days": 190,
+        "quarters": 18240,
+        "point_weighted_mae_eur_per_mwh": 19.865406243309994,
+        "daily_macro_mae_eur_per_mwh": 19.866661052257683
+      }
+    },
+    "three_feature_tail_expert_router": {
+      "all": {
+        "days": 365,
+        "quarters": 35040,
+        "point_weighted_mae_eur_per_mwh": 27.18669249357772,
+        "daily_macro_mae_eur_per_mwh": 27.18715115221964
+      },
+      "neg": {
+        "days": 63,
+        "quarters": 6048,
+        "point_weighted_mae_eur_per_mwh": 34.164278337145525,
+        "daily_macro_mae_eur_per_mwh": 34.164278337145525
+      },
+      "spike": {
+        "days": 112,
+        "quarters": 10752,
+        "point_weighted_mae_eur_per_mwh": 35.04571907018237,
+        "daily_macro_mae_eur_per_mwh": 35.04571907018238
+      },
+      "ordinary": {
+        "days": 190,
+        "quarters": 18240,
+        "point_weighted_mae_eur_per_mwh": 20.240382573975122,
+        "daily_macro_mae_eur_per_mwh": 20.241263681366185
+      }
+    }
+  },
+  "raw_parquet_sha256": "7dec9dabd778a042836c88b3c3460140f0057aff6e5d8a8e775a95ad8e9b887a"
+}

@@ -1,0 +1,811 @@
+{
+  "protocol": "austria_da_day_groups_v1",
+  "status": "our_frozen_systems_complete_teacher_models_pending_predictions",
+  "selection_allowed": false,
+  "spike_floor_eur_per_mwh": 212.456,
+  "group_precedence": "negative first; otherwise spike; otherwise ordinary",
+  "teacher_board_reconciliation": {
+    "teacher_title": "2025-10-01 to 2026-10-01",
+    "teacher_days": 366,
+    "teacher_group_counts": {
+      "neg": 63,
+      "spike": 112,
+      "ordinary": 191
+    },
+    "local_truth_interval": [
+      "2025-10-01 00:00:00+02:00",
+      "2026-09-30 23:45:00+02:00"
+    ],
+    "local_days": 365,
+    "local_group_counts": {
+      "neg": 63,
+      "spike": 112,
+      "ordinary": 190
+    },
+    "interpretation": "Local truth exactly matches teacher negative and spike counts; the board has one additional ordinary day, consistent with including 2026-10-01 while the local file ends at that day's 00:00 local boundary."
+  },
+  "frozen_common_interval": {
+    "days": 335,
+    "quarters": 32160,
+    "local_interval": [
+      "2025-10-01 00:00:00+02:00",
+      "2026-08-31 23:45:00+02:00"
+    ],
+    "group_counts": {
+      "neg": 59,
+      "spike": 86,
+      "ordinary": 190
+    }
+  },
+  "ranking_by_da_mae": [
+    {
+      "rank": 1,
+      "system": "transformer_three_seed_equal",
+      "all_mae": 23.996371247411115,
+      "neg_mae": 30.821428273328628,
+      "spike_mae": 30.902485616944144,
+      "ordinary_mae": 18.751085982627046,
+      "mean_complete_system_revenue_eur_per_day": -74.68094582419164
+    },
+    {
+      "rank": 2,
+      "system": "decision_aware_v4_three_seed_equal",
+      "all_mae": 24.632061211134445,
+      "neg_mae": 30.569141870050572,
+      "spike_mae": 31.263753789810988,
+      "ordinary_mae": 19.786727944596375,
+      "mean_complete_system_revenue_eur_per_day": 85.68647780703162
+    },
+    {
+      "rank": 3,
+      "system": "decision_aware_v4_robust_calibrated",
+      "all_mae": 24.6572537564637,
+      "neg_mae": 30.622134475016367,
+      "spike_mae": 31.16896912829598,
+      "ordinary_mae": 19.857593312399572,
+      "mean_complete_system_revenue_eur_per_day": 77.41338621907707
+    },
+    {
+      "rank": 4,
+      "system": "decision_aware_v4_final_2to1_blend",
+      "all_mae": 24.75871090851026,
+      "neg_mae": 30.97580036642305,
+      "spike_mae": 31.304287750035783,
+      "ordinary_mae": 19.865406243309994,
+      "mean_complete_system_revenue_eur_per_day": 96.04332817516007
+    },
+    {
+      "rank": 5,
+      "system": "decision_aware_v4_seed0",
+      "all_mae": 25.18625780752844,
+      "neg_mae": 31.8274994387392,
+      "spike_mae": 31.923614179084232,
+      "ordinary_mae": 20.074437259132466,
+      "mean_complete_system_revenue_eur_per_day": 87.60699060896224
+    },
+    {
+      "rank": 6,
+      "system": "three_feature_tail_expert_router",
+      "all_mae": 26.199686109007104,
+      "neg_mae": 33.576592443346705,
+      "spike_mae": 34.30468841051919,
+      "ordinary_mae": 20.240382573975122,
+      "mean_complete_system_revenue_eur_per_day": -49.355869543233204
+    },
+    {
+      "rank": 7,
+      "system": "dlinear",
+      "all_mae": 29.410853689744727,
+      "neg_mae": 36.99823507395741,
+      "spike_mae": 37.497183217027704,
+      "ordinary_mae": 23.394644000192706,
+      "mean_complete_system_revenue_eur_per_day": -68.70596404493435
+    },
+    {
+      "rank": 8,
+      "system": "timesfm25_lora",
+      "all_mae": 29.495358743279425,
+      "neg_mae": 42.67447749798076,
+      "spike_mae": 37.00298212731313,
+      "ordinary_mae": 22.0047081245727,
+      "mean_complete_system_revenue_eur_per_day": 38.234892815654504
+    },
+    {
+      "rank": 9,
+      "system": "seasonal_lag168",
+      "all_mae": 29.94465713619914,
+      "neg_mae": 36.24442891214783,
+      "spike_mae": 37.915773239945544,
+      "ordinary_mae": 24.380433348287752,
+      "mean_complete_system_revenue_eur_per_day": -458.99153802369847
+    },
+    {
+      "rank": 10,
+      "system": "pooled_xgboost",
+      "all_mae": 30.16878967773213,
+      "neg_mae": 45.94855362165649,
+      "spike_mae": 37.75638634695979,
+      "ordinary_mae": 21.834371855389424,
+      "mean_complete_system_revenue_eur_per_day": -47.2473429239491
+    },
+    {
+      "rank": 11,
+      "system": "timesfm3_frozen",
+      "all_mae": 49.27346906277209,
+      "neg_mae": 82.72895953458904,
+      "spike_mae": 57.672717659807866,
+      "ordinary_mae": 35.08289370918116,
+      "mean_complete_system_revenue_eur_per_day": -300.62956429451987
+    }
+  ],
+  "systems": {
+    "decision_aware_v4_final_2to1_blend": {
+      "forecast": {
+        "all": {
+          "days": 335,
+          "quarters": 32160,
+          "point_weighted_mae_eur_per_mwh": 24.75871090851026,
+          "daily_macro_mae_eur_per_mwh": 24.759422591197
+        },
+        "neg": {
+          "days": 59,
+          "quarters": 5664,
+          "point_weighted_mae_eur_per_mwh": 30.97580036642305,
+          "daily_macro_mae_eur_per_mwh": 30.975800366423048
+        },
+        "spike": {
+          "days": 86,
+          "quarters": 8256,
+          "point_weighted_mae_eur_per_mwh": 31.304287750035783,
+          "daily_macro_mae_eur_per_mwh": 31.304287750035787
+        },
+        "ordinary": {
+          "days": 190,
+          "quarters": 18240,
+          "point_weighted_mae_eur_per_mwh": 19.865406243309994,
+          "daily_macro_mae_eur_per_mwh": 19.866661052257683
+        }
+      },
+      "complete_system_settlement": {
+        "all": {
+          "days": 335,
+          "mean_net_revenue_eur_per_day": 96.04332817516007,
+          "positive_day_rate": 0.6417910447761194
+        },
+        "neg": {
+          "days": 59,
+          "mean_net_revenue_eur_per_day": 253.98499034944734,
+          "positive_day_rate": 0.8135593220338984
+        },
+        "spike": {
+          "days": 86,
+          "mean_net_revenue_eur_per_day": 104.13502363818749,
+          "positive_day_rate": 0.7325581395348837
+        },
+        "ordinary": {
+          "days": 190,
+          "mean_net_revenue_eur_per_day": 43.335728816721605,
+          "positive_day_rate": 0.5473684210526316
+        }
+      },
+      "forecast_resolution": "frozen hourly forecast repeated to native quarter-hours",
+      "strict_external_test": true,
+      "evidence": {
+        "robust_three_seed_weight": 0.3333333333333333,
+        "rule": "prediction-layer 2:1 blend frozen before Austria scoring",
+        "seed0_weight": 0.6666666666666666
+      }
+    },
+    "decision_aware_v4_robust_calibrated": {
+      "forecast": {
+        "all": {
+          "days": 335,
+          "quarters": 32160,
+          "point_weighted_mae_eur_per_mwh": 24.6572537564637,
+          "daily_macro_mae_eur_per_mwh": 24.658021614471338
+        },
+        "neg": {
+          "days": 59,
+          "quarters": 5664,
+          "point_weighted_mae_eur_per_mwh": 30.622134475016367,
+          "daily_macro_mae_eur_per_mwh": 30.622134475016367
+        },
+        "spike": {
+          "days": 86,
+          "quarters": 8256,
+          "point_weighted_mae_eur_per_mwh": 31.16896912829598,
+          "daily_macro_mae_eur_per_mwh": 31.168969128295984
+        },
+        "ordinary": {
+          "days": 190,
+          "quarters": 18240,
+          "point_weighted_mae_eur_per_mwh": 19.857593312399572,
+          "daily_macro_mae_eur_per_mwh": 19.858947167307775
+        }
+      },
+      "complete_system_settlement": {
+        "all": {
+          "days": 335,
+          "mean_net_revenue_eur_per_day": 77.41338621907707,
+          "positive_day_rate": 0.573134328358209
+        },
+        "neg": {
+          "days": 59,
+          "mean_net_revenue_eur_per_day": 222.19671824178585,
+          "positive_day_rate": 0.6610169491525424
+        },
+        "spike": {
+          "days": 86,
+          "mean_net_revenue_eur_per_day": 116.4803005669457,
+          "positive_day_rate": 0.6395348837209303
+        },
+        "ordinary": {
+          "days": 190,
+          "mean_net_revenue_eur_per_day": 14.771432412463787,
+          "positive_day_rate": 0.5157894736842106
+        }
+      },
+      "forecast_resolution": "frozen hourly forecast repeated to native quarter-hours",
+      "strict_external_test": true,
+      "evidence": {
+        "calibrator": "faee6ffc9c48c2c6dd5b30231a4a8fceedae4bdb78c3826457848a2905042d9f",
+        "seed0": {
+          "da": "fdbea7657310cf4ffac5ec9c85e0ea1c30e3bff58493230edec1f34561a257f2",
+          "rt": "4a3836c803cf27d9a95eb0d62b9c92cf0783be284239d5e8b2abedbe231d1991",
+          "rt_at_da": "3089e83d7dbd85073ca46cd60f10dd4a80be837bf246b0167a899e0a0d402c12"
+        },
+        "seed1": {
+          "da": "b296cf6072a3fb7fa9d0cc12bd538438000b650d571756c7611534dc662b1417",
+          "rt": "a8f18a8bc0ef2e8b9885c05f59a5e8f4bde1c90b781c0d0c5c8c5bcff76adabb",
+          "rt_at_da": "9458f8d26cd447d82e2f32b3d8bf1239fc68824b9a2354cf9a0cd1e662a81020"
+        },
+        "seed2": {
+          "da": "a82d2229b2db5914bfb8735f2ea40543692cdd7ae7e0df5b122071b7c2705f33",
+          "rt": "e7ddc081fc8f3971958f17cb6952ff96fb02470a1595ffe3ba9056db6730fbcb",
+          "rt_at_da": "54aaecccdf7302384b97f8a8c2b9fc2eab71fb6f34f290cc01e59713725e3624"
+        }
+      }
+    },
+    "decision_aware_v4_seed0": {
+      "forecast": {
+        "all": {
+          "days": 335,
+          "quarters": 32160,
+          "point_weighted_mae_eur_per_mwh": 25.18625780752844,
+          "daily_macro_mae_eur_per_mwh": 25.186941809702976
+        },
+        "neg": {
+          "days": 59,
+          "quarters": 5664,
+          "point_weighted_mae_eur_per_mwh": 31.8274994387392,
+          "daily_macro_mae_eur_per_mwh": 31.827499438739203
+        },
+        "spike": {
+          "days": 86,
+          "quarters": 8256,
+          "point_weighted_mae_eur_per_mwh": 31.923614179084232,
+          "daily_macro_mae_eur_per_mwh": 31.923614179084236
+        },
+        "ordinary": {
+          "days": 190,
+          "quarters": 18240,
+          "point_weighted_mae_eur_per_mwh": 20.074437259132466,
+          "daily_macro_mae_eur_per_mwh": 20.07564326296653
+        }
+      },
+      "complete_system_settlement": {
+        "all": {
+          "days": 335,
+          "mean_net_revenue_eur_per_day": 87.60699060896224,
+          "positive_day_rate": 0.6656716417910448
+        },
+        "neg": {
+          "days": 59,
+          "mean_net_revenue_eur_per_day": 195.2256450328109,
+          "positive_day_rate": 0.7966101694915254
+        },
+        "spike": {
+          "days": 86,
+          "mean_net_revenue_eur_per_day": 153.66585507221583,
+          "positive_day_rate": 0.7674418604651163
+        },
+        "ordinary": {
+          "days": 190,
+          "mean_net_revenue_eur_per_day": 24.288238215031342,
+          "positive_day_rate": 0.5789473684210527
+        }
+      },
+      "forecast_resolution": "frozen hourly forecast repeated to native quarter-hours",
+      "strict_external_test": true,
+      "evidence": {
+        "seed0": {
+          "da": "fdbea7657310cf4ffac5ec9c85e0ea1c30e3bff58493230edec1f34561a257f2",
+          "rt": "4a3836c803cf27d9a95eb0d62b9c92cf0783be284239d5e8b2abedbe231d1991",
+          "rt_at_da": "3089e83d7dbd85073ca46cd60f10dd4a80be837bf246b0167a899e0a0d402c12"
+        }
+      }
+    },
+    "decision_aware_v4_three_seed_equal": {
+      "forecast": {
+        "all": {
+          "days": 335,
+          "quarters": 32160,
+          "point_weighted_mae_eur_per_mwh": 24.632061211134445,
+          "daily_macro_mae_eur_per_mwh": 24.632846099081306
+        },
+        "neg": {
+          "days": 59,
+          "quarters": 5664,
+          "point_weighted_mae_eur_per_mwh": 30.569141870050572,
+          "daily_macro_mae_eur_per_mwh": 30.569141870050572
+        },
+        "spike": {
+          "days": 86,
+          "quarters": 8256,
+          "point_weighted_mae_eur_per_mwh": 31.263753789810988,
+          "daily_macro_mae_eur_per_mwh": 31.263753789810988
+        },
+        "ordinary": {
+          "days": 190,
+          "quarters": 18240,
+          "point_weighted_mae_eur_per_mwh": 19.786727944596375,
+          "daily_macro_mae_eur_per_mwh": 19.78811182597636
+        }
+      },
+      "complete_system_settlement": {
+        "all": {
+          "days": 335,
+          "mean_net_revenue_eur_per_day": 85.68647780703162,
+          "positive_day_rate": 0.582089552238806
+        },
+        "neg": {
+          "days": 59,
+          "mean_net_revenue_eur_per_day": 236.7170340201276,
+          "positive_day_rate": 0.6779661016949152
+        },
+        "spike": {
+          "days": 86,
+          "mean_net_revenue_eur_per_day": 109.28580621720795,
+          "positive_day_rate": 0.6511627906976745
+        },
+        "ordinary": {
+          "days": 190,
+          "mean_net_revenue_eur_per_day": 28.10571433414829,
+          "positive_day_rate": 0.5210526315789473
+        }
+      },
+      "forecast_resolution": "frozen hourly forecast repeated to native quarter-hours",
+      "strict_external_test": true,
+      "evidence": {
+        "seed0": {
+          "da": "fdbea7657310cf4ffac5ec9c85e0ea1c30e3bff58493230edec1f34561a257f2",
+          "rt": "4a3836c803cf27d9a95eb0d62b9c92cf0783be284239d5e8b2abedbe231d1991",
+          "rt_at_da": "3089e83d7dbd85073ca46cd60f10dd4a80be837bf246b0167a899e0a0d402c12"
+        },
+        "seed1": {
+          "da": "b296cf6072a3fb7fa9d0cc12bd538438000b650d571756c7611534dc662b1417",
+          "rt": "a8f18a8bc0ef2e8b9885c05f59a5e8f4bde1c90b781c0d0c5c8c5bcff76adabb",
+          "rt_at_da": "9458f8d26cd447d82e2f32b3d8bf1239fc68824b9a2354cf9a0cd1e662a81020"
+        },
+        "seed2": {
+          "da": "a82d2229b2db5914bfb8735f2ea40543692cdd7ae7e0df5b122071b7c2705f33",
+          "rt": "e7ddc081fc8f3971958f17cb6952ff96fb02470a1595ffe3ba9056db6730fbcb",
+          "rt_at_da": "54aaecccdf7302384b97f8a8c2b9fc2eab71fb6f34f290cc01e59713725e3624"
+        }
+      }
+    },
+    "dlinear": {
+      "forecast": {
+        "all": {
+          "days": 335,
+          "quarters": 32160,
+          "point_weighted_mae_eur_per_mwh": 29.410853689744727,
+          "daily_macro_mae_eur_per_mwh": 29.412888924506305
+        },
+        "neg": {
+          "days": 59,
+          "quarters": 5664,
+          "point_weighted_mae_eur_per_mwh": 36.99823507395741,
+          "daily_macro_mae_eur_per_mwh": 36.99823507395742
+        },
+        "spike": {
+          "days": 86,
+          "quarters": 8256,
+          "point_weighted_mae_eur_per_mwh": 37.497183217027704,
+          "daily_macro_mae_eur_per_mwh": 37.49718321702771
+        },
+        "ordinary": {
+          "days": 190,
+          "quarters": 18240,
+          "point_weighted_mae_eur_per_mwh": 23.394644000192706,
+          "daily_macro_mae_eur_per_mwh": 23.39823244043022
+        }
+      },
+      "complete_system_settlement": {
+        "all": {
+          "days": 335,
+          "mean_net_revenue_eur_per_day": -68.70596404493435,
+          "positive_day_rate": 0.3880597014925373
+        },
+        "neg": {
+          "days": 59,
+          "mean_net_revenue_eur_per_day": 56.341077326447,
+          "positive_day_rate": 0.5423728813559322
+        },
+        "spike": {
+          "days": 86,
+          "mean_net_revenue_eur_per_day": -111.68562049238916,
+          "positive_day_rate": 0.43023255813953487
+        },
+        "ordinary": {
+          "days": 190,
+          "mean_net_revenue_eur_per_day": -88.08241134193636,
+          "positive_day_rate": 0.32105263157894737
+        }
+      },
+      "forecast_resolution": "frozen hourly forecast repeated to native quarter-hours",
+      "strict_external_test": true,
+      "evidence": {
+        "da": "6cb9ec40303b8db7ccbb2640819fd3fd94be5ccbfb2fb84aeaaf632e546960dd",
+        "rt": "cac9b0a96dc1bdbc06ec45977fd70b4b5fac0a7d7b2a348e4248f84d15aeb589",
+        "rt_at_da": "a75aab5657f7ce3d414cef101ec163239caa7181c2724499c03cbb5c4ebb81b2"
+      }
+    },
+    "pooled_xgboost": {
+      "forecast": {
+        "all": {
+          "days": 335,
+          "quarters": 32160,
+          "point_weighted_mae_eur_per_mwh": 30.16878967773213,
+          "daily_macro_mae_eur_per_mwh": 30.17075003388715
+        },
+        "neg": {
+          "days": 59,
+          "quarters": 5664,
+          "point_weighted_mae_eur_per_mwh": 45.94855362165649,
+          "daily_macro_mae_eur_per_mwh": 45.94855362165647
+        },
+        "spike": {
+          "days": 86,
+          "quarters": 8256,
+          "point_weighted_mae_eur_per_mwh": 37.75638634695979,
+          "daily_macro_mae_eur_per_mwh": 37.7563863469598
+        },
+        "ordinary": {
+          "days": 190,
+          "quarters": 18240,
+          "point_weighted_mae_eur_per_mwh": 21.834371855389424,
+          "daily_macro_mae_eur_per_mwh": 21.837828272820634
+        }
+      },
+      "complete_system_settlement": {
+        "all": {
+          "days": 335,
+          "mean_net_revenue_eur_per_day": -47.2473429239491,
+          "positive_day_rate": 0.4955223880597015
+        },
+        "neg": {
+          "days": 59,
+          "mean_net_revenue_eur_per_day": 61.03604430872195,
+          "positive_day_rate": 0.6271186440677966
+        },
+        "spike": {
+          "days": 86,
+          "mean_net_revenue_eur_per_day": -112.45194510505557,
+          "positive_day_rate": 0.5465116279069767
+        },
+        "ordinary": {
+          "days": 190,
+          "mean_net_revenue_eur_per_day": -51.35852218264614,
+          "positive_day_rate": 0.43157894736842106
+        }
+      },
+      "forecast_resolution": "frozen hourly forecast repeated to native quarter-hours",
+      "strict_external_test": true,
+      "evidence": {
+        "da": "57d03ba2e494a9abf4de5e0593a234911290bdcec7aa4e57e3b2e10b16fd693e",
+        "rt": "1501c2a972d01b6db8fd0a46afc8ff597014c80f21b8e8ec54d9a624f12f04d8",
+        "rt_at_da": "7f6c111d539688e0733ee1ab5d05ab0a24161fb5ba8dd8200b533d90aeff582f"
+      }
+    },
+    "seasonal_lag168": {
+      "forecast": {
+        "all": {
+          "days": 335,
+          "quarters": 32160,
+          "point_weighted_mae_eur_per_mwh": 29.94465713619914,
+          "daily_macro_mae_eur_per_mwh": 29.94765876514879
+        },
+        "neg": {
+          "days": 59,
+          "quarters": 5664,
+          "point_weighted_mae_eur_per_mwh": 36.24442891214783,
+          "daily_macro_mae_eur_per_mwh": 36.24442891214784
+        },
+        "spike": {
+          "days": 86,
+          "quarters": 8256,
+          "point_weighted_mae_eur_per_mwh": 37.915773239945544,
+          "daily_macro_mae_eur_per_mwh": 37.915773239945544
+        },
+        "ordinary": {
+          "days": 190,
+          "quarters": 18240,
+          "point_weighted_mae_eur_per_mwh": 24.380433348287752,
+          "daily_macro_mae_eur_per_mwh": 24.38572569406741
+        }
+      },
+      "complete_system_settlement": {
+        "all": {
+          "days": 335,
+          "mean_net_revenue_eur_per_day": -458.99153802369847,
+          "positive_day_rate": 0.2656716417910448
+        },
+        "neg": {
+          "days": 59,
+          "mean_net_revenue_eur_per_day": -88.97875386462633,
+          "positive_day_rate": 0.4576271186440678
+        },
+        "spike": {
+          "days": 86,
+          "mean_net_revenue_eur_per_day": -1009.2653943839081,
+          "positive_day_rate": 0.22093023255813954
+        },
+        "ordinary": {
+          "days": 190,
+          "mean_net_revenue_eur_per_day": -324.8189202258419,
+          "positive_day_rate": 0.22631578947368422
+        }
+      },
+      "forecast_resolution": "frozen hourly forecast repeated to native quarter-hours",
+      "strict_external_test": true,
+      "evidence": {
+        "rule": "strict hourly lag-168"
+      }
+    },
+    "three_feature_tail_expert_router": {
+      "forecast": {
+        "all": {
+          "days": 335,
+          "quarters": 32160,
+          "point_weighted_mae_eur_per_mwh": 26.199686109007104,
+          "daily_macro_mae_eur_per_mwh": 26.200185841557264
+        },
+        "neg": {
+          "days": 59,
+          "quarters": 5664,
+          "point_weighted_mae_eur_per_mwh": 33.576592443346705,
+          "daily_macro_mae_eur_per_mwh": 33.576592443346705
+        },
+        "spike": {
+          "days": 86,
+          "quarters": 8256,
+          "point_weighted_mae_eur_per_mwh": 34.30468841051919,
+          "daily_macro_mae_eur_per_mwh": 34.30468841051919
+        },
+        "ordinary": {
+          "days": 190,
+          "quarters": 18240,
+          "point_weighted_mae_eur_per_mwh": 20.240382573975122,
+          "daily_macro_mae_eur_per_mwh": 20.241263681366185
+        }
+      },
+      "complete_system_settlement": {
+        "all": {
+          "days": 335,
+          "mean_net_revenue_eur_per_day": -49.355869543233204,
+          "positive_day_rate": 0.4417910447761194
+        },
+        "neg": {
+          "days": 59,
+          "mean_net_revenue_eur_per_day": 152.14624502320765,
+          "positive_day_rate": 0.6101694915254238
+        },
+        "spike": {
+          "days": 86,
+          "mean_net_revenue_eur_per_day": -186.19251156651876,
+          "positive_day_rate": 0.4883720930232558
+        },
+        "ordinary": {
+          "days": 190,
+          "mean_net_revenue_eur_per_day": -49.99099346648294,
+          "positive_day_rate": 0.3684210526315789
+        }
+      },
+      "forecast_resolution": "frozen hourly forecast repeated to native quarter-hours",
+      "strict_external_test": true,
+      "evidence": {
+        "hybrid_selection_rate": 0.41194029850746267,
+        "router": "1526e1bc43ca09abade12e43aeb1c403d36f8818a8c37eb488bc0f91489f73f7"
+      }
+    },
+    "timesfm25_lora": {
+      "forecast": {
+        "all": {
+          "days": 335,
+          "quarters": 32160,
+          "point_weighted_mae_eur_per_mwh": 29.495358743279425,
+          "daily_macro_mae_eur_per_mwh": 29.49658555380661
+        },
+        "neg": {
+          "days": 59,
+          "quarters": 5664,
+          "point_weighted_mae_eur_per_mwh": 42.67447749798076,
+          "daily_macro_mae_eur_per_mwh": 42.67447749798077
+        },
+        "spike": {
+          "days": 86,
+          "quarters": 8256,
+          "point_weighted_mae_eur_per_mwh": 37.00298212731313,
+          "daily_macro_mae_eur_per_mwh": 37.00298212731313
+        },
+        "ordinary": {
+          "days": 190,
+          "quarters": 18240,
+          "point_weighted_mae_eur_per_mwh": 22.0047081245727,
+          "daily_macro_mae_eur_per_mwh": 22.00687118523906
+        }
+      },
+      "complete_system_settlement": {
+        "all": {
+          "days": 335,
+          "mean_net_revenue_eur_per_day": 38.234892815654504,
+          "positive_day_rate": 0.6029850746268657
+        },
+        "neg": {
+          "days": 59,
+          "mean_net_revenue_eur_per_day": 17.43954580768004,
+          "positive_day_rate": 0.5084745762711864
+        },
+        "spike": {
+          "days": 86,
+          "mean_net_revenue_eur_per_day": 65.43930717412695,
+          "positive_day_rate": 0.5813953488372093
+        },
+        "ordinary": {
+          "days": 190,
+          "mean_net_revenue_eur_per_day": 32.37881828219063,
+          "positive_day_rate": 0.6421052631578947
+        }
+      },
+      "forecast_resolution": "frozen hourly forecast repeated to native quarter-hours",
+      "strict_external_test": true,
+      "evidence": {
+        "da": "e53ba3c2d9b7d50999fe9190a0270a456ce55865cc78373a1dd38b3ac811979c",
+        "rt": "bc44163f84abe6f90f333507276b6d9cd9e990f58906b981ccd8d0060360932f",
+        "rt_at_da": "abd778033dac6bdf908d9ac1bef7df7000b662e086686e5f7d62db431571ca71"
+      }
+    },
+    "timesfm3_frozen": {
+      "forecast": {
+        "all": {
+          "days": 335,
+          "quarters": 32160,
+          "point_weighted_mae_eur_per_mwh": 49.27346906277209,
+          "daily_macro_mae_eur_per_mwh": 49.2741916152908
+        },
+        "neg": {
+          "days": 59,
+          "quarters": 5664,
+          "point_weighted_mae_eur_per_mwh": 82.72895953458904,
+          "daily_macro_mae_eur_per_mwh": 82.72895953458905
+        },
+        "spike": {
+          "days": 86,
+          "quarters": 8256,
+          "point_weighted_mae_eur_per_mwh": 57.672717659807866,
+          "daily_macro_mae_eur_per_mwh": 57.67271765980786
+        },
+        "ordinary": {
+          "days": 190,
+          "quarters": 18240,
+          "point_weighted_mae_eur_per_mwh": 35.08289370918116,
+          "daily_macro_mae_eur_per_mwh": 35.084167683358906
+        }
+      },
+      "complete_system_settlement": {
+        "all": {
+          "days": 335,
+          "mean_net_revenue_eur_per_day": -300.62956429451987,
+          "positive_day_rate": 0.10746268656716418
+        },
+        "neg": {
+          "days": 59,
+          "mean_net_revenue_eur_per_day": -651.8732777277822,
+          "positive_day_rate": 0.01694915254237288
+        },
+        "spike": {
+          "days": 86,
+          "mean_net_revenue_eur_per_day": -301.8914292204583,
+          "positive_day_rate": 0.22093023255813954
+        },
+        "ordinary": {
+          "days": 190,
+          "mean_net_revenue_eur_per_day": -190.98798810402934,
+          "positive_day_rate": 0.08421052631578947
+        }
+      },
+      "forecast_resolution": "frozen hourly forecast repeated to native quarter-hours",
+      "strict_external_test": true,
+      "evidence": {
+        "device": "cuda",
+        "model": "google/timesfm-3.0-pytorch (local frozen cache)"
+      }
+    },
+    "transformer_three_seed_equal": {
+      "forecast": {
+        "all": {
+          "days": 335,
+          "quarters": 32160,
+          "point_weighted_mae_eur_per_mwh": 23.996371247411115,
+          "daily_macro_mae_eur_per_mwh": 23.996870979961272
+        },
+        "neg": {
+          "days": 59,
+          "quarters": 5664,
+          "point_weighted_mae_eur_per_mwh": 30.821428273328628,
+          "daily_macro_mae_eur_per_mwh": 30.821428273328628
+        },
+        "spike": {
+          "days": 86,
+          "quarters": 8256,
+          "point_weighted_mae_eur_per_mwh": 30.902485616944144,
+          "daily_macro_mae_eur_per_mwh": 30.902485616944148
+        },
+        "ordinary": {
+          "days": 190,
+          "quarters": 18240,
+          "point_weighted_mae_eur_per_mwh": 18.751085982627046,
+          "daily_macro_mae_eur_per_mwh": 18.75196709001811
+        }
+      },
+      "complete_system_settlement": {
+        "all": {
+          "days": 335,
+          "mean_net_revenue_eur_per_day": -74.68094582419164,
+          "positive_day_rate": 0.2626865671641791
+        },
+        "neg": {
+          "days": 59,
+          "mean_net_revenue_eur_per_day": 120.86478384630678,
+          "positive_day_rate": 0.4067796610169492
+        },
+        "spike": {
+          "days": 86,
+          "mean_net_revenue_eur_per_day": -250.77186022291244,
+          "positive_day_rate": 0.3023255813953488
+        },
+        "ordinary": {
+          "days": 190,
+          "mean_net_revenue_eur_per_day": -55.698732204556954,
+          "positive_day_rate": 0.2
+        }
+      },
+      "forecast_resolution": "frozen hourly forecast repeated to native quarter-hours",
+      "strict_external_test": true,
+      "evidence": {
+        "seed0": {
+          "da": "64d97a56ce2e4675c4753a497b20221e86335913802312b4a93eadee8fe0d010",
+          "rt": "be25141a3bf437dba2cde8d761337be69591e0ffc025572c8fcde20f984713eb",
+          "rt_at_da": "19951250788b2c699dd4f9293324b4cf725cac171c7bd7e8aaa4a9d30bb91184"
+        },
+        "seed1": {
+          "da": "b2bc96f3dccf2dc1ced04d557169c74a4dea0bbec3c7ecdb8e9795add6d50993",
+          "rt": "6688a49d413522be5c7a17ea3e4f009703beb3c7b53da53ec9ed4f4d31098705",
+          "rt_at_da": "0f06d81530107b1c1acb04ae38b1f622cc71618f9922d7d5ae66acb28519dc14"
+        },
+        "seed2": {
+          "da": "d8f9ec44198544d145cc9b3274d79e1fb4716382c7d4a49bd87c9f5a74bda508",
+          "rt": "d0972420baccaee4de900a2256e327f57426aaaf2baa3f6d51fee907e118819e",
+          "rt_at_da": "7a0bdbf63cff4195817008f9094dbd30f120b8d9d5afaa7ba78681014246b618"
+        }
+      }
+    }
+  },
+  "limitations": [
+    "Teacher-board model predictions are not available, so their MAE cannot be recomputed on the 335-day intersection.",
+    "Teacher-board model settlement cannot be reconstructed from aggregate MAE.",
+    "Complete-system revenue includes each frozen system's own three forecast legs and is not a DA-only controlled-leg comparison."
+  ],
+  "raw_sha256": "7dec9dabd778a042836c88b3c3460140f0057aff6e5d8a8e775a95ad8e9b887a"
+}

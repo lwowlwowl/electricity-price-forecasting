@@ -1,0 +1,68 @@
+{
+  "protocol": "austria_teacher_simple_baselines_v1",
+  "model": "d-1 persist",
+  "prediction_rule": "UTC series shifted by exactly 96 native 15-minute rows",
+  "days": 365,
+  "quarters": 35040,
+  "metrics": {
+    "all": 26.081142123287673,
+    "neg": 30.176283068783068,
+    "spike": 33.6728162202381,
+    "ordinary": 20.248187500000004
+  },
+  "teacher_comparison": {
+    "all": {
+      "ours": 26.081142123287673,
+      "teacher": 26.095,
+      "absolute_gap_ours_minus_teacher": -0.013857876712325634
+    },
+    "neg": {
+      "ours": 30.176283068783068,
+      "teacher": 30.148,
+      "absolute_gap_ours_minus_teacher": 0.028283068783068188
+    },
+    "spike": {
+      "ours": 33.6728162202381,
+      "teacher": 33.488,
+      "absolute_gap_ours_minus_teacher": 0.18481622023809763
+    },
+    "ordinary": {
+      "ours": 20.248187500000004,
+      "teacher": 20.423,
+      "absolute_gap_ours_minus_teacher": -0.1748124999999945
+    }
+  },
+  "seasonal_7d_candidate": {
+    "status": "candidate_rule_check_not_claimed_as_teacher_implementation",
+    "prediction_rule": "UTC series shifted by exactly 672 native 15-minute rows",
+    "metrics": {
+      "all": 29.658516837899544,
+      "neg": 35.06077876984127,
+      "spike": 36.73455171130953,
+      "ordinary": 23.696104166666668
+    },
+    "teacher_comparison": {
+      "all": {
+        "ours": 29.658516837899544,
+        "teacher": 58.046,
+        "absolute_gap_ours_minus_teacher": -28.387483162100455
+      },
+      "neg": {
+        "ours": 35.06077876984127,
+        "teacher": 94.006,
+        "absolute_gap_ours_minus_teacher": -58.94522123015873
+      },
+      "spike": {
+        "ours": 36.73455171130953,
+        "teacher": 66.999,
+        "absolute_gap_ours_minus_teacher": -30.264448288690467
+      },
+      "ordinary": {
+        "ours": 23.696104166666668,
+        "teacher": 41.593,
+        "absolute_gap_ours_minus_teacher": -17.896895833333335
+      }
+    }
+  },
+  "interpretation": "The near-zero all-MAE gap verifies the local target series and scoring alignment."
+}
