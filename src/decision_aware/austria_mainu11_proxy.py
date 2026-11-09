@@ -74,6 +74,58 @@ def build_mainu11_proxy(raw: pd.DataFrame) -> pd.DataFrame:
     return output
 
 
+def build_mainu11_proxy_covariates(
+    raw: pd.DataFrame,
+    *,
+    future_quarters: int = 0,
+) -> pd.DataFrame:
+    """Build the six causal proxies and optionally extend beyond raw end.
+
+    Every output row reads the source row exactly seven days earlier, so the
+    extension never needs future observations.
+    """
+    required = (TIMESTAMP, LOAD, WIND, SOLAR, WEATHER_WIND, WEATHER_RADIATION)
+    missing = [name for name in required if name not in raw.columns]
+    if missing:
+        raise ValueError(f"奥地利数据缺少mainU11代理源列: {missing}")
+    if future_quarters < 0:
+        raise ValueError("future_quarters不能为负")
+    timestamp = pd.DatetimeIndex(pd.to_datetime(raw[TIMESTAMP], utc=True))
+    if not timestamp.is_unique or not timestamp.is_monotonic_increasing:
+        raise ValueError("奥地利UTC时间必须唯一递增")
+    if not (timestamp.to_series().diff().dropna() == pd.Timedelta(minutes=15)).all():
+        raise ValueError("奥地利数据不是连续15分钟")
+    source = raw.copy()
+    source.index = timestamp
+    lag_quarters = 7 * 24 * 4
+    target_index = pd.date_range(
+        timestamp[lag_quarters],
+        timestamp[-1] + pd.Timedelta(minutes=15 * future_quarters),
+        freq="15min",
+        tz="UTC",
+    )
+    lag_index = target_index - pd.Timedelta(days=7)
+
+    def lagged(column: str) -> np.ndarray:
+        values = pd.to_numeric(source[column], errors="coerce").reindex(lag_index)
+        return values.to_numpy(np.float64)
+
+    load = lagged(LOAD)
+    wind = lagged(WIND)
+    solar = lagged(SOLAR)
+    output = pd.DataFrame(index=target_index)
+    output["at_gen_da_a71_proxy"] = load
+    output["at_resload_da_proxy"] = load - wind - solar
+    output["at_solar_da_proxy"] = solar
+    output["at_wind_da_proxy"] = wind
+    output["wx_sw_rad_proxy"] = lagged(WEATHER_RADIATION)
+    output["wx_wind10_ms_proxy"] = lagged(WEATHER_WIND)
+    output.index.name = "timestamp_utc"
+    if output.isna().any().any() or not np.isfinite(output.to_numpy()).all():
+        raise ValueError("mainU11扩展代理表包含缺失或非有限值")
+    return output
+
+
 def make_tasks(
     frame: pd.DataFrame,
     origins: pd.DatetimeIndex,

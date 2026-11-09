@@ -15,11 +15,14 @@
 8. `progress/8_奥地利DA预测与经济价值统一对比/9_Chronos2_fat近似复刻.md`：仅使用老师fat特征家族的Chronos2近似复刻及MAE差距。
 9. `progress/8_奥地利DA预测与经济价值统一对比/10_其余模型复刻审计.md`：规则基线核验及老师榜单中其余模型的可复刻性边界。
 10. `progress/8_奥地利DA预测与经济价值统一对比/11_受控DA腿结算.md`：固定v4后两腿、只替换DA预测的365天经济价值比较。
-11. `progress/8_奥地利DA预测与经济价值统一对比/5_我方分组MAE与结算结果.md`：既有335天结果，仅作历史对照。
-12. `progress/7_端到端Decision-aware重启与跨年验证/5_阶段索引.md`：decision-aware方法与跨年证据。
-13. `progress/100_奥地利15分钟外部验证/1_冻结协议与参评边界.md`：既有奥地利零样本迁移协议。
-14. `progress/100_奥地利15分钟外部验证/2_完整结果与结论.md`：既有奥地利15分钟外部验证结果。
-15. `../paper/decision_aware_latex/main.tex`：面向老师阅读的LaTeX论文材料。
+11. `progress/8_奥地利DA预测与经济价值统一对比/12_受控DA腿稳健性统计.md`：配对bootstrap、7日区块、去极端日和335天前缀敏感性检验。
+12. `progress/8_奥地利DA预测与经济价值统一对比/13_TimesFM3完整三腿零样本结算.md`：冻结TimesFM3分别承担DA、RT-at-DA和rolling RT后的完整零样本结算及失败原因。
+13. `progress/8_奥地利DA预测与经济价值统一对比/14_奥地利DA模型复刻与决策结算对比.md`：15个奥地利DA模型的复刻状态、MAE对照、固定v4后两腿和各自完整三腿结算总览。
+14. `progress/8_奥地利DA预测与经济价值统一对比/5_我方分组MAE与结算结果.md`：既有335天结果，仅作历史对照。
+15. `progress/7_端到端Decision-aware重启与跨年验证/5_阶段索引.md`：decision-aware方法与跨年证据。
+16. `progress/100_奥地利15分钟外部验证/1_冻结协议与参评边界.md`：既有奥地利零样本迁移协议。
+17. `progress/100_奥地利15分钟外部验证/2_完整结果与结论.md`：既有奥地利15分钟外部验证结果。
+18. `../paper/decision_aware_latex/main.tex`：面向老师阅读的LaTeX论文材料。
 
 ## 历史与学习材料
 

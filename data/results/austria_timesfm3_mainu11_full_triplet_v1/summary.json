@@ -1,0 +1,87 @@
+{
+  "protocol": "austria_timesfm3_mainu11_full_triplet_v1",
+  "status": "complete",
+  "model": "timesfm3_mainu11_proxy6_full_triplet",
+  "strict_external_zero_shot": true,
+  "austria_training_finetuning_or_selection": false,
+  "teacher_model_claim": false,
+  "interpretation": "Project extension of the teacher-family DA proxy: the same frozen TimesFM3 and proxy6 feature family produce causal RT-at-DA and rolling RT legs.",
+  "features": [
+    "at_gen_da_a71_proxy",
+    "at_resload_da_proxy",
+    "at_solar_da_proxy",
+    "at_wind_da_proxy",
+    "wx_sw_rad_proxy",
+    "wx_wind10_ms_proxy"
+  ],
+  "timing": {
+    "rt_at_da_gate": "D-1 12:00 Europe/Vienna",
+    "rt_at_da_forecast": "forecast gate-to-delivery-end; retain delivery day only",
+    "rolling_rt_issue": "every UTC hour",
+    "rolling_rt_horizon": "16 native quarter-hours (4 hours)"
+  },
+  "metrics": {
+    "rt_at_da_mae_eur_per_mwh": 54.9684421106232,
+    "rolling_rt_first_available_mae_eur_per_mwh": 44.996966113482436
+  },
+  "settlement": {
+    "days": 365,
+    "mean_daily_net_revenue_eur": -143.7978347915728,
+    "median_daily_net_revenue_eur": 6.90722543865138,
+    "p10_daily_net_revenue_eur": -737.3175338357826,
+    "positive_day_rate": 0.5205479452054794,
+    "mean_daily_throughput_mwh": 5.300255083160373,
+    "soc_violation_count": 0,
+    "final_soc_mwh": 3.081578947368421
+  },
+  "by_day_group": {
+    "all": {
+      "days": 365,
+      "mean_net_revenue_eur_per_day": -143.7978347915728,
+      "positive_day_rate": 0.5205479452054794
+    },
+    "neg": {
+      "days": 63,
+      "mean_net_revenue_eur_per_day": -46.164751749483756,
+      "positive_day_rate": 0.6666666666666666
+    },
+    "spike": {
+      "days": 112,
+      "mean_net_revenue_eur_per_day": -401.5202436747665,
+      "positive_day_rate": 0.48214285714285715
+    },
+    "ordinary": {
+      "days": 190,
+      "mean_net_revenue_eur_per_day": -24.250331827014513,
+      "positive_day_rate": 0.49473684210526314
+    }
+  },
+  "group_counts": {
+    "neg": 63,
+    "spike": 112,
+    "ordinary": 190
+  },
+  "battery": {
+    "power_mw": 1.0,
+    "energy_mwh": 4.0,
+    "efficiency_component": 0.95,
+    "initial_soc_mwh": 2.0,
+    "soc_min_mwh": 0.4,
+    "soc_max_mwh": 3.6,
+    "daily_discharge_cap_mwh": 4.0,
+    "degradation_eur_per_mwh": 5.266075388026607,
+    "deviation_tolerance_fraction": 0.03,
+    "deviation_penalty_abs_rt_multiplier": 2.0
+  },
+  "data_checks": {
+    "august_apcs_overlap": {
+      "overlap_quarters": 2976,
+      "max_absolute_difference_eur_per_mwh": 0.005579999999994811,
+      "mean_absolute_difference_eur_per_mwh": 0.0024403158602146575,
+      "interpretation": "same field; differences are explained by two-decimal rounding"
+    },
+    "raw_parquet_modified": false
+  },
+  "device": "cuda",
+  "runtime_seconds": 1863.8649839000136
+}
