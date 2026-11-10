@@ -1,0 +1,3011 @@
+{
+  "system": "decision-aware-v4-inverse-lp-lexicographic",
+  "protocol": "austria_v4_inverse_lp_lexicographic_v1",
+  "strict_external_zero_shot": true,
+  "austria_labels_used_for_prediction_or_selection": false,
+  "external_model_predictions_used": false,
+  "da_mae_eur_per_mwh": 14.5416909153536,
+  "forecast_by_day_group": {
+    "all": {
+      "days": 365,
+      "quarters": 35040,
+      "point_weighted_mae_eur_per_mwh": 14.5416909153536,
+      "daily_macro_mae_eur_per_mwh": 14.541965777221776
+    },
+    "neg": {
+      "days": 63,
+      "quarters": 6048,
+      "point_weighted_mae_eur_per_mwh": 16.05035550116402,
+      "daily_macro_mae_eur_per_mwh": 16.05035550116402
+    },
+    "spike": {
+      "days": 112,
+      "quarters": 10752,
+      "point_weighted_mae_eur_per_mwh": 18.732033076496823,
+      "daily_macro_mae_eur_per_mwh": 18.732033076496823
+    },
+    "ordinary": {
+      "days": 190,
+      "quarters": 18240,
+      "point_weighted_mae_eur_per_mwh": 11.571353068226774,
+      "daily_macro_mae_eur_per_mwh": 11.571881092341956
+    }
+  },
+  "group_counts": {
+    "neg": 63,
+    "spike": 112,
+    "ordinary": 190
+  },
+  "lexicographic_rule": "Primary: projected-price joint LP. Secondary: among the primary optimal face, minimize distance to the frozen v4 plan. KKT audit proves the secondary optimum has zero distance.",
+  "max_primary_objective_gap_of_v4_plan": 4.547473508864641e-13,
+  "max_secondary_solution_distance_from_v4": 0.0,
+  "paired_revenue_audit_vs_frozen_v4": {
+    "mean_delta_eur_per_day": 8.477845518452702e-15,
+    "max_absolute_daily_delta_eur": 2.7853275241795927e-12
+  },
+  "settlement": {
+    "days": 365,
+    "mean_daily_net_revenue_eur": 84.50925640446145,
+    "median_daily_net_revenue_eur": 84.5537425409787,
+    "p10_daily_net_revenue_eur": -166.4781973400061,
+    "positive_day_rate": 0.6520547945205479,
+    "mean_daily_throughput_mwh": 5.133307922409591,
+    "soc_violation_count": 0,
+    "final_soc_mwh": 0.40663157894736995,
+    "daily": {
+      "2025-10-01": {
+        "da_leg": 389.49749896907224,
+        "rt_deviation_leg": 0.14049278350508773,
+        "degradation_cost": 8.004434589800443,
+        "deviation_penalty": 4.318377253009764e-16,
+        "throughput_mwh": 1.52,
+        "net_revenue": 381.63355716277687
+      },
+      "2025-10-02": {
+        "da_leg": 177.42543944813485,
+        "rt_deviation_leg": 3.3019126139633697,
+        "degradation_cost": 44.16918359473692,
+        "deviation_penalty": 1.3051559616047982e-14,
+        "throughput_mwh": 8.387495495253205,
+        "net_revenue": 136.5581684673613
+      },
+      "2025-10-03": {
+        "da_leg": 4.44000000000002,
+        "rt_deviation_leg": 13.314308271253008,
+        "degradation_cost": 17.844715343295483,
+        "deviation_penalty": 89.16138345749398,
+        "throughput_mwh": 3.388617524137374,
+        "net_revenue": -89.25179052953644
+      },
+      "2025-10-04": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -0.11822714681440542,
+        "degradation_cost": 0.22639747928579954,
+        "deviation_penalty": 0.23645429362881085,
+        "throughput_mwh": 0.04299168975069288,
+        "net_revenue": -0.5810789197290158
+      },
+      "2025-10-05": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-10-06": {
+        "da_leg": 154.6627456321216,
+        "rt_deviation_leg": 417.9081471378189,
+        "degradation_cost": 31.596452328159643,
+        "deviation_penalty": 1122.7968129473686,
+        "throughput_mwh": 5.999999999999997,
+        "net_revenue": -581.8223725055877
+      },
+      "2025-10-07": {
+        "da_leg": 226.94135942084716,
+        "rt_deviation_leg": 69.20606378601995,
+        "degradation_cost": 28.65236316956471,
+        "deviation_penalty": 125.70975886426618,
+        "throughput_mwh": 5.44093296398892,
+        "net_revenue": 141.78530117303626
+      },
+      "2025-10-08": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -62.865,
+        "degradation_cost": 5.266075388026607,
+        "deviation_penalty": 125.73,
+        "throughput_mwh": 1.0,
+        "net_revenue": -193.86107538802662
+      },
+      "2025-10-09": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-10-10": {
+        "da_leg": 68.93930000000006,
+        "rt_deviation_leg": 10.73047200000001,
+        "degradation_cost": 19.73014135254989,
+        "deviation_penalty": 1.9630408409909705e-14,
+        "throughput_mwh": 3.74665,
+        "net_revenue": 59.93963064745015
+      },
+      "2025-10-11": {
+        "da_leg": 115.83485417529502,
+        "rt_deviation_leg": 86.91322111706974,
+        "degradation_cost": 38.79770101528764,
+        "deviation_penalty": 157.73703614824,
+        "throughput_mwh": 7.367479224376729,
+        "net_revenue": 6.213338128837108
+      },
+      "2025-10-12": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-10-13": {
+        "da_leg": 462.6946387411831,
+        "rt_deviation_leg": -2.3529173488876767,
+        "degradation_cost": 33.37977004137427,
+        "deviation_penalty": 1.8612056340572282e-14,
+        "throughput_mwh": 6.338642647856756,
+        "net_revenue": 426.96195135092114
+      },
+      "2025-10-14": {
+        "da_leg": 393.8416221649485,
+        "rt_deviation_leg": -105.76696433505154,
+        "degradation_cost": 34.894463691796005,
+        "deviation_penalty": 215.95500000000004,
+        "throughput_mwh": 6.626275,
+        "net_revenue": 37.22519413810093
+      },
+      "2025-10-15": {
+        "da_leg": 449.90191403079933,
+        "rt_deviation_leg": -35.679629362621256,
+        "degradation_cost": 45.63489498005623,
+        "deviation_penalty": 444.9651343600027,
+        "throughput_mwh": 8.66582637305489,
+        "net_revenue": -76.37774467188086
+      },
+      "2025-10-16": {
+        "da_leg": 156.85974751552723,
+        "rt_deviation_leg": 61.30802712840368,
+        "degradation_cost": 38.42849223946785,
+        "deviation_penalty": 126.33362502631641,
+        "throughput_mwh": 7.297368421052631,
+        "net_revenue": 53.40565737814663
+      },
+      "2025-10-17": {
+        "da_leg": 129.0777552913966,
+        "rt_deviation_leg": 1.130908782869875,
+        "degradation_cost": 43.684303449189386,
+        "deviation_penalty": 1.5379361846534767e-13,
+        "throughput_mwh": 8.295419307614495,
+        "net_revenue": 86.52436062507695
+      },
+      "2025-10-18": {
+        "da_leg": 94.36394044321324,
+        "rt_deviation_leg": 5.199154778393356,
+        "degradation_cost": 44.177996265608556,
+        "deviation_penalty": 8.359701819671274e-15,
+        "throughput_mwh": 8.389168975069254,
+        "net_revenue": 55.385098955998025
+      },
+      "2025-10-19": {
+        "da_leg": 267.11708959739667,
+        "rt_deviation_leg": -0.9760791947933223,
+        "degradation_cost": 33.09400163379624,
+        "deviation_penalty": 2.9348745655966016e-15,
+        "throughput_mwh": 6.284376731301937,
+        "net_revenue": 233.0470087688071
+      },
+      "2025-10-20": {
+        "da_leg": 180.35362880886427,
+        "rt_deviation_leg": 1.337931024930715,
+        "degradation_cost": 44.33160228731471,
+        "deviation_penalty": 2.6848315237693045e-16,
+        "throughput_mwh": 8.418337950138504,
+        "net_revenue": 137.3599575464803
+      },
+      "2025-10-21": {
+        "da_leg": 51.663473884113486,
+        "rt_deviation_leg": -5.172022379844077,
+        "degradation_cost": 22.202194616653408,
+        "deviation_penalty": 1.0161784608220259e-14,
+        "throughput_mwh": 4.216079904046605,
+        "net_revenue": 24.289256887615988
+      },
+      "2025-10-22": {
+        "da_leg": 169.90101882325786,
+        "rt_deviation_leg": -153.56778912966868,
+        "degradation_cost": 16.19449475992903,
+        "deviation_penalty": 306.69,
+        "throughput_mwh": 3.075249320727576,
+        "net_revenue": -306.55126506633985
+      },
+      "2025-10-23": {
+        "da_leg": 52.17135219004044,
+        "rt_deviation_leg": 5.579661519147716,
+        "degradation_cost": 38.74555319963984,
+        "deviation_penalty": 3.2538071702286806,
+        "throughput_mwh": 7.357576628647401,
+        "net_revenue": 15.751653339319626
+      },
+      "2025-10-24": {
+        "da_leg": 104.88617077682893,
+        "rt_deviation_leg": -80.96358758673027,
+        "degradation_cost": 33.10492568369057,
+        "deviation_penalty": 177.71350868004194,
+        "throughput_mwh": 6.286451150881872,
+        "net_revenue": -186.89585117363384
+      },
+      "2025-10-25": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -67.705,
+        "degradation_cost": 10.532150776053214,
+        "deviation_penalty": 146.97,
+        "throughput_mwh": 2.0,
+        "net_revenue": -225.2071507760532
+      },
+      "2025-10-26": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -138.26107063711913,
+        "degradation_cost": 7.038160812230131,
+        "deviation_penalty": 276.6778587257618,
+        "throughput_mwh": 1.3365096952908586,
+        "net_revenue": -421.977090175111
+      },
+      "2025-10-27": {
+        "da_leg": -5.388647938144302,
+        "rt_deviation_leg": 87.1803131714602,
+        "degradation_cost": 38.438525634238864,
+        "deviation_penalty": 162.7260526315802,
+        "throughput_mwh": 7.299273709912308,
+        "net_revenue": -119.37291303250316
+      },
+      "2025-10-28": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-10-29": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-10-30": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -98.89,
+        "degradation_cost": 5.266075388026607,
+        "deviation_penalty": 197.78,
+        "throughput_mwh": 1.0,
+        "net_revenue": -301.9360753880266
+      },
+      "2025-10-31": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-11-01": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -0.12615643830144385,
+        "degradation_cost": 0.055041368250234514,
+        "deviation_penalty": 0.2523128766028877,
+        "throughput_mwh": 0.010452066139307692,
+        "net_revenue": -0.4335106831545661
+      },
+      "2025-11-02": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-11-03": {
+        "da_leg": 12.110184047748241,
+        "rt_deviation_leg": 327.13684038741195,
+        "degradation_cost": 19.589239190687373,
+        "deviation_penalty": 634.6819760000001,
+        "throughput_mwh": 3.719893421052634,
+        "net_revenue": -315.02419075552723
+      },
+      "2025-11-04": {
+        "da_leg": 244.96147606449688,
+        "rt_deviation_leg": 1.7705253581806861,
+        "degradation_cost": 44.44100828568092,
+        "deviation_penalty": 3.3844411648220604e-14,
+        "throughput_mwh": 8.439113573407202,
+        "net_revenue": 202.2909931369966
+      },
+      "2025-11-05": {
+        "da_leg": 119.38447404395255,
+        "rt_deviation_leg": -0.06239769058073252,
+        "degradation_cost": 44.525469716419614,
+        "deviation_penalty": 1.6485359084772443e-15,
+        "throughput_mwh": 8.455152354570636,
+        "net_revenue": 74.79660663695219
+      },
+      "2025-11-06": {
+        "da_leg": 56.14037298331381,
+        "rt_deviation_leg": -6.8601000000000045,
+        "degradation_cost": 19.750630186069902,
+        "deviation_penalty": 1.2693734952051728e-14,
+        "throughput_mwh": 3.7505407216494855,
+        "net_revenue": 29.52964279724389
+      },
+      "2025-11-07": {
+        "da_leg": 92.79654138042604,
+        "rt_deviation_leg": 1.3660983873793486,
+        "degradation_cost": 33.120204874198905,
+        "deviation_penalty": 1.167342264518645e-14,
+        "throughput_mwh": 6.289352588742612,
+        "net_revenue": 61.04243489360647
+      },
+      "2025-11-08": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-11-09": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-11-10": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-11-11": {
+        "da_leg": 71.28969149484544,
+        "rt_deviation_leg": -3.9782177319587673,
+        "degradation_cost": 19.89483786031042,
+        "deviation_penalty": 6.830785936884354e-15,
+        "throughput_mwh": 3.7779250000000006,
+        "net_revenue": 47.41663590257625
+      },
+      "2025-11-12": {
+        "da_leg": 108.94086553305857,
+        "rt_deviation_leg": 8.602208327833546,
+        "degradation_cost": 33.24546770049194,
+        "deviation_penalty": 6.18770312765804e-14,
+        "throughput_mwh": 6.313139340177628,
+        "net_revenue": 84.29760616040012
+      },
+      "2025-11-13": {
+        "da_leg": 135.81034248507888,
+        "rt_deviation_leg": 2.998781213781882,
+        "degradation_cost": 33.60997354104282,
+        "deviation_penalty": 2.3103914614797108e-15,
+        "throughput_mwh": 6.3823570808464485,
+        "net_revenue": 105.19915015781794
+      },
+      "2025-11-14": {
+        "da_leg": 87.82818622707251,
+        "rt_deviation_leg": 3.992408758131912,
+        "degradation_cost": 32.654951962354005,
+        "deviation_penalty": 1.8643897189973835e-14,
+        "throughput_mwh": 6.201003509482803,
+        "net_revenue": 59.1656430228504
+      },
+      "2025-11-15": {
+        "da_leg": 58.26933776677706,
+        "rt_deviation_leg": -5.510638800495295,
+        "degradation_cost": 21.536060217061497,
+        "deviation_penalty": 9.245779153689524,
+        "throughput_mwh": 4.089584487534626,
+        "net_revenue": 21.976859595530748
+      },
+      "2025-11-16": {
+        "da_leg": 0.26225010882866956,
+        "rt_deviation_leg": -0.2742258816410563,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.5319982103836493,
+        "throughput_mwh": 0.0,
+        "net_revenue": -0.543973983196036
+      },
+      "2025-11-17": {
+        "da_leg": -39.59099999999996,
+        "rt_deviation_leg": -0.9924135000000394,
+        "degradation_cost": 29.15444151884701,
+        "deviation_penalty": 1.1343672529084968e-13,
+        "throughput_mwh": 5.536274999999999,
+        "net_revenue": -69.73785501884711
+      },
+      "2025-11-18": {
+        "da_leg": 184.11794840409007,
+        "rt_deviation_leg": -1.3658638843920756,
+        "degradation_cost": 33.44666712860311,
+        "deviation_penalty": 5.617208087560499e-15,
+        "throughput_mwh": 6.351346052631579,
+        "net_revenue": 149.3054173910949
+      },
+      "2025-11-19": {
+        "da_leg": 107.9970886997744,
+        "rt_deviation_leg": -0.04393402633006805,
+        "degradation_cost": 22.56851785626202,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 4.28564275923123,
+        "net_revenue": 85.38463681718231
+      },
+      "2025-11-20": {
+        "da_leg": 200.7110862131471,
+        "rt_deviation_leg": -4.363764316779545,
+        "degradation_cost": 33.22285219858686,
+        "deviation_penalty": 8.366363157819024e-15,
+        "throughput_mwh": 6.308844775394809,
+        "net_revenue": 163.1244696977807
+      },
+      "2025-11-21": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-11-22": {
+        "da_leg": 75.12318289513206,
+        "rt_deviation_leg": -0.16044982349113104,
+        "degradation_cost": 33.49391629711752,
+        "deviation_penalty": 1.1637947550102722e-14,
+        "throughput_mwh": 6.360318421052632,
+        "net_revenue": 41.46881677452339
+      },
+      "2025-11-23": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-11-24": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-11-25": {
+        "da_leg": 397.23022354856215,
+        "rt_deviation_leg": -10.980829648941977,
+        "degradation_cost": 33.06151078931128,
+        "deviation_penalty": 4.1864151034687326e-14,
+        "throughput_mwh": 6.278206890938687,
+        "net_revenue": 353.1878831103088
+      },
+      "2025-11-26": {
+        "da_leg": 78.62188883495148,
+        "rt_deviation_leg": 0.23182390776699102,
+        "degradation_cost": 9.718147172949003,
+        "deviation_penalty": 6.772291061274416e-15,
+        "throughput_mwh": 1.845425,
+        "net_revenue": 69.13556556976947
+      },
+      "2025-11-27": {
+        "da_leg": 134.38683188553924,
+        "rt_deviation_leg": 2.8658238667400733,
+        "degradation_cost": 33.572178783988804,
+        "deviation_penalty": 6.432580162973878e-15,
+        "throughput_mwh": 6.375180055401662,
+        "net_revenue": 103.6804769682905
+      },
+      "2025-11-28": {
+        "da_leg": 156.0977901890649,
+        "rt_deviation_leg": -3.6415233203883512,
+        "degradation_cost": 33.537361419068745,
+        "deviation_penalty": 9.161907343901986e-15,
+        "throughput_mwh": 6.3685684210526325,
+        "net_revenue": 118.91890544960779
+      },
+      "2025-11-29": {
+        "da_leg": 53.02315789473674,
+        "rt_deviation_leg": 1.8586940443214501,
+        "degradation_cost": 33.26875948185319,
+        "deviation_penalty": 5.792838431162295e-14,
+        "throughput_mwh": 6.317562326869805,
+        "net_revenue": 21.61309245720495
+      },
+      "2025-11-30": {
+        "da_leg": 3.830000000000078,
+        "rt_deviation_leg": 0.12566400000000288,
+        "degradation_cost": 0.21696230598670063,
+        "deviation_penalty": 6.358108484150193e-16,
+        "throughput_mwh": 0.04120000000000084,
+        "net_revenue": 3.7387016940133795
+      },
+      "2025-12-01": {
+        "da_leg": -31.631934997286834,
+        "rt_deviation_leg": 16.867819004340777,
+        "degradation_cost": 33.08336600224016,
+        "deviation_penalty": 2.602515425387253e-14,
+        "throughput_mwh": 6.282357080846449,
+        "net_revenue": -47.84748199518624
+      },
+      "2025-12-02": {
+        "da_leg": 141.2941734728845,
+        "rt_deviation_leg": 2.08398420267298,
+        "degradation_cost": 32.55160992994408,
+        "deviation_penalty": 3.460121078546763e-14,
+        "throughput_mwh": 6.181379401433589,
+        "net_revenue": 110.82654774561337
+      },
+      "2025-12-03": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-12-04": {
+        "da_leg": 126.63648882399997,
+        "rt_deviation_leg": -5.551288671045494,
+        "degradation_cost": 33.18988820135637,
+        "deviation_penalty": 1.0213774270795283e-14,
+        "throughput_mwh": 6.302585085815461,
+        "net_revenue": 87.89531195159809
+      },
+      "2025-12-05": {
+        "da_leg": 119.48196054773379,
+        "rt_deviation_leg": 5.893526545677816,
+        "degradation_cost": 33.21051827012499,
+        "deviation_penalty": 1.1571021918399539e-14,
+        "throughput_mwh": 6.306502627295314,
+        "net_revenue": 92.1649688232866
+      },
+      "2025-12-06": {
+        "da_leg": 72.68752127538066,
+        "rt_deviation_leg": 3.2788555194619824,
+        "degradation_cost": 32.901955382203646,
+        "deviation_penalty": 1.964537907350738e-14,
+        "throughput_mwh": 6.247908158894249,
+        "net_revenue": 43.06442141263898
+      },
+      "2025-12-07": {
+        "da_leg": -13.813374624519735,
+        "rt_deviation_leg": 1.483848321904915,
+        "degradation_cost": 21.53245094701231,
+        "deviation_penalty": 2.3941786053693903e-14,
+        "throughput_mwh": 4.088899106148443,
+        "net_revenue": -33.86197724962715
+      },
+      "2025-12-08": {
+        "da_leg": -0.9695375219235736,
+        "rt_deviation_leg": 1.3067018378013504,
+        "degradation_cost": 10.752933208653111,
+        "deviation_penalty": 2.3541769766320515,
+        "throughput_mwh": 2.0419254219379166,
+        "net_revenue": -12.769945869407387
+      },
+      "2025-12-09": {
+        "da_leg": 99.94250435797002,
+        "rt_deviation_leg": -1.6898268715754883,
+        "degradation_cost": 33.1047844407574,
+        "deviation_penalty": 1.6890724929830015e-14,
+        "throughput_mwh": 6.286424329592246,
+        "net_revenue": 65.14789304563712
+      },
+      "2025-12-10": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-12-11": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-12-12": {
+        "da_leg": 74.75898795057658,
+        "rt_deviation_leg": 1.8359684787865485,
+        "degradation_cost": 32.769389743523405,
+        "deviation_penalty": 2.0988965773738323e-14,
+        "throughput_mwh": 6.22273464182276,
+        "net_revenue": 43.82556668583971
+      },
+      "2025-12-13": {
+        "da_leg": 54.52452674991198,
+        "rt_deviation_leg": -0.6436303905680946,
+        "degradation_cost": 32.68187931486721,
+        "deviation_penalty": 1.2382594949400527e-14,
+        "throughput_mwh": 6.20611687200215,
+        "net_revenue": 21.199017044476665
+      },
+      "2025-12-14": {
+        "da_leg": 25.566285234240798,
+        "rt_deviation_leg": -8.459409807091731,
+        "degradation_cost": 10.01870842572062,
+        "deviation_penalty": 8.754812558733569,
+        "throughput_mwh": 1.9024999999999999,
+        "net_revenue": -1.666645557305122
+      },
+      "2025-12-15": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-12-16": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-12-17": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-12-18": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-12-19": {
+        "da_leg": 74.02629978296258,
+        "rt_deviation_leg": -6.27663461475854,
+        "degradation_cost": 33.43758314855876,
+        "deviation_penalty": 2.619638013456882e-14,
+        "throughput_mwh": 6.349621052631579,
+        "net_revenue": 34.31208201964526
+      },
+      "2025-12-20": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-12-21": {
+        "da_leg": 52.68959027044011,
+        "rt_deviation_leg": 6.711201544321523,
+        "degradation_cost": 32.71114737717354,
+        "deviation_penalty": 2.032929380391124e-14,
+        "throughput_mwh": 6.211674722991691,
+        "net_revenue": 26.689644437588072
+      },
+      "2025-12-22": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-12-23": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-12-24": {
+        "da_leg": 0.9612695876288706,
+        "rt_deviation_leg": -0.6355994845360855,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 1.233063000000006,
+        "throughput_mwh": 0.0,
+        "net_revenue": -0.9073928969072209
+      },
+      "2025-12-25": {
+        "da_leg": 15.419768969357744,
+        "rt_deviation_leg": -3.2704830503755344,
+        "degradation_cost": 11.101061967557476,
+        "deviation_penalty": 9.595726990774266e-15,
+        "throughput_mwh": 2.1080332409972296,
+        "net_revenue": 1.0482239514247234
+      },
+      "2025-12-26": {
+        "da_leg": 29.531002768625772,
+        "rt_deviation_leg": -2.096016538447233,
+        "degradation_cost": 10.034111696230598,
+        "deviation_penalty": 4.589002788879526e-15,
+        "throughput_mwh": 1.9054249999999997,
+        "net_revenue": 17.40087453394794
+      },
+      "2025-12-27": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-12-28": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-12-29": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2025-12-30": {
+        "da_leg": 16.77367178798887,
+        "rt_deviation_leg": 8.424707135819757,
+        "degradation_cost": 33.026822967108714,
+        "deviation_penalty": 1.639674507281086e-14,
+        "throughput_mwh": 6.271619856069908,
+        "net_revenue": -7.828444043300104
+      },
+      "2025-12-31": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-01-01": {
+        "da_leg": 4.234329896907097,
+        "rt_deviation_leg": -11.257769072164946,
+        "degradation_cost": 10.690133037694007,
+        "deviation_penalty": 27.44,
+        "throughput_mwh": 2.0299999999999994,
+        "net_revenue": -45.15357221295186
+      },
+      "2026-01-02": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-01-03": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-01-04": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-01-05": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-01-06": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-01-07": {
+        "da_leg": 7.92195738664801,
+        "rt_deviation_leg": 38.155090575295404,
+        "degradation_cost": 42.12860310421269,
+        "deviation_penalty": 542.9018084613384,
+        "throughput_mwh": 7.999999999999969,
+        "net_revenue": -538.9533636036077
+      },
+      "2026-01-08": {
+        "da_leg": 388.88194819587636,
+        "rt_deviation_leg": 38.94449529510295,
+        "degradation_cost": 24.879606083702726,
+        "deviation_penalty": 63.62602132731933,
+        "throughput_mwh": 4.724506249999971,
+        "net_revenue": 339.32081607995724
+      },
+      "2026-01-09": {
+        "da_leg": 115.87485190527434,
+        "rt_deviation_leg": 30.72497159654978,
+        "degradation_cost": 39.291798151873024,
+        "deviation_penalty": 46.54256096321884,
+        "throughput_mwh": 7.461305670103048,
+        "net_revenue": 60.765464386732255
+      },
+      "2026-01-10": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-01-11": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-01-12": {
+        "da_leg": 360.3941152868607,
+        "rt_deviation_leg": 2.5018795470771042,
+        "degradation_cost": 33.35453378457231,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 6.333850415512471,
+        "net_revenue": 329.5414610493655
+      },
+      "2026-01-13": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-01-14": {
+        "da_leg": 217.24634866982495,
+        "rt_deviation_leg": -4.313701137175728,
+        "degradation_cost": 43.28301403186807,
+        "deviation_penalty": 13.79633824946595,
+        "throughput_mwh": 8.21921655931474,
+        "net_revenue": 155.8532952513152
+      },
+      "2026-01-15": {
+        "da_leg": 241.52818225718943,
+        "rt_deviation_leg": -0.3105215599568334,
+        "degradation_cost": 33.0353727827051,
+        "deviation_penalty": 1.433190000000564,
+        "throughput_mwh": 6.273243421052629,
+        "net_revenue": 206.7490979145269
+      },
+      "2026-01-16": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-01-17": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-01-18": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-01-19": {
+        "da_leg": 145.60701523545706,
+        "rt_deviation_leg": 32.49544193587373,
+        "degradation_cost": 41.14773175807012,
+        "deviation_penalty": 228.17718858088872,
+        "throughput_mwh": 7.8137376938482666,
+        "net_revenue": -91.22246316762804
+      },
+      "2026-01-20": {
+        "da_leg": 270.2730422366279,
+        "rt_deviation_leg": 5.813169838193049,
+        "degradation_cost": 43.92218461897535,
+        "deviation_penalty": 2.2602475446831253e-14,
+        "throughput_mwh": 8.340591689750692,
+        "net_revenue": 232.16402745584557
+      },
+      "2026-01-21": {
+        "da_leg": 146.26773157894752,
+        "rt_deviation_leg": -4.630410157894734,
+        "degradation_cost": 33.456291574279376,
+        "deviation_penalty": 2.3137876163648043e-14,
+        "throughput_mwh": 6.3531736842105255,
+        "net_revenue": 108.18102984677337
+      },
+      "2026-01-22": {
+        "da_leg": 421.99595789473705,
+        "rt_deviation_leg": 2.1757816703599016,
+        "degradation_cost": 33.71845460380443,
+        "deviation_penalty": 16.072000554017087,
+        "throughput_mwh": 6.402957063711914,
+        "net_revenue": 374.3812844072754
+      },
+      "2026-01-23": {
+        "da_leg": 332.2687829822463,
+        "rt_deviation_leg": 2.4023955393510725,
+        "degradation_cost": 43.50256411191504,
+        "deviation_penalty": 6.117309783726377e-14,
+        "throughput_mwh": 8.260907963988917,
+        "net_revenue": 291.1686144096823
+      },
+      "2026-01-24": {
+        "da_leg": 22.306876248679096,
+        "rt_deviation_leg": -4.1949173731329,
+        "degradation_cost": 32.604929104913076,
+        "deviation_penalty": 3.7676339999997537,
+        "throughput_mwh": 6.191504432132964,
+        "net_revenue": -18.26060422936663
+      },
+      "2026-01-25": {
+        "da_leg": 67.76937141269251,
+        "rt_deviation_leg": -0.4237008125734243,
+        "degradation_cost": 33.42494456762749,
+        "deviation_penalty": 9.60453071241485e-15,
+        "throughput_mwh": 6.347221052631579,
+        "net_revenue": 33.92072603249158
+      },
+      "2026-01-26": {
+        "da_leg": 247.20752355998516,
+        "rt_deviation_leg": -1.428486532969734,
+        "degradation_cost": 43.958809807108565,
+        "deviation_penalty": 1.4375774876063118e-14,
+        "throughput_mwh": 8.34754662021304,
+        "net_revenue": 201.82022721990683
+      },
+      "2026-01-27": {
+        "da_leg": 206.6073974450692,
+        "rt_deviation_leg": 6.098483695464546,
+        "degradation_cost": 33.50253340680203,
+        "deviation_penalty": 8.013034680232067e-15,
+        "throughput_mwh": 6.36195476482851,
+        "net_revenue": 179.20334773373173
+      },
+      "2026-01-28": {
+        "da_leg": 109.45072536870451,
+        "rt_deviation_leg": -6.1835491769464195,
+        "degradation_cost": 44.08416917155651,
+        "deviation_penalty": 1.445383865220952e-14,
+        "throughput_mwh": 8.371351703735577,
+        "net_revenue": 59.18300702020157
+      },
+      "2026-01-29": {
+        "da_leg": 163.698357776736,
+        "rt_deviation_leg": -4.520618718067045,
+        "degradation_cost": 33.112978143159985,
+        "deviation_penalty": 2.6318253132373568e-14,
+        "throughput_mwh": 6.2879802705537475,
+        "net_revenue": 126.06476091550894
+      },
+      "2026-01-30": {
+        "da_leg": 120.175305664045,
+        "rt_deviation_leg": -2.510577829603537,
+        "degradation_cost": 33.11098529346269,
+        "deviation_penalty": 6.919386938419871e-14,
+        "throughput_mwh": 6.287601838884913,
+        "net_revenue": 84.5537425409787
+      },
+      "2026-01-31": {
+        "da_leg": 100.45895511394467,
+        "rt_deviation_leg": 8.675349407352156,
+        "degradation_cost": 33.33031100704049,
+        "deviation_penalty": 1.495303880716392e-14,
+        "throughput_mwh": 6.329250637547478,
+        "net_revenue": 75.80399351425632
+      },
+      "2026-02-01": {
+        "da_leg": 1.2108595360824872,
+        "rt_deviation_leg": -0.9263071254890346,
+        "degradation_cost": 0.08855106079454453,
+        "deviation_penalty": 1.770974183967759,
+        "throughput_mwh": 0.0168153803866693,
+        "net_revenue": -1.574972834168851
+      },
+      "2026-02-02": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-02-03": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-02-04": {
+        "da_leg": 92.27649804560963,
+        "rt_deviation_leg": 3.731669638869537,
+        "degradation_cost": 33.21949305095207,
+        "deviation_penalty": 9.046173532478718e-14,
+        "throughput_mwh": 6.308206890938687,
+        "net_revenue": 62.788674633527
+      },
+      "2026-02-05": {
+        "da_leg": 147.40467948996206,
+        "rt_deviation_leg": -4.79629276994032,
+        "degradation_cost": 33.3118556701031,
+        "deviation_penalty": 1.054087372942547e-14,
+        "throughput_mwh": 6.3257460661964195,
+        "net_revenue": 109.29653104991863
+      },
+      "2026-02-06": {
+        "da_leg": 104.5016322943281,
+        "rt_deviation_leg": 3.675213213827936,
+        "degradation_cost": 33.38989728938557,
+        "deviation_penalty": 2.010336341840002e-14,
+        "throughput_mwh": 6.340565758952795,
+        "net_revenue": 74.78694821877045
+      },
+      "2026-02-07": {
+        "da_leg": 16.90224845360823,
+        "rt_deviation_leg": 0.3752716546391641,
+        "degradation_cost": 9.718147172949003,
+        "deviation_penalty": 3.316021068844321e-14,
+        "throughput_mwh": 1.8454249999999999,
+        "net_revenue": 7.5593729352983585
+      },
+      "2026-02-08": {
+        "da_leg": 51.33453883495159,
+        "rt_deviation_leg": -2.3718481820390007,
+        "degradation_cost": 29.45500277161862,
+        "deviation_penalty": 2.0409646195318488e-14,
+        "throughput_mwh": 5.593349999999997,
+        "net_revenue": 19.507687881293943
+      },
+      "2026-02-09": {
+        "da_leg": 23.571506125596223,
+        "rt_deviation_leg": 5.620605503755325,
+        "degradation_cost": 22.224658187087712,
+        "deviation_penalty": 1.0411821551410335e-14,
+        "throughput_mwh": 4.220345617842762,
+        "net_revenue": 6.967453442263825
+      },
+      "2026-02-10": {
+        "da_leg": 55.47044095722238,
+        "rt_deviation_leg": -5.040881325400884,
+        "degradation_cost": 39.49404835974466,
+        "deviation_penalty": 8.66182646441782e-14,
+        "throughput_mwh": 7.499711920103092,
+        "net_revenue": 10.93551127207675
+      },
+      "2026-02-11": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-02-12": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-02-13": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -37.57,
+        "degradation_cost": 5.266075388026607,
+        "deviation_penalty": 75.14,
+        "throughput_mwh": 1.0,
+        "net_revenue": -117.9760753880266
+      },
+      "2026-02-14": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-02-15": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-02-16": {
+        "da_leg": 26.78473684210535,
+        "rt_deviation_leg": 44.926374861498154,
+        "degradation_cost": 42.12860310421273,
+        "deviation_penalty": 312.24234626038316,
+        "throughput_mwh": 7.999999999999975,
+        "net_revenue": -282.65983766099237
+      },
+      "2026-02-17": {
+        "da_leg": 98.04219483982965,
+        "rt_deviation_leg": 40.167349117439954,
+        "degradation_cost": 40.69658427329763,
+        "deviation_penalty": 69.00487340720065,
+        "throughput_mwh": 7.728067160950413,
+        "net_revenue": 28.508086276771323
+      },
+      "2026-02-18": {
+        "da_leg": 147.650399706578,
+        "rt_deviation_leg": 1.3034584469285433,
+        "degradation_cost": 33.22502778761972,
+        "deviation_penalty": 2.0959727009550734e-14,
+        "throughput_mwh": 6.3092579083016815,
+        "net_revenue": 115.72883036588682
+      },
+      "2026-02-19": {
+        "da_leg": 75.55745964631342,
+        "rt_deviation_leg": -2.1269975424935414,
+        "degradation_cost": 33.146105875831495,
+        "deviation_penalty": 1.7867001281257625e-14,
+        "throughput_mwh": 6.29427105263158,
+        "net_revenue": 40.28435622798836
+      },
+      "2026-02-20": {
+        "da_leg": 8.589557989690729,
+        "rt_deviation_leg": 0.23334093556700497,
+        "degradation_cost": 9.718147172949003,
+        "deviation_penalty": 1.965688029015311e-14,
+        "throughput_mwh": 1.8454249999999999,
+        "net_revenue": -0.8952482476912885
+      },
+      "2026-02-21": {
+        "da_leg": 85.70092105263151,
+        "rt_deviation_leg": 3.3438415131579275,
+        "degradation_cost": 33.03537278270511,
+        "deviation_penalty": 1.6647377920619987e-14,
+        "throughput_mwh": 6.273243421052632,
+        "net_revenue": 56.009389783084316
+      },
+      "2026-02-22": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -55.13249999999999,
+        "degradation_cost": 5.266075388026607,
+        "deviation_penalty": 110.26499999999999,
+        "throughput_mwh": 1.0,
+        "net_revenue": -170.66357538802657
+      },
+      "2026-02-23": {
+        "da_leg": 3.9628000000000747,
+        "rt_deviation_leg": -0.33236842105263853,
+        "degradation_cost": 12.689246119733934,
+        "deviation_penalty": 34.41473684210528,
+        "throughput_mwh": 2.409621052631581,
+        "net_revenue": -43.47355138289177
+      },
+      "2026-02-24": {
+        "da_leg": 94.19368421052627,
+        "rt_deviation_leg": 107.0589839999999,
+        "degradation_cost": 33.32039911308204,
+        "deviation_penalty": 556.085928,
+        "throughput_mwh": 6.327368421052629,
+        "net_revenue": -388.15365890255583
+      },
+      "2026-02-25": {
+        "da_leg": 101.56854249364594,
+        "rt_deviation_leg": 47.904097050389765,
+        "degradation_cost": 38.97395069496495,
+        "deviation_penalty": 124.59107700000027,
+        "throughput_mwh": 7.400948110917554,
+        "net_revenue": -14.092388150929509
+      },
+      "2026-02-26": {
+        "da_leg": 8.56737319587644,
+        "rt_deviation_leg": -16.423582432989686,
+        "degradation_cost": 10.916867442338908,
+        "deviation_penalty": 107.5,
+        "throughput_mwh": 2.073055670103094,
+        "net_revenue": -126.27307667945215
+      },
+      "2026-02-27": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -126.71410083102495,
+        "degradation_cost": 6.648675458046446,
+        "deviation_penalty": 274.25179833795016,
+        "throughput_mwh": 1.2625484764542936,
+        "net_revenue": -407.61457462702157
+      },
+      "2026-02-28": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-03-01": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-03-02": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-03-03": {
+        "da_leg": 152.35266438426152,
+        "rt_deviation_leg": 249.7656451248084,
+        "degradation_cost": 31.438470066518843,
+        "deviation_penalty": 530.8799697105264,
+        "throughput_mwh": 5.97,
+        "net_revenue": -160.20013026797534
+      },
+      "2026-03-04": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-03-05": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -8.345939058171744,
+        "degradation_cost": 12.965777803711052,
+        "deviation_penalty": 126.0718781163435,
+        "throughput_mwh": 2.4621329639889202,
+        "net_revenue": -147.38359497822628
+      },
+      "2026-03-06": {
+        "da_leg": 431.5029203477867,
+        "rt_deviation_leg": -50.86110193512989,
+        "degradation_cost": 28.27050997782705,
+        "deviation_penalty": 340.9736350370468,
+        "throughput_mwh": 5.368421052631578,
+        "net_revenue": 11.397673397782967
+      },
+      "2026-03-07": {
+        "da_leg": 8.779280097087394,
+        "rt_deviation_leg": 135.21117636650484,
+        "degradation_cost": 20.693438192904654,
+        "deviation_penalty": 489.495,
+        "throughput_mwh": 3.929575,
+        "net_revenue": -366.1979817293124
+      },
+      "2026-03-08": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -27.69204321329642,
+        "degradation_cost": 5.7595693779904265,
+        "deviation_penalty": 69.69591357340718,
+        "throughput_mwh": 1.0937119113573401,
+        "net_revenue": -103.14752616469403
+      },
+      "2026-03-09": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -4.078959392472825e-15,
+        "degradation_cost": 18.02206672232335,
+        "deviation_penalty": 8.15791878494565e-15,
+        "throughput_mwh": 3.422295617586455,
+        "net_revenue": -18.02206672232336
+      },
+      "2026-03-10": {
+        "da_leg": 417.1524014632554,
+        "rt_deviation_leg": -382.76650062454553,
+        "degradation_cost": 45.37773900897034,
+        "deviation_penalty": 1176.6636796470536,
+        "throughput_mwh": 8.61699380759816,
+        "net_revenue": -1187.6555178173141
+      },
+      "2026-03-11": {
+        "da_leg": 68.01074848113304,
+        "rt_deviation_leg": 127.85006450928334,
+        "degradation_cost": 14.77440338766087,
+        "deviation_penalty": 240.3483005,
+        "throughput_mwh": 2.805581443298969,
+        "net_revenue": -59.261890897244484
+      },
+      "2026-03-12": {
+        "da_leg": 336.40084182551004,
+        "rt_deviation_leg": 16.708622073884058,
+        "degradation_cost": 33.656823685955004,
+        "deviation_penalty": 145.13568379611698,
+        "throughput_mwh": 6.39125367678556,
+        "net_revenue": 174.31695641732207
+      },
+      "2026-03-13": {
+        "da_leg": 455.5530139393876,
+        "rt_deviation_leg": -64.5256561256306,
+        "degradation_cost": 35.606686529933484,
+        "deviation_penalty": 106.44654250000103,
+        "throughput_mwh": 6.761522368421055,
+        "net_revenue": 248.9741287838225
+      },
+      "2026-03-14": {
+        "da_leg": 35.13890922330098,
+        "rt_deviation_leg": -21.326029975728186,
+        "degradation_cost": 33.25526607538803,
+        "deviation_penalty": 306.4043709999999,
+        "throughput_mwh": 6.315000000000001,
+        "net_revenue": -325.84675782781517
+      },
+      "2026-03-15": {
+        "da_leg": 243.1523856412876,
+        "rt_deviation_leg": 34.774702411471836,
+        "degradation_cost": 36.926480263157885,
+        "deviation_penalty": 46.269000000000005,
+        "throughput_mwh": 7.012144252077562,
+        "net_revenue": 194.73160778960153
+      },
+      "2026-03-16": {
+        "da_leg": 375.04360517055375,
+        "rt_deviation_leg": 4.164389866113457,
+        "degradation_cost": 44.434773271670934,
+        "deviation_penalty": 1.0076609685549797e-14,
+        "throughput_mwh": 8.437929577062569,
+        "net_revenue": 334.77322176499626
+      },
+      "2026-03-17": {
+        "da_leg": 174.73288678368942,
+        "rt_deviation_leg": -3.646320246761092,
+        "degradation_cost": 43.743974923299774,
+        "deviation_penalty": 2.713503581111643,
+        "throughput_mwh": 8.306750606487666,
+        "net_revenue": 124.62908803251692
+      },
+      "2026-03-18": {
+        "da_leg": 175.19294975016365,
+        "rt_deviation_leg": -73.47305275595949,
+        "degradation_cost": 39.56669282024728,
+        "deviation_penalty": 160.24964637932126,
+        "throughput_mwh": 7.513506720813275,
+        "net_revenue": -98.09644220536438
+      },
+      "2026-03-19": {
+        "da_leg": 325.21935615530424,
+        "rt_deviation_leg": -73.97360527844482,
+        "degradation_cost": 41.683836396248786,
+        "deviation_penalty": 234.43727463394538,
+        "throughput_mwh": 7.915541143035033,
+        "net_revenue": -24.875360153334753
+      },
+      "2026-03-20": {
+        "da_leg": 2.9491237113401687,
+        "rt_deviation_leg": 0.07161847422680333,
+        "degradation_cost": 0.06542420051660602,
+        "deviation_penalty": 2.3604382337616413e-16,
+        "throughput_mwh": 0.012423711340206029,
+        "net_revenue": 2.9553179850503652
+      },
+      "2026-03-21": {
+        "da_leg": 21.279842233009713,
+        "rt_deviation_leg": -97.76502584708739,
+        "degradation_cost": 15.427362804878047,
+        "deviation_penalty": 199.38000000000002,
+        "throughput_mwh": 2.929575,
+        "net_revenue": -291.29254641895574
+      },
+      "2026-03-22": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-03-23": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-03-24": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -15.689003711802592,
+        "degradation_cost": 9.570984110955495,
+        "deviation_penalty": 35.188007423605185,
+        "throughput_mwh": 1.8174795090698646,
+        "net_revenue": -60.44799524636327
+      },
+      "2026-03-25": {
+        "da_leg": 438.1291700688515,
+        "rt_deviation_leg": -202.2065763371349,
+        "degradation_cost": 26.027577605321504,
+        "deviation_penalty": 638.5462414317833,
+        "throughput_mwh": 4.942500000000001,
+        "net_revenue": -428.65122530538815
+      },
+      "2026-03-26": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 0.0,
+        "degradation_cost": 0.0,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 0.0,
+        "net_revenue": 0.0
+      },
+      "2026-03-27": {
+        "da_leg": 94.52713988919666,
+        "rt_deviation_leg": -20.12579743767312,
+        "degradation_cost": 38.26500320924261,
+        "deviation_penalty": 71.71000000000002,
+        "throughput_mwh": 7.26632271468144,
+        "net_revenue": -35.5736607577191
+      },
+      "2026-03-28": {
+        "da_leg": 111.88889391657477,
+        "rt_deviation_leg": -29.12606603555388,
+        "degradation_cost": 10.919142098351813,
+        "deviation_penalty": 229.28775000000005,
+        "throughput_mwh": 2.073487615308071,
+        "net_revenue": -157.44406421733095
+      },
+      "2026-03-29": {
+        "da_leg": 112.25181648871796,
+        "rt_deviation_leg": 14.93065532434177,
+        "degradation_cost": 21.570194888551754,
+        "deviation_penalty": 1.5960809063297888e-14,
+        "throughput_mwh": 4.096066481994459,
+        "net_revenue": 105.61227692450797
+      },
+      "2026-03-30": {
+        "da_leg": 63.87823722167114,
+        "rt_deviation_leg": -182.73517508541482,
+        "degradation_cost": 48.166534427022285,
+        "deviation_penalty": 449.1089435620284,
+        "throughput_mwh": 9.146571379615601,
+        "net_revenue": -616.1324158527943
+      },
+      "2026-03-31": {
+        "da_leg": 186.18249536822918,
+        "rt_deviation_leg": -66.38222994867013,
+        "degradation_cost": 43.86203174232697,
+        "deviation_penalty": 619.3007912299778,
+        "throughput_mwh": 8.329168975069248,
+        "net_revenue": -543.3625575527457
+      },
+      "2026-04-01": {
+        "da_leg": 180.33125572812503,
+        "rt_deviation_leg": 108.61269499194748,
+        "degradation_cost": 43.45469428802301,
+        "deviation_penalty": 302.7088704039729,
+        "throughput_mwh": 8.251817736378268,
+        "net_revenue": -57.21961397192342
+      },
+      "2026-04-02": {
+        "da_leg": 107.44124137868053,
+        "rt_deviation_leg": 11.114867061863821,
+        "degradation_cost": 44.11076768483868,
+        "deviation_penalty": 2.3505071587021086e-14,
+        "throughput_mwh": 8.37640262141568,
+        "net_revenue": 74.44534075570564
+      },
+      "2026-04-03": {
+        "da_leg": 197.32607753019977,
+        "rt_deviation_leg": -4.187302153624673,
+        "degradation_cost": 44.0408671877603,
+        "deviation_penalty": 0.35574520508327173,
+        "throughput_mwh": 8.36312888491785,
+        "net_revenue": 148.74216298373153
+      },
+      "2026-04-04": {
+        "da_leg": 390.6467317138886,
+        "rt_deviation_leg": -2.5686560657855497,
+        "degradation_cost": 38.219586973590744,
+        "deviation_penalty": 15.151341825242735,
+        "throughput_mwh": 7.257698410563969,
+        "net_revenue": 334.7071468492695
+      },
+      "2026-04-05": {
+        "da_leg": 348.44283157894745,
+        "rt_deviation_leg": -78.91644965866145,
+        "degradation_cost": 47.39467849223944,
+        "deviation_penalty": 137.72553479100708,
+        "throughput_mwh": 8.999999999999995,
+        "net_revenue": 84.40616863703946
+      },
+      "2026-04-06": {
+        "da_leg": 683.5419445291619,
+        "rt_deviation_leg": -1718.6846221264811,
+        "degradation_cost": 48.15570661687475,
+        "deviation_penalty": 2942.3297116988574,
+        "throughput_mwh": 9.144515235457067,
+        "net_revenue": -4025.6280959130513
+      },
+      "2026-04-07": {
+        "da_leg": 131.99196713518614,
+        "rt_deviation_leg": 108.02477779716472,
+        "degradation_cost": 33.096964390719734,
+        "deviation_penalty": 175.6155582336018,
+        "throughput_mwh": 6.2849393432482525,
+        "net_revenue": 31.304222308029324
+      },
+      "2026-04-08": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -26.790776454293635,
+        "degradation_cost": 12.435523398296182,
+        "deviation_penalty": 80.06844709141274,
+        "throughput_mwh": 2.3614404432132963,
+        "net_revenue": -119.29474694400255
+      },
+      "2026-04-09": {
+        "da_leg": 284.9144587378641,
+        "rt_deviation_leg": 17.449404609223276,
+        "degradation_cost": 29.22671840354767,
+        "deviation_penalty": 104.62188649999996,
+        "throughput_mwh": 5.550000000000001,
+        "net_revenue": 168.51525844353972
+      },
+      "2026-04-10": {
+        "da_leg": 280.6597168293569,
+        "rt_deviation_leg": -215.22132228567963,
+        "degradation_cost": 47.39467849223941,
+        "deviation_penalty": 767.2481098421031,
+        "throughput_mwh": 8.999999999999993,
+        "net_revenue": -749.2043937906652
+      },
+      "2026-04-11": {
+        "da_leg": 369.3891226210237,
+        "rt_deviation_leg": -93.08831136702405,
+        "degradation_cost": 40.5737626519954,
+        "deviation_penalty": 173.77861465163548,
+        "throughput_mwh": 7.704743981494705,
+        "net_revenue": 61.94843395036878
+      },
+      "2026-04-12": {
+        "da_leg": 413.07625438895013,
+        "rt_deviation_leg": 84.51634687591593,
+        "degradation_cost": 28.03652557227984,
+        "deviation_penalty": 150.5823795013851,
+        "throughput_mwh": 5.323988645515035,
+        "net_revenue": 318.9736961912011
+      },
+      "2026-04-13": {
+        "da_leg": 212.29020361219833,
+        "rt_deviation_leg": 1.485704401593087,
+        "degradation_cost": 33.747228381374725,
+        "deviation_penalty": 4.488629086474294e-14,
+        "throughput_mwh": 6.4084210526315815,
+        "net_revenue": 180.02867963241664
+      },
+      "2026-04-14": {
+        "da_leg": 97.5702177513779,
+        "rt_deviation_leg": 6.710280780049694,
+        "degradation_cost": 22.292048898390625,
+        "deviation_penalty": 1.8492360420729882e-14,
+        "throughput_mwh": 4.233142759231231,
+        "net_revenue": 81.98844963303695
+      },
+      "2026-04-15": {
+        "da_leg": 154.31993949625058,
+        "rt_deviation_leg": -3.3461765521400544,
+        "degradation_cost": 33.246623001517094,
+        "deviation_penalty": 2.6833644473715044,
+        "throughput_mwh": 6.313358725761772,
+        "net_revenue": 115.04377549522192
+      },
+      "2026-04-16": {
+        "da_leg": 218.91323628662911,
+        "rt_deviation_leg": -1.917500754406281,
+        "degradation_cost": 44.297541341250025,
+        "deviation_penalty": 1.5180495749333998e-14,
+        "throughput_mwh": 8.411869955748955,
+        "net_revenue": 172.69819419097277
+      },
+      "2026-04-17": {
+        "da_leg": 321.3256863004955,
+        "rt_deviation_leg": 0.04634892780133378,
+        "degradation_cost": 44.20610150588236,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 8.39450601227493,
+        "net_revenue": 277.1659337224144
+      },
+      "2026-04-18": {
+        "da_leg": 443.5636246253675,
+        "rt_deviation_leg": -3.971724929480839,
+        "degradation_cost": 33.93902885964722,
+        "deviation_penalty": 4.552385072833874,
+        "throughput_mwh": 6.444842953979325,
+        "net_revenue": 401.1004857634055
+      },
+      "2026-04-19": {
+        "da_leg": 239.3419672968829,
+        "rt_deviation_leg": 7.723396737084156,
+        "degradation_cost": 33.25841512700442,
+        "deviation_penalty": 0.7108995508700116,
+        "throughput_mwh": 6.315597988327998,
+        "net_revenue": 213.09604935609264
+      },
+      "2026-04-20": {
+        "da_leg": 257.4748577882144,
+        "rt_deviation_leg": 7.441900991841517,
+        "degradation_cost": 44.276791010030145,
+        "deviation_penalty": 1.6160553797939235e-14,
+        "throughput_mwh": 8.40792957706257,
+        "net_revenue": 220.63996777002578
+      },
+      "2026-04-21": {
+        "da_leg": 301.04679904735127,
+        "rt_deviation_leg": 2.684277995943026,
+        "degradation_cost": 44.00350697095422,
+        "deviation_penalty": 2.34634794232802e-14,
+        "throughput_mwh": 8.356034376379098,
+        "net_revenue": 259.7275700723401
+      },
+      "2026-04-22": {
+        "da_leg": 412.12402351567965,
+        "rt_deviation_leg": -7.057719403258386,
+        "degradation_cost": 44.06683995809833,
+        "deviation_penalty": 3.3092813928944786,
+        "throughput_mwh": 8.368060977306255,
+        "net_revenue": 357.69018276142845
+      },
+      "2026-04-23": {
+        "da_leg": 547.980033249731,
+        "rt_deviation_leg": -1.795917924579504,
+        "degradation_cost": 44.033300001510256,
+        "deviation_penalty": 8.928524152657103e-15,
+        "throughput_mwh": 8.361691916076268,
+        "net_revenue": 502.15081532364127
+      },
+      "2026-04-24": {
+        "da_leg": 512.3669845583598,
+        "rt_deviation_leg": 0.27835757099788083,
+        "degradation_cost": 44.41197542903211,
+        "deviation_penalty": 1.0071006528722393e-14,
+        "throughput_mwh": 8.4336003867341,
+        "net_revenue": 468.2333667003256
+      },
+      "2026-04-25": {
+        "da_leg": 790.0239787945992,
+        "rt_deviation_leg": -5.282718303114037,
+        "degradation_cost": 33.55542772581113,
+        "deviation_penalty": 0.9380620051324982,
+        "throughput_mwh": 6.371999117617187,
+        "net_revenue": 750.2477707605416
+      },
+      "2026-04-26": {
+        "da_leg": 1551.325266530404,
+        "rt_deviation_leg": 11.299867808568393,
+        "degradation_cost": 42.62210621134318,
+        "deviation_penalty": 2.170711527194058e-15,
+        "throughput_mwh": 8.09371364265928,
+        "net_revenue": 1520.0030281276292
+      },
+      "2026-04-27": {
+        "da_leg": 471.23178597579937,
+        "rt_deviation_leg": 2.618047556640599,
+        "degradation_cost": 44.35790864381075,
+        "deviation_penalty": 1.6661663368444657e-14,
+        "throughput_mwh": 8.423333388782591,
+        "net_revenue": 429.4919248886292
+      },
+      "2026-04-28": {
+        "da_leg": 332.80142765310217,
+        "rt_deviation_leg": 0.5070448304042281,
+        "degradation_cost": 44.1000659000436,
+        "deviation_penalty": 4.669081970369924,
+        "throughput_mwh": 8.374370408808284,
+        "net_revenue": 284.5393246130929
+      },
+      "2026-04-29": {
+        "da_leg": 422.4408098907409,
+        "rt_deviation_leg": -4.886003922765573,
+        "degradation_cost": 43.91924489285635,
+        "deviation_penalty": 5.465929432130423,
+        "throughput_mwh": 8.340033451232935,
+        "net_revenue": 368.16963164298863
+      },
+      "2026-04-30": {
+        "da_leg": 457.50151986713286,
+        "rt_deviation_leg": -1.523411590914884,
+        "degradation_cost": 33.852681541019955,
+        "deviation_penalty": 2.35804075300239,
+        "throughput_mwh": 6.42844605263158,
+        "net_revenue": 419.76738598219566
+      },
+      "2026-05-01": {
+        "da_leg": 1686.2521823595532,
+        "rt_deviation_leg": 12.905350026277096,
+        "degradation_cost": 44.2339951416655,
+        "deviation_penalty": 1.0181034834633173e-13,
+        "throughput_mwh": 8.399802866901538,
+        "net_revenue": 1654.923537244165
+      },
+      "2026-05-02": {
+        "da_leg": 750.762916114503,
+        "rt_deviation_leg": -4.099701402057757,
+        "degradation_cost": 33.89806919587414,
+        "deviation_penalty": 4.516688119141302,
+        "throughput_mwh": 6.437064929405996,
+        "net_revenue": 708.2484573974297
+      },
+      "2026-05-03": {
+        "da_leg": 420.2537135411344,
+        "rt_deviation_leg": -4.613826421563622,
+        "degradation_cost": 33.595565410199555,
+        "deviation_penalty": 8.83335071755198e-15,
+        "throughput_mwh": 6.379621052631579,
+        "net_revenue": 382.0443217093713
+      },
+      "2026-05-04": {
+        "da_leg": 647.3640145064078,
+        "rt_deviation_leg": 1.3807510635890188,
+        "degradation_cost": 44.440575173275015,
+        "deviation_penalty": 3.61335961152065e-15,
+        "throughput_mwh": 8.439031327640858,
+        "net_revenue": 604.3041903967219
+      },
+      "2026-05-05": {
+        "da_leg": 426.34711594434987,
+        "rt_deviation_leg": 4.142505307887626,
+        "degradation_cost": 33.47167120031088,
+        "deviation_penalty": 4.594796765289288e-15,
+        "throughput_mwh": 6.356094194248508,
+        "net_revenue": 397.0179500519266
+      },
+      "2026-05-06": {
+        "da_leg": 44.62750000000002,
+        "rt_deviation_leg": 1.1282659279778038,
+        "degradation_cost": 28.2165363519664,
+        "deviation_penalty": 8.993468144044392,
+        "throughput_mwh": 5.358171745152356,
+        "net_revenue": 8.545761431967026
+      },
+      "2026-05-07": {
+        "da_leg": 229.44893237570324,
+        "rt_deviation_leg": 1.1396986206699566,
+        "degradation_cost": 17.840471466915623,
+        "deviation_penalty": 3.2432390106862384e-15,
+        "throughput_mwh": 3.38781163434903,
+        "net_revenue": 212.74815952945755
+      },
+      "2026-05-08": {
+        "da_leg": 167.8863255333747,
+        "rt_deviation_leg": 21.211077343948826,
+        "degradation_cost": 31.623779198242765,
+        "deviation_penalty": 38.67783086861297,
+        "throughput_mwh": 6.005189228803152,
+        "net_revenue": 118.79579281046779
+      },
+      "2026-05-09": {
+        "da_leg": 444.4130972601658,
+        "rt_deviation_leg": 4.993733540414302,
+        "degradation_cost": 33.30512895320341,
+        "deviation_penalty": 1.5064451422408533e-13,
+        "throughput_mwh": 6.324468698060941,
+        "net_revenue": 416.10170184737655
+      },
+      "2026-05-10": {
+        "da_leg": 278.8380436893203,
+        "rt_deviation_leg": 8.100547867479746,
+        "degradation_cost": 31.767134420387542,
+        "deviation_penalty": 6.258193905817176,
+        "throughput_mwh": 6.032411630987277,
+        "net_revenue": 248.9132632305953
+      },
+      "2026-05-11": {
+        "da_leg": 39.86860723598603,
+        "rt_deviation_leg": 25.866211322314534,
+        "degradation_cost": 31.78947702658148,
+        "deviation_penalty": 43.007479229755695,
+        "throughput_mwh": 6.03665437431084,
+        "net_revenue": -9.062137698036615
+      },
+      "2026-05-12": {
+        "da_leg": 229.76319411778078,
+        "rt_deviation_leg": 0.5121610564892145,
+        "degradation_cost": 44.32416719101337,
+        "deviation_penalty": 2.3261219339598683e-14,
+        "throughput_mwh": 8.416926064482965,
+        "net_revenue": 185.9511879832566
+      },
+      "2026-05-13": {
+        "da_leg": 221.61899983458792,
+        "rt_deviation_leg": -8.784428648019254,
+        "degradation_cost": 33.29369074292549,
+        "deviation_penalty": 3.0649617786202183,
+        "throughput_mwh": 6.322296642130271,
+        "net_revenue": 176.47591866502296
+      },
+      "2026-05-14": {
+        "da_leg": 390.90561545035274,
+        "rt_deviation_leg": 0.6146936993531256,
+        "degradation_cost": 33.54985594876882,
+        "deviation_penalty": 2.7932400316343918e-14,
+        "throughput_mwh": 6.370941066481996,
+        "net_revenue": 357.9704532009371
+      },
+      "2026-05-15": {
+        "da_leg": 1.495006701030935,
+        "rt_deviation_leg": -81.37422929896906,
+        "degradation_cost": 5.315143538414063,
+        "deviation_penalty": 176.14499999999998,
+        "throughput_mwh": 1.0093177835051548,
+        "net_revenue": -261.33936613635217
+      },
+      "2026-05-16": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -55.09611224548081,
+        "degradation_cost": 7.027323978907427,
+        "deviation_penalty": 196.3022244909616,
+        "throughput_mwh": 1.334451837678842,
+        "net_revenue": -258.42566071534986
+      },
+      "2026-05-17": {
+        "da_leg": 467.0449349514563,
+        "rt_deviation_leg": 69.45531936637731,
+        "degradation_cost": 21.274944567627493,
+        "deviation_penalty": 145.2716652018396,
+        "throughput_mwh": 4.04,
+        "net_revenue": 369.9536445483666
+      },
+      "2026-05-18": {
+        "da_leg": 366.18307644353604,
+        "rt_deviation_leg": 0.6370245636177301,
+        "degradation_cost": 33.740909090909085,
+        "deviation_penalty": 2.5289492722180287e-15,
+        "throughput_mwh": 6.407221052631581,
+        "net_revenue": 333.07919191624467
+      },
+      "2026-05-19": {
+        "da_leg": 282.1330591424249,
+        "rt_deviation_leg": 4.900830562043508,
+        "degradation_cost": 44.39116724657744,
+        "deviation_penalty": 1.1390194343263715e-14,
+        "throughput_mwh": 8.42964902240271,
+        "net_revenue": 242.64272245789095
+      },
+      "2026-05-20": {
+        "da_leg": 108.05302144050778,
+        "rt_deviation_leg": -7.851580926423991,
+        "degradation_cost": 20.550740331625512,
+        "deviation_penalty": 45.12,
+        "throughput_mwh": 3.902477427184466,
+        "net_revenue": 34.53070018245828
+      },
+      "2026-05-21": {
+        "da_leg": 483.22523755748597,
+        "rt_deviation_leg": 145.39962526417997,
+        "degradation_cost": 32.370386331345664,
+        "deviation_penalty": 286.4750944077672,
+        "throughput_mwh": 6.146965993868167,
+        "net_revenue": 309.77938208255307
+      },
+      "2026-05-22": {
+        "da_leg": 490.7359989148129,
+        "rt_deviation_leg": -3.7590256632492958,
+        "degradation_cost": 33.42119850624343,
+        "deviation_penalty": 4.50292407527808e-14,
+        "throughput_mwh": 6.346509695290859,
+        "net_revenue": 453.5557747453201
+      },
+      "2026-05-23": {
+        "da_leg": 572.00179110884,
+        "rt_deviation_leg": -6.08031510628513,
+        "degradation_cost": 33.42051581281363,
+        "deviation_penalty": 1.0833079225336384e-14,
+        "throughput_mwh": 6.346380055401662,
+        "net_revenue": 532.5009601897412
+      },
+      "2026-05-24": {
+        "da_leg": 588.9604710781811,
+        "rt_deviation_leg": -6.1433146945646895,
+        "degradation_cost": 33.26953553506827,
+        "deviation_penalty": 3.3121422271520374e-14,
+        "throughput_mwh": 6.317709695290857,
+        "net_revenue": 549.5476208485481
+      },
+      "2026-05-25": {
+        "da_leg": 638.7770789473685,
+        "rt_deviation_leg": 1.6466553324099347,
+        "degradation_cost": 33.40413117049831,
+        "deviation_penalty": 2.9518054667221344e-15,
+        "throughput_mwh": 6.343268698060942,
+        "net_revenue": 607.0196031092802
+      },
+      "2026-05-26": {
+        "da_leg": 607.8270842105264,
+        "rt_deviation_leg": 3.5303368421052785,
+        "degradation_cost": 33.74722838137474,
+        "deviation_penalty": 0.657947368421063,
+        "throughput_mwh": 6.4084210526315815,
+        "net_revenue": 576.9522453028359
+      },
+      "2026-05-27": {
+        "da_leg": 397.5182894736842,
+        "rt_deviation_leg": -0.2468921052631584,
+        "degradation_cost": 33.08134700665189,
+        "deviation_penalty": 1.4241663404135355e-14,
+        "throughput_mwh": 6.281973684210526,
+        "net_revenue": 364.1900503617692
+      },
+      "2026-05-28": {
+        "da_leg": 859.2772968540107,
+        "rt_deviation_leg": -7.821955938662251,
+        "degradation_cost": 35.25430763466632,
+        "deviation_penalty": 6.061726125000047,
+        "throughput_mwh": 6.694607470835583,
+        "net_revenue": 810.1393071556821
+      },
+      "2026-05-29": {
+        "da_leg": 585.2130082968023,
+        "rt_deviation_leg": 3.4912243032568533,
+        "degradation_cost": 44.23620025673938,
+        "deviation_penalty": 0.6647052631579273,
+        "throughput_mwh": 8.4002216066482,
+        "net_revenue": 543.8033270801619
+      },
+      "2026-05-30": {
+        "da_leg": 487.3559798160451,
+        "rt_deviation_leg": 3.8010910479791025,
+        "degradation_cost": 33.58156144240866,
+        "deviation_penalty": 7.244634074711189,
+        "throughput_mwh": 6.376961772853181,
+        "net_revenue": 450.33087534690435
+      },
+      "2026-05-31": {
+        "da_leg": 480.9554570260603,
+        "rt_deviation_leg": -5.715681749132676,
+        "degradation_cost": 33.111553273427475,
+        "deviation_penalty": 2.295823253728457e-14,
+        "throughput_mwh": 6.287709695290856,
+        "net_revenue": 442.1282220035001
+      },
+      "2026-06-01": {
+        "da_leg": 467.6982796735066,
+        "rt_deviation_leg": 8.049668944410119,
+        "degradation_cost": 43.92286147741858,
+        "deviation_penalty": 1.9871541478283516e-13,
+        "throughput_mwh": 8.340720221606649,
+        "net_revenue": 431.825087140498
+      },
+      "2026-06-02": {
+        "da_leg": 207.67507197372373,
+        "rt_deviation_leg": -4.11218979390319,
+        "degradation_cost": 33.55248570428287,
+        "deviation_penalty": 9.936339945282313e-15,
+        "throughput_mwh": 6.371440443213296,
+        "net_revenue": 170.01039647553768
+      },
+      "2026-06-03": {
+        "da_leg": 218.42624871963713,
+        "rt_deviation_leg": 1.785111496725228,
+        "degradation_cost": 33.57217878398879,
+        "deviation_penalty": 1.143009298321118e-15,
+        "throughput_mwh": 6.375180055401661,
+        "net_revenue": 186.63918143237356
+      },
+      "2026-06-04": {
+        "da_leg": 368.88765214939986,
+        "rt_deviation_leg": -9.750742478583927,
+        "degradation_cost": 33.22062084257206,
+        "deviation_penalty": 3.7161076077334214,
+        "throughput_mwh": 6.308421052631577,
+        "net_revenue": 322.20018122051044
+      },
+      "2026-06-05": {
+        "da_leg": 340.3932548383018,
+        "rt_deviation_leg": -1.8255280894786081,
+        "degradation_cost": 33.463111214844204,
+        "deviation_penalty": 1.2845618665990875e-14,
+        "throughput_mwh": 6.354468698060942,
+        "net_revenue": 305.104615533979
+      },
+      "2026-06-06": {
+        "da_leg": 257.3173684210526,
+        "rt_deviation_leg": -8.856345914127441,
+        "degradation_cost": 27.779495857159525,
+        "deviation_penalty": 0.254278670360146,
+        "throughput_mwh": 5.27518005540166,
+        "net_revenue": 220.42724797940548
+      },
+      "2026-06-07": {
+        "da_leg": 539.9862933329748,
+        "rt_deviation_leg": -12.309530724390184,
+        "degradation_cost": 37.92946775858338,
+        "deviation_penalty": 0.5698545706371371,
+        "throughput_mwh": 7.202606298577304,
+        "net_revenue": 489.1774402793642
+      },
+      "2026-06-08": {
+        "da_leg": 341.60780691988435,
+        "rt_deviation_leg": 7.635817072685993,
+        "degradation_cost": 43.51760749688138,
+        "deviation_penalty": 3.519328925505327e-14,
+        "throughput_mwh": 8.263764623618322,
+        "net_revenue": 305.7260164956889
+      },
+      "2026-06-09": {
+        "da_leg": 267.64528706583843,
+        "rt_deviation_leg": 4.647645379179405,
+        "degradation_cost": 33.18386042712102,
+        "deviation_penalty": 9.872688644086734,
+        "throughput_mwh": 6.301440443213295,
+        "net_revenue": 229.23638337381004
+      },
+      "2026-06-10": {
+        "da_leg": 271.80370237280033,
+        "rt_deviation_leg": 1.27261681188971,
+        "degradation_cost": 33.00574746178083,
+        "deviation_penalty": 1.3542722498982581e-13,
+        "throughput_mwh": 6.267617728531854,
+        "net_revenue": 240.07057172290905
+      },
+      "2026-06-11": {
+        "da_leg": 15.642046263742543,
+        "rt_deviation_leg": 8.902761147354097,
+        "degradation_cost": 32.89279379157429,
+        "deviation_penalty": 5.708711281471323e-14,
+        "throughput_mwh": 6.246168421052634,
+        "net_revenue": -8.347986380477707
+      },
+      "2026-06-12": {
+        "da_leg": 93.18819274768349,
+        "rt_deviation_leg": -9.566109711113118,
+        "degradation_cost": 33.15029302396198,
+        "deviation_penalty": 9.424600489471084,
+        "throughput_mwh": 6.295066170023936,
+        "net_revenue": 41.04718952313731
+      },
+      "2026-06-13": {
+        "da_leg": 254.9336988462747,
+        "rt_deviation_leg": -48.39247792572179,
+        "degradation_cost": 27.468199323141558,
+        "deviation_penalty": 98.29,
+        "throughput_mwh": 5.216066481994458,
+        "net_revenue": 80.78302159741135
+      },
+      "2026-06-14": {
+        "da_leg": 304.1862724138983,
+        "rt_deviation_leg": -10.17427869497367,
+        "degradation_cost": 27.28848173649201,
+        "deviation_penalty": 25.62818484210525,
+        "throughput_mwh": 5.181939058171746,
+        "net_revenue": 241.09532714032733
+      },
+      "2026-06-15": {
+        "da_leg": 396.7420993868167,
+        "rt_deviation_leg": -13.252746233144244,
+        "degradation_cost": 32.9994281713152,
+        "deviation_penalty": 0.9347013850417192,
+        "throughput_mwh": 6.266417728531856,
+        "net_revenue": 349.55522359731555
+      },
+      "2026-06-16": {
+        "da_leg": 377.1588231076391,
+        "rt_deviation_leg": -2.353858959546064,
+        "degradation_cost": 33.24289298634613,
+        "deviation_penalty": 2.0449475446326914e-14,
+        "throughput_mwh": 6.312650415512465,
+        "net_revenue": 341.56207116174687
+      },
+      "2026-06-17": {
+        "da_leg": 272.2041359939735,
+        "rt_deviation_leg": 1.7019397873251858,
+        "degradation_cost": 33.232144941066636,
+        "deviation_penalty": 5.070525596617693e-14,
+        "throughput_mwh": 6.310609418282549,
+        "net_revenue": 240.673930840232
+      },
+      "2026-06-18": {
+        "da_leg": 634.7051828120377,
+        "rt_deviation_leg": -13.85622327609392,
+        "degradation_cost": 33.04557124518613,
+        "deviation_penalty": 3.037001206074308e-14,
+        "throughput_mwh": 6.275180055401661,
+        "net_revenue": 587.8033882907577
+      },
+      "2026-06-19": {
+        "da_leg": 299.2206263614816,
+        "rt_deviation_leg": -3.7138163954650594,
+        "degradation_cost": 26.547339246119734,
+        "deviation_penalty": 7.733402174658024,
+        "throughput_mwh": 5.0412,
+        "net_revenue": 261.2260685452388
+      },
+      "2026-06-20": {
+        "da_leg": 484.7579435191672,
+        "rt_deviation_leg": 27.895924558286872,
+        "degradation_cost": 29.983141701145218,
+        "deviation_penalty": 50.26522727112303,
+        "throughput_mwh": 5.693640803038525,
+        "net_revenue": 432.4054991051858
+      },
+      "2026-06-21": {
+        "da_leg": 440.11233857945837,
+        "rt_deviation_leg": -4.227970729177315,
+        "degradation_cost": 33.50498998988225,
+        "deviation_penalty": 7.59253770965529e-15,
+        "throughput_mwh": 6.36242125702606,
+        "net_revenue": 402.3793778603988
+      },
+      "2026-06-22": {
+        "da_leg": 583.2057486142791,
+        "rt_deviation_leg": 3.5108789997561716,
+        "degradation_cost": 33.669756188201546,
+        "deviation_penalty": 1.395741161536179e-15,
+        "throughput_mwh": 6.393709490896379,
+        "net_revenue": 553.0468714258337
+      },
+      "2026-06-23": {
+        "da_leg": 680.1351335065825,
+        "rt_deviation_leg": -0.1333489055315983,
+        "degradation_cost": 22.56851785626202,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 4.28564275923123,
+        "net_revenue": 657.4332667447889
+      },
+      "2026-06-24": {
+        "da_leg": 1386.2521055641173,
+        "rt_deviation_leg": -24.626097854116765,
+        "degradation_cost": 33.7092736180481,
+        "deviation_penalty": 21.156799999999965,
+        "throughput_mwh": 6.401213642837766,
+        "net_revenue": 1306.7599340919523
+      },
+      "2026-06-25": {
+        "da_leg": 513.8016882267725,
+        "rt_deviation_leg": -1.9662448310238088,
+        "degradation_cost": 33.174477768701124,
+        "deviation_penalty": 1.0799555694163133e-14,
+        "throughput_mwh": 6.2996587257617715,
+        "net_revenue": 478.6609656270476
+      },
+      "2026-06-26": {
+        "da_leg": 662.6249643068234,
+        "rt_deviation_leg": -5.637085291305157,
+        "degradation_cost": 33.40719453845256,
+        "deviation_penalty": 1.3175849300495203e-14,
+        "throughput_mwh": 6.343850415512465,
+        "net_revenue": 623.5806844770656
+      },
+      "2026-06-27": {
+        "da_leg": 504.92618579458355,
+        "rt_deviation_leg": -6.088429787591089,
+        "degradation_cost": 33.40787723188237,
+        "deviation_penalty": 1.2942060617637807e-14,
+        "throughput_mwh": 6.343980055401661,
+        "net_revenue": 465.42987877511007
+      },
+      "2026-06-28": {
+        "da_leg": 433.69119437915174,
+        "rt_deviation_leg": -10.185663375413455,
+        "degradation_cost": 33.24289298634613,
+        "deviation_penalty": 3.4530878627329886,
+        "throughput_mwh": 6.312650415512465,
+        "net_revenue": 386.8095501546591
+      },
+      "2026-06-29": {
+        "da_leg": 306.78881024290274,
+        "rt_deviation_leg": -3.5227056259635807,
+        "degradation_cost": 33.232144941066636,
+        "deviation_penalty": 1.626178358637986e-14,
+        "throughput_mwh": 6.3106094182825485,
+        "net_revenue": 270.03395967587255
+      },
+      "2026-06-30": {
+        "da_leg": 109.04151519262078,
+        "rt_deviation_leg": -8.653381917354434,
+        "degradation_cost": 22.410535594621223,
+        "deviation_penalty": 1.579000818985321e-14,
+        "throughput_mwh": 4.255642759231231,
+        "net_revenue": 77.9775976806451
+      },
+      "2026-07-01": {
+        "da_leg": 89.98826873022284,
+        "rt_deviation_leg": 0.3344823386175707,
+        "degradation_cost": 32.721090032639836,
+        "deviation_penalty": 3.336266159170709e-14,
+        "throughput_mwh": 6.213562780934973,
+        "net_revenue": 57.60166103620055
+      },
+      "2026-07-02": {
+        "da_leg": 444.6830917731221,
+        "rt_deviation_leg": -5.618242378129812,
+        "degradation_cost": 37.045655668377876,
+        "deviation_penalty": 0.7729373530915228,
+        "throughput_mwh": 7.03477503428986,
+        "net_revenue": 401.24625637352284
+      },
+      "2026-07-03": {
+        "da_leg": 388.3153529892694,
+        "rt_deviation_leg": -1.768278047602407,
+        "degradation_cost": 33.38860902984,
+        "deviation_penalty": 99.65200111072265,
+        "throughput_mwh": 6.340321125245407,
+        "net_revenue": 253.50646480110436
+      },
+      "2026-07-04": {
+        "da_leg": 338.54313106796116,
+        "rt_deviation_leg": -7.765169730118621,
+        "degradation_cost": 33.203421794751236,
+        "deviation_penalty": 1.4607204334993184e-14,
+        "throughput_mwh": 6.305155043971706,
+        "net_revenue": 297.5745395430913
+      },
+      "2026-07-05": {
+        "da_leg": 389.74030432283786,
+        "rt_deviation_leg": -9.638661747030774,
+        "degradation_cost": 33.11418485237484,
+        "deviation_penalty": 0.2931339590673423,
+        "throughput_mwh": 6.2882094182825465,
+        "net_revenue": 346.6943237643649
+      },
+      "2026-07-06": {
+        "da_leg": 295.0063170716803,
+        "rt_deviation_leg": -3.637287190576804,
+        "degradation_cost": 33.05709534368071,
+        "deviation_penalty": 2.1309655429124775e-14,
+        "throughput_mwh": 6.277368421052631,
+        "net_revenue": 258.3119345374228
+      },
+      "2026-07-07": {
+        "da_leg": 318.1641954474817,
+        "rt_deviation_leg": 11.418699265786561,
+        "degradation_cost": 33.070124808558305,
+        "deviation_penalty": 2.1928240473423345e-14,
+        "throughput_mwh": 6.279842647856754,
+        "net_revenue": 296.51276990470996
+      },
+      "2026-07-08": {
+        "da_leg": 103.99496107091949,
+        "rt_deviation_leg": 17.739420327165647,
+        "degradation_cost": 32.84645232815965,
+        "deviation_penalty": 4.733984038107763e-14,
+        "throughput_mwh": 6.237368421052631,
+        "net_revenue": 88.88792906992545
+      },
+      "2026-07-09": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -116.9975,
+        "degradation_cost": 5.266075388026607,
+        "deviation_penalty": 233.995,
+        "throughput_mwh": 1.0,
+        "net_revenue": -356.2585753880266
+      },
+      "2026-07-10": {
+        "da_leg": 317.1301602210688,
+        "rt_deviation_leg": 103.19696813885281,
+        "degradation_cost": 27.60867211345619,
+        "deviation_penalty": 209.8449666961764,
+        "throughput_mwh": 5.242741525544734,
+        "net_revenue": 182.87348955028904
+      },
+      "2026-07-11": {
+        "da_leg": 405.5596116504854,
+        "rt_deviation_leg": -6.342507266089345,
+        "degradation_cost": 32.637122184618974,
+        "deviation_penalty": 0.20178448753463646,
+        "throughput_mwh": 6.1976177285318546,
+        "net_revenue": 366.37819771224247
+      },
+      "2026-07-12": {
+        "da_leg": 418.0374727823185,
+        "rt_deviation_leg": -2.463094665621455,
+        "degradation_cost": 32.84776520014003,
+        "deviation_penalty": 1.6847338245974182,
+        "throughput_mwh": 6.237617728531855,
+        "net_revenue": 381.04187909195963
+      },
+      "2026-07-13": {
+        "da_leg": 256.30953955718036,
+        "rt_deviation_leg": 2.5005084143875043,
+        "degradation_cost": 33.39712918660287,
+        "deviation_penalty": 8.572342488633034e-14,
+        "throughput_mwh": 6.341939058171745,
+        "net_revenue": 225.41291878496494
+      },
+      "2026-07-14": {
+        "da_leg": 182.05901261620232,
+        "rt_deviation_leg": -4.856854529783198,
+        "degradation_cost": 33.37860310421286,
+        "deviation_penalty": 1.103221680676114e-14,
+        "throughput_mwh": 6.33842105263158,
+        "net_revenue": 143.82355498220628
+      },
+      "2026-07-15": {
+        "da_leg": 221.4246203683315,
+        "rt_deviation_leg": -3.4654636117874804,
+        "degradation_cost": 33.603051637826596,
+        "deviation_penalty": 1.4948836439543366e-14,
+        "throughput_mwh": 6.381042647856754,
+        "net_revenue": 184.3561051187174
+      },
+      "2026-07-16": {
+        "da_leg": 412.8835747230403,
+        "rt_deviation_leg": 1.9311753336841293,
+        "degradation_cost": 33.63475450346671,
+        "deviation_penalty": 1.82413387780217e-13,
+        "throughput_mwh": 6.387062855184624,
+        "net_revenue": 381.1799955532575
+      },
+      "2026-07-17": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -88.63,
+        "degradation_cost": 5.266075388026607,
+        "deviation_penalty": 177.26,
+        "throughput_mwh": 1.0,
+        "net_revenue": -271.1560753880266
+      },
+      "2026-07-18": {
+        "da_leg": 404.813372151252,
+        "rt_deviation_leg": 76.3987061811448,
+        "degradation_cost": 33.90707455654102,
+        "deviation_penalty": 118.34377531579017,
+        "throughput_mwh": 6.438775,
+        "net_revenue": 328.9612284600656
+      },
+      "2026-07-19": {
+        "da_leg": 401.69742281418934,
+        "rt_deviation_leg": -8.640347245505735,
+        "degradation_cost": 33.13357837128103,
+        "deviation_penalty": 9.296964240124162e-15,
+        "throughput_mwh": 6.291892145451681,
+        "net_revenue": 359.9234971974026
+      },
+      "2026-07-20": {
+        "da_leg": 329.70985053653544,
+        "rt_deviation_leg": -5.6774296091782395,
+        "degradation_cost": 33.21688117639988,
+        "deviation_penalty": 1.0698109065288008e-14,
+        "throughput_mwh": 6.307710909707937,
+        "net_revenue": 290.8155397509573
+      },
+      "2026-07-21": {
+        "da_leg": 210.15732007352324,
+        "rt_deviation_leg": 1.2496427502411342,
+        "degradation_cost": 32.61610758572318,
+        "deviation_penalty": 4.4639916763067327e-14,
+        "throughput_mwh": 6.193627166804693,
+        "net_revenue": 178.79085523804113
+      },
+      "2026-07-22": {
+        "da_leg": 243.23613471029745,
+        "rt_deviation_leg": 10.334874065674338,
+        "degradation_cost": 33.14860130258556,
+        "deviation_penalty": 2.566450524321695e-14,
+        "throughput_mwh": 6.294744921038354,
+        "net_revenue": 220.4224074733862
+      },
+      "2026-07-23": {
+        "da_leg": 217.29259959448265,
+        "rt_deviation_leg": -4.836120363680502,
+        "degradation_cost": 21.968724471933715,
+        "deviation_penalty": 9.596351491225619e-15,
+        "throughput_mwh": 4.171745152354572,
+        "net_revenue": 190.48775475886845
+      },
+      "2026-07-24": {
+        "da_leg": 490.7408585260807,
+        "rt_deviation_leg": -4.4523567955967005,
+        "degradation_cost": 32.94142951757292,
+        "deviation_penalty": 1.1790399385980255e-14,
+        "throughput_mwh": 6.255404089442268,
+        "net_revenue": 453.34707221291103
+      },
+      "2026-07-25": {
+        "da_leg": 521.7841786713306,
+        "rt_deviation_leg": -13.432653608933663,
+        "degradation_cost": 33.41419652234799,
+        "deviation_penalty": 19.6959253476051,
+        "throughput_mwh": 6.345180055401662,
+        "net_revenue": 455.2414031924438
+      },
+      "2026-07-26": {
+        "da_leg": 491.78925858588514,
+        "rt_deviation_leg": 2.3771216314355734,
+        "degradation_cost": 33.42051581281362,
+        "deviation_penalty": 7.203291826909686,
+        "throughput_mwh": 6.34638005540166,
+        "net_revenue": 453.5425725775974
+      },
+      "2026-07-27": {
+        "da_leg": 407.83639469417204,
+        "rt_deviation_leg": 23.75362336959913,
+        "degradation_cost": 33.26321624460264,
+        "deviation_penalty": 6.181229916897503,
+        "throughput_mwh": 6.316509695290858,
+        "net_revenue": 392.14557190227106
+      },
+      "2026-07-28": {
+        "da_leg": 572.4519742560548,
+        "rt_deviation_leg": -7.184560470898921,
+        "degradation_cost": 33.02850390944101,
+        "deviation_penalty": 1.2456000000000282,
+        "throughput_mwh": 6.271939058171745,
+        "net_revenue": 530.9933098757148
+      },
+      "2026-07-29": {
+        "da_leg": 683.8909002554931,
+        "rt_deviation_leg": -0.47363131377246437,
+        "degradation_cost": 44.03255922511376,
+        "deviation_penalty": 1.9413316440508587e-14,
+        "throughput_mwh": 8.361551246537392,
+        "net_revenue": 639.3847097166068
+      },
+      "2026-07-30": {
+        "da_leg": 523.046106712357,
+        "rt_deviation_leg": -5.043245368199817,
+        "degradation_cost": 33.459175134006415,
+        "deviation_penalty": 9.702325748373042e-15,
+        "throughput_mwh": 6.35372125702606,
+        "net_revenue": 484.5436862101508
+      },
+      "2026-07-31": {
+        "da_leg": 369.9374169802405,
+        "rt_deviation_leg": 1.9465014574875614,
+        "degradation_cost": 44.047573664404126,
+        "deviation_penalty": 7.061018436615996e-15,
+        "throughput_mwh": 8.364402409535272,
+        "net_revenue": 327.83634477332396
+      },
+      "2026-08-01": {
+        "da_leg": 483.78190258548483,
+        "rt_deviation_leg": -4.922163279567438,
+        "degradation_cost": 33.595565410199555,
+        "deviation_penalty": 0.4736377002460857,
+        "throughput_mwh": 6.37962105263158,
+        "net_revenue": 444.79053619547176
+      },
+      "2026-08-02": {
+        "da_leg": 545.94709851814,
+        "rt_deviation_leg": -1.8745978242743353,
+        "degradation_cost": 33.57918076788424,
+        "deviation_penalty": 1.0052466449721906,
+        "throughput_mwh": 6.376509695290859,
+        "net_revenue": 509.48807328100924
+      },
+      "2026-08-03": {
+        "da_leg": 411.7386631262874,
+        "rt_deviation_leg": 0.19040448047989728,
+        "degradation_cost": 33.74722838137472,
+        "deviation_penalty": 1.5248913243226524e-14,
+        "throughput_mwh": 6.408421052631579,
+        "net_revenue": 378.1818392253926
+      },
+      "2026-08-04": {
+        "da_leg": 417.1202863566683,
+        "rt_deviation_leg": -1.5606961563618917,
+        "degradation_cost": 33.595565410199555,
+        "deviation_penalty": 9.066983275296537e-15,
+        "throughput_mwh": 6.37962105263158,
+        "net_revenue": 381.9640247901069
+      },
+      "2026-08-05": {
+        "da_leg": 427.203395145631,
+        "rt_deviation_leg": -3.3296104652526526,
+        "degradation_cost": 33.48759700665188,
+        "deviation_penalty": 0.0,
+        "throughput_mwh": 6.359118421052632,
+        "net_revenue": 390.3861876737265
+      },
+      "2026-08-06": {
+        "da_leg": 225.70262692897293,
+        "rt_deviation_leg": -50.827233375578786,
+        "degradation_cost": 33.33593403547671,
+        "deviation_penalty": 9.837609026008831e-14,
+        "throughput_mwh": 6.33031842105263,
+        "net_revenue": 141.53945951791732
+      },
+      "2026-08-07": {
+        "da_leg": 93.74392525773202,
+        "rt_deviation_leg": -1.6163312164949304,
+        "degradation_cost": 19.736855598669624,
+        "deviation_penalty": 1.0043216258637245e-14,
+        "throughput_mwh": 3.7479250000000004,
+        "net_revenue": 72.39073844256745
+      },
+      "2026-08-08": {
+        "da_leg": 483.99082370975987,
+        "rt_deviation_leg": -5.056651836484425,
+        "degradation_cost": 33.595565410199555,
+        "deviation_penalty": 1.5783763185339696e-14,
+        "throughput_mwh": 6.37962105263158,
+        "net_revenue": 445.33860646307585
+      },
+      "2026-08-09": {
+        "da_leg": 521.8128929887315,
+        "rt_deviation_leg": -3.6740191243310036,
+        "degradation_cost": 33.2724190947953,
+        "deviation_penalty": 1.9466813019390496,
+        "throughput_mwh": 6.318257268106393,
+        "net_revenue": 482.9197734676661
+      },
+      "2026-08-10": {
+        "da_leg": 370.87274149260645,
+        "rt_deviation_leg": 6.529740932689311,
+        "degradation_cost": 33.40732625052827,
+        "deviation_penalty": 2.5346494868239145e-13,
+        "throughput_mwh": 6.343875426942422,
+        "net_revenue": 343.99515617476726
+      },
+      "2026-08-11": {
+        "da_leg": 410.34888699136695,
+        "rt_deviation_leg": -8.657583375467285,
+        "degradation_cost": 33.185358829014504,
+        "deviation_penalty": 1.7937040741600185e-14,
+        "throughput_mwh": 6.301724981846542,
+        "net_revenue": 368.50594478688515
+      },
+      "2026-08-12": {
+        "da_leg": 654.8740201986774,
+        "rt_deviation_leg": -3.7236811327790624,
+        "degradation_cost": 33.5046925188674,
+        "deviation_penalty": 1.2852600927981682e-14,
+        "throughput_mwh": 6.3623647688459775,
+        "net_revenue": 617.645646547031
+      },
+      "2026-08-13": {
+        "da_leg": 580.0728086867654,
+        "rt_deviation_leg": 4.619530534491839,
+        "degradation_cost": 33.18703575388027,
+        "deviation_penalty": 1.32354804199819e-14,
+        "throughput_mwh": 6.302043421052633,
+        "net_revenue": 551.5053034673768
+      },
+      "2026-08-14": {
+        "da_leg": 576.1478012989807,
+        "rt_deviation_leg": -1.5653347120590175,
+        "degradation_cost": 43.67324293966623,
+        "deviation_penalty": 2.4102018558042063e-13,
+        "throughput_mwh": 8.293318975069251,
+        "net_revenue": 530.9092236472552
+      },
+      "2026-08-15": {
+        "da_leg": 510.434025293817,
+        "rt_deviation_leg": -20.357551543689492,
+        "degradation_cost": 33.595565410199555,
+        "deviation_penalty": 4.698889115994226,
+        "throughput_mwh": 6.379621052631579,
+        "net_revenue": 451.78201922393373
+      },
+      "2026-08-16": {
+        "da_leg": 324.1313271333674,
+        "rt_deviation_leg": -7.882540111879094,
+        "degradation_cost": 33.26953553506827,
+        "deviation_penalty": 0.18161551246539534,
+        "throughput_mwh": 6.317709695290857,
+        "net_revenue": 282.79763597395464
+      },
+      "2026-08-17": {
+        "da_leg": 149.38125135411326,
+        "rt_deviation_leg": 12.35041559728909,
+        "degradation_cost": 43.58556278445557,
+        "deviation_penalty": 4.037343809965011e-14,
+        "throughput_mwh": 8.27666897506925,
+        "net_revenue": 118.14610416694676
+      },
+      "2026-08-18": {
+        "da_leg": 130.61061265191302,
+        "rt_deviation_leg": -5.76182545044752,
+        "degradation_cost": 33.28880373711063,
+        "deviation_penalty": 2.024597503536008e-14,
+        "throughput_mwh": 6.321368625447111,
+        "net_revenue": 91.55998346435486
+      },
+      "2026-08-19": {
+        "da_leg": 97.22052959505669,
+        "rt_deviation_leg": 4.025729127793955,
+        "degradation_cost": 32.84645232815964,
+        "deviation_penalty": 3.575376106290662e-14,
+        "throughput_mwh": 6.237368421052632,
+        "net_revenue": 68.39980639469096
+      },
+      "2026-08-20": {
+        "da_leg": 163.01150548305097,
+        "rt_deviation_leg": -0.10504504032686672,
+        "degradation_cost": 33.11788082757204,
+        "deviation_penalty": 5.757980897636017e-16,
+        "throughput_mwh": 6.288911264519997,
+        "net_revenue": 129.78857961515206
+      },
+      "2026-08-21": {
+        "da_leg": 130.71169574232695,
+        "rt_deviation_leg": -2.0179789892851403,
+        "degradation_cost": 33.34200003413767,
+        "deviation_penalty": 2.874555124653734,
+        "throughput_mwh": 6.331470322272038,
+        "net_revenue": 92.47716159425042
+      },
+      "2026-08-22": {
+        "da_leg": -16.368799999999894,
+        "rt_deviation_leg": 27.883853392566497,
+        "degradation_cost": 27.023538899810276,
+        "deviation_penalty": 47.055121785133004,
+        "throughput_mwh": 5.131627807921867,
+        "net_revenue": -62.56360729237667
+      },
+      "2026-08-23": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": 22.31189889196678,
+        "degradation_cost": 21.139281129653405,
+        "deviation_penalty": 44.62379778393356,
+        "throughput_mwh": 4.014238227146815,
+        "net_revenue": -43.45118002162019
+      },
+      "2026-08-24": {
+        "da_leg": 270.7978213646022,
+        "rt_deviation_leg": -307.43199277128434,
+        "degradation_cost": 44.97315906173414,
+        "deviation_penalty": 2157.567619942143,
+        "throughput_mwh": 8.540166204986148,
+        "net_revenue": -2239.1749504105596
+      },
+      "2026-08-25": {
+        "da_leg": 139.78331886013208,
+        "rt_deviation_leg": 8.886530904353464,
+        "degradation_cost": 41.812638580931235,
+        "deviation_penalty": 1374.3817419044453,
+        "throughput_mwh": 7.939999999999998,
+        "net_revenue": -1267.524530720891
+      },
+      "2026-08-26": {
+        "da_leg": 214.8271480994946,
+        "rt_deviation_leg": -321.5444766729126,
+        "degradation_cost": 43.726362664868404,
+        "deviation_penalty": 1598.9408145909842,
+        "throughput_mwh": 8.303406131307645,
+        "net_revenue": -1749.3845058292707
+      },
+      "2026-08-27": {
+        "da_leg": 40.070220539898536,
+        "rt_deviation_leg": 1.9140750729905545,
+        "degradation_cost": 42.87256389310305,
+        "deviation_penalty": 1613.2959155790943,
+        "throughput_mwh": 8.14127423822715,
+        "net_revenue": -1614.1841838593082
+      },
+      "2026-08-28": {
+        "da_leg": 266.16994688127204,
+        "rt_deviation_leg": -453.32512519313,
+        "degradation_cost": 44.74109133629536,
+        "deviation_penalty": 1244.136495377799,
+        "throughput_mwh": 8.496097765334405,
+        "net_revenue": -1476.0327650259524
+      },
+      "2026-08-29": {
+        "da_leg": 370.54870337250907,
+        "rt_deviation_leg": -33.86518448717992,
+        "degradation_cost": 32.70717849223948,
+        "deviation_penalty": 47.129113336081865,
+        "throughput_mwh": 6.21092105263158,
+        "net_revenue": 256.84722705700784
+      },
+      "2026-08-30": {
+        "da_leg": 314.9770411881773,
+        "rt_deviation_leg": 34.000152952415704,
+        "degradation_cost": 31.959630547791782,
+        "deviation_penalty": 0.8412818804116721,
+        "throughput_mwh": 6.068965632443829,
+        "net_revenue": 316.17628171238954
+      },
+      "2026-08-31": {
+        "da_leg": 238.76109084175764,
+        "rt_deviation_leg": 5.670699561475278,
+        "degradation_cost": 33.5138289181935,
+        "deviation_penalty": 1.5758618685210513,
+        "throughput_mwh": 6.364099722991691,
+        "net_revenue": 209.34209961651837
+      },
+      "2026-09-01": {
+        "da_leg": 128.0990858725762,
+        "rt_deviation_leg": -7.821932557757666,
+        "degradation_cost": 22.410535594621223,
+        "deviation_penalty": 1.424846352016118e-14,
+        "throughput_mwh": 4.255642759231231,
+        "net_revenue": 97.86661772019731
+      },
+      "2026-09-02": {
+        "da_leg": 377.23260278710666,
+        "rt_deviation_leg": -1.4185468909553307,
+        "degradation_cost": 32.83715958567986,
+        "deviation_penalty": 1.6781272552113256e-14,
+        "throughput_mwh": 6.235603778164893,
+        "net_revenue": 342.9768963104715
+      },
+      "2026-09-03": {
+        "da_leg": 241.69346305031877,
+        "rt_deviation_leg": -3.6311886167333935,
+        "degradation_cost": 33.42751779670907,
+        "deviation_penalty": 1.2722461972813903e-14,
+        "throughput_mwh": 6.34770969529086,
+        "net_revenue": 204.63475663687632
+      },
+      "2026-09-04": {
+        "da_leg": 359.5476021433695,
+        "rt_deviation_leg": -6.883670177039959,
+        "degradation_cost": 33.016495507060334,
+        "deviation_penalty": 0.2910415512465653,
+        "throughput_mwh": 6.269658725761772,
+        "net_revenue": 319.35639490802265
+      },
+      "2026-09-05": {
+        "da_leg": 105.87819737556046,
+        "rt_deviation_leg": -52.02663590398949,
+        "degradation_cost": 27.626181584782355,
+        "deviation_penalty": 96.3173,
+        "throughput_mwh": 5.246066481994459,
+        "net_revenue": -70.09192011321139
+      },
+      "2026-09-06": {
+        "da_leg": 518.0207169631337,
+        "rt_deviation_leg": -13.251184070942106,
+        "degradation_cost": 35.697783179546505,
+        "deviation_penalty": 42.249611912621376,
+        "throughput_mwh": 6.778821142726517,
+        "net_revenue": 426.82213780002377
+      },
+      "2026-09-07": {
+        "da_leg": 403.21749159711896,
+        "rt_deviation_leg": 17.760391102104112,
+        "degradation_cost": 43.551369201174666,
+        "deviation_penalty": 3.201855447443335e-14,
+        "throughput_mwh": 8.270175793570438,
+        "net_revenue": 377.42651349804834
+      },
+      "2026-09-08": {
+        "da_leg": 145.6867687679854,
+        "rt_deviation_leg": 33.184418383266525,
+        "degradation_cost": 34.42661337378925,
+        "deviation_penalty": 12.54955055401669,
+        "throughput_mwh": 6.537432686980611,
+        "net_revenue": 131.89502322344597
+      },
+      "2026-09-09": {
+        "da_leg": 273.53237414409807,
+        "rt_deviation_leg": 12.764199485820296,
+        "degradation_cost": 33.24601579822617,
+        "deviation_penalty": 2.0626833574510782e-14,
+        "throughput_mwh": 6.313243421052633,
+        "net_revenue": 253.0505578316922
+      },
+      "2026-09-10": {
+        "da_leg": 578.260327801947,
+        "rt_deviation_leg": -1.049755325229003,
+        "degradation_cost": 33.248036632286365,
+        "deviation_penalty": 8.485139674219154e-15,
+        "throughput_mwh": 6.313627166804695,
+        "net_revenue": 543.9625358444316
+      },
+      "2026-09-11": {
+        "da_leg": 276.2684190786114,
+        "rt_deviation_leg": -1.4620446235914286,
+        "degradation_cost": 33.14034309721088,
+        "deviation_penalty": 2.0796277026835507e-14,
+        "throughput_mwh": 6.29317673130194,
+        "net_revenue": 241.666031357809
+      },
+      "2026-09-12": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -235.23,
+        "degradation_cost": 15.798226164079821,
+        "deviation_penalty": 472.32,
+        "throughput_mwh": 3.0,
+        "net_revenue": -723.3482261640797
+      },
+      "2026-09-13": {
+        "da_leg": 0.0,
+        "rt_deviation_leg": -70.32300919696148,
+        "degradation_cost": 5.314675260014806,
+        "deviation_penalty": 140.64601839392296,
+        "throughput_mwh": 1.0092288599017591,
+        "net_revenue": -216.28370285089926
+      },
+      "2026-09-14": {
+        "da_leg": 894.6375894360326,
+        "rt_deviation_leg": -488.2422376517494,
+        "degradation_cost": 44.587466448827165,
+        "deviation_penalty": 2269.5594422715753,
+        "throughput_mwh": 8.466925207756233,
+        "net_revenue": -1907.7515569361194
+      },
+      "2026-09-15": {
+        "da_leg": 313.8450268267757,
+        "rt_deviation_leg": -288.72534913720676,
+        "degradation_cost": 44.40424787022989,
+        "deviation_penalty": 3047.3903485064943,
+        "throughput_mwh": 8.43213296398892,
+        "net_revenue": -3066.6749186871552
+      },
+      "2026-09-16": {
+        "da_leg": 169.96059269289736,
+        "rt_deviation_leg": -219.6376333884099,
+        "degradation_cost": 42.87256389310305,
+        "deviation_penalty": 2433.4377068327885,
+        "throughput_mwh": 8.141274238227147,
+        "net_revenue": -2525.9873114214042
+      },
+      "2026-09-17": {
+        "da_leg": 259.79010746652585,
+        "rt_deviation_leg": -330.84252381377274,
+        "degradation_cost": 45.93593184735675,
+        "deviation_penalty": 2567.107370510315,
+        "throughput_mwh": 8.722991689750694,
+        "net_revenue": -2684.0957187049185
+      },
+      "2026-09-18": {
+        "da_leg": 600.8661057741442,
+        "rt_deviation_leg": 145.09091966785894,
+        "degradation_cost": 25.72069706208426,
+        "deviation_penalty": 282.4059317148696,
+        "throughput_mwh": 4.884225,
+        "net_revenue": 437.83039666504936
+      },
+      "2026-09-19": {
+        "da_leg": 654.2728800976281,
+        "rt_deviation_leg": 6.703345970681099,
+        "degradation_cost": 33.52958338195822,
+        "deviation_penalty": 2.0198792115258524,
+        "throughput_mwh": 6.367091412742383,
+        "net_revenue": 625.4267634748251
+      },
+      "2026-09-20": {
+        "da_leg": 635.1517303024245,
+        "rt_deviation_leg": 7.640922549012966,
+        "degradation_cost": 33.303185902672425,
+        "deviation_penalty": 37.27134307459813,
+        "throughput_mwh": 6.32409972299169,
+        "net_revenue": 572.218123874167
+      },
+      "2026-09-21": {
+        "da_leg": 682.3026450009995,
+        "rt_deviation_leg": 3.182881467130361,
+        "degradation_cost": 44.331764962423165,
+        "deviation_penalty": 1.3451508686766345,
+        "throughput_mwh": 8.418368841285414,
+        "net_revenue": 639.8086106370301
+      },
+      "2026-09-22": {
+        "da_leg": 914.4227999541692,
+        "rt_deviation_leg": 5.101553092520117,
+        "degradation_cost": 44.26752120145379,
+        "deviation_penalty": 9.441822323985605e-15,
+        "throughput_mwh": 8.406169289202388,
+        "net_revenue": 875.2568318452356
+      },
+      "2026-09-23": {
+        "da_leg": 609.1075155645622,
+        "rt_deviation_leg": -2.2220634899434573,
+        "degradation_cost": 44.30762355429316,
+        "deviation_penalty": 1.2727737527112872e-12,
+        "throughput_mwh": 8.41378451494157,
+        "net_revenue": 562.5778285203243
+      },
+      "2026-09-24": {
+        "da_leg": 91.25009730017433,
+        "rt_deviation_leg": -0.2216567166471719,
+        "degradation_cost": 43.63247470347742,
+        "deviation_penalty": 2.4275557692493566e-13,
+        "throughput_mwh": 8.285577301586661,
+        "net_revenue": 47.395965880049495
+      },
+      "2026-09-25": {
+        "da_leg": 225.58476301427532,
+        "rt_deviation_leg": -0.003817223365026823,
+        "degradation_cost": 33.7409090909091,
+        "deviation_penalty": 0.3118179412857107,
+        "throughput_mwh": 6.407221052631581,
+        "net_revenue": 191.5282187587155
+      },
+      "2026-09-26": {
+        "da_leg": 473.94352171427965,
+        "rt_deviation_leg": -10.234978961207197,
+        "degradation_cost": 33.41794258373206,
+        "deviation_penalty": 4.299031009224101,
+        "throughput_mwh": 6.345891412742381,
+        "net_revenue": 425.9915691601163
+      },
+      "2026-09-27": {
+        "da_leg": 622.1503056039911,
+        "rt_deviation_leg": -14.257585248240051,
+        "degradation_cost": 33.07416267942584,
+        "deviation_penalty": 2.5465358988174814e-14,
+        "throughput_mwh": 6.280609418282547,
+        "net_revenue": 574.8185576763252
+      },
+      "2026-09-28": {
+        "da_leg": 888.2343986063153,
+        "rt_deviation_leg": 0.3321196447998139,
+        "degradation_cost": 44.11925539555793,
+        "deviation_penalty": 0.45864733700778665,
+        "throughput_mwh": 8.378014393009108,
+        "net_revenue": 843.9886155185494
+      },
+      "2026-09-29": {
+        "da_leg": 486.338893630306,
+        "rt_deviation_leg": 8.422563191893513,
+        "degradation_cost": 44.5543438768132,
+        "deviation_penalty": 1.7632770243913854e-15,
+        "throughput_mwh": 8.46063540566011,
+        "net_revenue": 450.2071129453863
+      },
+      "2026-09-30": {
+        "da_leg": 725.0284778590323,
+        "rt_deviation_leg": -1.3989056854016997,
+        "degradation_cost": 44.225805558997706,
+        "deviation_penalty": 0.5128228738274666,
+        "throughput_mwh": 8.398247708255992,
+        "net_revenue": 678.8909437408054
+      }
+    }
+  },
+  "settlement_by_day_group": {
+    "all": {
+      "days": 365,
+      "mean_net_revenue_eur_per_day": 84.50925640446145,
+      "positive_day_rate": 0.6520547945205479
+    },
+    "neg": {
+      "days": 63,
+      "mean_net_revenue_eur_per_day": 276.23748992835647,
+      "positive_day_rate": 0.8253968253968254
+    },
+    "spike": {
+      "days": 112,
+      "mean_net_revenue_eur_per_day": 46.5100736336149,
+      "positive_day_rate": 0.7321428571428571
+    },
+    "ordinary": {
+      "days": 190,
+      "mean_net_revenue_eur_per_day": 43.3357288167216,
+      "positive_day_rate": 0.5473684210526316
+    }
+  },
+  "external_board_reference": {
+    "timesfm3_zs_mainu11_exaa_mae": 12.603,
+    "this_method_indicative_rank_on_365_day_local_truth": 2,
+    "comparison_caveat": "Teacher board has 366 days; local strict external truth has 365 days."
+  },
+  "gates": {
+    "mae_top3": true,
+    "revenue_floor": true,
+    "soc": true,
+    "paired_revenue_exact": true
+  }
+}

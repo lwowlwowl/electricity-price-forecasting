@@ -1,0 +1,16 @@
+{
+  "method": "pure-v4-fixed-three-branch-consensus",
+  "weights": [
+    0.3333333333333333,
+    0.3333333333333333,
+    0.3333333333333333
+  ],
+  "members": [
+    "data/results/pure_v4_local_meta_ridge_v1/predictions.npz",
+    "data/results/pure_v4_context_kernel_v1/predictions.npz",
+    "data/results/austria_pure_v4_multiscale_5y_v1/predictions.npz"
+  ],
+  "uses_exaa": false,
+  "uses_external_model_predictions": false,
+  "uses_austria_labels_for_training_or_selection": false
+}

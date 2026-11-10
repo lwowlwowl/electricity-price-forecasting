@@ -1,0 +1,1468 @@
+{
+  "experiment": "pure_v42_memory_us_markets_v1",
+  "status": "frozen_source_side_audit_no_target_market_tuning",
+  "year": 2023,
+  "anchor": "two_thirds_seed0_plus_one_third_three_seed_median_proxy",
+  "selected_config": {
+    "memory_days": 112,
+    "neighbors": 7,
+    "base_weight": 1.0,
+    "physical_weight": 2.0,
+    "calendar_weight": 0.5,
+    "gate": 0.75,
+    "aggregation": "median",
+    "granularity": "hour"
+  },
+  "markets": {
+    "caiso": {
+      "node_count": 3,
+      "macro_base_mae_usd_per_mwh": 10.763520077617983,
+      "macro_candidate_mae_usd_per_mwh": 9.927154593296754,
+      "macro_relative_mae_change_pct": -7.770371386777031,
+      "improved_nodes": 3,
+      "rows": [
+        {
+          "node": "TH_NP15_GEN-APND",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 9.488328359684115,
+            "candidate_mae_usd_per_mwh": 9.018482278031927,
+            "mae_change_usd_per_mwh": -0.46984608165218766,
+            "relative_mae_change_pct": -4.951832017624547,
+            "base_normalized_mae": 0.5709579556189279,
+            "candidate_normalized_mae": 0.5422798266380329
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 6.93606063524882,
+            "candidate_mae_usd_per_mwh": 6.342686094438602,
+            "mae_change_usd_per_mwh": -0.5933745408102178,
+            "relative_mae_change_pct": -8.55492147509076,
+            "base_normalized_mae": 0.5412351405649732,
+            "candidate_normalized_mae": 0.4961966182319331
+          },
+          "mean_retrieval_confidence": 0.8804499938927866
+        },
+        {
+          "node": "TH_SP15_GEN-APND",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 11.80377419903465,
+            "candidate_mae_usd_per_mwh": 10.693468421265703,
+            "mae_change_usd_per_mwh": -1.1103057777689482,
+            "relative_mae_change_pct": -9.40636239771303,
+            "base_normalized_mae": 0.532764179912255,
+            "candidate_normalized_mae": 0.4768932802047165
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 8.599377025323516,
+            "candidate_mae_usd_per_mwh": 7.101586759919943,
+            "mae_change_usd_per_mwh": -1.497790265403573,
+            "relative_mae_change_pct": -17.417427576356616,
+            "base_normalized_mae": 0.4457672927528451,
+            "candidate_normalized_mae": 0.36867228728850315
+          },
+          "mean_retrieval_confidence": 0.8822160521085566
+        },
+        {
+          "node": "TH_ZP26_GEN-APND",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 10.998457674135178,
+            "candidate_mae_usd_per_mwh": 10.069513080592628,
+            "mae_change_usd_per_mwh": -0.9289445935425498,
+            "relative_mae_change_pct": -8.446135095170003,
+            "base_normalized_mae": 0.5259284665786148,
+            "candidate_normalized_mae": 0.48181928600217494
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 8.260020210628433,
+            "candidate_mae_usd_per_mwh": 7.091800996850289,
+            "mae_change_usd_per_mwh": -1.1682192137781442,
+            "relative_mae_change_pct": -14.143055149852524,
+            "base_normalized_mae": 0.454305516552785,
+            "candidate_normalized_mae": 0.39221813748902445
+          },
+          "mean_retrieval_confidence": 0.8819147335165858
+        }
+      ]
+    },
+    "ercot": {
+      "node_count": 15,
+      "macro_base_mae_usd_per_mwh": 33.03780804418101,
+      "macro_candidate_mae_usd_per_mwh": 29.74775863561303,
+      "macro_relative_mae_change_pct": -9.958437327828296,
+      "improved_nodes": 15,
+      "rows": [
+        {
+          "node": "HB_BUSAVG",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 31.892050489082017,
+            "candidate_mae_usd_per_mwh": 28.482759580439538,
+            "mae_change_usd_per_mwh": -3.409290908642479,
+            "relative_mae_change_pct": -10.690096297852103,
+            "base_normalized_mae": 2.4835783344183104,
+            "candidate_normalized_mae": 2.241337253754809
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 8.857683089835406,
+            "candidate_mae_usd_per_mwh": 7.877882359501354,
+            "mae_change_usd_per_mwh": -0.9798007303340528,
+            "relative_mae_change_pct": -11.061591619352685,
+            "base_normalized_mae": 1.1782762669188729,
+            "candidate_normalized_mae": 1.0475732085115417
+          },
+          "mean_retrieval_confidence": 0.8828171626475769
+        },
+        {
+          "node": "HB_HOUSTON",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 31.82798456238941,
+            "candidate_mae_usd_per_mwh": 28.61747946827416,
+            "mae_change_usd_per_mwh": -3.210505094115252,
+            "relative_mae_change_pct": -10.087051185481133,
+            "base_normalized_mae": 2.3218877190582456,
+            "candidate_normalized_mae": 2.111848351029411
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 8.743842729337421,
+            "candidate_mae_usd_per_mwh": 7.825357490137382,
+            "mae_change_usd_per_mwh": -0.9184852392000398,
+            "relative_mae_change_pct": -10.5043659593548,
+            "base_normalized_mae": 1.176675193866186,
+            "candidate_normalized_mae": 1.0534579724693967
+          },
+          "mean_retrieval_confidence": 0.8830835692584394
+        },
+        {
+          "node": "HB_HUBAVG",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 32.20899916949924,
+            "candidate_mae_usd_per_mwh": 28.929572290360433,
+            "mae_change_usd_per_mwh": -3.2794268791388106,
+            "relative_mae_change_pct": -10.181709968325592,
+            "base_normalized_mae": 2.44841988565735,
+            "candidate_normalized_mae": 2.221759380690578
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 9.297212481461926,
+            "candidate_mae_usd_per_mwh": 8.151455177991256,
+            "mae_change_usd_per_mwh": -1.1457573034706705,
+            "relative_mae_change_pct": -12.323664816257995,
+            "base_normalized_mae": 1.1246616821255253,
+            "candidate_normalized_mae": 0.9845331700704428
+          },
+          "mean_retrieval_confidence": 0.8826865885764206
+        },
+        {
+          "node": "HB_NORTH",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 31.992852438534293,
+            "candidate_mae_usd_per_mwh": 28.733101227506847,
+            "mae_change_usd_per_mwh": -3.259751211027446,
+            "relative_mae_change_pct": -10.18899836233792,
+            "base_normalized_mae": 2.519087524464427,
+            "candidate_normalized_mae": 2.291911814632419
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 8.622001596052705,
+            "candidate_mae_usd_per_mwh": 7.76543042401173,
+            "mae_change_usd_per_mwh": -0.856571172040975,
+            "relative_mae_change_pct": -9.934713679862083,
+            "base_normalized_mae": 1.2310990385245133,
+            "candidate_normalized_mae": 1.1091662819182813
+          },
+          "mean_retrieval_confidence": 0.8824476221038985
+        },
+        {
+          "node": "HB_PAN",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 35.99617215613303,
+            "candidate_mae_usd_per_mwh": 32.52243211955806,
+            "mae_change_usd_per_mwh": -3.4737400365749664,
+            "relative_mae_change_pct": -9.650303986511833,
+            "base_normalized_mae": 2.3935451637009124,
+            "candidate_normalized_mae": 2.1937169352768575
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 13.044119896253365,
+            "candidate_mae_usd_per_mwh": 11.470352672881015,
+            "mae_change_usd_per_mwh": -1.57376722337235,
+            "relative_mae_change_pct": -12.064955212688433,
+            "base_normalized_mae": 1.2554625169224387,
+            "candidate_normalized_mae": 1.1080670855099977
+          },
+          "mean_retrieval_confidence": 0.8801989309690885
+        },
+        {
+          "node": "HB_SOUTH",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 30.837385841942552,
+            "candidate_mae_usd_per_mwh": 28.166443238232002,
+            "mae_change_usd_per_mwh": -2.67094260371055,
+            "relative_mae_change_pct": -8.661378164156009,
+            "base_normalized_mae": 2.4901499533695706,
+            "candidate_normalized_mae": 2.288952798044981
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 8.650942966323576,
+            "candidate_mae_usd_per_mwh": 7.689602029380408,
+            "mae_change_usd_per_mwh": -0.9613409369431682,
+            "relative_mae_change_pct": -11.112556639033222,
+            "base_normalized_mae": 1.135749819959232,
+            "candidate_normalized_mae": 1.0065748281357523
+          },
+          "mean_retrieval_confidence": 0.8823484184075662
+        },
+        {
+          "node": "HB_WEST",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 35.56348205233778,
+            "candidate_mae_usd_per_mwh": 31.91864450990909,
+            "mae_change_usd_per_mwh": -3.644837542428693,
+            "relative_mae_change_pct": -10.248820790564572,
+            "base_normalized_mae": 2.419272927641239,
+            "candidate_normalized_mae": 2.2009922896609377
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 12.467949610553038,
+            "candidate_mae_usd_per_mwh": 10.376017325552917,
+            "mae_change_usd_per_mwh": -2.091932285000121,
+            "relative_mae_change_pct": -16.77847882244793,
+            "base_normalized_mae": 1.0590007196382099,
+            "candidate_normalized_mae": 0.8880616299820062
+          },
+          "mean_retrieval_confidence": 0.8814968108192525
+        },
+        {
+          "node": "LZ_AEN",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 33.652482139980314,
+            "candidate_mae_usd_per_mwh": 29.985854358812894,
+            "mae_change_usd_per_mwh": -3.6666277811674206,
+            "relative_mae_change_pct": -10.895564154571947,
+            "base_normalized_mae": 2.4274816285882026,
+            "candidate_normalized_mae": 2.1837697844168793
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 10.088537496733077,
+            "candidate_mae_usd_per_mwh": 9.458270450206571,
+            "mae_change_usd_per_mwh": -0.6302670465265052,
+            "relative_mae_change_pct": -6.247357922103191,
+            "base_normalized_mae": 1.1797669748751338,
+            "candidate_normalized_mae": 1.1029024316730214
+          },
+          "mean_retrieval_confidence": 0.8830573703457623
+        },
+        {
+          "node": "LZ_CPS",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 32.75973394800937,
+            "candidate_mae_usd_per_mwh": 29.447409913384977,
+            "mae_change_usd_per_mwh": -3.3123240346243925,
+            "relative_mae_change_pct": -10.11096134016578,
+            "base_normalized_mae": 2.442936100743007,
+            "candidate_normalized_mae": 2.2353970715403944
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 9.15079725375514,
+            "candidate_mae_usd_per_mwh": 8.264451047071038,
+            "mae_change_usd_per_mwh": -0.8863462066841024,
+            "relative_mae_change_pct": -9.685999832641679,
+            "base_normalized_mae": 1.1234106126831598,
+            "candidate_normalized_mae": 1.0141963124516316
+          },
+          "mean_retrieval_confidence": 0.8826820962806854
+        },
+        {
+          "node": "LZ_HOUSTON",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 31.876306556067156,
+            "candidate_mae_usd_per_mwh": 28.66178040766383,
+            "mae_change_usd_per_mwh": -3.2145261484033263,
+            "relative_mae_change_pct": -10.08437455810417,
+            "base_normalized_mae": 2.3106063700798867,
+            "candidate_normalized_mae": 2.103955900089569
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 8.89283270228792,
+            "candidate_mae_usd_per_mwh": 7.958741706775636,
+            "mae_change_usd_per_mwh": -0.9340909955122845,
+            "relative_mae_change_pct": -10.503863355845711,
+            "base_normalized_mae": 1.1714764906789623,
+            "candidate_normalized_mae": 1.048128901254427
+          },
+          "mean_retrieval_confidence": 0.8831086359209233
+        },
+        {
+          "node": "LZ_LCRA",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 33.03951817985372,
+            "candidate_mae_usd_per_mwh": 29.63907933574464,
+            "mae_change_usd_per_mwh": -3.4004388441090825,
+            "relative_mae_change_pct": -10.292035209467866,
+            "base_normalized_mae": 2.4486089519586587,
+            "candidate_normalized_mae": 2.2250992340309645
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 9.291029780477652,
+            "candidate_mae_usd_per_mwh": 8.409440776564246,
+            "mae_change_usd_per_mwh": -0.8815890039134064,
+            "relative_mae_change_pct": -9.48860379035491,
+            "base_normalized_mae": 1.1421827774255082,
+            "candidate_normalized_mae": 1.0320034847605732
+          },
+          "mean_retrieval_confidence": 0.8828376698918042
+        },
+        {
+          "node": "LZ_NORTH",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 32.11994697394396,
+            "candidate_mae_usd_per_mwh": 28.67523959507496,
+            "mae_change_usd_per_mwh": -3.4447073788690012,
+            "relative_mae_change_pct": -10.724511412373705,
+            "base_normalized_mae": 2.4638141039246646,
+            "candidate_normalized_mae": 2.232814846979301
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 8.625780174522488,
+            "candidate_mae_usd_per_mwh": 7.797591445552692,
+            "mae_change_usd_per_mwh": -0.8281887289697956,
+            "relative_mae_change_pct": -9.601319674433306,
+            "base_normalized_mae": 1.2083246894631003,
+            "candidate_normalized_mae": 1.0929823957143068
+          },
+          "mean_retrieval_confidence": 0.8822230575945339
+        },
+        {
+          "node": "LZ_RAYBN",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 32.27627512338258,
+            "candidate_mae_usd_per_mwh": 29.05390990127205,
+            "mae_change_usd_per_mwh": -3.2223652221105326,
+            "relative_mae_change_pct": -9.983696104313122,
+            "base_normalized_mae": 2.4998949383668676,
+            "candidate_normalized_mae": 2.2954881864685177
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 8.644370283591158,
+            "candidate_mae_usd_per_mwh": 8.177926173384508,
+            "mae_change_usd_per_mwh": -0.4664441102066501,
+            "relative_mae_change_pct": -5.395929314736314,
+            "base_normalized_mae": 1.1948593402419059,
+            "candidate_normalized_mae": 1.1394084743784942
+          },
+          "mean_retrieval_confidence": 0.8819356903582486
+        },
+        {
+          "node": "LZ_SOUTH",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 30.1401160882189,
+            "candidate_mae_usd_per_mwh": 27.906425828569102,
+            "mae_change_usd_per_mwh": -2.233690259649798,
+            "relative_mae_change_pct": -7.411020757557396,
+            "base_normalized_mae": 2.3925235832071596,
+            "candidate_normalized_mae": 2.2240459060614004
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 8.772550270274099,
+            "candidate_mae_usd_per_mwh": 7.83370157546839,
+            "mae_change_usd_per_mwh": -0.9388486948057091,
+            "relative_mae_change_pct": -10.702118151286177,
+            "base_normalized_mae": 1.1073884626086279,
+            "candidate_normalized_mae": 0.9863480617498102
+          },
+          "mean_retrieval_confidence": 0.8814902445604049
+        },
+        {
+          "node": "LZ_WEST",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 39.38381494334095,
+            "candidate_mae_usd_per_mwh": 35.4762477593928,
+            "mae_change_usd_per_mwh": -3.907567183948153,
+            "relative_mae_change_pct": -9.921758949887726,
+            "base_normalized_mae": 2.1822616172675358,
+            "candidate_normalized_mae": 1.9971768137306924
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 16.683184169449007,
+            "candidate_mae_usd_per_mwh": 14.108648172608724,
+            "mae_change_usd_per_mwh": -2.5745359968402823,
+            "relative_mae_change_pct": -15.431922171996925,
+            "base_normalized_mae": 0.9819874115243635,
+            "candidate_normalized_mae": 0.841578153184324
+          },
+          "mean_retrieval_confidence": 0.8821162699480906
+        }
+      ]
+    },
+    "nyiso": {
+      "node_count": 11,
+      "macro_base_mae_usd_per_mwh": 6.493218040978792,
+      "macro_candidate_mae_usd_per_mwh": 5.988602375369249,
+      "macro_relative_mae_change_pct": -7.771426470278775,
+      "improved_nodes": 11,
+      "rows": [
+        {
+          "node": "CAPITL",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 8.45972669717548,
+            "candidate_mae_usd_per_mwh": 7.969187700029021,
+            "mae_change_usd_per_mwh": -0.49053899714645866,
+            "relative_mae_change_pct": -5.798520622542558,
+            "base_normalized_mae": 0.8132800455133941,
+            "candidate_normalized_mae": 0.7775601039731517
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.669317620183215,
+            "candidate_mae_usd_per_mwh": 4.634693118654862,
+            "mae_change_usd_per_mwh": -0.03462450152835306,
+            "relative_mae_change_pct": -0.74153236821346,
+            "base_normalized_mae": 0.6396260835492935,
+            "candidate_normalized_mae": 0.6350660604638083
+          },
+          "mean_retrieval_confidence": 0.8900498279379944
+        },
+        {
+          "node": "CENTRL",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 5.571606845621454,
+            "candidate_mae_usd_per_mwh": 4.9996402259854795,
+            "mae_change_usd_per_mwh": -0.5719666196359743,
+            "relative_mae_change_pct": -10.26573904950714,
+            "base_normalized_mae": 0.8384567783191226,
+            "candidate_normalized_mae": 0.7572986516776447
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.430170956953072,
+            "candidate_mae_usd_per_mwh": 3.8639974819829286,
+            "mae_change_usd_per_mwh": -0.5661734749701433,
+            "relative_mae_change_pct": -12.779946428061528,
+            "base_normalized_mae": 0.7246522959388781,
+            "candidate_normalized_mae": 0.6380808980088946
+          },
+          "mean_retrieval_confidence": 0.8869101662567237
+        },
+        {
+          "node": "DUNWOD",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 6.256014455193076,
+            "candidate_mae_usd_per_mwh": 5.837657673274956,
+            "mae_change_usd_per_mwh": -0.41835678191811976,
+            "relative_mae_change_pct": -6.687273261826377,
+            "base_normalized_mae": 0.6775659984735335,
+            "candidate_normalized_mae": 0.637968698684664
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.234132685779053,
+            "candidate_mae_usd_per_mwh": 4.136288649778525,
+            "mae_change_usd_per_mwh": -0.09784403600052816,
+            "relative_mae_change_pct": -2.3108401002441825,
+            "base_normalized_mae": 0.5819043705365491,
+            "candidate_normalized_mae": 0.5702950184172685
+          },
+          "mean_retrieval_confidence": 0.8894902427141154
+        },
+        {
+          "node": "GENESE",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 5.443298590066493,
+            "candidate_mae_usd_per_mwh": 4.946515540228227,
+            "mae_change_usd_per_mwh": -0.4967830498382657,
+            "relative_mae_change_pct": -9.126507422261342,
+            "base_normalized_mae": 0.8606318628316849,
+            "candidate_normalized_mae": 0.7851707010862568
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.354779784179028,
+            "candidate_mae_usd_per_mwh": 3.799565926787734,
+            "mae_change_usd_per_mwh": -0.5552138573912941,
+            "relative_mae_change_pct": -12.749527758174894,
+            "base_normalized_mae": 0.741187415273616,
+            "candidate_normalized_mae": 0.6533497990391682
+          },
+          "mean_retrieval_confidence": 0.8880078015284246
+        },
+        {
+          "node": "HUD VL",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 6.101864995004425,
+            "candidate_mae_usd_per_mwh": 5.652161915512245,
+            "mae_change_usd_per_mwh": -0.44970307949217947,
+            "relative_mae_change_pct": -7.369928372069023,
+            "base_normalized_mae": 0.677332376277932,
+            "candidate_normalized_mae": 0.6302319383458646
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 3.9512187167450232,
+            "candidate_mae_usd_per_mwh": 3.7741910335019067,
+            "mae_change_usd_per_mwh": -0.17702768324311657,
+            "relative_mae_change_pct": -4.480331156887973,
+            "base_normalized_mae": 0.5680479109305893,
+            "candidate_normalized_mae": 0.5444777963948785
+          },
+          "mean_retrieval_confidence": 0.8902724501754714
+        },
+        {
+          "node": "LONGIL",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 9.432904347097761,
+            "candidate_mae_usd_per_mwh": 8.697501738594408,
+            "mae_change_usd_per_mwh": -0.7354026085033532,
+            "relative_mae_change_pct": -7.796141903311204,
+            "base_normalized_mae": 0.7717466761959706,
+            "candidate_normalized_mae": 0.7234612804443392
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 6.571053945723875,
+            "candidate_mae_usd_per_mwh": 6.321482558062367,
+            "mae_change_usd_per_mwh": -0.24957138766150866,
+            "relative_mae_change_pct": -3.7980419841769475,
+            "base_normalized_mae": 0.6354612703651128,
+            "candidate_normalized_mae": 0.6136859842181065
+          },
+          "mean_retrieval_confidence": 0.8880574212300111
+        },
+        {
+          "node": "MHK VL",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 5.785989223451179,
+            "candidate_mae_usd_per_mwh": 5.287435810339435,
+            "mae_change_usd_per_mwh": -0.49855341311174417,
+            "relative_mae_change_pct": -8.61656311233796,
+            "base_normalized_mae": 0.8380900512008772,
+            "candidate_normalized_mae": 0.7706940688098021
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.751530708942885,
+            "candidate_mae_usd_per_mwh": 4.24325781325283,
+            "mae_change_usd_per_mwh": -0.5082728956900544,
+            "relative_mae_change_pct": -10.697034846758557,
+            "base_normalized_mae": 0.7335767568167887,
+            "candidate_normalized_mae": 0.6628022037478043
+          },
+          "mean_retrieval_confidence": 0.8880780699847745
+        },
+        {
+          "node": "MILLWD",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 6.22953772672572,
+            "candidate_mae_usd_per_mwh": 5.736726128535461,
+            "mae_change_usd_per_mwh": -0.49281159819025877,
+            "relative_mae_change_pct": -7.910885523271139,
+            "base_normalized_mae": 0.6785800875909682,
+            "candidate_normalized_mae": 0.6335836086095445
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.159624109297623,
+            "candidate_mae_usd_per_mwh": 4.023452842971614,
+            "mae_change_usd_per_mwh": -0.1361712663260093,
+            "relative_mae_change_pct": -3.273643549224514,
+            "base_normalized_mae": 0.5750105136400944,
+            "candidate_normalized_mae": 0.5578333196660376
+          },
+          "mean_retrieval_confidence": 0.8875592709030757
+        },
+        {
+          "node": "N.Y.C.",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 6.302630044467448,
+            "candidate_mae_usd_per_mwh": 5.912470474557414,
+            "mae_change_usd_per_mwh": -0.3901595699100344,
+            "relative_mae_change_pct": -6.190424745817391,
+            "base_normalized_mae": 0.6764278178987085,
+            "candidate_normalized_mae": 0.6419290854455143
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.266225712829166,
+            "candidate_mae_usd_per_mwh": 4.225498443633711,
+            "mae_change_usd_per_mwh": -0.040727269195454774,
+            "relative_mae_change_pct": -0.954644032850438,
+            "base_normalized_mae": 0.5831204014276377,
+            "candidate_normalized_mae": 0.5774060523141923
+          },
+          "mean_retrieval_confidence": 0.8938496037853869
+        },
+        {
+          "node": "NORTH",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 6.555575646712058,
+            "candidate_mae_usd_per_mwh": 6.04217918437887,
+            "mae_change_usd_per_mwh": -0.5133964623331879,
+            "relative_mae_change_pct": -7.831447457870178,
+            "base_normalized_mae": 1.016170321105222,
+            "candidate_normalized_mae": 0.9420280910437341
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 6.277296443479021,
+            "candidate_mae_usd_per_mwh": 5.6639658280562175,
+            "mae_change_usd_per_mwh": -0.6133306154228038,
+            "relative_mae_change_pct": -9.770617350084587,
+            "base_normalized_mae": 0.9242256236803276,
+            "candidate_normalized_mae": 0.841702617032829
+          },
+          "mean_retrieval_confidence": 0.88395069299215
+        },
+        {
+          "node": "WEST",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 5.286249879251608,
+            "candidate_mae_usd_per_mwh": 4.793149737626209,
+            "mae_change_usd_per_mwh": -0.4931001416253995,
+            "relative_mae_change_pct": -9.327976408395012,
+            "base_normalized_mae": 0.8503197268290235,
+            "candidate_normalized_mae": 0.7738584024063352
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.349493514314109,
+            "candidate_mae_usd_per_mwh": 3.8739421499199933,
+            "mae_change_usd_per_mwh": -0.47555136439411605,
+            "relative_mae_change_pct": -10.93348829763936,
+            "base_normalized_mae": 0.7633874439962753,
+            "candidate_normalized_mae": 0.6879715596786328
+          },
+          "mean_retrieval_confidence": 0.8884856529370476
+        }
+      ]
+    },
+    "pjm": {
+      "node_count": 35,
+      "macro_base_mae_usd_per_mwh": 5.319177052775136,
+      "macro_candidate_mae_usd_per_mwh": 4.904378653408212,
+      "macro_relative_mae_change_pct": -7.7981686875888805,
+      "improved_nodes": 35,
+      "rows": [
+        {
+          "node": "HUB:AEP GEN HUB",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.526907594188623,
+            "candidate_mae_usd_per_mwh": 4.061249072703337,
+            "mae_change_usd_per_mwh": -0.4656585214852864,
+            "relative_mae_change_pct": -10.286459615015586,
+            "base_normalized_mae": 0.5428172563711763,
+            "candidate_normalized_mae": 0.4923096601546617
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.735030050042235,
+            "candidate_mae_usd_per_mwh": 4.434141430152822,
+            "mae_change_usd_per_mwh": -0.3008886198894132,
+            "relative_mae_change_pct": -6.35452397787274,
+            "base_normalized_mae": 0.6299792246290002,
+            "candidate_normalized_mae": 0.5912668276442278
+          },
+          "mean_retrieval_confidence": 0.8779881550011476
+        },
+        {
+          "node": "HUB:AEP-DAYTON HUB",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.697327912565324,
+            "candidate_mae_usd_per_mwh": 4.211384055756121,
+            "mae_change_usd_per_mwh": -0.48594385680920293,
+            "relative_mae_change_pct": -10.345112494899622,
+            "base_normalized_mae": 0.5443749867243028,
+            "candidate_normalized_mae": 0.4927722729239064
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.8169144680470595,
+            "candidate_mae_usd_per_mwh": 4.506188262446858,
+            "mae_change_usd_per_mwh": -0.3107262056002016,
+            "relative_mae_change_pct": -6.450731223512474,
+            "base_normalized_mae": 0.6247720332846118,
+            "candidate_normalized_mae": 0.58383369579453
+          },
+          "mean_retrieval_confidence": 0.8781659499308184
+        },
+        {
+          "node": "HUB:ATSI GEN HUB",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.576329992530467,
+            "candidate_mae_usd_per_mwh": 4.145634170786592,
+            "mae_change_usd_per_mwh": -0.4306958217438748,
+            "relative_mae_change_pct": -9.411380351654298,
+            "base_normalized_mae": 0.5540308049760166,
+            "candidate_normalized_mae": 0.5045218835250236
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.799210948267102,
+            "candidate_mae_usd_per_mwh": 4.52527855487731,
+            "mae_change_usd_per_mwh": -0.27393239338979214,
+            "relative_mae_change_pct": -5.707863153810811,
+            "base_normalized_mae": 0.654517375525987,
+            "candidate_normalized_mae": 0.6184016298870362
+          },
+          "mean_retrieval_confidence": 0.8778163477027402
+        },
+        {
+          "node": "HUB:CHICAGO GEN HUB",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 5.554336147024536,
+            "candidate_mae_usd_per_mwh": 4.973493638973809,
+            "mae_change_usd_per_mwh": -0.5808425080507265,
+            "relative_mae_change_pct": -10.457460489889225,
+            "base_normalized_mae": 0.6052831863987901,
+            "candidate_normalized_mae": 0.5426648371304281
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 5.8311064090165825,
+            "candidate_mae_usd_per_mwh": 5.412141095636344,
+            "mae_change_usd_per_mwh": -0.41896531338023824,
+            "relative_mae_change_pct": -7.185005451665161,
+            "base_normalized_mae": 0.721213126492609,
+            "candidate_normalized_mae": 0.6703946533335038
+          },
+          "mean_retrieval_confidence": 0.8742071704059193
+        },
+        {
+          "node": "HUB:CHICAGO HUB",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 5.7064715176817895,
+            "candidate_mae_usd_per_mwh": 5.148972657708096,
+            "mae_change_usd_per_mwh": -0.5574988599736939,
+            "relative_mae_change_pct": -9.769589811256497,
+            "base_normalized_mae": 0.6072766111720748,
+            "candidate_normalized_mae": 0.5480660298677895
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 5.968293310269529,
+            "candidate_mae_usd_per_mwh": 5.540058707321342,
+            "mae_change_usd_per_mwh": -0.42823460294818716,
+            "relative_mae_change_pct": -7.175160145218262,
+            "base_normalized_mae": 0.7219565629008444,
+            "candidate_normalized_mae": 0.6713732242604105
+          },
+          "mean_retrieval_confidence": 0.8741505302070816
+        },
+        {
+          "node": "HUB:DOMINION HUB",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 5.744613503621629,
+            "candidate_mae_usd_per_mwh": 5.234684649630512,
+            "mae_change_usd_per_mwh": -0.5099288539911173,
+            "relative_mae_change_pct": -8.876643375044091,
+            "base_normalized_mae": 0.5878547272280181,
+            "candidate_normalized_mae": 0.5402737033106945
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 6.078263284689115,
+            "candidate_mae_usd_per_mwh": 5.6124424244163,
+            "mae_change_usd_per_mwh": -0.46582086027281466,
+            "relative_mae_change_pct": -7.663716401462861,
+            "base_normalized_mae": 0.6888172114540784,
+            "candidate_normalized_mae": 0.6349309634992713
+          },
+          "mean_retrieval_confidence": 0.8774351483741947
+        },
+        {
+          "node": "HUB:EASTERN HUB",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 7.519988245680532,
+            "candidate_mae_usd_per_mwh": 7.4329974123219085,
+            "mae_change_usd_per_mwh": -0.08699083335862312,
+            "relative_mae_change_pct": -1.1567948049465482,
+            "base_normalized_mae": 1.0453783069043328,
+            "candidate_normalized_mae": 1.0189044189238452
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 7.048200830522879,
+            "candidate_mae_usd_per_mwh": 7.137121732117188,
+            "mae_change_usd_per_mwh": 0.08892090159430843,
+            "relative_mae_change_pct": 1.2616113492287084,
+            "base_normalized_mae": 0.8820692287305669,
+            "candidate_normalized_mae": 0.8786226418044153
+          },
+          "mean_retrieval_confidence": 0.8770175916177207
+        },
+        {
+          "node": "HUB:N ILLINOIS HUB",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 5.678582355441206,
+            "candidate_mae_usd_per_mwh": 5.113355565082226,
+            "mae_change_usd_per_mwh": -0.56522679035898,
+            "relative_mae_change_pct": -9.9536601739584,
+            "base_normalized_mae": 0.6074374763535978,
+            "candidate_normalized_mae": 0.5466823081947797
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 5.903118446055386,
+            "candidate_mae_usd_per_mwh": 5.475606283337239,
+            "mae_change_usd_per_mwh": -0.4275121627181466,
+            "relative_mae_change_pct": -7.2421410246955364,
+            "base_normalized_mae": 0.7204134122960788,
+            "candidate_normalized_mae": 0.6690645519719053
+          },
+          "mean_retrieval_confidence": 0.874216711012773
+        },
+        {
+          "node": "HUB:NEW JERSEY HUB",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.440493522359576,
+            "candidate_mae_usd_per_mwh": 4.233763309045883,
+            "mae_change_usd_per_mwh": -0.20673021331369323,
+            "relative_mae_change_pct": -4.655568401861821,
+            "base_normalized_mae": 0.7463981940306182,
+            "candidate_normalized_mae": 0.7108670600676172
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 3.993079588516258,
+            "candidate_mae_usd_per_mwh": 3.8598825000452774,
+            "mae_change_usd_per_mwh": -0.13319708847098077,
+            "relative_mae_change_pct": -3.335698313002422,
+            "base_normalized_mae": 0.7602562293309576,
+            "candidate_normalized_mae": 0.73297016317815
+          },
+          "mean_retrieval_confidence": 0.8750771244573134
+        },
+        {
+          "node": "HUB:OHIO HUB",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.71398988374337,
+            "candidate_mae_usd_per_mwh": 4.222799533731741,
+            "mae_change_usd_per_mwh": -0.49119035001162903,
+            "relative_mae_change_pct": -10.41984310796984,
+            "base_normalized_mae": 0.5467796003485268,
+            "candidate_normalized_mae": 0.4942828105266848
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.812298808421617,
+            "candidate_mae_usd_per_mwh": 4.499862986212163,
+            "mae_change_usd_per_mwh": -0.3124358222094541,
+            "relative_mae_change_pct": -6.492444352430593,
+            "base_normalized_mae": 0.6275361971225746,
+            "candidate_normalized_mae": 0.5861459182739406
+          },
+          "mean_retrieval_confidence": 0.8780895237513882
+        },
+        {
+          "node": "HUB:WEST INT HUB",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.988624907138336,
+            "candidate_mae_usd_per_mwh": 4.549570296150707,
+            "mae_change_usd_per_mwh": -0.439054610987629,
+            "relative_mae_change_pct": -8.80111491965202,
+            "base_normalized_mae": 0.5551413336884701,
+            "candidate_normalized_mae": 0.5093347257905155
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 5.415286861378469,
+            "candidate_mae_usd_per_mwh": 5.167841367228697,
+            "mae_change_usd_per_mwh": -0.24744549414977168,
+            "relative_mae_change_pct": -4.5693884827143645,
+            "base_normalized_mae": 0.6468100742432289,
+            "candidate_normalized_mae": 0.6142457171088548
+          },
+          "mean_retrieval_confidence": 0.8777956971840335
+        },
+        {
+          "node": "HUB:WESTERN HUB",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 5.66726448957731,
+            "candidate_mae_usd_per_mwh": 5.179315616240726,
+            "mae_change_usd_per_mwh": -0.48794887333658377,
+            "relative_mae_change_pct": -8.609954136320486,
+            "base_normalized_mae": 0.5725531587563123,
+            "candidate_normalized_mae": 0.5256930253327032
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 6.549501206992585,
+            "candidate_mae_usd_per_mwh": 6.184710084193136,
+            "mae_change_usd_per_mwh": -0.36479112279944914,
+            "relative_mae_change_pct": -5.569754264797744,
+            "base_normalized_mae": 0.6529676343413218,
+            "candidate_normalized_mae": 0.6173231371106983
+          },
+          "mean_retrieval_confidence": 0.8782679111262239
+        },
+        {
+          "node": "ZONE:AECO",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.580904117720113,
+            "candidate_mae_usd_per_mwh": 4.39160931744471,
+            "mae_change_usd_per_mwh": -0.18929480027540269,
+            "relative_mae_change_pct": -4.132258510785281,
+            "base_normalized_mae": 0.78322194114596,
+            "candidate_normalized_mae": 0.7503790025180658
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.129806587799095,
+            "candidate_mae_usd_per_mwh": 4.037452191323305,
+            "mae_change_usd_per_mwh": -0.09235439647579025,
+            "relative_mae_change_pct": -2.236288661765362,
+            "base_normalized_mae": 0.7911624800963211,
+            "candidate_normalized_mae": 0.769811755508097
+          },
+          "mean_retrieval_confidence": 0.8748118513925892
+        },
+        {
+          "node": "ZONE:AEP",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.7480210394606805,
+            "candidate_mae_usd_per_mwh": 4.255865846607061,
+            "mae_change_usd_per_mwh": -0.49215519285361964,
+            "relative_mae_change_pct": -10.36548045519029,
+            "base_normalized_mae": 0.54537775914079,
+            "candidate_normalized_mae": 0.49369976302282137
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.844549150672959,
+            "candidate_mae_usd_per_mwh": 4.537122489901956,
+            "mae_change_usd_per_mwh": -0.3074266607710028,
+            "relative_mae_change_pct": -6.345826024456747,
+            "base_normalized_mae": 0.6211459476452788,
+            "candidate_normalized_mae": 0.5812126826697074
+          },
+          "mean_retrieval_confidence": 0.8782494549312051
+        },
+        {
+          "node": "ZONE:APS",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 5.143991922981921,
+            "candidate_mae_usd_per_mwh": 4.665972578360545,
+            "mae_change_usd_per_mwh": -0.47801934462137563,
+            "relative_mae_change_pct": -9.292770124418714,
+            "base_normalized_mae": 0.5538824843116777,
+            "candidate_normalized_mae": 0.5053649598886346
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 5.754170201148515,
+            "candidate_mae_usd_per_mwh": 5.3113849880724295,
+            "mae_change_usd_per_mwh": -0.4427852130760854,
+            "relative_mae_change_pct": -7.695031561417953,
+            "base_normalized_mae": 0.6356005679384278,
+            "candidate_normalized_mae": 0.5829794782386022
+          },
+          "mean_retrieval_confidence": 0.8784198928340229
+        },
+        {
+          "node": "ZONE:ATSI",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.705923614167715,
+            "candidate_mae_usd_per_mwh": 4.271490497854349,
+            "mae_change_usd_per_mwh": -0.43443311631336634,
+            "relative_mae_change_pct": -9.231622778692294,
+            "base_normalized_mae": 0.5524499789196887,
+            "candidate_normalized_mae": 0.5042623536742673
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.918268096741334,
+            "candidate_mae_usd_per_mwh": 4.670894638999174,
+            "mae_change_usd_per_mwh": -0.24737345774216024,
+            "relative_mae_change_pct": -5.029686322021787,
+            "base_normalized_mae": 0.6509226553641552,
+            "candidate_normalized_mae": 0.6180486617390302
+          },
+          "mean_retrieval_confidence": 0.8778834093773592
+        },
+        {
+          "node": "ZONE:BGE",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 7.321717370567169,
+            "candidate_mae_usd_per_mwh": 6.661065056130768,
+            "mae_change_usd_per_mwh": -0.6606523144364012,
+            "relative_mae_change_pct": -9.023187880649164,
+            "base_normalized_mae": 0.5870661085594044,
+            "candidate_normalized_mae": 0.5387314188553437
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 8.056896105371875,
+            "candidate_mae_usd_per_mwh": 7.4679455818537495,
+            "mae_change_usd_per_mwh": -0.5889505235181254,
+            "relative_mae_change_pct": -7.309893485227481,
+            "base_normalized_mae": 0.6900183018277245,
+            "candidate_normalized_mae": 0.6373360601838022
+          },
+          "mean_retrieval_confidence": 0.8780741691056835
+        },
+        {
+          "node": "ZONE:COMED",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 5.6757661583524985,
+            "candidate_mae_usd_per_mwh": 5.115651545071121,
+            "mae_change_usd_per_mwh": -0.5601146132813772,
+            "relative_mae_change_pct": -9.868528717609493,
+            "base_normalized_mae": 0.6052465823038105,
+            "candidate_normalized_mae": 0.5452937299578051
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 5.921249704099731,
+            "candidate_mae_usd_per_mwh": 5.508368660860825,
+            "mae_change_usd_per_mwh": -0.4128810432389063,
+            "relative_mae_change_pct": -6.972869983055052,
+            "base_normalized_mae": 0.7186878967482252,
+            "candidate_normalized_mae": 0.6690950126682362
+          },
+          "mean_retrieval_confidence": 0.8741926314734315
+        },
+        {
+          "node": "ZONE:DAY",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.940659405807854,
+            "candidate_mae_usd_per_mwh": 4.420295923158399,
+            "mae_change_usd_per_mwh": -0.5203634826494552,
+            "relative_mae_change_pct": -10.53226785958482,
+            "base_normalized_mae": 0.5397169449382995,
+            "candidate_normalized_mae": 0.48893738563491806
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 5.004919862894364,
+            "candidate_mae_usd_per_mwh": 4.671666143234355,
+            "mae_change_usd_per_mwh": -0.33325371966000894,
+            "relative_mae_change_pct": -6.658522589556249,
+            "base_normalized_mae": 0.6266416005895805,
+            "candidate_normalized_mae": 0.5844778020579007
+          },
+          "mean_retrieval_confidence": 0.8785062011227491
+        },
+        {
+          "node": "ZONE:DEOK",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.911145866373317,
+            "candidate_mae_usd_per_mwh": 4.425157191051756,
+            "mae_change_usd_per_mwh": -0.4859886753215612,
+            "relative_mae_change_pct": -9.895626978810224,
+            "base_normalized_mae": 0.5412761736580806,
+            "candidate_normalized_mae": 0.4935584492517357
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.907033996081647,
+            "candidate_mae_usd_per_mwh": 4.583346236557927,
+            "mae_change_usd_per_mwh": -0.32368775952372,
+            "relative_mae_change_pct": -6.596403444161791,
+            "base_normalized_mae": 0.6255106220351605,
+            "candidate_normalized_mae": 0.5839075105778846
+          },
+          "mean_retrieval_confidence": 0.8785420998239719
+        },
+        {
+          "node": "ZONE:DOM",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 6.6828610811680145,
+            "candidate_mae_usd_per_mwh": 6.183515343301682,
+            "mae_change_usd_per_mwh": -0.4993457378663324,
+            "relative_mae_change_pct": -7.472035282514922,
+            "base_normalized_mae": 0.6160767096834142,
+            "candidate_normalized_mae": 0.57467649739864
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 7.413213154710369,
+            "candidate_mae_usd_per_mwh": 7.031310766922494,
+            "mae_change_usd_per_mwh": -0.3819023877878749,
+            "relative_mae_change_pct": -5.151644500404162,
+            "base_normalized_mae": 0.680249599095232,
+            "candidate_normalized_mae": 0.6427156547653773
+          },
+          "mean_retrieval_confidence": 0.8773097465629087
+        },
+        {
+          "node": "ZONE:DPL",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 7.835001873440828,
+            "candidate_mae_usd_per_mwh": 7.735196983613388,
+            "mae_change_usd_per_mwh": -0.09980488982743996,
+            "relative_mae_change_pct": -1.2738336434322983,
+            "base_normalized_mae": 1.0955397086624181,
+            "candidate_normalized_mae": 1.0652705646289509
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 7.025954255351314,
+            "candidate_mae_usd_per_mwh": 7.154543332574439,
+            "mae_change_usd_per_mwh": 0.12858907722312551,
+            "relative_mae_change_pct": 1.8302008887288945,
+            "base_normalized_mae": 0.895510633284406,
+            "candidate_normalized_mae": 0.8960461890552825
+          },
+          "mean_retrieval_confidence": 0.8766658803406865
+        },
+        {
+          "node": "ZONE:DUQ",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.961994818674887,
+            "candidate_mae_usd_per_mwh": 4.525424114945155,
+            "mae_change_usd_per_mwh": -0.43657070372973195,
+            "relative_mae_change_pct": -8.798290197455694,
+            "base_normalized_mae": 0.5623685446274617,
+            "candidate_normalized_mae": 0.5153227152382346
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 6.199893782609774,
+            "candidate_mae_usd_per_mwh": 5.907702350433307,
+            "mae_change_usd_per_mwh": -0.2921914321764669,
+            "relative_mae_change_pct": -4.7128457748105586,
+            "base_normalized_mae": 0.6841600208052707,
+            "candidate_normalized_mae": 0.6497933660609998
+          },
+          "mean_retrieval_confidence": 0.8779310978590997
+        },
+        {
+          "node": "ZONE:EKPC",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.737259397347622,
+            "candidate_mae_usd_per_mwh": 4.250745240650736,
+            "mae_change_usd_per_mwh": -0.48651415669688625,
+            "relative_mae_change_pct": -10.269949687983814,
+            "base_normalized_mae": 0.5350066405357459,
+            "candidate_normalized_mae": 0.48536142870498733
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.8120571360176,
+            "candidate_mae_usd_per_mwh": 4.49756126830121,
+            "mae_change_usd_per_mwh": -0.31449586771639026,
+            "relative_mae_change_pct": -6.535580497630233,
+            "base_normalized_mae": 0.6192341788681663,
+            "candidate_normalized_mae": 0.5791048168325585
+          },
+          "mean_retrieval_confidence": 0.8784162447444429
+        },
+        {
+          "node": "ZONE:JCPL",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.377365999350242,
+            "candidate_mae_usd_per_mwh": 4.163699234442891,
+            "mae_change_usd_per_mwh": -0.2136667649073507,
+            "relative_mae_change_pct": -4.881172032200787,
+            "base_normalized_mae": 0.7323161992542873,
+            "candidate_normalized_mae": 0.6960665166339505
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 3.9787388872953113,
+            "candidate_mae_usd_per_mwh": 3.827696797529759,
+            "mae_change_usd_per_mwh": -0.15104208976555222,
+            "relative_mae_change_pct": -3.7962302640128343,
+            "base_normalized_mae": 0.7441012612294274,
+            "candidate_normalized_mae": 0.715125848573707
+          },
+          "mean_retrieval_confidence": 0.8753209316348176
+        },
+        {
+          "node": "ZONE:METED",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 5.0431622488074686,
+            "candidate_mae_usd_per_mwh": 4.780954294706641,
+            "mae_change_usd_per_mwh": -0.26220795410082776,
+            "relative_mae_change_pct": -5.199276588073898,
+            "base_normalized_mae": 0.6599908936856085,
+            "candidate_normalized_mae": 0.6257551205526003
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 5.228619868814209,
+            "candidate_mae_usd_per_mwh": 4.945426018700804,
+            "mae_change_usd_per_mwh": -0.28319385011340525,
+            "relative_mae_change_pct": -5.416225643070705,
+            "base_normalized_mae": 0.7129679457698948,
+            "candidate_normalized_mae": 0.6726478102693355
+          },
+          "mean_retrieval_confidence": 0.8763883314148702
+        },
+        {
+          "node": "ZONE:MID-ATL/APS",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 6.421706444012268,
+            "candidate_mae_usd_per_mwh": 5.891974782690095,
+            "mae_change_usd_per_mwh": -0.529731661322173,
+            "relative_mae_change_pct": -8.249079367620515,
+            "base_normalized_mae": 0.6233166346547732,
+            "candidate_normalized_mae": 0.5723024519833475
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 6.582515030878561,
+            "candidate_mae_usd_per_mwh": 6.022620025643983,
+            "mae_change_usd_per_mwh": -0.5598950052345781,
+            "relative_mae_change_pct": -8.505791519018368,
+            "base_normalized_mae": 0.6978706713869312,
+            "candidate_normalized_mae": 0.6370120715411329
+          },
+          "mean_retrieval_confidence": 0.878381099310926
+        },
+        {
+          "node": "ZONE:OVEC",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.586395348581583,
+            "candidate_mae_usd_per_mwh": 4.138257873546718,
+            "mae_change_usd_per_mwh": -0.4481374750348648,
+            "relative_mae_change_pct": -9.771017127284033,
+            "base_normalized_mae": 0.5448268933819091,
+            "candidate_normalized_mae": 0.4966121326900846
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.780148248024928,
+            "candidate_mae_usd_per_mwh": 4.475854645774356,
+            "mae_change_usd_per_mwh": -0.30429360225057245,
+            "relative_mae_change_pct": -6.36577751278532,
+            "base_normalized_mae": 0.6272942271409977,
+            "candidate_normalized_mae": 0.5874792682985445
+          },
+          "mean_retrieval_confidence": 0.8780717622617416
+        },
+        {
+          "node": "ZONE:PECO",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.748563902847694,
+            "candidate_mae_usd_per_mwh": 4.5644778008857605,
+            "mae_change_usd_per_mwh": -0.18408610196193376,
+            "relative_mae_change_pct": -3.8766689409305055,
+            "base_normalized_mae": 0.8305574534229232,
+            "candidate_normalized_mae": 0.7968187707517751
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.381168811740698,
+            "candidate_mae_usd_per_mwh": 4.293748644965227,
+            "mae_change_usd_per_mwh": -0.08742016677547149,
+            "relative_mae_change_pct": -1.9953617523525202,
+            "base_normalized_mae": 0.8312188202934553,
+            "candidate_normalized_mae": 0.811487104996804
+          },
+          "mean_retrieval_confidence": 0.8744262921096694
+        },
+        {
+          "node": "ZONE:PENELEC",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 5.287861766200713,
+            "candidate_mae_usd_per_mwh": 4.922915053493157,
+            "mae_change_usd_per_mwh": -0.36494671270755585,
+            "relative_mae_change_pct": -6.901593287484276,
+            "base_normalized_mae": 0.6170817108529014,
+            "candidate_normalized_mae": 0.5727089871410838
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 6.293950624230468,
+            "candidate_mae_usd_per_mwh": 6.040023538694475,
+            "mae_change_usd_per_mwh": -0.2539270855359925,
+            "relative_mae_change_pct": -4.034462624451218,
+            "base_normalized_mae": 0.679718779934078,
+            "candidate_normalized_mae": 0.6496675127514204
+          },
+          "mean_retrieval_confidence": 0.8769114223413375
+        },
+        {
+          "node": "ZONE:PEPCO",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 6.639686998840789,
+            "candidate_mae_usd_per_mwh": 6.033852881194236,
+            "mae_change_usd_per_mwh": -0.6058341176465527,
+            "relative_mae_change_pct": -9.124437910285899,
+            "base_normalized_mae": 0.5873553846721359,
+            "candidate_normalized_mae": 0.5385558965617011
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 7.013643274042342,
+            "candidate_mae_usd_per_mwh": 6.503378683760316,
+            "mae_change_usd_per_mwh": -0.5102645902820262,
+            "relative_mae_change_pct": -7.275314274544408,
+            "base_normalized_mae": 0.689246904796905,
+            "candidate_normalized_mae": 0.6387695789397566
+          },
+          "mean_retrieval_confidence": 0.8779816161866261
+        },
+        {
+          "node": "ZONE:PJM-RTO",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 5.282280547413799,
+            "candidate_mae_usd_per_mwh": 4.800782013227315,
+            "mae_change_usd_per_mwh": -0.4814985341864837,
+            "relative_mae_change_pct": -9.115353299858809,
+            "base_normalized_mae": 0.5661868508174124,
+            "candidate_normalized_mae": 0.5158271763749893
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 5.2101238701078625,
+            "candidate_mae_usd_per_mwh": 4.763751003488635,
+            "mae_change_usd_per_mwh": -0.44637286661922726,
+            "relative_mae_change_pct": -8.567413707382476,
+            "base_normalized_mae": 0.6415606740496832,
+            "candidate_normalized_mae": 0.5870818840353473
+          },
+          "mean_retrieval_confidence": 0.8786792298801744
+        },
+        {
+          "node": "ZONE:PPL",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.4054323190171525,
+            "candidate_mae_usd_per_mwh": 4.149527873219031,
+            "mae_change_usd_per_mwh": -0.2559044457981212,
+            "relative_mae_change_pct": -5.808838435525288,
+            "base_normalized_mae": 0.66721759444159,
+            "candidate_normalized_mae": 0.6285727003214759
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.354736741825386,
+            "candidate_mae_usd_per_mwh": 4.1509825077375275,
+            "mae_change_usd_per_mwh": -0.20375423408785842,
+            "relative_mae_change_pct": -4.678910486847254,
+            "base_normalized_mae": 0.6973782731085049,
+            "candidate_normalized_mae": 0.6627615406225348
+          },
+          "mean_retrieval_confidence": 0.8764397211705282
+        },
+        {
+          "node": "ZONE:PSEG",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.46834419574218,
+            "candidate_mae_usd_per_mwh": 4.239814420250402,
+            "mae_change_usd_per_mwh": -0.22852977549177833,
+            "relative_mae_change_pct": -5.114417454893938,
+            "base_normalized_mae": 0.7368837045591329,
+            "candidate_normalized_mae": 0.6988235935012439
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 3.996196033998772,
+            "candidate_mae_usd_per_mwh": 3.830036381027583,
+            "mae_change_usd_per_mwh": -0.16615965297118906,
+            "relative_mae_change_pct": -4.157945495104309,
+            "base_normalized_mae": 0.7547304574454683,
+            "candidate_normalized_mae": 0.7209244527612428
+          },
+          "mean_retrieval_confidence": 0.8749490234317524
+        },
+        {
+          "node": "ZONE:RECO",
+          "full_year": {
+            "samples": 8712,
+            "base_mae_usd_per_mwh": 4.85022033870056,
+            "candidate_mae_usd_per_mwh": 4.557787025309872,
+            "mae_change_usd_per_mwh": -0.29243331339068845,
+            "relative_mae_change_pct": -6.029278939295269,
+            "base_normalized_mae": 0.7183217839017769,
+            "candidate_normalized_mae": 0.6748964633307588
+          },
+          "last_90_days": {
+            "samples": 2160,
+            "base_mae_usd_per_mwh": 4.244404984992227,
+            "candidate_mae_usd_per_mwh": 4.036243409842339,
+            "mae_change_usd_per_mwh": -0.2081615751498873,
+            "relative_mae_change_pct": -4.904375899234992,
+            "base_normalized_mae": 0.7259067878328146,
+            "candidate_normalized_mae": 0.6899357110755634
+          },
+          "mean_retrieval_confidence": 0.8749217891984786
+        }
+      ]
+    }
+  },
+  "pooled_micro": {
+    "samples": 557568,
+    "base_mae_usd_per_mwh": 12.272723065522902,
+    "candidate_mae_usd_per_mwh": 11.148839411131794,
+    "relative_mae_change_pct": -9.157573656561791
+  }
+}

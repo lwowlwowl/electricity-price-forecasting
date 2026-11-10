@@ -1,0 +1,28 @@
+{
+  "method": "pure-v4.2-causal-experience-conditioned-memory-candidate",
+  "literature_basis": "MemCast (ICML 2026)",
+  "source_selected_config": {
+    "memory_days": 112,
+    "neighbors": 7,
+    "base_weight": 1.0,
+    "physical_weight": 2.0,
+    "calendar_weight": 0.5,
+    "gate": 0.75,
+    "aggregation": "median",
+    "granularity": "hour"
+  },
+  "source_selection_scores": {
+    "caiso": 0.5871695722525619,
+    "nyiso": 0.7086318881560676,
+    "pjm": 0.5549936268171194
+  },
+  "ercot_heldout": {
+    "base_normalized_mae": 1.3191912610622423,
+    "candidate_normalized_mae": 1.1478600601348652
+  },
+  "uses_exaa": false,
+  "uses_external_model_predictions": false,
+  "uses_other_european_training_data": false,
+  "uses_austria_labels_for_training_or_selection": false,
+  "uses_only_past_published_austria_prices_as_causal_memory": true
+}

@@ -1,0 +1,143 @@
+{
+  "experiment": "pure_v42_memory_us_ercot_predictions_v1",
+  "status": "frozen_memory_correction_on_official_v4_da",
+  "year": 2023,
+  "selected_config": {
+    "memory_days": 112,
+    "neighbors": 7,
+    "base_weight": 1.0,
+    "physical_weight": 2.0,
+    "calendar_weight": 0.5,
+    "gate": 0.75,
+    "aggregation": "median",
+    "granularity": "hour"
+  },
+  "rt_at_da_and_rt_arrays_identical_to_official_v4": true,
+  "base_mae_usd_per_mwh": 37.22273013256679,
+  "candidate_mae_usd_per_mwh": 32.96819680551818,
+  "relative_mae_change_pct": -11.42993356988139,
+  "improved_nodes": 15,
+  "node_count": 15,
+  "nodes": [
+    {
+      "node": "HB_BUSAVG",
+      "base_mae_usd_per_mwh": 35.86869273685805,
+      "candidate_mae_usd_per_mwh": 31.54952296370895,
+      "relative_mae_change_pct": -12.04161468842938,
+      "mean_absolute_correction_usd_per_mwh": 9.610159423284857,
+      "mean_retrieval_confidence": 0.8828171626475769
+    },
+    {
+      "node": "HB_HOUSTON",
+      "base_mae_usd_per_mwh": 36.211425419701854,
+      "candidate_mae_usd_per_mwh": 31.935318709614254,
+      "relative_mae_change_pct": -11.808722414337947,
+      "mean_absolute_correction_usd_per_mwh": 9.540315313265001,
+      "mean_retrieval_confidence": 0.8830835692584394
+    },
+    {
+      "node": "HB_HUBAVG",
+      "base_mae_usd_per_mwh": 36.262126849795784,
+      "candidate_mae_usd_per_mwh": 32.10061003020659,
+      "relative_mae_change_pct": -11.476207219799717,
+      "mean_absolute_correction_usd_per_mwh": 9.701821830654094,
+      "mean_retrieval_confidence": 0.8826865885764206
+    },
+    {
+      "node": "HB_NORTH",
+      "base_mae_usd_per_mwh": 35.91936933181503,
+      "candidate_mae_usd_per_mwh": 31.696422545201735,
+      "relative_mae_change_pct": -11.756739790174663,
+      "mean_absolute_correction_usd_per_mwh": 9.341686800671152,
+      "mean_retrieval_confidence": 0.8824476221038985
+    },
+    {
+      "node": "HB_PAN",
+      "base_mae_usd_per_mwh": 39.6969521396804,
+      "candidate_mae_usd_per_mwh": 35.52027127896252,
+      "relative_mae_change_pct": -10.521414455249678,
+      "mean_absolute_correction_usd_per_mwh": 11.495702087590407,
+      "mean_retrieval_confidence": 0.8801989309690885
+    },
+    {
+      "node": "HB_SOUTH",
+      "base_mae_usd_per_mwh": 34.52222175850606,
+      "candidate_mae_usd_per_mwh": 31.02256435039532,
+      "relative_mae_change_pct": -10.1374049231013,
+      "mean_absolute_correction_usd_per_mwh": 8.739786973092931,
+      "mean_retrieval_confidence": 0.8823484184075662
+    },
+    {
+      "node": "HB_WEST",
+      "base_mae_usd_per_mwh": 39.64579273666919,
+      "candidate_mae_usd_per_mwh": 35.363411622040886,
+      "relative_mae_change_pct": -10.801602942012678,
+      "mean_absolute_correction_usd_per_mwh": 11.38928792770254,
+      "mean_retrieval_confidence": 0.8814968108192525
+    },
+    {
+      "node": "LZ_AEN",
+      "base_mae_usd_per_mwh": 38.43702522963672,
+      "candidate_mae_usd_per_mwh": 33.55065706877403,
+      "relative_mae_change_pct": -12.712659555909323,
+      "mean_absolute_correction_usd_per_mwh": 9.688451211574355,
+      "mean_retrieval_confidence": 0.8830573703457623
+    },
+    {
+      "node": "LZ_CPS",
+      "base_mae_usd_per_mwh": 36.99469200352034,
+      "candidate_mae_usd_per_mwh": 32.51354161765045,
+      "relative_mae_change_pct": -12.112954975928636,
+      "mean_absolute_correction_usd_per_mwh": 9.833260127830792,
+      "mean_retrieval_confidence": 0.8826820962806854
+    },
+    {
+      "node": "LZ_HOUSTON",
+      "base_mae_usd_per_mwh": 36.2638943978475,
+      "candidate_mae_usd_per_mwh": 31.95469345223275,
+      "relative_mae_change_pct": -11.882896244785368,
+      "mean_absolute_correction_usd_per_mwh": 9.543284789868371,
+      "mean_retrieval_confidence": 0.8831086359209233
+    },
+    {
+      "node": "LZ_LCRA",
+      "base_mae_usd_per_mwh": 37.77899481035729,
+      "candidate_mae_usd_per_mwh": 33.05155150000225,
+      "relative_mae_change_pct": -12.513417400557703,
+      "mean_absolute_correction_usd_per_mwh": 9.888928989529635,
+      "mean_retrieval_confidence": 0.8828376698918042
+    },
+    {
+      "node": "LZ_NORTH",
+      "base_mae_usd_per_mwh": 36.20451546089571,
+      "candidate_mae_usd_per_mwh": 31.79623189887898,
+      "relative_mae_change_pct": -12.176060101613828,
+      "mean_absolute_correction_usd_per_mwh": 9.527008788450564,
+      "mean_retrieval_confidence": 0.8822230575945339
+    },
+    {
+      "node": "LZ_RAYBN",
+      "base_mae_usd_per_mwh": 36.44972695572057,
+      "candidate_mae_usd_per_mwh": 32.16823292941154,
+      "relative_mae_change_pct": -11.74629931113127,
+      "mean_absolute_correction_usd_per_mwh": 9.520563121331854,
+      "mean_retrieval_confidence": 0.8819356903582486
+    },
+    {
+      "node": "LZ_SOUTH",
+      "base_mae_usd_per_mwh": 33.9407183596825,
+      "candidate_mae_usd_per_mwh": 30.626943280395796,
+      "relative_mae_change_pct": -9.763420573982518,
+      "mean_absolute_correction_usd_per_mwh": 8.481558819035046,
+      "mean_retrieval_confidence": 0.8814902445604049
+    },
+    {
+      "node": "LZ_WEST",
+      "base_mae_usd_per_mwh": 44.14480379781484,
+      "candidate_mae_usd_per_mwh": 39.67297883529663,
+      "relative_mae_change_pct": -10.12990109322801,
+      "mean_absolute_correction_usd_per_mwh": 12.931895626390588,
+      "mean_retrieval_confidence": 0.8821162699480906
+    }
+  ]
+}

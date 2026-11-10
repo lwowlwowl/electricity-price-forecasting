@@ -1,0 +1,12 @@
+{
+  "experiment": "pure_v42_memory_locked_us_ercot_predictions_v1",
+  "year": 2023,
+  "base_mae_usd_per_mwh": 37.22273013256679,
+  "raw_candidate_mae_usd_per_mwh": 32.96819680078109,
+  "locked_candidate_mae_usd_per_mwh": 32.98575233341847,
+  "maximum_target_objective_gap": 2.025549150630468e-08,
+  "maximum_plan_difference_mwh": 1.0000000000000007,
+  "maximum_stationarity_residual": 4.547473508864641e-13,
+  "nodes": 15,
+  "days": 363
+}

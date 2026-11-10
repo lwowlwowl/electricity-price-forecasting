@@ -177,3 +177,38 @@ def test_backtest_optional_hourly_ledger_reconstructs_daily_revenue():
         timestamps,
         _cfg(),
     )
+
+
+def test_backtest_can_apply_an_explicit_lexicographic_da_plan():
+    delivery_date = date(2023, 1, 3)
+    timestamps = pd.date_range(
+        "2023-01-03 00:00", periods=24, freq="h", tz="America/Chicago"
+    )
+    rt_da_prediction = np.linspace(10.0, 40.0, 24)
+    rt_prediction = np.tile(np.asarray([10.0, 15.0, 20.0, 25.0]), (24, 1))
+    truth_da = np.linspace(-30.0, 120.0, 24)
+    truth_rt = np.linspace(-10.0, 90.0, 24)
+    base = locked_continuous_mpc_backtest(
+        {delivery_date: np.linspace(-20.0, 100.0, 24)},
+        {delivery_date: rt_da_prediction},
+        rt_prediction,
+        truth_da,
+        truth_rt,
+        timestamps,
+        _cfg(),
+        include_hourly_details=True,
+    )
+    plan = np.asarray([row["da_plan_mwh"] for row in base["hourly"]])
+    tied = locked_continuous_mpc_backtest(
+        {delivery_date: np.linspace(-100.0, 200.0, 24)},
+        {delivery_date: rt_da_prediction},
+        rt_prediction,
+        truth_da,
+        truth_rt,
+        timestamps,
+        _cfg(),
+        locked_da_plans={delivery_date: plan},
+    )
+    assert tied["da_plan_action_digest"] == base["da_plan_action_digest"]
+    assert tied["actual_state"]["action_digest"] == base["actual_state"]["action_digest"]
+    assert tied["total_revenue"] == pytest.approx(base["total_revenue"])

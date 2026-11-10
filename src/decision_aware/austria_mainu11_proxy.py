@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 
 from .austria_external import PRICE_DA, TIMESTAMP
+from .austria_exaa import EXAA_COLUMN, exaa_quarter_hour_covariate
 
 
 PROXY_COLUMNS: tuple[str, ...] = (
@@ -21,6 +22,8 @@ PROXY_COLUMNS: tuple[str, ...] = (
     "wx_sw_rad_proxy",
     "wx_wind10_ms_proxy",
 )
+
+PROXY_COLUMNS_WITH_EXAA: tuple[str, ...] = (*PROXY_COLUMNS, EXAA_COLUMN)
 
 UNAVAILABLE_MAINU11_COLUMNS: tuple[str, ...] = (
     "maxbex_at_de",
@@ -71,6 +74,18 @@ def build_mainu11_proxy(raw: pd.DataFrame) -> pd.DataFrame:
     output = output.dropna()
     if not np.isfinite(output.to_numpy(dtype=np.float64)).all():
         raise ValueError("mainU11代理表包含非有限值")
+    return output
+
+
+def build_mainu11_proxy_with_exaa(
+    raw: pd.DataFrame,
+    exaa_hourly: pd.DataFrame,
+) -> pd.DataFrame:
+    """Add the teacher-specified early EXAA auction as a causal covariate."""
+    output = build_mainu11_proxy(raw)
+    output[EXAA_COLUMN] = exaa_quarter_hour_covariate(exaa_hourly, output.index)
+    if output[list(PROXY_COLUMNS_WITH_EXAA)].isna().any().any():
+        raise ValueError("mainU11+EXAA proxy table contains missing values")
     return output
 
 
@@ -132,6 +147,7 @@ def make_tasks(
     *,
     context_length: int = 4096,
     horizon: int = 96,
+    covariate_columns: tuple[str, ...] = PROXY_COLUMNS,
 ) -> list[dict[str, object]]:
     tasks: list[dict[str, object]] = []
     for origin in origins:
@@ -145,8 +161,8 @@ def make_tasks(
             raise ValueError(f"{origin}的预测窗口不连续")
         tasks.append({
             "context": history["y"].to_numpy(np.float32),
-            "hist_cov": history[list(PROXY_COLUMNS)].to_numpy(np.float32),
-            "future_cov": future[list(PROXY_COLUMNS)].to_numpy(np.float32),
+            "hist_cov": history[list(covariate_columns)].to_numpy(np.float32),
+            "future_cov": future[list(covariate_columns)].to_numpy(np.float32),
             "truth": future["y"].to_numpy(np.float32),
             "index": expected,
         })

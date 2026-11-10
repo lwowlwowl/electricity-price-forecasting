@@ -246,6 +246,8 @@ def quarter_hour_backtest(
     realized_rt: np.ndarray,
     local_timestamps: pd.DatetimeIndex,
     battery: dict[str, float],
+    *,
+    locked_da_plans: np.ndarray | None = None,
 ) -> dict[str, Any]:
     count = len(local_timestamps)
     arrays = [da_prediction, rt_at_da_prediction, realized_da, realized_rt]
@@ -264,17 +266,22 @@ def quarter_hour_backtest(
     for index, stamp in enumerate(local_timestamps):
         positions[stamp.date()].append(index)
     ordered_dates = sorted(positions)
-    plan_soc = float(battery["initial_soc_mwh"])
-    plans = np.zeros(count, dtype=np.float64)
-    for sample_index, delivery_date in enumerate(ordered_dates):
-        idx = np.asarray(positions[delivery_date], dtype=np.int64)
-        solved = solve_predicted_da_penalty_lp_day(
-            da_prediction[idx], rt_at_da_prediction[idx], simulator,
-            initial_plan_soc_mwh=plan_soc, initial_actual_soc_mwh=plan_soc,
-            sample_index=sample_index,
-        )
-        plans[idx] = solved.dispatch.da_discharge_mwh - solved.dispatch.da_charge_mwh
-        plan_soc = float(solved.dispatch.da_soc_path_mwh[-1])
+    if locked_da_plans is None:
+        plan_soc = float(battery["initial_soc_mwh"])
+        plans = np.zeros(count, dtype=np.float64)
+        for sample_index, delivery_date in enumerate(ordered_dates):
+            idx = np.asarray(positions[delivery_date], dtype=np.int64)
+            solved = solve_predicted_da_penalty_lp_day(
+                da_prediction[idx], rt_at_da_prediction[idx], simulator,
+                initial_plan_soc_mwh=plan_soc, initial_actual_soc_mwh=plan_soc,
+                sample_index=sample_index,
+            )
+            plans[idx] = solved.dispatch.da_discharge_mwh - solved.dispatch.da_charge_mwh
+            plan_soc = float(solved.dispatch.da_soc_path_mwh[-1])
+    else:
+        plans = np.asarray(locked_da_plans, dtype=np.float64)
+        if plans.shape != (count,) or not np.isfinite(plans).all():
+            raise ValueError("词典序锁定DA计划必须与15分钟时间轴同形且有限")
 
     actual_soc = float(battery["initial_soc_mwh"])
     discharged_today = 0.0

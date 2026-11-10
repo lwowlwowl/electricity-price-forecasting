@@ -1,0 +1,51 @@
+{
+  "model": "TimesFM3-ZS-mainU11-proxy6+EXAA",
+  "status": "frozen_zero_shot_approximation_of_teacher_feature_protocol",
+  "austria_training_tuning_or_selection_used": false,
+  "teacher_feature_families_used": [
+    "at_gen_da_a71_proxy",
+    "at_resload_da_proxy",
+    "at_solar_da_proxy",
+    "at_wind_da_proxy",
+    "wx_sw_rad_proxy",
+    "wx_wind10_ms_proxy",
+    "exaa_eur_per_mwh"
+  ],
+  "unavailable_teacher_features": [
+    "maxbex_at_de",
+    "maxbex_at_hu",
+    "maxbex_cz_at",
+    "maxbex_de_at",
+    "ttf"
+  ],
+  "exaa_availability": "earlier auction price known before forecast gate",
+  "metrics": {
+    "all": 5.543668247403505,
+    "neg": 5.879681371157945,
+    "spike": 7.250102286256151,
+    "ordinary": 4.426355409782315
+  },
+  "teacher_comparison": {
+    "all": {
+      "ours": 5.543668247403505,
+      "teacher": 12.603,
+      "gap_ours_minus_teacher": -7.059331752596495
+    },
+    "neg": {
+      "ours": 5.879681371157945,
+      "teacher": 16.898,
+      "gap_ours_minus_teacher": -11.018318628842055
+    },
+    "spike": {
+      "ours": 7.250102286256151,
+      "teacher": 15.159,
+      "gap_ours_minus_teacher": -7.908897713743849
+    },
+    "ordinary": {
+      "ours": 4.426355409782315,
+      "teacher": 9.687,
+      "gap_ours_minus_teacher": -5.260644590217685
+    }
+  },
+  "device": "cuda"
+}

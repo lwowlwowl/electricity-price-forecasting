@@ -410,6 +410,7 @@ def locked_continuous_mpc_backtest(
     *,
     terminal_value_weight: float = 1.0,
     include_hourly_details: bool = False,
+    locked_da_plans: Mapping[date, Sequence[float]] | None = None,
 ) -> dict:
     """以严格信息边界运行连续DA-LP与每小时RT-LP回测。"""
     rt_forecasts = np.asarray(rt_price_forecasts, dtype=np.float64)
@@ -476,8 +477,25 @@ def locked_continuous_mpc_backtest(
         )
         da_solver_seconds += perf_counter() - solver_started
         plan = solved.dispatch.da_discharge_mwh - solved.dispatch.da_charge_mwh
+        if locked_da_plans is not None:
+            if delivery_date not in locked_da_plans:
+                raise ValueError(f"locked_da_plans缺少交付日: {delivery_date}")
+            locked_plan = np.asarray(
+                locked_da_plans[delivery_date], dtype=np.float64
+            )
+            if locked_plan.shape != (24,) or not np.isfinite(locked_plan).all():
+                raise ValueError(
+                    f"locked_da_plans[{delivery_date}]必须是24维有限向量"
+                )
+            plan = locked_plan
         da_plans[delivery_date] = plan
-        plan_soc = float(solved.dispatch.da_soc_path_mwh[-1])
+        if locked_da_plans is None:
+            plan_soc = float(solved.dispatch.da_soc_path_mwh[-1])
+        else:
+            discharge = np.maximum(plan, 0.0)
+            charge = np.maximum(-plan, 0.0)
+            plan_soc += float(np.sum(-discharge / simulator.eta + charge * simulator.eta))
+            plan_soc = float(np.clip(plan_soc, simulator.s_min, simulator.s_max))
         plan_soc_end[delivery_date] = plan_soc
         previous_last = utc[positions[-1]]
         da_solver_calls += 1

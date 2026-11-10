@@ -1,0 +1,39 @@
+{
+  "system": "pure-v4-source-multiscale-physical-gate",
+  "protocol": "austria_pure_v4_multiscale_v1",
+  "uses_exaa": false,
+  "uses_external_price_model_predictions": false,
+  "uses_austria_price_labels_for_training_or_selection": false,
+  "day_ahead_physical_forecasts": [
+    "load",
+    "wind",
+    "solar"
+  ],
+  "source_selected_epoch": 10,
+  "forecast": {
+    "all": {
+      "days": 365,
+      "quarters": 35040,
+      "point_weighted_mae_eur_per_mwh": 24.33168213771848,
+      "daily_macro_mae_eur_per_mwh": 24.332300361263293
+    },
+    "neg": {
+      "days": 63,
+      "quarters": 6048,
+      "point_weighted_mae_eur_per_mwh": 30.114088079904388,
+      "daily_macro_mae_eur_per_mwh": 30.11408807990439
+    },
+    "spike": {
+      "days": 112,
+      "quarters": 10752,
+      "point_weighted_mae_eur_per_mwh": 30.791452133544617,
+      "daily_macro_mae_eur_per_mwh": 30.791452133544617
+    },
+    "ordinary": {
+      "days": 190,
+      "quarters": 18240,
+      "point_weighted_mae_eur_per_mwh": 18.606493643559325,
+      "daily_macro_mae_eur_per_mwh": 18.607681283526993
+    }
+  }
+}

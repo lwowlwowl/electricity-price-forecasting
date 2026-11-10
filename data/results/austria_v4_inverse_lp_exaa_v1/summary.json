@@ -1,0 +1,3305 @@
+{
+  "system": "decision-aware-v4-inverse-lp-exaa",
+  "status": "frozen",
+  "strict_external_zero_shot": true,
+  "austria_labels_used": false,
+  "external_model_predictions_used": false,
+  "method": "L1 projection of causal EXAA onto the active-set normal cone of the frozen v4 joint DA/RT-at-DA LP",
+  "days": 365,
+  "mean_abs_projection_from_exaa_eur_per_mwh": 7.830309339978372,
+  "max_target_objective_gap": 4.547473508864641e-13,
+  "max_stationarity_residual": 1.9895196601282805e-13,
+  "max_plan_difference_mwh": 0.25,
+  "sources": {
+    "v4_sha256": "4a62c75e8d8d834c34b9b2e2765a12c2f4c0652bb49cfecbedc3322136485b65",
+    "exaa_sha256": "d6f142cec9e79bb361bb81552c87672e465ed8ac0cb56584ef699ad089bd1c35",
+    "protocol_sha256": "998ef311be2d52cfea327781266e038b3d7f0a42b69c512eec6a44d54c224064"
+  },
+  "daily_diagnostics": [
+    {
+      "date": "2025-10-01",
+      "quarters": 96,
+      "active_constraints": 786,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.007281553398058249,
+      "mean_abs_projection_from_exaa": 3.9110617735290525
+    },
+    {
+      "date": "2025-10-02",
+      "quarters": 96,
+      "active_constraints": 752,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 3.3300628544044506
+    },
+    {
+      "date": "2025-10-03",
+      "quarters": 96,
+      "active_constraints": 812,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 11.913484051684058
+    },
+    {
+      "date": "2025-10-04",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 9.06463565815226
+    },
+    {
+      "date": "2025-10-05",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 21.21796798184204
+    },
+    {
+      "date": "2025-10-06",
+      "quarters": 96,
+      "active_constraints": 852,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.041237113402062514,
+      "mean_abs_projection_from_exaa": 9.314539519266765
+    },
+    {
+      "date": "2025-10-07",
+      "quarters": 96,
+      "active_constraints": 762,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.1298155181768861,
+      "mean_abs_projection_from_exaa": 14.22074782428487
+    },
+    {
+      "date": "2025-10-08",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 4.881932271891274
+    },
+    {
+      "date": "2025-10-09",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.0
+    },
+    {
+      "date": "2025-10-10",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": -7.105427357601002e-15,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 2.5897440071347555
+    },
+    {
+      "date": "2025-10-11",
+      "quarters": 96,
+      "active_constraints": 778,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.317990331390216
+    },
+    {
+      "date": "2025-10-12",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 2.4115101891479487
+    },
+    {
+      "date": "2025-10-13",
+      "quarters": 96,
+      "active_constraints": 852,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.015463917525773412,
+      "mean_abs_projection_from_exaa": 2.4766104009043377
+    },
+    {
+      "date": "2025-10-14",
+      "quarters": 96,
+      "active_constraints": 770,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 12.34342136803182
+    },
+    {
+      "date": "2025-10-15",
+      "quarters": 96,
+      "active_constraints": 732,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 12.98320873453776
+    },
+    {
+      "date": "2025-10-16",
+      "quarters": 96,
+      "active_constraints": 766,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.007281553398058249,
+      "mean_abs_projection_from_exaa": 2.5008382017008457
+    },
+    {
+      "date": "2025-10-17",
+      "quarters": 96,
+      "active_constraints": 744,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 4.080115457036334
+    },
+    {
+      "date": "2025-10-18",
+      "quarters": 96,
+      "active_constraints": 721,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 1.8205906752395975
+    },
+    {
+      "date": "2025-10-19",
+      "quarters": 96,
+      "active_constraints": 740,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.12570260602963756,
+      "mean_abs_projection_from_exaa": 3.1674067562532806
+    },
+    {
+      "date": "2025-10-20",
+      "quarters": 96,
+      "active_constraints": 732,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.0740997229916899,
+      "mean_abs_projection_from_exaa": 4.369931680682497
+    },
+    {
+      "date": "2025-10-21",
+      "quarters": 96,
+      "active_constraints": 768,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 9.79998071481568
+    },
+    {
+      "date": "2025-10-22",
+      "quarters": 96,
+      "active_constraints": 770,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 6.576773343541464
+    },
+    {
+      "date": "2025-10-23",
+      "quarters": 96,
+      "active_constraints": 745,
+      "target_objective_gap": -7.105427357601002e-15,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 4.600394914616024
+    },
+    {
+      "date": "2025-10-24",
+      "quarters": 96,
+      "active_constraints": 762,
+      "target_objective_gap": -2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 7.331644908588409
+    },
+    {
+      "date": "2025-10-25",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 1.1472435682169593
+    },
+    {
+      "date": "2025-10-26",
+      "quarters": 100,
+      "active_constraints": 1000,
+      "target_objective_gap": 1.7763568394002505e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 6.785232532179915
+    },
+    {
+      "date": "2025-10-27",
+      "quarters": 96,
+      "active_constraints": 904,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 5.305426139038084
+    },
+    {
+      "date": "2025-10-28",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 1.665240374633789
+    },
+    {
+      "date": "2025-10-29",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.3295586062622071
+    },
+    {
+      "date": "2025-10-30",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.12274378810628228
+    },
+    {
+      "date": "2025-10-31",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.0
+    },
+    {
+      "date": "2025-11-01",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 10.763730960235597
+    },
+    {
+      "date": "2025-11-02",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.0
+    },
+    {
+      "date": "2025-11-03",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.003662506782420194,
+      "mean_abs_projection_from_exaa": 8.245405195556637
+    },
+    {
+      "date": "2025-11-04",
+      "quarters": 96,
+      "active_constraints": 757,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 7.105427357601002e-14,
+      "max_plan_difference_mwh": 0.16112174086872066,
+      "mean_abs_projection_from_exaa": 6.152088597387896
+    },
+    {
+      "date": "2025-11-05",
+      "quarters": 96,
+      "active_constraints": 731,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 9.836404202583314
+    },
+    {
+      "date": "2025-11-06",
+      "quarters": 96,
+      "active_constraints": 764,
+      "target_objective_gap": 7.105427357601002e-15,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 1.8999236431524167
+    },
+    {
+      "date": "2025-11-07",
+      "quarters": 96,
+      "active_constraints": 764,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 3.3171255732283966
+    },
+    {
+      "date": "2025-11-08",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.0
+    },
+    {
+      "date": "2025-11-09",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.2527967523396815
+    },
+    {
+      "date": "2025-11-10",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 2.10159925781028
+    },
+    {
+      "date": "2025-11-11",
+      "quarters": 96,
+      "active_constraints": 856,
+      "target_objective_gap": -1.4210854715202004e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.02791237113402081,
+      "mean_abs_projection_from_exaa": 2.3112940313542496
+    },
+    {
+      "date": "2025-11-12",
+      "quarters": 96,
+      "active_constraints": 751,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.019738880327346945,
+      "mean_abs_projection_from_exaa": 1.2632801122750468
+    },
+    {
+      "date": "2025-11-13",
+      "quarters": 96,
+      "active_constraints": 762,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 4.104257634026845
+    },
+    {
+      "date": "2025-11-14",
+      "quarters": 96,
+      "active_constraints": 740,
+      "target_objective_gap": 1.4210854715202004e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.018910484642364278,
+      "mean_abs_projection_from_exaa": 1.9054975512843102
+    },
+    {
+      "date": "2025-11-15",
+      "quarters": 96,
+      "active_constraints": 754,
+      "target_objective_gap": -1.4210854715202004e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.18979824646943638,
+      "mean_abs_projection_from_exaa": 3.4826908139856716
+    },
+    {
+      "date": "2025-11-16",
+      "quarters": 96,
+      "active_constraints": 814,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.6429972252400713
+    },
+    {
+      "date": "2025-11-17",
+      "quarters": 96,
+      "active_constraints": 842,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 14.151819547979832
+    },
+    {
+      "date": "2025-11-18",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.900538872049604
+    },
+    {
+      "date": "2025-11-19",
+      "quarters": 96,
+      "active_constraints": 764,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 9.786602447249953
+    },
+    {
+      "date": "2025-11-20",
+      "quarters": 96,
+      "active_constraints": 764,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 7.961011793378142
+    },
+    {
+      "date": "2025-11-21",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 1.0105198534342439
+    },
+    {
+      "date": "2025-11-22",
+      "quarters": 96,
+      "active_constraints": 784,
+      "target_objective_gap": -4.263256414560601e-14,
+      "max_stationarity_residual": 7.105427357601002e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.443756982147216
+    },
+    {
+      "date": "2025-11-23",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 4.46268506072998
+    },
+    {
+      "date": "2025-11-24",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 1.157825458618164
+    },
+    {
+      "date": "2025-11-25",
+      "quarters": 96,
+      "active_constraints": 844,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.041237113402062535,
+      "mean_abs_projection_from_exaa": 19.05406258764904
+    },
+    {
+      "date": "2025-11-26",
+      "quarters": 96,
+      "active_constraints": 896,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 18.16227821055094
+    },
+    {
+      "date": "2025-11-27",
+      "quarters": 96,
+      "active_constraints": 778,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.22999999999999687,
+      "mean_abs_projection_from_exaa": 37.65245228710938
+    },
+    {
+      "date": "2025-11-28",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.011113949923351657,
+      "mean_abs_projection_from_exaa": 6.89676412991206
+    },
+    {
+      "date": "2025-11-29",
+      "quarters": 96,
+      "active_constraints": 788,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.9280692253239952
+    },
+    {
+      "date": "2025-11-30",
+      "quarters": 96,
+      "active_constraints": 886,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.02000000000000045,
+      "mean_abs_projection_from_exaa": 2.0672198435249305
+    },
+    {
+      "date": "2025-12-01",
+      "quarters": 96,
+      "active_constraints": 832,
+      "target_objective_gap": 1.4210854715202004e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 6.342426725740501
+    },
+    {
+      "date": "2025-12-02",
+      "quarters": 96,
+      "active_constraints": 745,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.009974389464439584,
+      "mean_abs_projection_from_exaa": 2.967246711483
+    },
+    {
+      "date": "2025-12-03",
+      "quarters": 96,
+      "active_constraints": 768,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 14.004885816121424
+    },
+    {
+      "date": "2025-12-04",
+      "quarters": 96,
+      "active_constraints": 747,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.04000000000000059,
+      "mean_abs_projection_from_exaa": 1.9421850964044742
+    },
+    {
+      "date": "2025-12-05",
+      "quarters": 96,
+      "active_constraints": 781,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 4.513633494832357
+    },
+    {
+      "date": "2025-12-06",
+      "quarters": 96,
+      "active_constraints": 746,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 14.015864850011907
+    },
+    {
+      "date": "2025-12-07",
+      "quarters": 96,
+      "active_constraints": 790,
+      "target_objective_gap": -4.263256414560601e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.06890916606337519,
+      "mean_abs_projection_from_exaa": 1.636674569635704
+    },
+    {
+      "date": "2025-12-08",
+      "quarters": 96,
+      "active_constraints": 814,
+      "target_objective_gap": 3.552713678800501e-15,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 1.5774128249715165
+    },
+    {
+      "date": "2025-12-09",
+      "quarters": 96,
+      "active_constraints": 740,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 3.751113352437336
+    },
+    {
+      "date": "2025-12-10",
+      "quarters": 96,
+      "active_constraints": 768,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 1.4621026695353183
+    },
+    {
+      "date": "2025-12-11",
+      "quarters": 96,
+      "active_constraints": 768,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.0
+    },
+    {
+      "date": "2025-12-12",
+      "quarters": 96,
+      "active_constraints": 753,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 1.2271691849903983
+    },
+    {
+      "date": "2025-12-13",
+      "quarters": 96,
+      "active_constraints": 776,
+      "target_objective_gap": 1.4210854715202004e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 1.6653345369377348e-16,
+      "mean_abs_projection_from_exaa": 0.8858188662083935
+    },
+    {
+      "date": "2025-12-14",
+      "quarters": 96,
+      "active_constraints": 800,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 1.550898670471191
+    },
+    {
+      "date": "2025-12-15",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.26684756097412077
+    },
+    {
+      "date": "2025-12-16",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.09223038423665282
+    },
+    {
+      "date": "2025-12-17",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.7628743305664069
+    },
+    {
+      "date": "2025-12-18",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 4.804603286926267
+    },
+    {
+      "date": "2025-12-19",
+      "quarters": 96,
+      "active_constraints": 780,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 4.561248355081822
+    },
+    {
+      "date": "2025-12-20",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 1.6849597300821924
+    },
+    {
+      "date": "2025-12-21",
+      "quarters": 96,
+      "active_constraints": 740,
+      "target_objective_gap": -1.4210854715202004e-14,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.023195876288659947,
+      "mean_abs_projection_from_exaa": 1.9232044340324395
+    },
+    {
+      "date": "2025-12-22",
+      "quarters": 96,
+      "active_constraints": 768,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.0
+    },
+    {
+      "date": "2025-12-23",
+      "quarters": 96,
+      "active_constraints": 768,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.0
+    },
+    {
+      "date": "2025-12-24",
+      "quarters": 96,
+      "active_constraints": 902,
+      "target_objective_gap": 3.774758283725532e-15,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 6.587411414017718
+    },
+    {
+      "date": "2025-12-25",
+      "quarters": 96,
+      "active_constraints": 822,
+      "target_objective_gap": 1.4210854715202004e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 14.953306394161665
+    },
+    {
+      "date": "2025-12-26",
+      "quarters": 96,
+      "active_constraints": 800,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 4.546019990559894
+    },
+    {
+      "date": "2025-12-27",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 1.3420214454345702
+    },
+    {
+      "date": "2025-12-28",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.6881180331827791
+    },
+    {
+      "date": "2025-12-29",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 2.9605947323337506e-16
+    },
+    {
+      "date": "2025-12-30",
+      "quarters": 96,
+      "active_constraints": 776,
+      "target_objective_gap": -1.4210854715202004e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.1184210526315797,
+      "mean_abs_projection_from_exaa": 6.1429668891180675
+    },
+    {
+      "date": "2025-12-31",
+      "quarters": 96,
+      "active_constraints": 768,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.3067144429117838
+    },
+    {
+      "date": "2026-01-01",
+      "quarters": 96,
+      "active_constraints": 830,
+      "target_objective_gap": 1.687538997430238e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 17.894304416279304
+    },
+    {
+      "date": "2026-01-02",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 2.4868995751603507e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.161550656212922
+    },
+    {
+      "date": "2026-01-03",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 7.105427357601002e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 10.637986264462825
+    },
+    {
+      "date": "2026-01-04",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 6.043617728996132
+    },
+    {
+      "date": "2026-01-05",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 2.1316282072803006e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 15.245395051952883
+    },
+    {
+      "date": "2026-01-06",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.24457083191043102
+    },
+    {
+      "date": "2026-01-07",
+      "quarters": 96,
+      "active_constraints": 842,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.763764645209795
+    },
+    {
+      "date": "2026-01-08",
+      "quarters": 96,
+      "active_constraints": 758,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 34.25750137660106
+    },
+    {
+      "date": "2026-01-09",
+      "quarters": 96,
+      "active_constraints": 764,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 4.286938235925618
+    },
+    {
+      "date": "2026-01-10",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 2.628175887229483
+    },
+    {
+      "date": "2026-01-11",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 16.28061588685484
+    },
+    {
+      "date": "2026-01-12",
+      "quarters": 96,
+      "active_constraints": 744,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 23.10892258391536
+    },
+    {
+      "date": "2026-01-13",
+      "quarters": 96,
+      "active_constraints": 768,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 23.780758271338215
+    },
+    {
+      "date": "2026-01-14",
+      "quarters": 96,
+      "active_constraints": 772,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.407816450668074
+    },
+    {
+      "date": "2026-01-15",
+      "quarters": 96,
+      "active_constraints": 778,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 2.528758296726068
+    },
+    {
+      "date": "2026-01-16",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 1.292679791831139
+    },
+    {
+      "date": "2026-01-17",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 12.976318369693567
+    },
+    {
+      "date": "2026-01-18",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 7.736034230268989
+    },
+    {
+      "date": "2026-01-19",
+      "quarters": 96,
+      "active_constraints": 836,
+      "target_objective_gap": -1.4210854715202004e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 2.153285221931145
+    },
+    {
+      "date": "2026-01-20",
+      "quarters": 96,
+      "active_constraints": 755,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 7.105427357601002e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.330216779035046
+    },
+    {
+      "date": "2026-01-21",
+      "quarters": 96,
+      "active_constraints": 778,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 1.7708697932000528
+    },
+    {
+      "date": "2026-01-22",
+      "quarters": 96,
+      "active_constraints": 802,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 23.073509907628196
+    },
+    {
+      "date": "2026-01-23",
+      "quarters": 96,
+      "active_constraints": 724,
+      "target_objective_gap": -1.1368683772161603e-13,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 12.900260999949547
+    },
+    {
+      "date": "2026-01-24",
+      "quarters": 96,
+      "active_constraints": 763,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.20999999999999983,
+      "mean_abs_projection_from_exaa": 10.489439694409956
+    },
+    {
+      "date": "2026-01-25",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 6.922871264680933
+    },
+    {
+      "date": "2026-01-26",
+      "quarters": 96,
+      "active_constraints": 765,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.18765885141502775,
+      "mean_abs_projection_from_exaa": 7.803805091563994
+    },
+    {
+      "date": "2026-01-27",
+      "quarters": 96,
+      "active_constraints": 780,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 4.105767274077872
+    },
+    {
+      "date": "2026-01-28",
+      "quarters": 96,
+      "active_constraints": 752,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 7.474554544099263
+    },
+    {
+      "date": "2026-01-29",
+      "quarters": 96,
+      "active_constraints": 778,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.925823656838158
+    },
+    {
+      "date": "2026-01-30",
+      "quarters": 96,
+      "active_constraints": 778,
+      "target_objective_gap": -2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 9.118357636564598
+    },
+    {
+      "date": "2026-01-31",
+      "quarters": 96,
+      "active_constraints": 752,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.24451230484167077,
+      "mean_abs_projection_from_exaa": 3.2279452733060006
+    },
+    {
+      "date": "2026-02-01",
+      "quarters": 96,
+      "active_constraints": 812,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.004523195876288719,
+      "mean_abs_projection_from_exaa": 0.3433892608100371
+    },
+    {
+      "date": "2026-02-02",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.4388903522234173
+    },
+    {
+      "date": "2026-02-03",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 6.679919209445529
+    },
+    {
+      "date": "2026-02-04",
+      "quarters": 96,
+      "active_constraints": 780,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.206689048734148
+    },
+    {
+      "date": "2026-02-05",
+      "quarters": 96,
+      "active_constraints": 780,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.0836833029335695
+    },
+    {
+      "date": "2026-02-06",
+      "quarters": 96,
+      "active_constraints": 780,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 7.105427357601002e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 3.9758442865143215
+    },
+    {
+      "date": "2026-02-07",
+      "quarters": 96,
+      "active_constraints": 792,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 8.025869944099433
+    },
+    {
+      "date": "2026-02-08",
+      "quarters": 96,
+      "active_constraints": 850,
+      "target_objective_gap": 7.105427357601002e-15,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.020655339805824763,
+      "mean_abs_projection_from_exaa": 1.4518475147943246
+    },
+    {
+      "date": "2026-02-09",
+      "quarters": 96,
+      "active_constraints": 852,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.500571501033923
+    },
+    {
+      "date": "2026-02-10",
+      "quarters": 96,
+      "active_constraints": 776,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.007731958762886515,
+      "mean_abs_projection_from_exaa": 8.485850250770175
+    },
+    {
+      "date": "2026-02-11",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 6.772331366918344
+    },
+    {
+      "date": "2026-02-12",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 7.697719845596858
+    },
+    {
+      "date": "2026-02-13",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 2.518674395758209
+    },
+    {
+      "date": "2026-02-14",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.0
+    },
+    {
+      "date": "2026-02-15",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 3.7450023206794985
+    },
+    {
+      "date": "2026-02-16",
+      "quarters": 96,
+      "active_constraints": 840,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.07409972299168978,
+      "mean_abs_projection_from_exaa": 4.739396568102724
+    },
+    {
+      "date": "2026-02-17",
+      "quarters": 96,
+      "active_constraints": 756,
+      "target_objective_gap": -2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.06234114858497275,
+      "mean_abs_projection_from_exaa": 4.729630542275835
+    },
+    {
+      "date": "2026-02-18",
+      "quarters": 96,
+      "active_constraints": 778,
+      "target_objective_gap": 4.263256414560601e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 1.3916093563943328
+    },
+    {
+      "date": "2026-02-19",
+      "quarters": 96,
+      "active_constraints": 770,
+      "target_objective_gap": 1.4210854715202004e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 3.951947082021333
+    },
+    {
+      "date": "2026-02-20",
+      "quarters": 96,
+      "active_constraints": 792,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 6.223895353297425
+    },
+    {
+      "date": "2026-02-21",
+      "quarters": 96,
+      "active_constraints": 788,
+      "target_objective_gap": 8.526512829121202e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 9.445095743599849
+    },
+    {
+      "date": "2026-02-22",
+      "quarters": 96,
+      "active_constraints": 768,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.0
+    },
+    {
+      "date": "2026-02-23",
+      "quarters": 96,
+      "active_constraints": 900,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 6.665810688136053
+    },
+    {
+      "date": "2026-02-24",
+      "quarters": 96,
+      "active_constraints": 749,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.13494873918382483,
+      "mean_abs_projection_from_exaa": 13.074241346859587
+    },
+    {
+      "date": "2026-02-25",
+      "quarters": 96,
+      "active_constraints": 748,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 2.7747483413826326
+    },
+    {
+      "date": "2026-02-26",
+      "quarters": 96,
+      "active_constraints": 812,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.035463917525773984,
+      "mean_abs_projection_from_exaa": 8.100128674712877
+    },
+    {
+      "date": "2026-02-27",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 3.552713678800501e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 5.433057411595317
+    },
+    {
+      "date": "2026-02-28",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.49545812224621005
+    },
+    {
+      "date": "2026-03-01",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 2.694716079187273e-16
+    },
+    {
+      "date": "2026-03-02",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 7.105427357601002e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.0
+    },
+    {
+      "date": "2026-03-03",
+      "quarters": 96,
+      "active_constraints": 752,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 8.345223882797578
+    },
+    {
+      "date": "2026-03-04",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.0
+    },
+    {
+      "date": "2026-03-05",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 2.9632345804543108
+    },
+    {
+      "date": "2026-03-06",
+      "quarters": 96,
+      "active_constraints": 844,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.833834469249164
+    },
+    {
+      "date": "2026-03-07",
+      "quarters": 96,
+      "active_constraints": 879,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 5.089341072034423
+    },
+    {
+      "date": "2026-03-08",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.12829169332145085
+    },
+    {
+      "date": "2026-03-09",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.400971552577212
+    },
+    {
+      "date": "2026-03-10",
+      "quarters": 96,
+      "active_constraints": 761,
+      "target_objective_gap": -1.1368683772161603e-13,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 10.034637553146103
+    },
+    {
+      "date": "2026-03-11",
+      "quarters": 96,
+      "active_constraints": 782,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 24.20522761860579
+    },
+    {
+      "date": "2026-03-12",
+      "quarters": 96,
+      "active_constraints": 780,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 9.947598300641403e-14,
+      "max_plan_difference_mwh": 0.04123711340206204,
+      "mean_abs_projection_from_exaa": 14.995918109931942
+    },
+    {
+      "date": "2026-03-13",
+      "quarters": 96,
+      "active_constraints": 798,
+      "target_objective_gap": -1.1368683772161603e-13,
+      "max_stationarity_residual": 7.105427357601002e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 7.5415228616194625
+    },
+    {
+      "date": "2026-03-14",
+      "quarters": 96,
+      "active_constraints": 871,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 7.105427357601002e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 5.283437661499649
+    },
+    {
+      "date": "2026-03-15",
+      "quarters": 96,
+      "active_constraints": 798,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.2100000000000002,
+      "mean_abs_projection_from_exaa": 36.65248738286493
+    },
+    {
+      "date": "2026-03-16",
+      "quarters": 96,
+      "active_constraints": 779,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 10.971857844607845
+    },
+    {
+      "date": "2026-03-17",
+      "quarters": 96,
+      "active_constraints": 746,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 27.061081983830075
+    },
+    {
+      "date": "2026-03-18",
+      "quarters": 96,
+      "active_constraints": 746,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.10801126779754966,
+      "mean_abs_projection_from_exaa": 15.498004716323521
+    },
+    {
+      "date": "2026-03-19",
+      "quarters": 96,
+      "active_constraints": 718,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.19549790101950487,
+      "mean_abs_projection_from_exaa": 7.6544157093165195
+    },
+    {
+      "date": "2026-03-20",
+      "quarters": 96,
+      "active_constraints": 802,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.01206185567010294,
+      "mean_abs_projection_from_exaa": 0.0
+    },
+    {
+      "date": "2026-03-21",
+      "quarters": 96,
+      "active_constraints": 900,
+      "target_objective_gap": -1.4210854715202004e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 3.3861779566284333
+    },
+    {
+      "date": "2026-03-22",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 2.788388402732032
+    },
+    {
+      "date": "2026-03-23",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.0
+    },
+    {
+      "date": "2026-03-24",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 9.35728616520551
+    },
+    {
+      "date": "2026-03-25",
+      "quarters": 96,
+      "active_constraints": 852,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.12018448182311389,
+      "mean_abs_projection_from_exaa": 4.309611663274709
+    },
+    {
+      "date": "2026-03-26",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 4.718686896508539
+    },
+    {
+      "date": "2026-03-27",
+      "quarters": 96,
+      "active_constraints": 754,
+      "target_objective_gap": 1.4210854715202004e-14,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 1.1078451556978812
+    },
+    {
+      "date": "2026-03-28",
+      "quarters": 96,
+      "active_constraints": 818,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.032272812844579335,
+      "mean_abs_projection_from_exaa": 17.04060186451603
+    },
+    {
+      "date": "2026-03-29",
+      "quarters": 92,
+      "active_constraints": 812,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.1201080972875588,
+      "mean_abs_projection_from_exaa": 13.456996852709608
+    },
+    {
+      "date": "2026-03-30",
+      "quarters": 96,
+      "active_constraints": 765,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 17.933611932137726
+    },
+    {
+      "date": "2026-03-31",
+      "quarters": 96,
+      "active_constraints": 738,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.01395618556701042,
+      "mean_abs_projection_from_exaa": 6.284487993555281
+    },
+    {
+      "date": "2026-04-01",
+      "quarters": 96,
+      "active_constraints": 781,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 6.930047773465508
+    },
+    {
+      "date": "2026-04-02",
+      "quarters": 96,
+      "active_constraints": 729,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 4.39006582277876
+    },
+    {
+      "date": "2026-04-03",
+      "quarters": 96,
+      "active_constraints": 753,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 16.303588904931182
+    },
+    {
+      "date": "2026-04-04",
+      "quarters": 96,
+      "active_constraints": 770,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.046391752577322476,
+      "mean_abs_projection_from_exaa": 19.008185521879433
+    },
+    {
+      "date": "2026-04-05",
+      "quarters": 96,
+      "active_constraints": 834,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 32.25458558873564
+    },
+    {
+      "date": "2026-04-06",
+      "quarters": 96,
+      "active_constraints": 761,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.1316282072803006e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 37.354717013662984
+    },
+    {
+      "date": "2026-04-07",
+      "quarters": 96,
+      "active_constraints": 742,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 25.472061326313852
+    },
+    {
+      "date": "2026-04-08",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.0
+    },
+    {
+      "date": "2026-04-09",
+      "quarters": 96,
+      "active_constraints": 854,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 7.105427357601002e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 1.7427958770982943
+    },
+    {
+      "date": "2026-04-10",
+      "quarters": 96,
+      "active_constraints": 846,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 9.947598300641403e-14,
+      "max_plan_difference_mwh": 0.05825242718446633,
+      "mean_abs_projection_from_exaa": 23.118382058458348
+    },
+    {
+      "date": "2026-04-11",
+      "quarters": 96,
+      "active_constraints": 790,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.18628808864265914,
+      "mean_abs_projection_from_exaa": 5.9999577244722495
+    },
+    {
+      "date": "2026-04-12",
+      "quarters": 96,
+      "active_constraints": 792,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 17.746906855230183
+    },
+    {
+      "date": "2026-04-13",
+      "quarters": 96,
+      "active_constraints": 850,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.1298155181768861,
+      "mean_abs_projection_from_exaa": 19.2718435941982
+    },
+    {
+      "date": "2026-04-14",
+      "quarters": 96,
+      "active_constraints": 784,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 21.88618671465348
+    },
+    {
+      "date": "2026-04-15",
+      "quarters": 96,
+      "active_constraints": 747,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 2.7998932466672826
+    },
+    {
+      "date": "2026-04-16",
+      "quarters": 96,
+      "active_constraints": 736,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 3.444748159843734
+    },
+    {
+      "date": "2026-04-17",
+      "quarters": 96,
+      "active_constraints": 731,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 1.7114783460625027
+    },
+    {
+      "date": "2026-04-18",
+      "quarters": 96,
+      "active_constraints": 790,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 4.52863263418819
+    },
+    {
+      "date": "2026-04-19",
+      "quarters": 96,
+      "active_constraints": 748,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 2.2850227215988594
+    },
+    {
+      "date": "2026-04-20",
+      "quarters": 96,
+      "active_constraints": 787,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 4.703721138564557
+    },
+    {
+      "date": "2026-04-21",
+      "quarters": 96,
+      "active_constraints": 768,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 2.779441920232417
+    },
+    {
+      "date": "2026-04-22",
+      "quarters": 96,
+      "active_constraints": 754,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 0.3882999024664517
+    },
+    {
+      "date": "2026-04-23",
+      "quarters": 96,
+      "active_constraints": 768,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 2.4645384666650303
+    },
+    {
+      "date": "2026-04-24",
+      "quarters": 96,
+      "active_constraints": 768,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 7.105427357601002e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 0.686802522537835
+    },
+    {
+      "date": "2026-04-25",
+      "quarters": 96,
+      "active_constraints": 781,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 10.190480380747225
+    },
+    {
+      "date": "2026-04-26",
+      "quarters": 96,
+      "active_constraints": 786,
+      "target_objective_gap": 4.547473508864641e-13,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 15.412405268038569
+    },
+    {
+      "date": "2026-04-27",
+      "quarters": 96,
+      "active_constraints": 782,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.12981551817688633,
+      "mean_abs_projection_from_exaa": 18.822391523552454
+    },
+    {
+      "date": "2026-04-28",
+      "quarters": 96,
+      "active_constraints": 768,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.21918639517948393,
+      "mean_abs_projection_from_exaa": 14.828879618448033
+    },
+    {
+      "date": "2026-04-29",
+      "quarters": 96,
+      "active_constraints": 765,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 3.1163999281215116
+    },
+    {
+      "date": "2026-04-30",
+      "quarters": 96,
+      "active_constraints": 792,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 1.2939097597998208
+    },
+    {
+      "date": "2026-05-01",
+      "quarters": 96,
+      "active_constraints": 791,
+      "target_objective_gap": 2.2737367544323206e-13,
+      "max_stationarity_residual": 9.947598300641403e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 7.630697280285649
+    },
+    {
+      "date": "2026-05-02",
+      "quarters": 96,
+      "active_constraints": 836,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 12.19749944675569
+    },
+    {
+      "date": "2026-05-03",
+      "quarters": 96,
+      "active_constraints": 842,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 21.804180340719487
+    },
+    {
+      "date": "2026-05-04",
+      "quarters": 96,
+      "active_constraints": 785,
+      "target_objective_gap": -1.1368683772161603e-13,
+      "max_stationarity_residual": 7.105427357601002e-14,
+      "max_plan_difference_mwh": 0.18628808864266,
+      "mean_abs_projection_from_exaa": 19.37561030432926
+    },
+    {
+      "date": "2026-05-05",
+      "quarters": 96,
+      "active_constraints": 764,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 11.865638236028602
+    },
+    {
+      "date": "2026-05-06",
+      "quarters": 96,
+      "active_constraints": 728,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 20.0122009291325
+    },
+    {
+      "date": "2026-05-07",
+      "quarters": 96,
+      "active_constraints": 752,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 14.201859117934077
+    },
+    {
+      "date": "2026-05-08",
+      "quarters": 96,
+      "active_constraints": 776,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 4.339296848748008
+    },
+    {
+      "date": "2026-05-09",
+      "quarters": 96,
+      "active_constraints": 796,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.048485179475968
+    },
+    {
+      "date": "2026-05-10",
+      "quarters": 96,
+      "active_constraints": 836,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 2.309635580841462
+    },
+    {
+      "date": "2026-05-11",
+      "quarters": 96,
+      "active_constraints": 852,
+      "target_objective_gap": -2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.1298155181768861,
+      "mean_abs_projection_from_exaa": 20.546387176617802
+    },
+    {
+      "date": "2026-05-12",
+      "quarters": 96,
+      "active_constraints": 785,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.20876288659793776,
+      "mean_abs_projection_from_exaa": 7.802313981080829
+    },
+    {
+      "date": "2026-05-13",
+      "quarters": 96,
+      "active_constraints": 770,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 6.906952485698551
+    },
+    {
+      "date": "2026-05-14",
+      "quarters": 96,
+      "active_constraints": 769,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 9.085941701045313
+    },
+    {
+      "date": "2026-05-15",
+      "quarters": 96,
+      "active_constraints": 792,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.02216219979325018
+    },
+    {
+      "date": "2026-05-16",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 3.841153584132288
+    },
+    {
+      "date": "2026-05-17",
+      "quarters": 96,
+      "active_constraints": 852,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.15137966274910583,
+      "mean_abs_projection_from_exaa": 3.916994244692262
+    },
+    {
+      "date": "2026-05-18",
+      "quarters": 96,
+      "active_constraints": 850,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 15.041857250438909
+    },
+    {
+      "date": "2026-05-19",
+      "quarters": 96,
+      "active_constraints": 785,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.04123711340206229,
+      "mean_abs_projection_from_exaa": 6.18013991361295
+    },
+    {
+      "date": "2026-05-20",
+      "quarters": 96,
+      "active_constraints": 784,
+      "target_objective_gap": -1.4210854715202004e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.791954311994007
+    },
+    {
+      "date": "2026-05-21",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.12046499744506861,
+      "mean_abs_projection_from_exaa": 9.657547059183873
+    },
+    {
+      "date": "2026-05-22",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.132252719461448
+    },
+    {
+      "date": "2026-05-23",
+      "quarters": 96,
+      "active_constraints": 846,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.021844660194175296,
+      "mean_abs_projection_from_exaa": 1.120909097080758
+    },
+    {
+      "date": "2026-05-24",
+      "quarters": 96,
+      "active_constraints": 840,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 6.584839920870788
+    },
+    {
+      "date": "2026-05-25",
+      "quarters": 96,
+      "active_constraints": 852,
+      "target_objective_gap": -1.1368683772161603e-13,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.0012371134020618749,
+      "mean_abs_projection_from_exaa": 2.6809489610754587
+    },
+    {
+      "date": "2026-05-26",
+      "quarters": 96,
+      "active_constraints": 852,
+      "target_objective_gap": -1.1368683772161603e-13,
+      "max_stationarity_residual": 9.947598300641403e-14,
+      "max_plan_difference_mwh": 0.1298155181768861,
+      "mean_abs_projection_from_exaa": 0.4215552807884466
+    },
+    {
+      "date": "2026-05-27",
+      "quarters": 96,
+      "active_constraints": 834,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 3.103553349088306
+    },
+    {
+      "date": "2026-05-28",
+      "quarters": 96,
+      "active_constraints": 790,
+      "target_objective_gap": -1.1368683772161603e-13,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.119866670495793
+    },
+    {
+      "date": "2026-05-29",
+      "quarters": 96,
+      "active_constraints": 793,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.2858230687081775
+    },
+    {
+      "date": "2026-05-30",
+      "quarters": 96,
+      "active_constraints": 840,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 11.856918070908124
+    },
+    {
+      "date": "2026-05-31",
+      "quarters": 96,
+      "active_constraints": 842,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 9.624775661652345
+    },
+    {
+      "date": "2026-06-01",
+      "quarters": 96,
+      "active_constraints": 795,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 20.051411559093058
+    },
+    {
+      "date": "2026-06-02",
+      "quarters": 96,
+      "active_constraints": 842,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 6.709281018932516
+    },
+    {
+      "date": "2026-06-03",
+      "quarters": 96,
+      "active_constraints": 842,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 10.644452249238961
+    },
+    {
+      "date": "2026-06-04",
+      "quarters": 96,
+      "active_constraints": 832,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 7.105427357601002e-14,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 4.914192718547776
+    },
+    {
+      "date": "2026-06-05",
+      "quarters": 96,
+      "active_constraints": 786,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 1.2789769243681803e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 14.407299676202344
+    },
+    {
+      "date": "2026-06-06",
+      "quarters": 96,
+      "active_constraints": 832,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.395968001860696
+    },
+    {
+      "date": "2026-06-07",
+      "quarters": 96,
+      "active_constraints": 732,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 15.097149133156625
+    },
+    {
+      "date": "2026-06-08",
+      "quarters": 96,
+      "active_constraints": 776,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 9.789576554489344
+    },
+    {
+      "date": "2026-06-09",
+      "quarters": 96,
+      "active_constraints": 832,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.13157894736842077,
+      "mean_abs_projection_from_exaa": 5.030175923824043
+    },
+    {
+      "date": "2026-06-10",
+      "quarters": 96,
+      "active_constraints": 762,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.03999999999999986,
+      "mean_abs_projection_from_exaa": 2.4956833743619735
+    },
+    {
+      "date": "2026-06-11",
+      "quarters": 96,
+      "active_constraints": 781,
+      "target_objective_gap": 7.105427357601002e-15,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.17289935364727346,
+      "mean_abs_projection_from_exaa": 29.328577823595555
+    },
+    {
+      "date": "2026-06-12",
+      "quarters": 96,
+      "active_constraints": 788,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.971542005668589
+    },
+    {
+      "date": "2026-06-13",
+      "quarters": 96,
+      "active_constraints": 852,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 7.738245456437774
+    },
+    {
+      "date": "2026-06-14",
+      "quarters": 96,
+      "active_constraints": 762,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 2.842170943040401e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.717569503150756
+    },
+    {
+      "date": "2026-06-15",
+      "quarters": 96,
+      "active_constraints": 842,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 7.105427357601002e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 7.329362517339372
+    },
+    {
+      "date": "2026-06-16",
+      "quarters": 96,
+      "active_constraints": 850,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 12.86838585660076
+    },
+    {
+      "date": "2026-06-17",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 15.182934366963854
+    },
+    {
+      "date": "2026-06-18",
+      "quarters": 96,
+      "active_constraints": 834,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 1.9895196601282805e-13,
+      "max_plan_difference_mwh": 0.11701584057230396,
+      "mean_abs_projection_from_exaa": 13.177979056622988
+    },
+    {
+      "date": "2026-06-19",
+      "quarters": 96,
+      "active_constraints": 782,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 3.4229857785120346
+    },
+    {
+      "date": "2026-06-20",
+      "quarters": 96,
+      "active_constraints": 836,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.029248675282831
+    },
+    {
+      "date": "2026-06-21",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 7.892090269487023
+    },
+    {
+      "date": "2026-06-22",
+      "quarters": 96,
+      "active_constraints": 850,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.02123711340206191,
+      "mean_abs_projection_from_exaa": 5.956219561471887
+    },
+    {
+      "date": "2026-06-23",
+      "quarters": 96,
+      "active_constraints": 840,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 23.049605768724792
+    },
+    {
+      "date": "2026-06-24",
+      "quarters": 96,
+      "active_constraints": 763,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 19.937585020865168
+    },
+    {
+      "date": "2026-06-25",
+      "quarters": 96,
+      "active_constraints": 850,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 2.1199800458785107
+    },
+    {
+      "date": "2026-06-26",
+      "quarters": 96,
+      "active_constraints": 844,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.021237113402065338,
+      "mean_abs_projection_from_exaa": 5.9707002154604885
+    },
+    {
+      "date": "2026-06-27",
+      "quarters": 96,
+      "active_constraints": 842,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 1.7053025658242404e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 6.7945719910096996
+    },
+    {
+      "date": "2026-06-28",
+      "quarters": 96,
+      "active_constraints": 842,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.005464128241733396,
+      "mean_abs_projection_from_exaa": 5.863106251550335
+    },
+    {
+      "date": "2026-06-29",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 18.536284625846825
+    },
+    {
+      "date": "2026-06-30",
+      "quarters": 96,
+      "active_constraints": 852,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 15.070573840030036
+    },
+    {
+      "date": "2026-07-01",
+      "quarters": 96,
+      "active_constraints": 772,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 16.16493528322235
+    },
+    {
+      "date": "2026-07-02",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.2027184466019418,
+      "mean_abs_projection_from_exaa": 24.900900856919844
+    },
+    {
+      "date": "2026-07-03",
+      "quarters": 96,
+      "active_constraints": 850,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 11.946629307311184
+    },
+    {
+      "date": "2026-07-04",
+      "quarters": 96,
+      "active_constraints": 820,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.400420833626683
+    },
+    {
+      "date": "2026-07-05",
+      "quarters": 96,
+      "active_constraints": 786,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 4.263256414560601e-14,
+      "max_plan_difference_mwh": 0.04368932038834927,
+      "mean_abs_projection_from_exaa": 4.787195319122841
+    },
+    {
+      "date": "2026-07-06",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 1.4210854715202004e-13,
+      "max_plan_difference_mwh": 0.10472056429734108,
+      "mean_abs_projection_from_exaa": 8.584327883407243
+    },
+    {
+      "date": "2026-07-07",
+      "quarters": 96,
+      "active_constraints": 842,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 7.069703053088619
+    },
+    {
+      "date": "2026-07-08",
+      "quarters": 96,
+      "active_constraints": 830,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.009760464299942
+    },
+    {
+      "date": "2026-07-09",
+      "quarters": 96,
+      "active_constraints": 768,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 3.2474531746797872
+    },
+    {
+      "date": "2026-07-10",
+      "quarters": 96,
+      "active_constraints": 736,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.007281553398058249,
+      "mean_abs_projection_from_exaa": 4.084647284110885
+    },
+    {
+      "date": "2026-07-11",
+      "quarters": 96,
+      "active_constraints": 740,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0992613111726712,
+      "mean_abs_projection_from_exaa": 5.588863547469856
+    },
+    {
+      "date": "2026-07-12",
+      "quarters": 96,
+      "active_constraints": 770,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 3.5277480886478787
+    },
+    {
+      "date": "2026-07-13",
+      "quarters": 96,
+      "active_constraints": 850,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.029094523098793
+    },
+    {
+      "date": "2026-07-14",
+      "quarters": 96,
+      "active_constraints": 832,
+      "target_objective_gap": -2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.076714274148953
+    },
+    {
+      "date": "2026-07-15",
+      "quarters": 96,
+      "active_constraints": 767,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.844748334138442
+    },
+    {
+      "date": "2026-07-16",
+      "quarters": 96,
+      "active_constraints": 842,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 4.489450974338389
+    },
+    {
+      "date": "2026-07-17",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 0.4925965228937148
+    },
+    {
+      "date": "2026-07-18",
+      "quarters": 96,
+      "active_constraints": 846,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.18556701030927733,
+      "mean_abs_projection_from_exaa": 19.155598415484814
+    },
+    {
+      "date": "2026-07-19",
+      "quarters": 96,
+      "active_constraints": 825,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.4210854715202004e-13,
+      "max_plan_difference_mwh": 0.22968829841594138,
+      "mean_abs_projection_from_exaa": 2.72671164666971
+    },
+    {
+      "date": "2026-07-20",
+      "quarters": 96,
+      "active_constraints": 844,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 3.578441316146197
+    },
+    {
+      "date": "2026-07-21",
+      "quarters": 96,
+      "active_constraints": 829,
+      "target_objective_gap": -2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.874737780831635
+    },
+    {
+      "date": "2026-07-22",
+      "quarters": 96,
+      "active_constraints": 751,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 4.839238214170006
+    },
+    {
+      "date": "2026-07-23",
+      "quarters": 96,
+      "active_constraints": 746,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 6.114807277066537
+    },
+    {
+      "date": "2026-07-24",
+      "quarters": 96,
+      "active_constraints": 754,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 4.9745557885773595
+    },
+    {
+      "date": "2026-07-25",
+      "quarters": 96,
+      "active_constraints": 846,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 1.9429792422950782
+    },
+    {
+      "date": "2026-07-26",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.563506191871624
+    },
+    {
+      "date": "2026-07-27",
+      "quarters": 96,
+      "active_constraints": 850,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 15.11221157368171
+    },
+    {
+      "date": "2026-07-28",
+      "quarters": 96,
+      "active_constraints": 829,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 4.817694292929747
+    },
+    {
+      "date": "2026-07-29",
+      "quarters": 96,
+      "active_constraints": 772,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 2.0576639840042117
+    },
+    {
+      "date": "2026-07-30",
+      "quarters": 96,
+      "active_constraints": 842,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 3.3871059955256047
+    },
+    {
+      "date": "2026-07-31",
+      "quarters": 96,
+      "active_constraints": 796,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 6.605247675678721
+    },
+    {
+      "date": "2026-08-01",
+      "quarters": 96,
+      "active_constraints": 846,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.4210854715202004e-13,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 7.685524791655278
+    },
+    {
+      "date": "2026-08-02",
+      "quarters": 96,
+      "active_constraints": 846,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 1.9134782466932119
+    },
+    {
+      "date": "2026-08-03",
+      "quarters": 96,
+      "active_constraints": 852,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 7.370938404854428
+    },
+    {
+      "date": "2026-08-04",
+      "quarters": 96,
+      "active_constraints": 846,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 5.1941326055184485
+    },
+    {
+      "date": "2026-08-05",
+      "quarters": 96,
+      "active_constraints": 846,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.465194978134328
+    },
+    {
+      "date": "2026-08-06",
+      "quarters": 96,
+      "active_constraints": 846,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 13.365863651554145
+    },
+    {
+      "date": "2026-08-07",
+      "quarters": 96,
+      "active_constraints": 824,
+      "target_objective_gap": -1.4210854715202004e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.1783992134753
+    },
+    {
+      "date": "2026-08-08",
+      "quarters": 96,
+      "active_constraints": 846,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.10245273377618805,
+      "mean_abs_projection_from_exaa": 7.376188703612063
+    },
+    {
+      "date": "2026-08-09",
+      "quarters": 96,
+      "active_constraints": 822,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.06583653820294245,
+      "mean_abs_projection_from_exaa": 5.105302581930057
+    },
+    {
+      "date": "2026-08-10",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 9.9134004662833
+    },
+    {
+      "date": "2026-08-11",
+      "quarters": 96,
+      "active_constraints": 828,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 1.3904499213826613
+    },
+    {
+      "date": "2026-08-12",
+      "quarters": 96,
+      "active_constraints": 767,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.20271844660194205,
+      "mean_abs_projection_from_exaa": 3.339135971538712
+    },
+    {
+      "date": "2026-08-13",
+      "quarters": 96,
+      "active_constraints": 846,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.28999743298032
+    },
+    {
+      "date": "2026-08-14",
+      "quarters": 96,
+      "active_constraints": 795,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.20271844660194246,
+      "mean_abs_projection_from_exaa": 3.4241184390529895
+    },
+    {
+      "date": "2026-08-15",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 2.902184960476903
+    },
+    {
+      "date": "2026-08-16",
+      "quarters": 96,
+      "active_constraints": 846,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 19.841936620144633
+    },
+    {
+      "date": "2026-08-17",
+      "quarters": 96,
+      "active_constraints": 795,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 19.14260580684409
+    },
+    {
+      "date": "2026-08-18",
+      "quarters": 96,
+      "active_constraints": 770,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 12.712426383216657
+    },
+    {
+      "date": "2026-08-19",
+      "quarters": 96,
+      "active_constraints": 822,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 10.441106452165164
+    },
+    {
+      "date": "2026-08-20",
+      "quarters": 96,
+      "active_constraints": 728,
+      "target_objective_gap": -2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 3.834579343313347
+    },
+    {
+      "date": "2026-08-21",
+      "quarters": 96,
+      "active_constraints": 748,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.45533956943776
+    },
+    {
+      "date": "2026-08-22",
+      "quarters": 96,
+      "active_constraints": 760,
+      "target_objective_gap": -3.552713678800501e-15,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 30.48108051596301
+    },
+    {
+      "date": "2026-08-23",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 12.603757990389084
+    },
+    {
+      "date": "2026-08-24",
+      "quarters": 96,
+      "active_constraints": 746,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.20271844660194144,
+      "mean_abs_projection_from_exaa": 3.7990309975036465
+    },
+    {
+      "date": "2026-08-25",
+      "quarters": 96,
+      "active_constraints": 844,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 11.110312550938481
+    },
+    {
+      "date": "2026-08-26",
+      "quarters": 96,
+      "active_constraints": 756,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 2.1261987098538513
+    },
+    {
+      "date": "2026-08-27",
+      "quarters": 96,
+      "active_constraints": 838,
+      "target_objective_gap": 7.105427357601002e-15,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.2027184466019415,
+      "mean_abs_projection_from_exaa": 7.980546635622059
+    },
+    {
+      "date": "2026-08-28",
+      "quarters": 96,
+      "active_constraints": 798,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 7.105427357601002e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 6.934240068919671
+    },
+    {
+      "date": "2026-08-29",
+      "quarters": 96,
+      "active_constraints": 764,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 4.972197990897136
+    },
+    {
+      "date": "2026-08-30",
+      "quarters": 96,
+      "active_constraints": 764,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.76241288948602
+    },
+    {
+      "date": "2026-08-31",
+      "quarters": 96,
+      "active_constraints": 848,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 10.092200793766231
+    },
+    {
+      "date": "2026-09-01",
+      "quarters": 96,
+      "active_constraints": 844,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.420795547814448
+    },
+    {
+      "date": "2026-09-02",
+      "quarters": 96,
+      "active_constraints": 740,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.16853418307316803,
+      "mean_abs_projection_from_exaa": 10.655075099625101
+    },
+    {
+      "date": "2026-09-03",
+      "quarters": 96,
+      "active_constraints": 750,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 4.609777514637147
+    },
+    {
+      "date": "2026-09-04",
+      "quarters": 96,
+      "active_constraints": 764,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.24271844660194175,
+      "mean_abs_projection_from_exaa": 8.017313333681601
+    },
+    {
+      "date": "2026-09-05",
+      "quarters": 96,
+      "active_constraints": 836,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 1.7053025658242404e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 15.198565741754903
+    },
+    {
+      "date": "2026-09-06",
+      "quarters": 96,
+      "active_constraints": 748,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 10.021260721212775
+    },
+    {
+      "date": "2026-09-07",
+      "quarters": 96,
+      "active_constraints": 741,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 7.756198888888779
+    },
+    {
+      "date": "2026-09-08",
+      "quarters": 96,
+      "active_constraints": 741,
+      "target_objective_gap": -5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.029126213592232233,
+      "mean_abs_projection_from_exaa": 9.093834697505779
+    },
+    {
+      "date": "2026-09-09",
+      "quarters": 96,
+      "active_constraints": 846,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 14.233696460088877
+    },
+    {
+      "date": "2026-09-10",
+      "quarters": 96,
+      "active_constraints": 832,
+      "target_objective_gap": 2.2737367544323206e-13,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 4.308015642184876
+    },
+    {
+      "date": "2026-09-11",
+      "quarters": 96,
+      "active_constraints": 787,
+      "target_objective_gap": 5.684341886080802e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.013298969072165552,
+      "mean_abs_projection_from_exaa": 0.39585172930067297
+    },
+    {
+      "date": "2026-09-12",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 24.2890625540248
+    },
+    {
+      "date": "2026-09-13",
+      "quarters": 96,
+      "active_constraints": 960,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 1.4692664434595855
+    },
+    {
+      "date": "2026-09-14",
+      "quarters": 96,
+      "active_constraints": 786,
+      "target_objective_gap": -1.1368683772161603e-13,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 13.274693799643819
+    },
+    {
+      "date": "2026-09-15",
+      "quarters": 96,
+      "active_constraints": 740,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.0,
+      "mean_abs_projection_from_exaa": 19.91861962444443
+    },
+    {
+      "date": "2026-09-16",
+      "quarters": 96,
+      "active_constraints": 846,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.4210854715202004e-13,
+      "max_plan_difference_mwh": 0.008913285114497793,
+      "mean_abs_projection_from_exaa": 1.6476025283053657
+    },
+    {
+      "date": "2026-09-17",
+      "quarters": 96,
+      "active_constraints": 760,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 6.792887468749463
+    },
+    {
+      "date": "2026-09-18",
+      "quarters": 96,
+      "active_constraints": 776,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 6.376005403341833
+    },
+    {
+      "date": "2026-09-19",
+      "quarters": 96,
+      "active_constraints": 829,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.17289935364727346,
+      "mean_abs_projection_from_exaa": 9.19599593147617
+    },
+    {
+      "date": "2026-09-20",
+      "quarters": 96,
+      "active_constraints": 744,
+      "target_objective_gap": -2.2737367544323206e-13,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 3.6736152569182834
+    },
+    {
+      "date": "2026-09-21",
+      "quarters": 96,
+      "active_constraints": 752,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 11.061051255351396
+    },
+    {
+      "date": "2026-09-22",
+      "quarters": 96,
+      "active_constraints": 749,
+      "target_objective_gap": -1.1368683772161603e-13,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 19.00687899774684
+    },
+    {
+      "date": "2026-09-23",
+      "quarters": 96,
+      "active_constraints": 738,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.862219324374047
+    },
+    {
+      "date": "2026-09-24",
+      "quarters": 96,
+      "active_constraints": 745,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.15472061974890947,
+      "mean_abs_projection_from_exaa": 17.043623214265015
+    },
+    {
+      "date": "2026-09-25",
+      "quarters": 96,
+      "active_constraints": 795,
+      "target_objective_gap": 2.842170943040401e-14,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.006361195990518501,
+      "mean_abs_projection_from_exaa": 2.6065586260557456
+    },
+    {
+      "date": "2026-09-26",
+      "quarters": 96,
+      "active_constraints": 842,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 5.684341886080802e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 10.240662402410972
+    },
+    {
+      "date": "2026-09-27",
+      "quarters": 96,
+      "active_constraints": 844,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.02501330144498415,
+      "mean_abs_projection_from_exaa": 21.561875177428742
+    },
+    {
+      "date": "2026-09-28",
+      "quarters": 96,
+      "active_constraints": 806,
+      "target_objective_gap": 1.1368683772161603e-13,
+      "max_stationarity_residual": 8.526512829121202e-14,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 9.029211194621487
+    },
+    {
+      "date": "2026-09-29",
+      "quarters": 96,
+      "active_constraints": 773,
+      "target_objective_gap": 0.0,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 5.8870402250314315
+    },
+    {
+      "date": "2026-09-30",
+      "quarters": 96,
+      "active_constraints": 746,
+      "target_objective_gap": -1.1368683772161603e-13,
+      "max_stationarity_residual": 1.1368683772161603e-13,
+      "max_plan_difference_mwh": 0.25,
+      "mean_abs_projection_from_exaa": 8.953015013628598
+    }
+  ]
+}

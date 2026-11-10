@@ -1,0 +1,150 @@
+{
+  "model_config": {
+    "context_channels": 13,
+    "expert_count": 4,
+    "d_model": 96,
+    "n_heads": 4,
+    "n_layers": 2,
+    "dropout": 0.1,
+    "residual_bound": 2.0
+  },
+  "selected_epoch": 8,
+  "selection_score": -8.0,
+  "source_validation": {},
+  "ercot_holdout": {},
+  "seed": 20261109,
+  "training_markets": [
+    "CAISO",
+    "NYISO",
+    "PJM",
+    "ERCOT"
+  ],
+  "holdout_market": null,
+  "final_all_markets_refit": true,
+  "uses_exaa": false,
+  "uses_external_model_predictions": false,
+  "uses_austria_labels": false,
+  "domain_generalization": false,
+  "domain_generalization_config": {
+    "rex_weight": 0.75,
+    "domain_weight": 0.2,
+    "domain_strength": 0.5,
+    "groupdro_eta": 0.1,
+    "final_group_weights": [
+      0.25,
+      0.25,
+      0.25,
+      0.25
+    ]
+  },
+  "history": [
+    {
+      "epoch": 0,
+      "train_loss": 1.9976020361247815,
+      "selection_score": -0.0,
+      "validation": {},
+      "group_weights": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    {
+      "epoch": 1,
+      "train_loss": 1.9057388054697137,
+      "selection_score": -1.0,
+      "validation": {},
+      "group_weights": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    {
+      "epoch": 2,
+      "train_loss": 1.8753689025577747,
+      "selection_score": -2.0,
+      "validation": {},
+      "group_weights": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    {
+      "epoch": 3,
+      "train_loss": 1.8443822358783923,
+      "selection_score": -3.0,
+      "validation": {},
+      "group_weights": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    {
+      "epoch": 4,
+      "train_loss": 1.8295838330921375,
+      "selection_score": -4.0,
+      "validation": {},
+      "group_weights": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    {
+      "epoch": 5,
+      "train_loss": 1.8279211960340802,
+      "selection_score": -5.0,
+      "validation": {},
+      "group_weights": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    {
+      "epoch": 6,
+      "train_loss": 1.8023351054442556,
+      "selection_score": -6.0,
+      "validation": {},
+      "group_weights": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    {
+      "epoch": 7,
+      "train_loss": 1.7823669910430908,
+      "selection_score": -7.0,
+      "validation": {},
+      "group_weights": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    {
+      "epoch": 8,
+      "train_loss": 1.7669000813835545,
+      "selection_score": -8.0,
+      "validation": {},
+      "group_weights": [
+        0.25,
+        0.25,
+        0.25,
+        0.25
+      ]
+    }
+  ]
+}

@@ -52,6 +52,9 @@ from scripts.decision_aware.summarize_austria_da_day_groups import (  # noqa: E4
 
 
 QUARTER_DA_CANDIDATES = {
+    "timesfm3_mainu11_proxy6_exaa": (
+        "data/results/austria_timesfm3_mainu11_exaa_v1/predictions.npz"
+    ),
     "timesfm3_mainu11_proxy6": (
         "data/results/austria_timesfm3_mainu11_proxy_v1/predictions.npz"
     ),
@@ -71,6 +74,7 @@ DAILY_DA_CANDIDATES = {
     ),
 }
 STRICT_EXTERNAL_STATUS = {
+    "timesfm3_mainu11_proxy6_exaa": True,
     "decision_aware_v4_final_2to1_blend": True,
     "three_feature_tail_expert_router_da_only": True,
     "timesfm3_mainu11_proxy6": True,
@@ -87,12 +91,18 @@ def load_quarter_da(
     with np.load(path, allow_pickle=False) as archive:
         timestamps = archive["timestamp_unix_seconds"].astype(np.int64)
         prediction = archive["prediction_eur_per_mwh"].astype(np.float64)
-        cached_truth = archive["truth_eur_per_mwh"].astype(np.float64)
+        cached_truth = (
+            archive["truth_eur_per_mwh"].astype(np.float64)
+            if "truth_eur_per_mwh" in archive.files
+            else None
+        )
     expected = np.asarray([int(item.timestamp()) for item in evaluation_index], dtype=np.int64)
     if not np.array_equal(timestamps, expected):
         raise ValueError(f"候选DA时间轴不一致: {path}")
-    if prediction.shape != truth.shape or not np.allclose(cached_truth, truth, atol=1e-5):
+    if prediction.shape != truth.shape:
         raise ValueError(f"候选DA真值或预测形状不一致: {path}")
+    if cached_truth is not None and not np.allclose(cached_truth, truth, atol=1e-5):
+        raise ValueError(f"候选DA缓存真值不一致: {path}")
     return prediction
 
 

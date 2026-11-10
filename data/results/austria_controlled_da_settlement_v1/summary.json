@@ -31,27 +31,34 @@
     },
     {
       "rank": 2,
+      "system": "timesfm3_mainu11_proxy6_exaa",
+      "da_mae_eur_per_mwh": 5.543668233292173,
+      "mean_daily_net_revenue_eur": 7.702651004224705,
+      "delta_revenue_vs_v4_eur_per_day": -76.80660540023675
+    },
+    {
+      "rank": 3,
       "system": "timesfm3_mainu11_proxy6",
       "da_mae_eur_per_mwh": 18.840952295292674,
       "mean_daily_net_revenue_eur": -22.06684460193948,
       "delta_revenue_vs_v4_eur_per_day": -106.57610100640093
     },
     {
-      "rank": 3,
+      "rank": 4,
       "system": "three_feature_tail_expert_router_da_only",
       "da_mae_eur_per_mwh": 27.18669249357772,
       "mean_daily_net_revenue_eur": -45.75868245474462,
       "delta_revenue_vs_v4_eur_per_day": -130.26793885920608
     },
     {
-      "rank": 4,
+      "rank": 5,
       "system": "chronos2_fat_proxy14plus3",
       "da_mae_eur_per_mwh": 18.802962045491014,
       "mean_daily_net_revenue_eur": -79.4556020315229,
       "delta_revenue_vs_v4_eur_per_day": -163.96485843598435
     },
     {
-      "rank": 5,
+      "rank": 6,
       "system": "d1_persist",
       "da_mae_eur_per_mwh": 26.08114210741922,
       "mean_daily_net_revenue_eur": -116.45930806606627,
@@ -132,6 +139,43 @@
         }
       },
       "delta_revenue_vs_v4_eur_per_day": -130.26793885920608
+    },
+    "timesfm3_mainu11_proxy6_exaa": {
+      "strict_external_zero_shot": true,
+      "da_mae_eur_per_mwh": 5.543668233292173,
+      "settlement": {
+        "days": 365,
+        "mean_daily_net_revenue_eur": 7.702651004224705,
+        "median_daily_net_revenue_eur": 84.6816763482299,
+        "p10_daily_net_revenue_eur": -406.4205718641669,
+        "positive_day_rate": 0.7616438356164383,
+        "mean_daily_throughput_mwh": 5.975350086562784,
+        "soc_violation_count": 0,
+        "final_soc_mwh": 2.06842105263158
+      },
+      "by_day_group": {
+        "all": {
+          "days": 365,
+          "mean_net_revenue_eur_per_day": 7.702651004224705,
+          "positive_day_rate": 0.7616438356164383
+        },
+        "neg": {
+          "days": 63,
+          "mean_net_revenue_eur_per_day": 221.81539313328588,
+          "positive_day_rate": 0.746031746031746
+        },
+        "spike": {
+          "days": 112,
+          "mean_net_revenue_eur_per_day": -198.31164580812805,
+          "positive_day_rate": 0.6875
+        },
+        "ordinary": {
+          "days": 190,
+          "mean_net_revenue_eur_per_day": 58.14737989292288,
+          "positive_day_rate": 0.8105263157894737
+        }
+      },
+      "delta_revenue_vs_v4_eur_per_day": -76.80660540023675
     },
     "timesfm3_mainu11_proxy6": {
       "strict_external_zero_shot": true,
@@ -266,5 +310,5 @@
       "interpretation": "same field; differences are explained by two-decimal rounding"
     }
   },
-  "runtime_seconds": 7.745070699980715
+  "runtime_seconds": 7.562167899995984
 }
